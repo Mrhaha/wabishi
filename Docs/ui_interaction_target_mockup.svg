@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .font { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .ink { fill: #2b2117; font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .muted { fill: #7b6b55; font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .tealText { fill: #0d6e6a; font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .goldText { fill: #cf961f; font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .paper { fill: #fff6e7; stroke: #79654a; stroke-width: 3; }
+      .softPaper { fill: #f4dfb6; stroke: #9d8561; stroke-width: 2; }
+      .palePaper { fill: #fffaf0; stroke: #d4bd91; stroke-width: 2; }
+      .table { fill: #1f7b75; stroke: #59452f; stroke-width: 4; }
+      .tableInset { fill: #2e9389; opacity: .34; }
+      .dash { fill: none; stroke: #b99663; stroke-width: 2; stroke-dasharray: 10 8; }
+      .shadow { fill: #2a2118; opacity: .12; }
+      .h1 { font-size: 44px; font-weight: 800; }
+      .h2 { font-size: 34px; font-weight: 800; }
+      .h3 { font-size: 28px; font-weight: 800; }
+      .body { font-size: 26px; }
+      .small { font-size: 22px; }
+      .tiny { font-size: 18px; }
+      .num { font-size: 78px; font-weight: 900; }
+      .buttonText { font-size: 40px; font-weight: 900; font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+    </style>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#2a2118" flood-opacity=".18"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#f2e2bf"/>
+  <rect width="1920" height="1080" fill="#fff8ea" opacity=".55"/>
+  <circle cx="1720" cy="980" r="260" fill="#d8b66e" opacity=".12"/>
+  <circle cx="150" cy="180" r="210" fill="#63aaa2" opacity=".08"/>
+
+  <!-- Header HUD: stable information only -->
+  <rect x="280" y="24" width="1440" height="104" rx="14" class="paper" filter="url(#softShadow)"/>
+  <text x="330" y="68" class="ink h3">骰子王</text>
+  <text x="330" y="104" class="muted body">1-2 账房抽查</text>
+  <line x1="660" y1="24" x2="660" y2="128" stroke="#8b7352" stroke-width="2"/>
+  <text x="710" y="68" class="muted small">金币</text>
+  <text x="710" y="108" class="ink h2">25</text>
+  <text x="900" y="68" class="muted small">账本</text>
+  <text x="900" y="108" class="goldText h2">+1</text>
+  <text x="1090" y="68" class="muted small">出手</text>
+  <text x="1090" y="108" class="ink h2">2 / 3</text>
+  <text x="1290" y="68" class="muted small">出千</text>
+  <text x="1290" y="108" class="ink h2">1 / 1</text>
+  <text x="1510" y="68" class="muted small">阶段</text>
+  <text x="1510" y="108" class="tealText h2">结果决策</text>
+
+  <!-- Left collapsed build summary -->
+  <rect x="48" y="152" width="222" height="760" rx="16" class="paper" filter="url(#softShadow)"/>
+  <text x="78" y="210" class="ink h2">骰袋摘要</text>
+  <text x="78" y="252" class="muted body">6 / 6 上场</text>
+  <rect x="78" y="292" width="150" height="44" rx="10" class="softPaper"/>
+  <text x="104" y="323" class="ink small" font-weight="800">偶数路线</text>
+  <rect x="78" y="352" width="150" height="44" rx="10" class="softPaper"/>
+  <text x="104" y="383" class="ink small" font-weight="800">成长 x1</text>
+  <rect x="78" y="412" width="150" height="44" rx="10" class="softPaper"/>
+  <text x="104" y="443" class="ink small" font-weight="800">锁定 x1</text>
+  <line x1="78" y1="500" x2="228" y2="500" stroke="#c9ad7a" stroke-width="2"/>
+  <text x="78" y="546" class="muted small">详情不常驻</text>
+  <text x="78" y="580" class="muted small">市场/出千展开</text>
+  <rect x="78" y="642" width="150" height="128" rx="10" class="dash"/>
+  <text x="104" y="696" class="muted small">关键提醒</text>
+  <text x="104" y="736" class="goldText body">大树成长 2</text>
+
+  <!-- Center play focus -->
+  <rect x="300" y="152" width="1130" height="760" rx="18" class="table" filter="url(#softShadow)"/>
+  <text x="760" y="214" fill="#fff6e7" font-size="42" font-weight="900" class="font">主投掷区</text>
+  <rect x="352" y="240" width="1026" height="300" rx="22" class="tableInset"/>
+  <text x="385" y="282" fill="#d9eee8" font-size="22" class="font">骰子按有效点数排序，类型效果在骰子上局部反馈</text>
+
+  <!-- Dice row -->
+  <g transform="translate(402 320)">
+    <ellipse cx="59" cy="134" rx="64" ry="12" fill="#123d39" opacity=".22"/>
+    <rect width="118" height="118" rx="15" fill="#fffaf0" stroke="#4d3827" stroke-width="4"/>
+    <circle cx="59" cy="59" r="12" fill="#2b2117"/>
+    <rect x="12" y="12" width="46" height="24" rx="8" fill="#d9c29a"/>
+    <text x="20" y="30" class="ink tiny" font-weight="800">基</text>
+  </g>
+  <g transform="translate(560 320)">
+    <ellipse cx="59" cy="134" rx="64" ry="12" fill="#123d39" opacity=".22"/>
+    <rect width="118" height="118" rx="15" fill="#fffaf0" stroke="#4d3827" stroke-width="4"/>
+    <circle cx="36" cy="36" r="11" fill="#2b2117"/><circle cx="82" cy="82" r="11" fill="#2b2117"/>
+    <rect x="12" y="12" width="46" height="24" rx="8" fill="#74a9d4"/>
+    <text x="20" y="30" class="ink tiny" font-weight="800">偶</text>
+    <text x="28" y="154" fill="#fff6e7" font-size="22" class="font">规则 +1</text>
+  </g>
+  <g transform="translate(718 320)">
+    <ellipse cx="59" cy="134" rx="64" ry="12" fill="#123d39" opacity=".22"/>
+    <rect width="118" height="118" rx="15" fill="#fffaf0" stroke="#4d3827" stroke-width="4"/>
+    <circle cx="34" cy="34" r="11" fill="#2b2117"/><circle cx="59" cy="59" r="11" fill="#2b2117"/><circle cx="84" cy="84" r="11" fill="#2b2117"/>
+    <rect x="12" y="12" width="46" height="24" rx="8" fill="#d9c29a"/>
+    <text x="20" y="30" class="ink tiny" font-weight="800">基</text>
+  </g>
+  <g transform="translate(876 320)">
+    <ellipse cx="59" cy="134" rx="64" ry="12" fill="#123d39" opacity=".22"/>
+    <rect width="118" height="118" rx="15" fill="#fffaf0" stroke="#4d3827" stroke-width="4"/>
+    <circle cx="36" cy="36" r="11" fill="#2b2117"/><circle cx="82" cy="36" r="11" fill="#2b2117"/><circle cx="36" cy="82" r="11" fill="#2b2117"/><circle cx="82" cy="82" r="11" fill="#2b2117"/>
+    <rect x="12" y="12" width="46" height="24" rx="8" fill="#74a9d4"/>
+    <text x="20" y="30" class="ink tiny" font-weight="800">偶</text>
+    <text x="28" y="154" fill="#fff6e7" font-size="22" class="font">规则 +1</text>
+  </g>
+  <g transform="translate(1034 320)">
+    <ellipse cx="59" cy="134" rx="64" ry="12" fill="#123d39" opacity=".22"/>
+    <rect width="118" height="118" rx="15" fill="#fffaf0" stroke="#4d3827" stroke-width="4"/>
+    <circle cx="36" cy="36" r="11" fill="#2b2117"/><circle cx="82" cy="36" r="11" fill="#2b2117"/><circle cx="59" cy="59" r="11" fill="#2b2117"/><circle cx="36" cy="82" r="11" fill="#2b2117"/><circle cx="82" cy="82" r="11" fill="#2b2117"/>
+    <rect x="12" y="12" width="46" height="24" rx="8" fill="#86a65c"/>
+    <text x="20" y="30" class="ink tiny" font-weight="800">树</text>
+    <text x="18" y="154" fill="#f8d378" font-size="22" class="font">命中成长</text>
+  </g>
+  <g transform="translate(1192 320)">
+    <ellipse cx="59" cy="134" rx="64" ry="12" fill="#123d39" opacity=".22"/>
+    <rect width="118" height="118" rx="15" fill="#fffaf0" stroke="#4d3827" stroke-width="4"/>
+    <circle cx="36" cy="28" r="10" fill="#2b2117"/><circle cx="36" cy="59" r="10" fill="#2b2117"/><circle cx="36" cy="90" r="10" fill="#2b2117"/><circle cx="82" cy="28" r="10" fill="#2b2117"/><circle cx="82" cy="59" r="10" fill="#2b2117"/><circle cx="82" cy="90" r="10" fill="#2b2117"/>
+    <rect x="12" y="12" width="46" height="24" rx="8" fill="#d6a02f"/>
+    <text x="20" y="30" class="ink tiny" font-weight="800">双</text>
+    <text x="30" y="154" fill="#f8d378" font-size="22" class="font">双倍</text>
+  </g>
+
+  <!-- Result decision card -->
+  <rect x="350" y="574" width="1030" height="320" rx="18" fill="#fff6e7" stroke="#6f5636" stroke-width="4"/>
+  <text x="770" y="635" class="tealText h1">结果判断</text>
+  <rect x="400" y="668" width="270" height="120" rx="12" class="palePaper"/>
+  <text x="440" y="710" class="muted small">当前牌型</text>
+  <text x="440" y="760" class="ink h2">顺子 x2</text>
+  <text x="440" y="786" class="muted tiny">1-2-3-4-5-6</text>
+  <rect x="705" y="668" width="270" height="120" rx="12" class="palePaper"/>
+  <text x="760" y="710" class="muted small">本次得分</text>
+  <text x="756" y="782" class="tealText num">+150</text>
+  <rect x="1010" y="668" width="320" height="120" rx="12" class="palePaper"/>
+  <text x="1050" y="710" class="muted small">结算后进度</text>
+  <rect x="1050" y="738" width="240" height="22" rx="11" fill="#d8c5a2"/>
+  <rect x="1050" y="738" width="190" height="22" rx="11" fill="#d6a02f"/>
+  <text x="1050" y="800" class="ink h3">264 / 300，还差 36</text>
+  <rect x="400" y="812" width="930" height="54" rx="12" fill="#efe0bd" stroke="#ceb07a" stroke-width="2"/>
+  <text x="430" y="848" class="ink body">出千建议：</text>
+  <text x="560" y="848" class="muted body">当前可接受；若追达标，优先重摇 1 点和 2 点。</text>
+
+  <!-- Right support column -->
+  <rect x="1460" y="152" width="400" height="760" rx="16" class="paper" filter="url(#softShadow)"/>
+  <text x="1500" y="210" class="ink h2">辅助信息</text>
+  <rect x="1500" y="242" width="320" height="126" rx="12" class="dash"/>
+  <text x="1530" y="292" class="ink h3">本关规则</text>
+  <text x="1530" y="334" class="muted body">偶数 +1，奇数 -1</text>
+  <rect x="1500" y="402" width="320" height="184" rx="12" class="softPaper"/>
+  <text x="1530" y="456" class="ink h3">最近反馈</text>
+  <text x="1530" y="500" class="muted body">顺子成立  x2</text>
+  <text x="1530" y="540" class="muted body">大树命中，成长待结算</text>
+  <rect x="1500" y="624" width="320" height="74" rx="12" fill="#fff7e8" stroke="#9d8561" stroke-width="2"/>
+  <text x="1530" y="671" class="ink h3">牌型表</text>
+  <text x="1695" y="671" class="muted body">展开</text>
+  <rect x="1500" y="730" width="320" height="120" rx="12" fill="#f7ead2" stroke="#d0b17a" stroke-width="2"/>
+  <text x="1530" y="778" class="muted small">右侧只做解释和回看，</text>
+  <text x="1530" y="812" class="muted small">不放必须决策信息。</text>
+
+  <!-- Action bar -->
+  <rect x="0" y="936" width="1920" height="144" fill="#e5d0a8"/>
+  <rect x="300" y="956" width="1530" height="96" rx="16" class="paper" filter="url(#softShadow)"/>
+  <text x="68" y="1008" class="tealText h2">行动条</text>
+  <text x="68" y="1038" class="muted tiny">每阶段只保留主动作</text>
+  <rect x="460" y="970" width="590" height="68" rx="12" fill="#167a73" stroke="#56422d" stroke-width="3"/>
+  <text x="650" y="1018" fill="#fff7e8" class="buttonText">Space 直接结算</text>
+  <rect x="1130" y="970" width="250" height="68" rx="12" class="softPaper"/>
+  <text x="1210" y="1018" class="ink h2">出千</text>
+  <rect x="1430" y="970" width="250" height="68" rx="12" class="softPaper"/>
+  <text x="1510" y="1018" class="ink h2">牌型表</text>
+</svg>

@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .bg { fill: #f5ead3; }
+      .ink { fill: #2a2118; font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .muted { fill: #776956; font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .teal { fill: #0f6f6c; }
+      .gold { fill: #d6a02f; }
+      .panel { fill: #fff7e8; stroke: #7f6b4e; stroke-width: 3; }
+      .panel-soft { fill: #f3e2bf; stroke: #9a8462; stroke-width: 2; }
+      .table { fill: #1f7773; stroke: #5e4a32; stroke-width: 4; }
+      .table-inner { fill: #2d8a84; opacity: .38; }
+      .soft-line { stroke: #b49d78; stroke-width: 2; stroke-dasharray: 10 8; fill: none; }
+      .hard-line { stroke: #7f6b4e; stroke-width: 3; fill: none; }
+      .label { fill: #0f6f6c; font-size: 34px; font-weight: 700; font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .small { font-size: 24px; }
+      .body { font-size: 28px; }
+      .h1 { font-size: 44px; font-weight: 800; }
+      .h2 { font-size: 34px; font-weight: 800; }
+      .h3 { font-size: 28px; font-weight: 700; }
+      .num { font-size: 72px; font-weight: 900; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1920" height="1080"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="#fff9ef" opacity=".35"/>
+
+  <!-- Top HUD -->
+  <rect x="210" y="24" width="1530" height="120" rx="12" class="panel"/>
+  <text x="40" y="70" class="label">顶部</text>
+  <text x="40" y="108" class="label">HUD</text>
+  <path d="M150 88 L198 88" stroke="#0f6f6c" stroke-width="8"/>
+  <path d="M198 88 l-18 -14 v28z" fill="#0f6f6c"/>
+  <text x="260" y="70" class="ink h3">目标进度</text>
+  <rect x="260" y="92" width="640" height="20" rx="10" fill="#d8c6a5"/>
+  <rect x="260" y="92" width="360" height="20" rx="10" class="gold"/>
+  <circle cx="260" cy="102" r="20" class="gold"/>
+  <circle cx="500" cy="102" r="20" class="gold"/>
+  <circle cx="620" cy="102" r="28" class="gold"/>
+  <circle cx="905" cy="102" r="18" fill="#f8f0dd" stroke="#9a8462" stroke-width="3"/>
+  <line x1="990" y1="24" x2="990" y2="144" class="hard-line"/>
+  <text x="1040" y="74" class="ink h3">金币</text>
+  <text x="1040" y="118" class="ink h2">125</text>
+  <line x1="1230" y1="24" x2="1230" y2="144" class="hard-line"/>
+  <text x="1278" y="74" class="ink h3">出手</text>
+  <text x="1278" y="118" class="ink h2">2 / 3</text>
+  <line x1="1492" y1="24" x2="1492" y2="144" class="hard-line"/>
+  <text x="1542" y="74" class="ink h3">出千</text>
+  <text x="1542" y="118" class="ink h2">1 / 1</text>
+
+  <!-- Left dice bag summary -->
+  <rect x="50" y="185" width="240" height="725" rx="14" class="panel"/>
+  <text x="82" y="235" class="ink h2">骰袋摘要</text>
+  <text x="82" y="280" class="muted body">容量 6 / 6</text>
+  <rect x="82" y="318" width="156" height="46" rx="8" class="panel-soft"/>
+  <text x="106" y="350" class="ink h3">偶数路线</text>
+  <rect x="82" y="380" width="156" height="46" rx="8" class="panel-soft"/>
+  <text x="106" y="412" class="ink h3">成长 x1</text>
+  <rect x="82" y="442" width="156" height="46" rx="8" class="panel-soft"/>
+  <text x="106" y="474" class="ink h3">锁定 x1</text>
+  <text x="82" y="548" class="muted small">骰袋详情不常驻</text>
+  <text x="82" y="584" class="muted small">只在市场 / 出千展开</text>
+  <rect x="82" y="630" width="176" height="150" rx="8" class="soft-line"/>
+  <text x="110" y="690" class="muted body">关键提醒</text>
+  <text x="110" y="734" class="gold body">大树成长 2</text>
+
+  <!-- Center roll and result focus -->
+  <rect x="320" y="185" width="1110" height="725" rx="16" class="table"/>
+  <rect x="360" y="246" width="1030" height="230" rx="18" class="table-inner"/>
+  <text x="820" y="226" fill="#fff7e8" font-size="44" font-weight="800" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif">主投掷区</text>
+  <path d="M958 238 L958 270" stroke="#fff7e8" stroke-width="8"/>
+  <path d="M958 270 l-14 -18 h28z" fill="#fff7e8"/>
+  <g transform="translate(455 310)">
+    <rect width="112" height="112" rx="12" fill="#fffaf0" stroke="#4e3b29" stroke-width="3"/>
+    <circle cx="56" cy="56" r="12" fill="#2a2118"/>
+  </g>
+  <g transform="translate(610 310)">
+    <rect width="112" height="112" rx="12" fill="#fffaf0" stroke="#4e3b29" stroke-width="3"/>
+    <circle cx="34" cy="34" r="11" fill="#2a2118"/><circle cx="78" cy="78" r="11" fill="#2a2118"/>
+  </g>
+  <g transform="translate(765 310)">
+    <rect width="112" height="112" rx="12" fill="#fffaf0" stroke="#4e3b29" stroke-width="3"/>
+    <circle cx="34" cy="34" r="11" fill="#2a2118"/><circle cx="56" cy="56" r="11" fill="#2a2118"/><circle cx="78" cy="78" r="11" fill="#2a2118"/>
+  </g>
+  <g transform="translate(920 310)">
+    <rect width="112" height="112" rx="12" fill="#fffaf0" stroke="#4e3b29" stroke-width="3"/>
+    <circle cx="34" cy="34" r="11" fill="#2a2118"/><circle cx="78" cy="34" r="11" fill="#2a2118"/><circle cx="34" cy="78" r="11" fill="#2a2118"/><circle cx="78" cy="78" r="11" fill="#2a2118"/>
+  </g>
+  <g transform="translate(1075 310)">
+    <rect width="112" height="112" rx="12" fill="#fffaf0" stroke="#4e3b29" stroke-width="3"/>
+    <circle cx="34" cy="34" r="11" fill="#2a2118"/><circle cx="78" cy="34" r="11" fill="#2a2118"/><circle cx="56" cy="56" r="11" fill="#2a2118"/><circle cx="34" cy="78" r="11" fill="#2a2118"/><circle cx="78" cy="78" r="11" fill="#2a2118"/>
+  </g>
+  <g transform="translate(1230 310)">
+    <rect width="112" height="112" rx="12" fill="#fffaf0" stroke="#4e3b29" stroke-width="3"/>
+    <circle cx="34" cy="28" r="10" fill="#2a2118"/><circle cx="34" cy="56" r="10" fill="#2a2118"/><circle cx="34" cy="84" r="10" fill="#2a2118"/><circle cx="78" cy="28" r="10" fill="#2a2118"/><circle cx="78" cy="56" r="10" fill="#2a2118"/><circle cx="78" cy="84" r="10" fill="#2a2118"/>
+  </g>
+  <path d="M950 500 l0 62" stroke="#f7ead0" stroke-width="16"/>
+  <path d="M950 562 l-28 -34 h56z" fill="#f7ead0"/>
+  <rect x="360" y="590" width="1030" height="255" rx="12" fill="#fff7e8" stroke="#715c3e" stroke-width="3"/>
+  <text x="810" y="650" class="label h1">结果判断</text>
+  <rect x="400" y="690" width="300" height="118" rx="10" fill="#fffaf0" stroke="#d2bd94" stroke-width="2"/>
+  <text x="450" y="735" class="ink h3">当前牌型</text>
+  <text x="450" y="782" class="ink h2">顺子 x2</text>
+  <rect x="735" y="690" width="300" height="118" rx="10" fill="#fffaf0" stroke="#d2bd94" stroke-width="2"/>
+  <text x="792" y="735" class="ink h3">本次得分</text>
+  <text x="800" y="794" class="teal num">+150</text>
+  <rect x="1070" y="690" width="300" height="118" rx="10" fill="#fffaf0" stroke="#d2bd94" stroke-width="2"/>
+  <text x="1120" y="735" class="ink h3">距离目标</text>
+  <rect x="1120" y="760" width="220" height="18" rx="9" fill="#d8c6a5"/>
+  <rect x="1120" y="760" width="120" height="18" rx="9" class="gold"/>
+  <text x="1160" y="815" class="ink h3">150 / 300</text>
+
+  <!-- Right secondary panels -->
+  <rect x="1460" y="185" width="410" height="725" rx="14" class="panel"/>
+  <rect x="1495" y="230" width="340" height="150" rx="10" class="soft-line"/>
+  <text x="1545" y="288" class="ink h3">本关规则</text>
+  <text x="1532" y="332" class="muted body">偶数 +1，奇数 -1</text>
+  <rect x="1495" y="420" width="340" height="205" rx="10" class="panel-soft"/>
+  <text x="1532" y="476" class="ink h3">最近事件</text>
+  <text x="1532" y="524" class="muted body">达成顺子  +150</text>
+  <text x="1532" y="568" class="muted body">猪猪命中  +1 金</text>
+  <text x="1532" y="612" class="muted body">大树成长  +1</text>
+  <rect x="1495" y="665" width="340" height="220" rx="10" class="panel-soft"/>
+  <text x="1532" y="720" class="ink h3">牌型参考</text>
+  <text x="1532" y="770" class="muted body">六同 五同 四同</text>
+  <text x="1532" y="815" class="muted body">顺子 三同</text>
+  <text x="1532" y="860" class="muted body">全奇 全偶</text>
+
+  <!-- Bottom action bar -->
+  <rect x="0" y="934" width="1920" height="146" fill="#ead9b8"/>
+  <rect x="330" y="956" width="1440" height="96" rx="12" class="panel"/>
+  <text x="54" y="1014" class="label">行动条</text>
+  <path d="M158 1000 L260 1000" stroke="#0f6f6c" stroke-width="8"/>
+  <path d="M260 1000 l-18 -14 v28z" fill="#0f6f6c"/>
+  <rect x="500" y="970" width="560" height="66" rx="8" fill="#177b75" stroke="#5e4a32" stroke-width="3"/>
+  <text x="675" y="1016" fill="#fff7e8" font-size="38" font-weight="800" font-family="Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif">直接结算</text>
+  <rect x="1190" y="970" width="260" height="66" rx="8" class="panel-soft"/>
+  <text x="1284" y="1016" class="ink h2">出千</text>
+  <rect x="1500" y="970" width="220" height="66" rx="8" class="panel-soft"/>
+  <text x="1574" y="1016" class="ink h2">取消</text>
+  <text x="420" y="930" class="muted small">核心原则：中央判断结果，底部只放下一步行动；右侧做参考，左侧做构筑。</text>
+</svg>

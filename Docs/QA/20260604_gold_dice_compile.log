@@ -1,0 +1,41 @@
+[LicensingClient] ERROR Failed to connect to local IPC
+[Licensing::Module] Failed to connect to channel: LicenseClient-admin
+[Licensing::Module] Successfully launched the LicensingClient
+[LicensingClient] ERROR Error 1 while verifying Licensing Client signature (path: 67916, process Id: D:/Unity20190433_release/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe)
+[Licensing::Module] LicensingClient has failed validation
+IPC channel to LicensingClient doesn't exist; falling back to Legacy licensing
+[LicensingClient] ERROR Failed to disconnect local IPC connection
+
+LICENSE SYSTEM [202664 22:46:25] Current license is already valid and activated. Skipping license activation process (Provided username/password will be ignored).
+[Moonton] DeviceId:2d07e8dbf9adf31237a4f2360ec5ca704959c37e
+Built from 'pre_release' branch; Version is '2019.4.33f1 (b64c72c48) revision 11947122'; Using compiler version '191627012'
+OS: 'Windows 10  (10.0.19044) 64bit EnterpriseS' Language: 'zh' Physical Memory: 65309 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 1
+[Package Manager] Server::Start -- Port 59424 was selected
+
+COMMAND LINE ARGUMENTS:
+D:\Unity20190433_release\Editor\Unity.exe
+-batchmode
+-projectPath
+F:\unity\wabish
+-quit
+-logFile
+F:\unity\wabish\Docs\QA\20260604_gold_dice_compile.log
+Successfully changed project path to: F:\unity\wabish
+F:/unity/wabish
+It looks like another Unity instance is running with this project open.
+
+Multiple Unity instances cannot open the same project.
+
+Project: F:/unity/wabish 
+(Filename: D:\CI\ml\20190433\pre_release\Editor/Src/Application/Application.cpp Line: 432)
+
+Fatal Error! It looks like another Unity instance is running with this project open.
+
+Multiple Unity instances cannot open the same project.
+
+Project: F:/unity/wabish
+ 
+(Filename: D:\CI\ml\20190433\pre_release\Runtime/Utilities/Argv.cpp Line: 498)
+
+Exiting without the bug reporter. Application will terminate with return code 1

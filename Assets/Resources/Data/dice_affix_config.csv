@@ -1,0 +1,13 @@
+affix_key,display_name,slot,trigger_key,curve_key,weight_ch1_2,weight_ch3_5,weight_ch6_10,short_rule,mutex_group,enabled
+flat_score,平账,prefix,always,score_high_freq,8,8,8,本骰单骰分 +V,flat_score,true
+top_face_score,顶面,prefix,top_face,score_low_freq,5,7,8,最高面时单骰分 +V,top_face_score,true
+low_face_score,厚底,prefix,low_face,score_low_freq,5,7,8,点数不高于 2 时单骰分 +V,low_face_score,true
+same_value_score,对印,prefix,same_value,score_high_freq,5,7,8,有同点伙伴时单骰分 +V,same_value_score,true
+straight_score,顺批,prefix,straight,score_low_freq,3,5,6,形成顺子时单骰分 +V,straight_score,true
+cheat_score,回火,prefix,cheat_rerolled,score_low_freq,3,5,6,出千确认后单骰分 +V,cheat_score,true
+top_face_gold,顶账,suffix,top_face,gold_low_freq,4,6,7,最高面时钱包 +G,top_face_gold,true
+low_face_gold,低保,suffix,low_face,gold_low_freq,4,6,7,点数不高于 2 时钱包 +G,low_face_gold,true
+same_value_gold,分账,suffix,same_value,gold_high_freq,4,6,7,有同点伙伴时钱包 +G,same_value_gold,true
+straight_gold,顺账,suffix,straight,gold_low_freq,3,5,6,形成顺子时钱包 +G,straight_gold,true
+cheat_gold,回火账,suffix,cheat_rerolled,gold_low_freq,3,5,6,出千确认后钱包 +G,cheat_gold,true
+first_roll_gold,首单,suffix,first_roll,gold_high_freq,5,7,7,小关第一次出手钱包 +G,first_roll_gold,true

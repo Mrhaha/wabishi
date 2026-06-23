@@ -1,0 +1,6 @@
+curve_key,t1,t2,t3,t4,t5,t6
+score_low_freq,6,5,4,3,2,1
+score_high_freq,4,3,2,2,1,1
+gold_low_freq,4,3,2,2,1,1
+gold_high_freq,3,2,2,1,1,1
+market_discount,4,3,2,2,1,1

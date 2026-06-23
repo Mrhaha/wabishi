@@ -1,0 +1,26 @@
+[LicensingClient] ERROR Failed to connect to local IPC
+[Licensing::Module] Failed to connect to channel: LicenseClient-admin
+[Licensing::Module] Successfully launched the LicensingClient
+[LicensingClient] ERROR Error 1 while verifying Licensing Client signature (path: 76792, process Id: F:/unity/Unity20190433_release/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe)
+[Licensing::Module] LicensingClient has failed validation
+IPC channel to LicensingClient doesn't exist; falling back to Legacy licensing
+[LicensingClient] ERROR Failed to disconnect local IPC connection
+
+LICENSE SYSTEM [202663 14:15:45] Current license is already valid and activated. Skipping license activation process (Provided username/password will be ignored).
+[Moonton] DeviceId:2d07e8dbf9adf31237a4f2360ec5ca704959c37e
+Built from 'pre_release' branch; Version is '2019.4.33f1 (c2fa268b6) revision 12778022'; Using compiler version '191627012'
+OS: 'Windows 10  (10.0.19044) 64bit EnterpriseS' Language: 'zh' Physical Memory: 65309 MB
+BatchMode: 0, IsHumanControllingUs: 1, StartBugReporterOnCrash: 1, Is64bit: 1, IsPro: 1
+[Package Manager] Server::Start -- Port 65190 was selected
+
+COMMAND LINE ARGUMENTS:
+F:\unity\Unity20190433_release\Editor\Unity.exe
+-projectPath
+F:\unity\wabish
+-executeMethod
+DiceKingUiAcceptanceRunner.Run
+-logFile
+F:\unity\wabish\Docs\QA\20260603_unity_acceptance_run.log
+Successfully changed project path to: F:\unity\wabish
+F:/unity/wabish
+Exiting without the bug reporter. Application will terminate with return code 0

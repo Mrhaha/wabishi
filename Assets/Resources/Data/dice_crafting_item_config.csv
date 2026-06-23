@@ -1,0 +1,4 @@
+item_key,display_name,craft_type,buy_price,unlock_chapter,weight_ch1_2,weight_ch3_5,weight_ch6_10,short_rule
+affix_add_stone,加印石,add_random_affix,7,2,4,7,8,随机加 1 条合法词缀
+affix_remove_stone,剥印石,remove_random_affix,5,2,3,5,6,随机删 1 条已有词缀
+affix_replace_stone,换印石,replace_random_affix,8,2,2,4,6,随机删 1 条后再随机加 1 条
