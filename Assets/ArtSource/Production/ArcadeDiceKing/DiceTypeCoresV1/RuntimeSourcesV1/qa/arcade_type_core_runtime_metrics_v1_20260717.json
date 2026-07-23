@@ -1,0 +1,858 @@
+{
+  "expected_count": 37,
+  "items": {
+    "basic": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        68,
+        55,
+        444,
+        446
+      ],
+      "bbox_coverage": 0.5608,
+      "opaque_pixels": 138599,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 9864,
+      "pass": true
+    },
+    "lightfang": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        72,
+        61,
+        438,
+        428
+      ],
+      "bbox_coverage": 0.5124,
+      "opaque_pixels": 59694,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 9651,
+      "pass": true
+    },
+    "duet": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        93,
+        70,
+        420,
+        421
+      ],
+      "bbox_coverage": 0.4378,
+      "opaque_pixels": 108189,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 3469,
+      "pass": true
+    },
+    "trigger": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        103,
+        49,
+        406,
+        447
+      ],
+      "bbox_coverage": 0.46,
+      "opaque_pixels": 99266,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 431,
+      "pass": true
+    },
+    "crown": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        60,
+        38,
+        451,
+        403
+      ],
+      "bbox_coverage": 0.5444,
+      "opaque_pixels": 74041,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 4687,
+      "pass": true
+    },
+    "relief": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        65,
+        50,
+        447,
+        468
+      ],
+      "bbox_coverage": 0.6091,
+      "opaque_pixels": 63223,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 10419,
+      "pass": true
+    },
+    "airstrike": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        73,
+        60,
+        438,
+        443
+      ],
+      "bbox_coverage": 0.5333,
+      "opaque_pixels": 120038,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 7600,
+      "pass": true
+    },
+    "pact": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        20,
+        110,
+        491,
+        377
+      ],
+      "bbox_coverage": 0.4797,
+      "opaque_pixels": 85605,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 3512,
+      "pass": true
+    },
+    "stitch": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        39,
+        39,
+        473,
+        475
+      ],
+      "bbox_coverage": 0.7218,
+      "opaque_pixels": 92419,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 7474,
+      "pass": true
+    },
+    "pig_farmer": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        50,
+        55,
+        461,
+        408
+      ],
+      "bbox_coverage": 0.5534,
+      "opaque_pixels": 104107,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 3108,
+      "pass": true
+    },
+    "meat_pig": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        57,
+        47,
+        452,
+        448
+      ],
+      "bbox_coverage": 0.6042,
+      "opaque_pixels": 73454,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 5540,
+      "pass": true
+    },
+    "trade_pig": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        60,
+        73,
+        463,
+        414
+      ],
+      "bbox_coverage": 0.5242,
+      "opaque_pixels": 76414,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 3824,
+      "pass": true
+    },
+    "sow_pig": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        72,
+        37,
+        440,
+        453
+      ],
+      "bbox_coverage": 0.584,
+      "opaque_pixels": 66347,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 5472,
+      "pass": true
+    },
+    "three_little_pigs": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        54,
+        37,
+        456,
+        456
+      ],
+      "bbox_coverage": 0.6425,
+      "opaque_pixels": 97884,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1512,
+      "pass": true
+    },
+    "greedy_pig": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        53,
+        39,
+        457,
+        442
+      ],
+      "bbox_coverage": 0.6211,
+      "opaque_pixels": 114703,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1272,
+      "pass": true
+    },
+    "feed_wholesaler": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        64,
+        58,
+        461,
+        437
+      ],
+      "bbox_coverage": 0.574,
+      "opaque_pixels": 89844,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 7974,
+      "pass": true
+    },
+    "imp": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        60,
+        57,
+        452,
+        458
+      ],
+      "bbox_coverage": 0.5996,
+      "opaque_pixels": 139343,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 4913,
+      "pass": true
+    },
+    "devourer": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        68,
+        57,
+        442,
+        455
+      ],
+      "bbox_coverage": 0.5678,
+      "opaque_pixels": 97864,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1306,
+      "pass": true
+    },
+    "demon": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        87,
+        48,
+        416,
+        442
+      ],
+      "bbox_coverage": 0.4945,
+      "opaque_pixels": 72092,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 5706,
+      "pass": true
+    },
+    "demon_bat": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        18,
+        92,
+        490,
+        383
+      ],
+      "bbox_coverage": 0.524,
+      "opaque_pixels": 87680,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1798,
+      "pass": true
+    },
+    "abyss_summon": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        63,
+        45,
+        447,
+        435
+      ],
+      "bbox_coverage": 0.5713,
+      "opaque_pixels": 85330,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1129,
+      "pass": true
+    },
+    "tribute": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        55,
+        45,
+        455,
+        445
+      ],
+      "bbox_coverage": 0.6104,
+      "opaque_pixels": 101925,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 15344,
+      "pass": true
+    },
+    "money_turtle": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        79,
+        65,
+        432,
+        428
+      ],
+      "bbox_coverage": 0.4888,
+      "opaque_pixels": 100204,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 5961,
+      "pass": true
+    },
+    "tiny_turtle": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        71,
+        55,
+        440,
+        444
+      ],
+      "bbox_coverage": 0.5476,
+      "opaque_pixels": 109605,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 2985,
+      "pass": true
+    },
+    "double_turtle": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        73,
+        70,
+        437,
+        426
+      ],
+      "bbox_coverage": 0.4943,
+      "opaque_pixels": 93763,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1854,
+      "pass": true
+    },
+    "lucky_turtle": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        82,
+        51,
+        428,
+        429
+      ],
+      "bbox_coverage": 0.4989,
+      "opaque_pixels": 93976,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 5510,
+      "pass": true
+    },
+    "magnet_turtle": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        82,
+        61,
+        427,
+        451
+      ],
+      "bbox_coverage": 0.5133,
+      "opaque_pixels": 104701,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1825,
+      "pass": true
+    },
+    "rally_turtle": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        39,
+        28,
+        471,
+        434
+      ],
+      "bbox_coverage": 0.6691,
+      "opaque_pixels": 73584,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 3657,
+      "pass": true
+    },
+    "leader_turtle": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        96,
+        53,
+        415,
+        457
+      ],
+      "bbox_coverage": 0.4916,
+      "opaque_pixels": 82074,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 7039,
+      "pass": true
+    },
+    "refresh_pirate": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        64,
+        46,
+        446,
+        445
+      ],
+      "bbox_coverage": 0.5814,
+      "opaque_pixels": 78365,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 3079,
+      "pass": true
+    },
+    "plunder_pirate": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        54,
+        74,
+        456,
+        389
+      ],
+      "bbox_coverage": 0.4831,
+      "opaque_pixels": 69463,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 4670,
+      "pass": true
+    },
+    "crew_pirate": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        67,
+        59,
+        445,
+        444
+      ],
+      "bbox_coverage": 0.5552,
+      "opaque_pixels": 134672,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1379,
+      "pass": true
+    },
+    "pirate_captain": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        86,
+        55,
+        426,
+        431
+      ],
+      "bbox_coverage": 0.4877,
+      "opaque_pixels": 89843,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 4474,
+      "pass": true
+    },
+    "training_pirate": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        81,
+        60,
+        432,
+        437
+      ],
+      "bbox_coverage": 0.5048,
+      "opaque_pixels": 88280,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1261,
+      "pass": true
+    },
+    "treasure_pirate": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        68,
+        58,
+        467,
+        430
+      ],
+      "bbox_coverage": 0.5662,
+      "opaque_pixels": 124256,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 977,
+      "pass": true
+    },
+    "robbery_pirate": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        96,
+        28,
+        415,
+        470
+      ],
+      "bbox_coverage": 0.5379,
+      "opaque_pixels": 68818,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 1465,
+      "pass": true
+    },
+    "pirate_king": {
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        81,
+        26,
+        430,
+        473
+      ],
+      "bbox_coverage": 0.5951,
+      "opaque_pixels": 79553,
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "activity_pixels": 4084,
+      "pass": true
+    }
+  },
+  "actual_count": 37,
+  "all_pass": true
+}

@@ -1,0 +1,1144 @@
+{
+  "sample": "MarketPhysicalKeyLabelsV2",
+  "status": "sample_pending_user_acceptance",
+  "revision_reason": "V1 added a flat color backing that interrupted the original keycap material.",
+  "render_contract": {
+    "family": "PhysicalKeyLabel",
+    "font_source": "C:\\Windows\\Fonts\\NotoSansSC-VF.ttf",
+    "font_sha256": "763146584cf0710223441356b4395e279021b0806c196614377a7a0174ae074a",
+    "font_weight": 600,
+    "enabled_ink_hex": "#180E08",
+    "solid_backing_added": false,
+    "surface_source": "Assets/Resources/Art/Market/arcade_market_common_base.png",
+    "surface_source_sha256": "4c4c3a8a2c027b6eb627051dff78e368f9e57cdc4d1829dcda4623e29a7beccc",
+    "anti_aliasing": "direct FreeType coverage at each native target resolution",
+    "resampling_after_text_render": "none",
+    "dot_matrix": false,
+    "glow": false,
+    "outline": false,
+    "shadow": false
+  },
+  "checks": {
+    "no_solid_backing_added": true,
+    "all_original_key_surfaces_restored": true,
+    "all_key_textures_preserved": true,
+    "all_p05_large_text_contrast_pass": true,
+    "all_median_contrast_pass": true,
+    "all_labels_fit": true,
+    "all_ink_heights_pass": true,
+    "all_stress_labels_fit": true,
+    "native_outputs_only": true,
+    "no_unity_files_modified": true
+  },
+  "inputs": [
+    {
+      "path": "Assets/Resources/Art/Market/arcade_market_common_base.png",
+      "sha256": "4c4c3a8a2c027b6eb627051dff78e368f9e57cdc4d1829dcda4623e29a7beccc"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedTextBrightnessV2/led_text_brightness_v2_market_core_1280x720.png",
+      "sha256": "cc1d4323c1fed1bc3dcbe17dd7fefe87e06a4a6ca5ef962346ab17f23f3e431c"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedTextBrightnessV2/led_text_brightness_v2_market_core_1920x1080.png",
+      "sha256": "5f5190de4d4a6974e2bde0c6b79554c2ab8528d010eb77676b48f28fe09f1d69"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/MarketPhysicalKeyLabelsV2/market_physical_key_labels_v2_full_1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "4cce3d5918ca20218d79c3443f93bd685c189842fdf3c0d9bae300f53aa316ee"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/MarketPhysicalKeyLabelsV2/market_physical_key_labels_v2_key_strip_1280x260.png",
+      "size": [
+        1280,
+        260
+      ],
+      "sha256": "6d8de3621c587a2b843bcbb06895c390e6f30e06e07941dc06fb31d0f1e86c4f"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/MarketPhysicalKeyLabelsV2/market_physical_key_labels_v2_state_stress_1280x500.png",
+      "size": [
+        1280,
+        500
+      ],
+      "sha256": "12ee74494da7c94a1bfd9e2e3d09f15d83c5b41bfcb0ca76b231b23806db4ce2"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/MarketPhysicalKeyLabelsV2/market_physical_key_labels_v2_full_1920x1080.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "895f6a381c7d0389a39133fccf17aeca8a9c433f521d46a7c8a6e3864612ef58"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/MarketPhysicalKeyLabelsV2/market_physical_key_labels_v2_key_strip_1920x390.png",
+      "size": [
+        1920,
+        390
+      ],
+      "sha256": "590e05947ead678da3e54a68f41afb8fb1f7c666fb816375d95664fe6919ab29"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/MarketPhysicalKeyLabelsV2/market_physical_key_labels_v2_state_stress_1920x750.png",
+      "size": [
+        1920,
+        750
+      ],
+      "sha256": "2c457dc61b3768df0befb2bce626ed34574a4f439da394b0d42b6e16756e5014"
+    }
+  ],
+  "keys": [
+    {
+      "text": "卖出 1 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        29,
+        11,
+        118,
+        32
+      ],
+      "ink_width_px": 89,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 29,
+        "right": 30,
+        "top": 11,
+        "bottom": 12
+      },
+      "minimum_padding_px": 11,
+      "solid_core_pixels": 440,
+      "antialias_edge_pixels": 440,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.190649,
+      "surface_luminance_median": 0.276748,
+      "surface_luminance_stddev": 0.052573,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 4.355,
+      "median_contrast_ratio": 5.9131,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "sell",
+      "resolution": [
+        1280,
+        720
+      ],
+      "outer_rect_px": [
+        59,
+        496,
+        172,
+        72
+      ],
+      "text_safe_rect_px": [
+        71,
+        510,
+        148,
+        44
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 18,
+      "ink_height_pass": true,
+      "padding_pass": true
+    },
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        44,
+        8,
+        146,
+        29
+      ],
+      "ink_width_px": 102,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 44,
+        "right": 45,
+        "top": 8,
+        "bottom": 8
+      },
+      "minimum_padding_px": 8,
+      "solid_core_pixels": 458,
+      "antialias_edge_pixels": 601,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.216192,
+      "surface_luminance_median": 0.277457,
+      "surface_luminance_stddev": 0.035117,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 4.8173,
+      "median_contrast_ratio": 5.926,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "buy_1",
+      "resolution": [
+        1280,
+        720
+      ],
+      "outer_rect_px": [
+        323,
+        472,
+        215,
+        57
+      ],
+      "text_safe_rect_px": [
+        335,
+        482,
+        191,
+        37
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 18,
+      "ink_height_pass": true,
+      "padding_pass": true
+    },
+    {
+      "text": "购买 8 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        51,
+        8,
+        140,
+        29
+      ],
+      "ink_width_px": 89,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 51,
+        "right": 51,
+        "top": 8,
+        "bottom": 8
+      },
+      "minimum_padding_px": 8,
+      "solid_core_pixels": 412,
+      "antialias_edge_pixels": 600,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.207462,
+      "surface_luminance_median": 0.26336,
+      "surface_luminance_stddev": 0.03303,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 4.6593,
+      "median_contrast_ratio": 5.6709,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "buy_2",
+      "resolution": [
+        1280,
+        720
+      ],
+      "outer_rect_px": [
+        617,
+        472,
+        215,
+        57
+      ],
+      "text_safe_rect_px": [
+        629,
+        482,
+        191,
+        37
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 18,
+      "ink_height_pass": true,
+      "padding_pass": true
+    },
+    {
+      "text": "购买 10 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        44,
+        8,
+        146,
+        29
+      ],
+      "ink_width_px": 102,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 44,
+        "right": 45,
+        "top": 8,
+        "bottom": 8
+      },
+      "minimum_padding_px": 8,
+      "solid_core_pixels": 465,
+      "antialias_edge_pixels": 620,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.193289,
+      "surface_luminance_median": 0.249847,
+      "surface_luminance_stddev": 0.034341,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 4.4028,
+      "median_contrast_ratio": 5.4263,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "buy_3",
+      "resolution": [
+        1280,
+        720
+      ],
+      "outer_rect_px": [
+        910,
+        472,
+        215,
+        57
+      ],
+      "text_safe_rect_px": [
+        922,
+        482,
+        191,
+        37
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 18,
+      "ink_height_pass": true,
+      "padding_pass": true
+    },
+    {
+      "text": "离开市场",
+      "requested_font_size_px": 24,
+      "font_size_px": 24,
+      "mask_bbox_local_px": [
+        87,
+        15,
+        181,
+        39
+      ],
+      "ink_width_px": 94,
+      "ink_height_px": 24,
+      "padding_px": {
+        "left": 87,
+        "right": 88,
+        "top": 15,
+        "bottom": 15
+      },
+      "minimum_padding_px": 15,
+      "solid_core_pixels": 593,
+      "antialias_edge_pixels": 608,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.156204,
+      "surface_luminance_median": 0.226083,
+      "surface_luminance_stddev": 0.046839,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 3.7317,
+      "median_contrast_ratio": 4.9963,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "leave",
+      "resolution": [
+        1280,
+        720
+      ],
+      "outer_rect_px": [
+        912,
+        601,
+        301,
+        82
+      ],
+      "text_safe_rect_px": [
+        928,
+        615,
+        269,
+        54
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 22,
+      "ink_height_pass": true,
+      "padding_pass": true
+    },
+    {
+      "text": "卖出 1 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        46,
+        16,
+        176,
+        49
+      ],
+      "ink_width_px": 130,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 46,
+        "right": 46,
+        "top": 16,
+        "bottom": 17
+      },
+      "minimum_padding_px": 16,
+      "solid_core_pixels": 1115,
+      "antialias_edge_pixels": 689,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.194809,
+      "surface_luminance_median": 0.276646,
+      "surface_luminance_stddev": 0.054257,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 4.4303,
+      "median_contrast_ratio": 5.9113,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "sell",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "outer_rect_px": [
+        88,
+        744,
+        258,
+        108
+      ],
+      "text_safe_rect_px": [
+        106,
+        765,
+        222,
+        66
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 27,
+      "ink_height_pass": true,
+      "padding_pass": true
+    },
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        69,
+        11,
+        218,
+        44
+      ],
+      "ink_width_px": 149,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 69,
+        "right": 69,
+        "top": 11,
+        "bottom": 11
+      },
+      "minimum_padding_px": 11,
+      "solid_core_pixels": 1219,
+      "antialias_edge_pixels": 920,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.214542,
+      "surface_luminance_median": 0.277393,
+      "surface_luminance_stddev": 0.036721,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 4.7874,
+      "median_contrast_ratio": 5.9248,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "buy_1",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "outer_rect_px": [
+        484,
+        708,
+        323,
+        86
+      ],
+      "text_safe_rect_px": [
+        502,
+        723,
+        287,
+        55
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 27,
+      "ink_height_pass": true,
+      "padding_pass": true
+    },
+    {
+      "text": "购买 8 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        78,
+        11,
+        208,
+        44
+      ],
+      "ink_width_px": 130,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 78,
+        "right": 78,
+        "top": 11,
+        "bottom": 11
+      },
+      "minimum_padding_px": 11,
+      "solid_core_pixels": 1108,
+      "antialias_edge_pixels": 919,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.205135,
+      "surface_luminance_median": 0.263539,
+      "surface_luminance_stddev": 0.034444,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 4.6172,
+      "median_contrast_ratio": 5.6741,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "buy_2",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "outer_rect_px": [
+        926,
+        708,
+        322,
+        86
+      ],
+      "text_safe_rect_px": [
+        944,
+        723,
+        286,
+        55
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 27,
+      "ink_height_pass": true,
+      "padding_pass": true
+    },
+    {
+      "text": "购买 10 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        69,
+        11,
+        218,
+        44
+      ],
+      "ink_width_px": 149,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 69,
+        "right": 69,
+        "top": 11,
+        "bottom": 11
+      },
+      "minimum_padding_px": 11,
+      "solid_core_pixels": 1248,
+      "antialias_edge_pixels": 945,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.19107,
+      "surface_luminance_median": 0.249678,
+      "surface_luminance_stddev": 0.03674,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 4.3626,
+      "median_contrast_ratio": 5.4233,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "buy_3",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "outer_rect_px": [
+        1365,
+        708,
+        323,
+        86
+      ],
+      "text_safe_rect_px": [
+        1383,
+        723,
+        287,
+        55
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 27,
+      "ink_height_pass": true,
+      "padding_pass": true
+    },
+    {
+      "text": "离开市场",
+      "requested_font_size_px": 36,
+      "font_size_px": 36,
+      "mask_bbox_local_px": [
+        132,
+        23,
+        273,
+        58
+      ],
+      "ink_width_px": 141,
+      "ink_height_px": 35,
+      "padding_px": {
+        "left": 132,
+        "right": 131,
+        "top": 23,
+        "bottom": 24
+      },
+      "minimum_padding_px": 23,
+      "solid_core_pixels": 1556,
+      "antialias_edge_pixels": 915,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "surface_luminance_p05": 0.153874,
+      "surface_luminance_median": 0.226083,
+      "surface_luminance_stddev": 0.04873,
+      "texture_preserved": true,
+      "p05_contrast_ratio": 3.6895,
+      "median_contrast_ratio": 4.9963,
+      "p05_large_text_contrast_pass_3_to_1": true,
+      "median_contrast_pass_4_5_to_1": true,
+      "key_id": "leave",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "outer_rect_px": [
+        1368,
+        902,
+        452,
+        122
+      ],
+      "text_safe_rect_px": [
+        1392,
+        922,
+        404,
+        82
+      ],
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "original_key_surface_restored": true,
+      "minimum_ink_height_px": 33,
+      "ink_height_pass": true,
+      "padding_pass": true
+    }
+  ],
+  "states_and_stress": [
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        44,
+        8,
+        146,
+        29
+      ],
+      "ink_width_px": 102,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 44,
+        "right": 45,
+        "top": 8,
+        "bottom": 8
+      },
+      "minimum_padding_px": 8,
+      "solid_core_pixels": 458,
+      "antialias_edge_pixels": 601,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "normal",
+      "key_id": "buy_1",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false
+    },
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        44,
+        8,
+        146,
+        29
+      ],
+      "ink_width_px": 102,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 44,
+        "right": 45,
+        "top": 8,
+        "bottom": 8
+      },
+      "minimum_padding_px": 8,
+      "solid_core_pixels": 458,
+      "antialias_edge_pixels": 601,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "hover",
+      "key_id": "buy_1",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false
+    },
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        44,
+        7,
+        146,
+        28
+      ],
+      "ink_width_px": 102,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 44,
+        "right": 45,
+        "top": 7,
+        "bottom": 7
+      },
+      "minimum_padding_px": 7,
+      "solid_core_pixels": 458,
+      "antialias_edge_pixels": 601,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "pressed",
+      "key_id": "buy_1",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false
+    },
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        44,
+        8,
+        146,
+        29
+      ],
+      "ink_width_px": 102,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 44,
+        "right": 45,
+        "top": 8,
+        "bottom": 8
+      },
+      "minimum_padding_px": 8,
+      "solid_core_pixels": 458,
+      "antialias_edge_pixels": 601,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "disabled",
+      "key_id": "buy_1",
+      "ink_hex": "#30261D",
+      "solid_backing_added": false
+    },
+    {
+      "text": "购买 999 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        38,
+        8,
+        153,
+        29
+      ],
+      "ink_width_px": 115,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 38,
+        "right": 38,
+        "top": 8,
+        "bottom": 8
+      },
+      "minimum_padding_px": 8,
+      "solid_core_pixels": 516,
+      "antialias_edge_pixels": 765,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "stress",
+      "key_id": "buy_1",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "resolution": [
+        1280,
+        500
+      ]
+    },
+    {
+      "text": "卖出 999 金",
+      "requested_font_size_px": 22,
+      "font_size_px": 22,
+      "mask_bbox_local_px": [
+        16,
+        11,
+        131,
+        32
+      ],
+      "ink_width_px": 115,
+      "ink_height_px": 21,
+      "padding_px": {
+        "left": 16,
+        "right": 17,
+        "top": 11,
+        "bottom": 12
+      },
+      "minimum_padding_px": 11,
+      "solid_core_pixels": 547,
+      "antialias_edge_pixels": 668,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "stress",
+      "key_id": "sell",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "resolution": [
+        1280,
+        500
+      ]
+    },
+    {
+      "text": "交互已锁定",
+      "requested_font_size_px": 24,
+      "font_size_px": 24,
+      "mask_bbox_local_px": [
+        74,
+        15,
+        194,
+        39
+      ],
+      "ink_width_px": 120,
+      "ink_height_px": 24,
+      "padding_px": {
+        "left": 74,
+        "right": 75,
+        "top": 15,
+        "bottom": 15
+      },
+      "minimum_padding_px": 15,
+      "solid_core_pixels": 714,
+      "antialias_edge_pixels": 777,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "stress",
+      "key_id": "leave",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "resolution": [
+        1280,
+        500
+      ]
+    },
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        69,
+        11,
+        218,
+        44
+      ],
+      "ink_width_px": 149,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 69,
+        "right": 69,
+        "top": 11,
+        "bottom": 11
+      },
+      "minimum_padding_px": 11,
+      "solid_core_pixels": 1219,
+      "antialias_edge_pixels": 920,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "normal",
+      "key_id": "buy_1",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false
+    },
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        69,
+        11,
+        218,
+        44
+      ],
+      "ink_width_px": 149,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 69,
+        "right": 69,
+        "top": 11,
+        "bottom": 11
+      },
+      "minimum_padding_px": 11,
+      "solid_core_pixels": 1219,
+      "antialias_edge_pixels": 920,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "hover",
+      "key_id": "buy_1",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false
+    },
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        69,
+        9,
+        218,
+        42
+      ],
+      "ink_width_px": 149,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 69,
+        "right": 69,
+        "top": 9,
+        "bottom": 10
+      },
+      "minimum_padding_px": 9,
+      "solid_core_pixels": 1219,
+      "antialias_edge_pixels": 920,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "pressed",
+      "key_id": "buy_1",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false
+    },
+    {
+      "text": "购买 12 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        69,
+        11,
+        218,
+        44
+      ],
+      "ink_width_px": 149,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 69,
+        "right": 69,
+        "top": 11,
+        "bottom": 11
+      },
+      "minimum_padding_px": 11,
+      "solid_core_pixels": 1219,
+      "antialias_edge_pixels": 920,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "disabled",
+      "key_id": "buy_1",
+      "ink_hex": "#30261D",
+      "solid_backing_added": false
+    },
+    {
+      "text": "购买 999 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        59,
+        11,
+        227,
+        44
+      ],
+      "ink_width_px": 168,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 59,
+        "right": 60,
+        "top": 11,
+        "bottom": 11
+      },
+      "minimum_padding_px": 11,
+      "solid_core_pixels": 1427,
+      "antialias_edge_pixels": 1178,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "stress",
+      "key_id": "buy_1",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "resolution": [
+        1920,
+        750
+      ]
+    },
+    {
+      "text": "卖出 999 金",
+      "requested_font_size_px": 33,
+      "font_size_px": 33,
+      "mask_bbox_local_px": [
+        27,
+        16,
+        195,
+        49
+      ],
+      "ink_width_px": 168,
+      "ink_height_px": 33,
+      "padding_px": {
+        "left": 27,
+        "right": 27,
+        "top": 16,
+        "bottom": 17
+      },
+      "minimum_padding_px": 16,
+      "solid_core_pixels": 1455,
+      "antialias_edge_pixels": 1044,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "stress",
+      "key_id": "sell",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "resolution": [
+        1920,
+        750
+      ]
+    },
+    {
+      "text": "交互已锁定",
+      "requested_font_size_px": 36,
+      "font_size_px": 36,
+      "mask_bbox_local_px": [
+        113,
+        23,
+        292,
+        58
+      ],
+      "ink_width_px": 179,
+      "ink_height_px": 35,
+      "padding_px": {
+        "left": 113,
+        "right": 112,
+        "top": 23,
+        "bottom": 24
+      },
+      "minimum_padding_px": 23,
+      "solid_core_pixels": 1774,
+      "antialias_edge_pixels": 1174,
+      "direct_native_rasterization": true,
+      "dot_grid": false,
+      "outline": false,
+      "glow": false,
+      "shadow": false,
+      "state": "stress",
+      "key_id": "leave",
+      "ink_hex": "#180E08",
+      "solid_backing_added": false,
+      "resolution": [
+        1920,
+        750
+      ]
+    }
+  ],
+  "generator": {
+    "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/MarketPhysicalKeyLabelsV2/build_market_physical_key_labels_v2.py",
+    "sha256": "4eb74085e656a36e4424d7af931c634c9bc70971cfa307a91472f270d91e8df0",
+    "v1_renderer_sha256": "c8f7193ae537416c26cb6af5b2cab64d09942aa55bfdfcc94e533b0c34f6b0bb"
+  }
+}

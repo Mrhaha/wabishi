@@ -1,0 +1,15 @@
+[0:v]format=rgba,split=2[base][window_src];
+[window_src]crop=405:900:1515:0,format=rgba,split=4[window_orig][interior_src][frame_src][mask_src];
+
+[interior_src]median=radius=10:radiusV=2,eq=contrast=0.97:saturation=0.94:brightness=-0.008,format=rgba,
+geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='255*max(0,min(1,min(X-66,min(Y-(210-0.53*X),(615+0.25*X)-Y))/8))'[interior_patch];
+[window_orig][interior_patch]overlay=0:0:shortest=1,format=rgba[window_interior_clean];
+
+[frame_src]median=radius=15:radiusV=3,eq=contrast=0.98:saturation=0.86:brightness=-0.018,format=rgb24[frame_replace];
+[mask_src]format=rgb24,
+geq=r='255*gt(gte(X,58)*lte(X,82)*gte(Y,110)*lte(Y,740)+gte(X,58)*lt(abs(Y-(210-0.53*X)),24)+gte(X,58)*lt(abs(Y-(615+0.25*X)),16),0)':g='255*gt(gte(X,58)*lte(X,82)*gte(Y,110)*lte(Y,740)+gte(X,58)*lt(abs(Y-(210-0.53*X)),24)+gte(X,58)*lt(abs(Y-(615+0.25*X)),16),0)':b='255*gt(gte(X,58)*lte(X,82)*gte(Y,110)*lte(Y,740)+gte(X,58)*lt(abs(Y-(210-0.53*X)),24)+gte(X,58)*lt(abs(Y-(615+0.25*X)),16),0)',
+format=gray,lut=y='if(lt(val,64),0,255)',gblur=sigma=1.15[frame_speck_mask];
+
+[frame_replace][frame_speck_mask]alphamerge[frame_patch];
+[window_interior_clean][frame_patch]overlay=0:0:shortest=1,format=rgba,split=2[clean_patch_for_base][patch_out];
+[base][clean_patch_for_base]overlay=1515:0:shortest=1,format=rgba[clean_base]

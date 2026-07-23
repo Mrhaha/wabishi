@@ -1,0 +1,298 @@
+{
+  "board_size": [
+    1280,
+    720
+  ],
+  "source_font": "C:\\Windows\\Fonts\\NotoSansSC-VF.ttf",
+  "source_font_weight": 500,
+  "logical_grid": [
+    16,
+    16
+  ],
+  "resampling": "none",
+  "antialias_in_output": false,
+  "halo": false,
+  "major_geometry": {
+    "name": "major",
+    "dot_px": 2,
+    "pitch_px": 3,
+    "char_gap_px": 4,
+    "line_gap_px": 6
+  },
+  "major_tight_geometry": {
+    "name": "major_tight",
+    "dot_px": 2,
+    "pitch_px": 3,
+    "char_gap_px": 2,
+    "line_gap_px": 4
+  },
+  "phrases": {
+    "T1": {
+      "text": "第 1 章 · 第 1 关",
+      "geometry": "major",
+      "line_count": 1,
+      "measured_size_px": [
+        296,
+        47
+      ],
+      "output_is_integer_geometry": true
+    },
+    "T2": {
+      "text": "生命 --    金币 8",
+      "geometry": "major",
+      "line_count": 1,
+      "measured_size_px": [
+        293,
+        47
+      ],
+      "output_is_integer_geometry": true
+    },
+    "T3": {
+      "text": "目标 15    当前 0",
+      "geometry": "major",
+      "line_count": 1,
+      "measured_size_px": [
+        305,
+        47
+      ],
+      "output_is_integer_geometry": true
+    },
+    "T4": {
+      "text": "本关规则",
+      "geometry": "major",
+      "line_count": 1,
+      "measured_size_px": [
+        182,
+        47
+      ],
+      "output_is_integer_geometry": true
+    },
+    "T5": {
+      "text": "无额外规则，检查基础骰袋。",
+      "geometry": "major",
+      "line_count": 1,
+      "measured_size_px": [
+        542,
+        47
+      ],
+      "output_is_integer_geometry": true
+    },
+    "T6": {
+      "text": "拖动骰子调整结算顺序",
+      "geometry": "major",
+      "line_count": 1,
+      "measured_size_px": [
+        476,
+        47
+      ],
+      "output_is_integer_geometry": true
+    },
+    "T7": {
+      "text": "SPACE  投掷",
+      "geometry": "major",
+      "line_count": 1,
+      "measured_size_px": [
+        251,
+        47
+      ],
+      "output_is_integer_geometry": true
+    }
+  },
+  "acceptance_scope": "glyph_recognition_only",
+  "outputs": {
+    "_internal_font_source_probe_v3.png": {
+      "size": [
+        1280,
+        920
+      ],
+      "sha256": "4E38D4EB19BBA92850B02D7A8D5C796762255C6C38B3EC1B6A286E623B4207FC"
+    },
+    "led_font_v3_recognition_pressure_board_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "9CEED4A2D998D5D144EF6F0EB3D362F844AFEFA86D9EDCB500AB48563D2B4BCD"
+    },
+    "led_font_v3_blind_reading_sheet_1to1.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "B85BD66CE1629F6AE0A86DC538C07E3C1D9881F5D13E47BDC645C6D3F0F4C667"
+    },
+    "led_font_v3_complex_glyphs_zoom2x_nearest.png": {
+      "size": [
+        884,
+        766
+      ],
+      "sha256": "42B52F3AC7138A59B615FE52177223158B768F33CA833775EA4D4C476A19CAF7"
+    }
+  },
+  "checks": {
+    "native_1280x720_board": true,
+    "binary_led_output": true,
+    "no_resampling_in_acceptance_board": true,
+    "zoom_is_integer_nearest": true,
+    "logical_grid_at_least_16": true,
+    "stress_characters_present": true,
+    "unity_runtime_changed": false,
+    "candidate_led_colors_binary": true,
+    "stress_masks_unique": true
+  },
+  "candidate_led_colors_rgb": [
+    [
+      230,
+      132,
+      36
+    ],
+    [
+      255,
+      184,
+      48
+    ]
+  ],
+  "stress_mask_metrics": {
+    "character_count": 13,
+    "unique_mask_count": 13,
+    "minimum_pairwise_hamming_distance": 66
+  },
+  "current_layout_feasibility_720p": {
+    "hud_primary": {
+      "text": "第 1 章 · 第 1 关",
+      "current_rect_px": [
+        760,
+        50
+      ],
+      "line_count": 1,
+      "measured_size_px": [
+        284,
+        47
+      ],
+      "fits_width": true,
+      "fits_height": true,
+      "requires_layout_reflow": false
+    },
+    "hud_life": {
+      "text": "生命 --",
+      "current_rect_px": [
+        158,
+        50
+      ],
+      "line_count": 1,
+      "measured_size_px": [
+        125,
+        47
+      ],
+      "fits_width": true,
+      "fits_height": true,
+      "requires_layout_reflow": false
+    },
+    "hud_gold": {
+      "text": "金币 8",
+      "current_rect_px": [
+        174,
+        50
+      ],
+      "line_count": 1,
+      "measured_size_px": [
+        118,
+        47
+      ],
+      "fits_width": true,
+      "fits_height": true,
+      "requires_layout_reflow": false
+    },
+    "rail_target": {
+      "text": "目标 15",
+      "current_rect_px": [
+        88,
+        28
+      ],
+      "line_count": 1,
+      "measured_size_px": [
+        140,
+        47
+      ],
+      "fits_width": false,
+      "fits_height": false,
+      "requires_layout_reflow": true
+    },
+    "rail_current": {
+      "text": "当前 0",
+      "current_rect_px": [
+        88,
+        28
+      ],
+      "line_count": 1,
+      "measured_size_px": [
+        115,
+        47
+      ],
+      "fits_width": false,
+      "fits_height": false,
+      "requires_layout_reflow": true
+    },
+    "terminal_title": {
+      "text": "本关规则",
+      "current_rect_px": [
+        162,
+        44
+      ],
+      "line_count": 1,
+      "measured_size_px": [
+        176,
+        47
+      ],
+      "fits_width": false,
+      "fits_height": false,
+      "requires_layout_reflow": true
+    },
+    "terminal_body": {
+      "text": "无额外规则，检查基础骰袋。",
+      "current_rect_px": [
+        142,
+        174
+      ],
+      "line_count": 5,
+      "measured_size_px": [
+        133,
+        251
+      ],
+      "fits_width": true,
+      "fits_height": false,
+      "requires_layout_reflow": true
+    },
+    "micro": {
+      "text": "拖动骰子调整结算顺序",
+      "current_rect_px": [
+        570,
+        28
+      ],
+      "line_count": 1,
+      "measured_size_px": [
+        458,
+        47
+      ],
+      "fits_width": true,
+      "fits_height": false,
+      "requires_layout_reflow": true
+    },
+    "action": {
+      "text": "SPACE  投掷",
+      "current_rect_px": [
+        356,
+        72
+      ],
+      "line_count": 1,
+      "measured_size_px": [
+        239,
+        47
+      ],
+      "fits_width": true,
+      "fits_height": true,
+      "requires_layout_reflow": false
+    }
+  },
+  "layout_reflow_required": true
+}

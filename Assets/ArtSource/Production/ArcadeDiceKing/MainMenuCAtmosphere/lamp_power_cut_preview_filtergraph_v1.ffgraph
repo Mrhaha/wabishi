@@ -1,0 +1,7 @@
+[0:v]format=rgba,split=3[base_on][local_on_source][core_on_source];
+[1:v]format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='255*max(0,min(1,(500-X)/180))*if(lt(T,2),0,if(lt(T,2.06),(T-2)/0.06,if(lt(T,2.34),1,if(lt(T,2.64),(2.64-T)/0.30,0))))'[off_overlay];
+[base_on][off_overlay]overlay=0:0:shortest=1[scene_off];
+[local_on_source]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='255*max(0,min(1,(330-sqrt((X-195)*(X-195)+(Y-220)*(Y-220)))/180))*if(lt(T,2.34),0,min(1,(T-2.34)/0.14))'[local_on];
+[scene_off][local_on]overlay=0:0:shortest=1[scene_local_relight];
+[core_on_source]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='255*max(0,min(1,(95-sqrt((X-195)*(X-195)+(Y-170)*(Y-170)))/45))*if(lt(T,2.34),0,min(1,(T-2.34)/0.06))'[core_on];
+[scene_local_relight][core_on]overlay=0:0:shortest=1,scale=1920:1080:flags=lanczos,format=yuv420p[vout]

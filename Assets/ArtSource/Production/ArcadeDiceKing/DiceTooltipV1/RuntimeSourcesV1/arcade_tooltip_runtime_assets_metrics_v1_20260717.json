@@ -1,0 +1,142 @@
+{
+  "source": "Assets/ArtSource/Production/ArcadeDiceKing/DiceTooltipV1/RuntimeSourcesV1/arcade_tooltip_runtime_parts_chromakey_source_v1_20260717.png",
+  "source_dimensions": [
+    1672,
+    941
+  ],
+  "source_boxes": {
+    "short": [
+      198,
+      31,
+      1131,
+      254
+    ],
+    "medium": [
+      198,
+      269,
+      1131,
+      530
+    ],
+    "tall": [
+      198,
+      547,
+      1131,
+      913
+    ],
+    "face_cell": [
+      1248,
+      290,
+      1481,
+      418
+    ],
+    "type_core": [
+      1249,
+      496,
+      1481,
+      717
+    ]
+  },
+  "outputs": {
+    "short": {
+      "path": "Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_panel_short.png",
+      "expected_dimensions": [
+        896,
+        392
+      ],
+      "metrics": {
+        "width": 896,
+        "height": 392,
+        "visible_bounds": [
+          0,
+          2,
+          896,
+          390
+        ],
+        "transparent_pixel_count": 17393,
+        "partial_alpha_pixel_count": 2862,
+        "green_fringe_pixel_count": 0
+      }
+    },
+    "medium": {
+      "path": "Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_panel_medium.png",
+      "expected_dimensions": [
+        896,
+        488
+      ],
+      "metrics": {
+        "width": 896,
+        "height": 488,
+        "visible_bounds": [
+          0,
+          2,
+          896,
+          486
+        ],
+        "transparent_pixel_count": 17572,
+        "partial_alpha_pixel_count": 3275,
+        "green_fringe_pixel_count": 0
+      }
+    },
+    "tall": {
+      "path": "Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_panel_tall.png",
+      "expected_dimensions": [
+        896,
+        576
+      ],
+      "metrics": {
+        "width": 896,
+        "height": 576,
+        "visible_bounds": [
+          0,
+          2,
+          896,
+          574
+        ],
+        "transparent_pixel_count": 18391,
+        "partial_alpha_pixel_count": 4004,
+        "green_fringe_pixel_count": 0
+      }
+    },
+    "face_cell": {
+      "path": "Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_face_cell.png",
+      "expected_dimensions": [
+        120,
+        88
+      ],
+      "metrics": {
+        "width": 120,
+        "height": 88,
+        "visible_bounds": [
+          1,
+          0,
+          119,
+          88
+        ],
+        "transparent_pixel_count": 643,
+        "partial_alpha_pixel_count": 797,
+        "green_fringe_pixel_count": 1
+      }
+    },
+    "type_core": {
+      "path": "Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_type_core_frame.png",
+      "expected_dimensions": [
+        128,
+        128
+      ],
+      "metrics": {
+        "width": 128,
+        "height": 128,
+        "visible_bounds": [
+          1,
+          0,
+          127,
+          127
+        ],
+        "transparent_pixel_count": 7927,
+        "partial_alpha_pixel_count": 2048,
+        "green_fringe_pixel_count": 2
+      }
+    }
+  },
+  "preview": "Assets/ArtSource/Production/ArcadeDiceKing/DiceTooltipV1/RuntimeSourcesV1/arcade_tooltip_runtime_assets_preview_v1_20260717.png"
+}

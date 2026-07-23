@@ -1,0 +1,801 @@
+{
+  "scope": "baseline_alignment_only",
+  "source_glyph_contract": "V3 exact active binary shapes",
+  "source_font": "C:\\Windows\\Fonts\\NotoSansSC-VF.ttf",
+  "source_font_weight": 500,
+  "logical_grid": [
+    16,
+    16
+  ],
+  "geometry_720p": {
+    "name": "major",
+    "dot_px": 2,
+    "pitch_px": 3,
+    "char_gap_px": 4,
+    "line_gap_px": 6
+  },
+  "resampling": "none; zoom uses integer 2x nearest only",
+  "halo": false,
+  "placement": {
+    "baseline_row": 14,
+    "midline_row": 7,
+    "baseline_character_count": 36,
+    "baseline_bottom_rows": [
+      14
+    ],
+    "max_baseline_deviation_logical_rows": 0,
+    "max_baseline_deviation_physical_px_720p": 0,
+    "shape_preserved_from_v3": true,
+    "lit_pixel_counts_preserved_from_v3": true,
+    "all_placements_fit": true,
+    "floating_punctuation_rule": {
+      "characters": [
+        "-",
+        ":",
+        "·",
+        "–",
+        "—",
+        "•",
+        "："
+      ],
+      "anchor": "midline",
+      "excluded_from_baseline_deviation": true
+    },
+    "per_character": {
+      "第": {
+        "v3_active_bounds": [
+          1,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          14,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 110,
+        "active_shape_sha256": "71308890AAD404D3359C14374BCDCF940C8590EFBAD9D49E9EBD22F4538200EA",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "章": {
+        "v3_active_bounds": [
+          0,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          15,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 97,
+        "active_shape_sha256": "8C7F58943E04A90CE053C503B2E8DA853B83F09EAE647BACB83FAF9C6FA15CB6",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "生": {
+        "v3_active_bounds": [
+          1,
+          0,
+          16,
+          15
+        ],
+        "active_size": [
+          15,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 106,
+        "active_shape_sha256": "E0D350D94C5843C764E5789E2D96F5D426D9F482D92A0BDA130D6C0CCC93FF27",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "命": {
+        "v3_active_bounds": [
+          0,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          15,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 109,
+        "active_shape_sha256": "EF7F0CE8383526933ABD5C06EBAFC1F18DC3C0D6F9CDE6FCAB2ACAC6FA0D8EF5",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "金": {
+        "v3_active_bounds": [
+          0,
+          1,
+          15,
+          15
+        ],
+        "active_size": [
+          15,
+          14
+        ],
+        "v4_top_row": 1,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 120,
+        "active_shape_sha256": "B020619B656D10F7320C293B724CE455489ADDB2DAA76438203270A07F104F72",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "币": {
+        "v3_active_bounds": [
+          1,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          14,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 100,
+        "active_shape_sha256": "EF11824A349EB2EFFB4751FF07892B8066A51B84D5D532836F75FC9114FD2AA9",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "目": {
+        "v3_active_bounds": [
+          2,
+          1,
+          14,
+          15
+        ],
+        "active_size": [
+          12,
+          14
+        ],
+        "v4_top_row": 1,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 120,
+        "active_shape_sha256": "901E6C7220D114FB362D6E90094C0F7219564C5E93279D3C8214BBD1A29797DD",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "标": {
+        "v3_active_bounds": [
+          0,
+          0,
+          16,
+          15
+        ],
+        "active_size": [
+          16,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 118,
+        "active_shape_sha256": "02361982DD950371CA8B005CC5538F43115A9696EBD257742BDA7B9F1F225F15",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "当": {
+        "v3_active_bounds": [
+          1,
+          0,
+          14,
+          15
+        ],
+        "active_size": [
+          13,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 109,
+        "active_shape_sha256": "2F1E314274723239029EA3EAC641DBDC611E7DC7261AD2EB65921EA6B0406D2B",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "前": {
+        "v3_active_bounds": [
+          1,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          14,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 107,
+        "active_shape_sha256": "45416BCD24D78B6EC0A2C4F3237658FFA43A4FEFEE848B4804423D7AE9D99EFC",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "本": {
+        "v3_active_bounds": [
+          0,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          15,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 100,
+        "active_shape_sha256": "FCAA0E9DBD57AD562ECD1241D292D9F0DBB679D5D0F2A4609D4380AC011EB037",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "关": {
+        "v3_active_bounds": [
+          1,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          14,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 100,
+        "active_shape_sha256": "5DAC20921BAAD2E245DA159463C3DB528898F6565FCC8A6BE6241B22C752558B",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "规": {
+        "v3_active_bounds": [
+          0,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          15,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 122,
+        "active_shape_sha256": "21C46996A4341B33B7D881A3323D8C4D8E2142D2FBA943D35F28BC9B8C6ED1F1",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "则": {
+        "v3_active_bounds": [
+          1,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          14,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 132,
+        "active_shape_sha256": "238E0DBC37F8AFBDBFB619D86F2B234F047DBCC141BEF6A44FF47CB6030ED7E7",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "投": {
+        "v3_active_bounds": [
+          0,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          15,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 112,
+        "active_shape_sha256": "6936B6FBEE3FDE5A5FA3EDA763BE5E72186DDC7FD05496E1A50DC7D0397AF8CC",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "掷": {
+        "v3_active_bounds": [
+          0,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          15,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 133,
+        "active_shape_sha256": "978BC8E9ACEF96076087832341E1CF152EE65557EAC02218BAC47446F844C62D",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "中": {
+        "v3_active_bounds": [
+          1,
+          0,
+          15,
+          15
+        ],
+        "active_size": [
+          14,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 92,
+        "active_shape_sha256": "7F5AF5523E95901559E027100E0745DC9C5F9670F66169D31C90AA227A858AAE",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "文": {
+        "v3_active_bounds": [
+          1,
+          1,
+          16,
+          16
+        ],
+        "active_size": [
+          15,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 93,
+        "active_shape_sha256": "7C5B04F013995186EB6B3DE3A17B1B9B51E481C38D1CD0ED2908CCCEB5D21D1F",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "混": {
+        "v3_active_bounds": [
+          0,
+          1,
+          15,
+          15
+        ],
+        "active_size": [
+          15,
+          14
+        ],
+        "v4_top_row": 1,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 107,
+        "active_shape_sha256": "34A6F5A438992454A74DAAD64D2068E99B158E68CEED457865C2C3DD9AA34528",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "排": {
+        "v3_active_bounds": [
+          0,
+          0,
+          16,
+          15
+        ],
+        "active_size": [
+          16,
+          15
+        ],
+        "v4_top_row": 0,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 122,
+        "active_shape_sha256": "F2631EAE3E377AA55F2CB6C7868E9B2CDC683B45D9BDC633AD0BFD6BEB53565C",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "S": {
+        "v3_active_bounds": [
+          4,
+          2,
+          12,
+          14
+        ],
+        "active_size": [
+          8,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 52,
+        "active_shape_sha256": "07E8505C08CAE6E382680F90B62B9C1F298D0EA515775BCE501237D6419DC434",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "P": {
+        "v3_active_bounds": [
+          4,
+          2,
+          12,
+          14
+        ],
+        "active_size": [
+          8,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 52,
+        "active_shape_sha256": "11EC0CF43D5D5F926D7C1C6E2BE610B137AD0B326B69534E52A1DAF8D0B0C940",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "A": {
+        "v3_active_bounds": [
+          3,
+          2,
+          13,
+          14
+        ],
+        "active_size": [
+          10,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 62,
+        "active_shape_sha256": "6A6B5A23ED91A617503C0CBBCF161667DA07D7DE7EC307F98D603CE7E4687185",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "C": {
+        "v3_active_bounds": [
+          4,
+          2,
+          13,
+          14
+        ],
+        "active_size": [
+          9,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 46,
+        "active_shape_sha256": "698E2A6F58A40B2D8FA8655DDA833ABEBCC9E0E61C9F2FC2BBE8CC750EDAC177",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "E": {
+        "v3_active_bounds": [
+          5,
+          2,
+          12,
+          14
+        ],
+        "active_size": [
+          7,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 52,
+        "active_shape_sha256": "76DFA6FB3EABDE52A7DC4FDD08D5EE66BD9217697D30C2B0F5B4485028285297",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "B": {
+        "v3_active_bounds": [
+          4,
+          2,
+          13,
+          14
+        ],
+        "active_size": [
+          9,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 72,
+        "active_shape_sha256": "9218FBF896CA389C14D212C59DF01A7535E11BB21D38FC13EB4DC7D1DA1CA1FE",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "0": {
+        "v3_active_bounds": [
+          4,
+          2,
+          12,
+          14
+        ],
+        "active_size": [
+          8,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 56,
+        "active_shape_sha256": "A287D133448969EB35EC83BE88B7B053C708B8FF5C2AEDEB054B3137DCD80E1F",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "1": {
+        "v3_active_bounds": [
+          4,
+          2,
+          11,
+          14
+        ],
+        "active_size": [
+          7,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 38,
+        "active_shape_sha256": "C7340BFAF88097C114C05A7C07979523463ED579D4F2FDAEA550EF68CA15450B",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "2": {
+        "v3_active_bounds": [
+          4,
+          2,
+          12,
+          14
+        ],
+        "active_size": [
+          8,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 50,
+        "active_shape_sha256": "FD43B1517D8503DA23F6D822574A653C8F4691F9427AAD8450483221712409A1",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "3": {
+        "v3_active_bounds": [
+          4,
+          2,
+          11,
+          14
+        ],
+        "active_size": [
+          7,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 46,
+        "active_shape_sha256": "DF18FC4F20C7CD859E906D7D33A55EBB759B9E925A4E1AB70C86684EC68E1194",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "4": {
+        "v3_active_bounds": [
+          4,
+          2,
+          13,
+          14
+        ],
+        "active_size": [
+          9,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 52,
+        "active_shape_sha256": "200956C3783F05CD3D9742BCE1E5F95840BE8BBF12F8B39ACDA97786F6673F01",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "5": {
+        "v3_active_bounds": [
+          4,
+          2,
+          12,
+          14
+        ],
+        "active_size": [
+          8,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 51,
+        "active_shape_sha256": "D8352FFD770FD79799696A43A6990847F0FFB5BBEFEAD3EB36177506C3C735B4",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "6": {
+        "v3_active_bounds": [
+          4,
+          2,
+          12,
+          14
+        ],
+        "active_size": [
+          8,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 57,
+        "active_shape_sha256": "B1BB080061D3865E51D74DAF78B67C0AF64D463E3325C78BFEF5B8B7F057E638",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "7": {
+        "v3_active_bounds": [
+          4,
+          2,
+          12,
+          14
+        ],
+        "active_size": [
+          8,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 37,
+        "active_shape_sha256": "7F45A367CFC35A43CD8F1B91E5E0D889EEDED562241B917AC2A3AE1E88B25C01",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "8": {
+        "v3_active_bounds": [
+          4,
+          2,
+          11,
+          14
+        ],
+        "active_size": [
+          7,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 60,
+        "active_shape_sha256": "61847A4368EB213A30457EBD0C15FE7A6F5DD45E98B02A78FA8086B654C15C00",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      },
+      "9": {
+        "v3_active_bounds": [
+          4,
+          2,
+          12,
+          14
+        ],
+        "active_size": [
+          8,
+          12
+        ],
+        "v4_top_row": 3,
+        "v4_bottom_row": 14,
+        "anchor": "baseline",
+        "lit_pixel_count": 57,
+        "active_shape_sha256": "C90FE8626FC3B0D831F5379D0454EF29C08F5011231683770602286E4F9235FB",
+        "shape_preserved": true,
+        "pixel_count_preserved": true,
+        "fits_16_rows": true
+      }
+    }
+  },
+  "outputs": {
+    "led_font_v4_baseline_calibration_board_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "AE9D7E9E063C200A6618245976376741386079B6239B0759D74745592EC32B74"
+    },
+    "led_font_v4_unified_baseline_1to1.png": {
+      "size": [
+        1280,
+        520
+      ],
+      "sha256": "2DB5473E569CA7537AED48E113F975F5F7F4A79FE472C44BC64F352B95B33E3C"
+    },
+    "led_font_v4_baseline_zoom2x_nearest.png": {
+      "size": [
+        1228,
+        484
+      ],
+      "sha256": "CC20CD77F56E9C1EABD5A7CB5C63A8BB033DE8B9F1DC743E6F56D4950EA230A2"
+    }
+  },
+  "checks": {
+    "native_1280x720_board": true,
+    "v3_active_shapes_preserved": true,
+    "v3_lit_pixel_counts_preserved": true,
+    "baseline_deviation_is_zero": true,
+    "integer_vertical_translation_only": true,
+    "all_placements_fit_16_rows": true,
+    "no_antialias_or_halo": true,
+    "zoom_is_integer_nearest": true,
+    "unity_runtime_unchanged": true
+  }
+}

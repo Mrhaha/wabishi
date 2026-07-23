@@ -1,0 +1,11 @@
+role_id,level,preferred_geometry,fallback_geometries,core_hex,alpha,halo_hex,halo_alpha,halo_pixels,min_contrast,surface_hex,usage
+focus_amber,L3,display,compact,#FFD36A,1.0,#FFD36A,0.18,1,7.0,#010506,当前琥珀焦点与唯一主操作
+focus_teal,L3,display,compact,#78F3E6,1.0,#78F3E6,0.18,1,7.0,#010506,当前青色焦点与可执行刷新
+primary_amber,L2,display,compact,#FFC04A,1.0,#FFC04A,0.0,0,7.0,#010506,菜单标题资源窗骰子名价格与关键数字
+secondary_amber,L1,compact,micro,#D99A4A,1.0,#D99A4A,0.0,0,4.5,#010506,六面分布操作说明和常规反馈
+secondary_warm,L1,compact,micro,#E4D0A5,1.0,#E4D0A5,0.0,0,4.5,#010506,规则正文与需要更稳识别的说明
+ambient,L0,micro,,#806B4E,1.0,#806B4E,0.0,0,3.0,#010506,机台刻字和非交互氛围字
+disabled,Disabled,display,compact|micro,#8C8068,1.0,#8C8068,0.0,0,3.0,#010506,不可用但仍需识别的选项
+ink_on_light,InkOnLight,display,compact,#180E08,1.0,#180E08,0.0,0,7.0,#C8A77C,米色实体键上的深墨点阵字
+warning,State,display,compact,#FF8B61,1.0,#FF8B61,0.0,0,7.0,#010506,仅用于失败警告和危险结果区域
+success,State,display,compact,#9DF6E8,1.0,#9DF6E8,0.0,0,7.0,#010506,仅用于通关成功和正向结果区域

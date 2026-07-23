@@ -1,0 +1,952 @@
+{
+  "version": "V2",
+  "date": "2026-07-17",
+  "status": "像素级样张待用户验收",
+  "v1_status": "REJECTED_BLUR",
+  "runtime_changed": false,
+  "acceptance_contract": {
+    "full_frames_are_native_resolution": true,
+    "comparison_crops_are_1to1_without_resampling": true,
+    "pixel_zoom_uses_integer_nearest_only": true,
+    "overview_thumbnail_can_approve_sharpness": false,
+    "core_render_uses_antialiasing": false,
+    "core_render_uses_texture_resizing": false,
+    "core_dot_geometry_is_integer_and_square": true,
+    "glow_is_separate_layer": true,
+    "glow_filter": "none",
+    "glow_radius_px": 1,
+    "glow_alpha": 34
+  },
+  "required_text_missing_glyphs": [],
+  "metrics": {
+    "hard_core": {
+      "1920x1080": {
+        "hud_primary": {
+          "line_count": 1,
+          "measured_width_px": 602,
+          "measured_height_px": 68,
+          "rect_px": [
+            75,
+            34,
+            1140,
+            76
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 10,
+          "core_dot_px": [
+            5,
+            5
+          ],
+          "pitch_px": 7,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "hud_life": {
+          "line_count": 1,
+          "measured_width_px": 136,
+          "measured_height_px": 31,
+          "rect_px": [
+            1281,
+            34,
+            237,
+            76
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 248,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "hud_gold": {
+          "line_count": 1,
+          "measured_width_px": 104,
+          "measured_height_px": 31,
+          "rect_px": [
+            1578,
+            34,
+            261,
+            76
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 248,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "rail_target": {
+          "line_count": 1,
+          "measured_width_px": 100,
+          "measured_height_px": 27,
+          "rect_px": [
+            72,
+            286,
+            132,
+            43
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 7,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 250,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "rail_current": {
+          "line_count": 1,
+          "measured_width_px": 100,
+          "measured_height_px": 27,
+          "rect_px": [
+            72,
+            330,
+            132,
+            42
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 7,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 250,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "terminal_title": {
+          "line_count": 1,
+          "measured_width_px": 156,
+          "measured_height_px": 35,
+          "rect_px": [
+            1593,
+            261,
+            243,
+            66
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "terminal_body": {
+          "line_count": 3,
+          "measured_width_px": 208,
+          "measured_height_px": 121,
+          "rect_px": [
+            1608,
+            345,
+            213,
+            261
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 238,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "micro": {
+          "line_count": 1,
+          "measured_width_px": 356,
+          "measured_height_px": 31,
+          "rect_px": [
+            480,
+            738,
+            855,
+            42
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 232,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "action": {
+          "line_count": 1,
+          "measured_width_px": 396,
+          "measured_height_px": 52,
+          "rect_px": [
+            687,
+            861,
+            534,
+            108
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            4,
+            4
+          ],
+          "pitch_px": 6,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        }
+      },
+      "1280x720": {
+        "hud_primary": {
+          "line_count": 1,
+          "measured_width_px": 344,
+          "measured_height_px": 39,
+          "rect_px": [
+            50,
+            23,
+            760,
+            50
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 10,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "hud_life": {
+          "line_count": 1,
+          "measured_width_px": 102,
+          "measured_height_px": 23,
+          "rect_px": [
+            854,
+            23,
+            158,
+            50
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 248,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "hud_gold": {
+          "line_count": 1,
+          "measured_width_px": 78,
+          "measured_height_px": 23,
+          "rect_px": [
+            1052,
+            23,
+            174,
+            50
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 248,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "rail_target": {
+          "line_count": 1,
+          "measured_width_px": 75,
+          "measured_height_px": 20,
+          "rect_px": [
+            48,
+            191,
+            88,
+            28
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 7,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 250,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "rail_current": {
+          "line_count": 1,
+          "measured_width_px": 75,
+          "measured_height_px": 20,
+          "rect_px": [
+            48,
+            220,
+            88,
+            28
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 7,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 250,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "terminal_title": {
+          "line_count": 1,
+          "measured_width_px": 117,
+          "measured_height_px": 26,
+          "rect_px": [
+            1062,
+            174,
+            162,
+            44
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "terminal_body": {
+          "line_count": 3,
+          "measured_width_px": 126,
+          "measured_height_px": 90,
+          "rect_px": [
+            1072,
+            230,
+            142,
+            174
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 238,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "micro": {
+          "line_count": 1,
+          "measured_width_px": 267,
+          "measured_height_px": 23,
+          "rect_px": [
+            320,
+            492,
+            570,
+            28
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 232,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        },
+        "action": {
+          "line_count": 1,
+          "measured_width_px": 264,
+          "measured_height_px": 35,
+          "rect_px": [
+            458,
+            574,
+            356,
+            72
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 0,
+          "halo_alpha": 0
+        }
+      }
+    },
+    "controlled_halo": {
+      "1920x1080": {
+        "hud_primary": {
+          "line_count": 1,
+          "measured_width_px": 602,
+          "measured_height_px": 68,
+          "rect_px": [
+            75,
+            34,
+            1140,
+            76
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 10,
+          "core_dot_px": [
+            5,
+            5
+          ],
+          "pitch_px": 7,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "hud_life": {
+          "line_count": 1,
+          "measured_width_px": 136,
+          "measured_height_px": 31,
+          "rect_px": [
+            1281,
+            34,
+            237,
+            76
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 248,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "hud_gold": {
+          "line_count": 1,
+          "measured_width_px": 104,
+          "measured_height_px": 31,
+          "rect_px": [
+            1578,
+            34,
+            261,
+            76
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 248,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "rail_target": {
+          "line_count": 1,
+          "measured_width_px": 100,
+          "measured_height_px": 27,
+          "rect_px": [
+            72,
+            286,
+            132,
+            43
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 7,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 250,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "rail_current": {
+          "line_count": 1,
+          "measured_width_px": 100,
+          "measured_height_px": 27,
+          "rect_px": [
+            72,
+            330,
+            132,
+            42
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 7,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 250,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "terminal_title": {
+          "line_count": 1,
+          "measured_width_px": 156,
+          "measured_height_px": 35,
+          "rect_px": [
+            1593,
+            261,
+            243,
+            66
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "terminal_body": {
+          "line_count": 3,
+          "measured_width_px": 208,
+          "measured_height_px": 121,
+          "rect_px": [
+            1608,
+            345,
+            213,
+            261
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 238,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "micro": {
+          "line_count": 1,
+          "measured_width_px": 356,
+          "measured_height_px": 31,
+          "rect_px": [
+            480,
+            738,
+            855,
+            42
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 232,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "action": {
+          "line_count": 1,
+          "measured_width_px": 396,
+          "measured_height_px": 52,
+          "rect_px": [
+            687,
+            861,
+            534,
+            108
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            4,
+            4
+          ],
+          "pitch_px": 6,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        }
+      },
+      "1280x720": {
+        "hud_primary": {
+          "line_count": 1,
+          "measured_width_px": 344,
+          "measured_height_px": 39,
+          "rect_px": [
+            50,
+            23,
+            760,
+            50
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 10,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "hud_life": {
+          "line_count": 1,
+          "measured_width_px": 102,
+          "measured_height_px": 23,
+          "rect_px": [
+            854,
+            23,
+            158,
+            50
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 248,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "hud_gold": {
+          "line_count": 1,
+          "measured_width_px": 78,
+          "measured_height_px": 23,
+          "rect_px": [
+            1052,
+            23,
+            174,
+            50
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 248,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "rail_target": {
+          "line_count": 1,
+          "measured_width_px": 75,
+          "measured_height_px": 20,
+          "rect_px": [
+            48,
+            191,
+            88,
+            28
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 7,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 250,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "rail_current": {
+          "line_count": 1,
+          "measured_width_px": 75,
+          "measured_height_px": 20,
+          "rect_px": [
+            48,
+            220,
+            88,
+            28
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 7,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 250,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "terminal_title": {
+          "line_count": 1,
+          "measured_width_px": 117,
+          "measured_height_px": 26,
+          "rect_px": [
+            1062,
+            174,
+            162,
+            44
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "terminal_body": {
+          "line_count": 3,
+          "measured_width_px": 126,
+          "measured_height_px": 90,
+          "rect_px": [
+            1072,
+            230,
+            142,
+            174
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 238,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "micro": {
+          "line_count": 1,
+          "measured_width_px": 267,
+          "measured_height_px": 23,
+          "rect_px": [
+            320,
+            492,
+            570,
+            28
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 8,
+          "core_dot_px": [
+            2,
+            2
+          ],
+          "pitch_px": 3,
+          "integer_geometry": true,
+          "core_alpha": 232,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        },
+        "action": {
+          "line_count": 1,
+          "measured_width_px": 264,
+          "measured_height_px": 35,
+          "rect_px": [
+            458,
+            574,
+            356,
+            72
+          ],
+          "fits_width": true,
+          "fits_height": true,
+          "grid": 9,
+          "core_dot_px": [
+            3,
+            3
+          ],
+          "pitch_px": 4,
+          "integer_geometry": true,
+          "core_alpha": 255,
+          "halo_radius_px": 1,
+          "halo_alpha": 34
+        }
+      }
+    }
+  },
+  "machine_result": "PASS",
+  "user_visual_result": "PENDING",
+  "outputs": [
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_hard_core_ready_1920x1080.png",
+      "bytes": 2211072,
+      "sha256": "53D139168D56110EAFD5BC6949F71AAB385AFDB54435B8DFCA601BE04065AD1D"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_controlled_halo_ready_1920x1080.png",
+      "bytes": 2215374,
+      "sha256": "B53DB729B1F7A0181CD238D74620AA4DE48D7CEEBE7B6755D8FDDAD1EFA51284"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_hard_core_ready_1280x720.png",
+      "bytes": 1303277,
+      "sha256": "7B1146F852407481B50C49E663C201F33704D28D9CE0197381AD68FB42227C50"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_controlled_halo_ready_1280x720.png",
+      "bytes": 1307081,
+      "sha256": "31C08EEDE9B5DD2885FD32D39DE4320F7AABDE196F05728022B604371913A9DF"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1920x1080_hud_primary_comparison_1to1.png",
+      "bytes": 471369,
+      "sha256": "B0B01369F9927AEC74B697EA06BE8E3087F77131979805D4857664793B7E564E"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1920x1080_rail_comparison_1to1.png",
+      "bytes": 244989,
+      "sha256": "82302E257C50DDDBAD6F9E7B600E59E952CAC63125E54DDFEC54F3B28E988FE3"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1920x1080_terminal_comparison_1to1.png",
+      "bytes": 693860,
+      "sha256": "DF32BE8243ED9BFDFB6505ECA146AEA134C6724C365A7D10BA0D7ED09BE96740"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1920x1080_action_comparison_1to1.png",
+      "bytes": 504960,
+      "sha256": "13457CA3B0E187DA70AACB8D9A9399C232F352F630B831F494D96065B9C490AD"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1920x1080_micro_comparison_1to1.png",
+      "bytes": 582325,
+      "sha256": "4246B2374DBF37F8AC11BBC11CDA4C85F15D6DC341777386376B8CE200003F45"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1280x720_hud_primary_comparison_1to1.png",
+      "bytes": 203622,
+      "sha256": "59A2BA5C9C38A7B52E5B20A61F1A3818DC3394AA7575B8ED27D7AFAABE4895EA"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1280x720_rail_comparison_1to1.png",
+      "bytes": 114998,
+      "sha256": "7D881BEE04F07770261EF23E09DD815F33896A53937410C6BABAEBD7396C35DC"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1280x720_terminal_comparison_1to1.png",
+      "bytes": 319514,
+      "sha256": "56E5C64D7BB953982DCC28746EE9DADEE6FFC21A02CB4536EE22BD2865E35A7B"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1280x720_action_comparison_1to1.png",
+      "bytes": 223781,
+      "sha256": "9740590F50BA3C6477564A4358B0FACDC94C5E81799A0D375F2C13C023D0BE2C"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1280x720_micro_comparison_1to1.png",
+      "bytes": 268732,
+      "sha256": "34993E2C1E8532106987BC42E1FB4B6159BD81B5B5649241C1DA72D220A74B8A"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1280x720_hud_primary_pixel_zoom4x.png",
+      "bytes": 231087,
+      "sha256": "38E90E7CACBA597998AAB43759642AD7357783A23AA9415BE4AA7FD04AE968F0"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1280x720_terminal_pixel_zoom4x.png",
+      "bytes": 372282,
+      "sha256": "8D8789DD03C82B954D0403A69425AA5935573769204083DD19D6F57FD9686A87"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV2/led_font_v2_1280x720_action_pixel_zoom4x.png",
+      "bytes": 261878,
+      "sha256": "BD37A2012B00B7D6DD8D7526B5B31B52C65A215682B701A66A3A3339F4E5FEF3"
+    }
+  ]
+}

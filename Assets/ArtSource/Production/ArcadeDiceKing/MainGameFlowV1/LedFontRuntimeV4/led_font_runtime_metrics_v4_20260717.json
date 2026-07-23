@@ -1,0 +1,162 @@
+{
+  "contract": "Wabish global LED text V4",
+  "scope": "all dynamic runtime text unless explicitly exempted",
+  "explicit_exceptions": [
+    "physical embossed die-face numerals",
+    "baked DICE KING cabinet marquee"
+  ],
+  "source_font": "C:\\Windows\\Fonts\\NotoSansSC-VF.ttf",
+  "source_font_weight": 500,
+  "logical_grid": [
+    16,
+    16
+  ],
+  "baseline_row": 14,
+  "midline_row": 7,
+  "named_styles_720p": {
+    "display": {
+      "name": "display",
+      "dot": 2,
+      "pitch": 3,
+      "char_gap": 4,
+      "line_gap": 6,
+      "cell_px": 47,
+      "line_px": 53
+    },
+    "compact": {
+      "name": "compact",
+      "dot": 1,
+      "pitch": 2,
+      "char_gap": 2,
+      "line_gap": 4,
+      "cell_px": 31,
+      "line_px": 35
+    },
+    "micro": {
+      "name": "micro",
+      "dot": 1,
+      "pitch": 1,
+      "char_gap": 1,
+      "line_gap": 2,
+      "cell_px": 16,
+      "line_px": 18
+    }
+  },
+  "glyph_count": 911,
+  "atlas": {
+    "size": [
+      576,
+      522
+    ],
+    "sha256": "0E79A8F12E9757278B82BE476B4D8B420CECABBD1DF8740D85F08A27BF62923A"
+  },
+  "map": {
+    "row_count": 911,
+    "sha256": "DA02A4F5502F2D312EE8F032B385CE814357BF252F399342A8A071A23C6E6C9E"
+  },
+  "styles": {
+    "row_count": 3,
+    "sha256": "5A81193E067F7BFEEDCDC721399C97D912A593726B36B58649690D889057BA0E"
+  },
+  "implementation_audit": {
+    "dynamic_label_sites_routed_to_standard_renderer": 92,
+    "raw_gui_label_calls": 8,
+    "raw_gui_toggle_calls": 1,
+    "raw_gui_button_calls": 15,
+    "text_bearing_raw_gui_button_calls": 0,
+    "other_text_widget_calls": 0,
+    "serialized_text_component_hits": [],
+    "raw_gui_label_allowlist": [
+      "2 physical die-face numeral draws",
+      "1 missing-resource safety fallback"
+    ],
+    "raw_gui_toggle_allowlist": [
+      "1 empty-content hit/control draw; label is rendered separately"
+    ],
+    "raw_gui_button_allowlist": [
+      "empty-content hit/control draws only; labels are rendered separately"
+    ],
+    "main_menu_baked_copy_is_covered": true,
+    "renderer_uses_named_styles": true,
+    "renderer_loads_shared_style_contract": true,
+    "renderer_forces_point_filter": true,
+    "renderer_uses_physical_pixel_rounding": true
+  },
+  "truth_outputs": {
+    "led_font_runtime_v4_truth_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "17B8FB804136504C83B09C24E4238EF86A177DDCAFC0F4D04BB878F9735DAC32"
+    },
+    "led_font_runtime_v4_truth_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "F1777B941CA8799F64531741CC9A02CC9939E1092E630719AA9E559CEDDA83FD"
+    },
+    "led_font_runtime_v4_main_menu_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "0F3D35D014B3CB18957569700C682CBD5587C0DB38389081F793E09D1C62AC92"
+    },
+    "led_font_runtime_v4_run_ready_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "D627F0572A97CA764D670CF37331A0B7A6CE768FDFCFE909F5745D1702EDA655"
+    },
+    "led_font_runtime_v4_market_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "656D8E0E86EF59CE816D94778D2E5F0BFD615F292246B3C1804E39838F12ADE1"
+    },
+    "led_font_runtime_v4_main_menu_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "0CF87D12EC2ED4912048EC1BCA9284C16E970F14E76306DE422A318DCC3AC6B1"
+    },
+    "led_font_runtime_v4_run_ready_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "5C38F14BB47E41B35F47E973791B2671273F893AA19C0D8BE8866FC6D762716D"
+    },
+    "led_font_runtime_v4_market_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "B403740969A80B31CC720DEAA5D270AB7BCBF13D2DC7500EFA003C09CC550C40"
+    }
+  },
+  "checks": {
+    "v4_approved_shapes_preserved": true,
+    "approved_baseline_deviation_zero": true,
+    "atlas_is_binary_alpha": true,
+    "all_source_characters_mapped": true,
+    "native_720_truth": true,
+    "native_1080_truth": true,
+    "no_halo_or_antialias": true,
+    "physical_pixel_rounding_only": true,
+    "all_dynamic_label_sites_route_standard": true,
+    "raw_gui_labels_match_allowlist": false,
+    "raw_gui_toggle_matches_allowlist": true,
+    "raw_gui_buttons_are_textless": true,
+    "no_other_text_widget_bypass": true,
+    "no_serialized_text_component_bypass": true,
+    "main_menu_baked_copy_covered": true,
+    "runtime_named_styles_present": true,
+    "runtime_loads_shared_style_contract": true
+  }
+}

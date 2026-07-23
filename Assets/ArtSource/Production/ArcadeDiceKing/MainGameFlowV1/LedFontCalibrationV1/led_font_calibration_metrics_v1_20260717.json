@@ -1,0 +1,478 @@
+{
+  "version": "V1",
+  "date": "2026-07-17",
+  "status": "样张待验收",
+  "runtime_changed": false,
+  "reference": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/MotionPreviewsV1/_sources/01_ready_1920x1080.png",
+  "current_runtime": {
+    "atlas": "Assets/Resources/Art/MainGame/Flow/main_game_led_font_atlas.png",
+    "map": "Assets/Resources/Art/MainGame/Flow/main_game_led_font_map.csv",
+    "tile_px": 32,
+    "source_dot_px": 2,
+    "sizes": {
+      "hud_primary": 22,
+      "hud_secondary": 18,
+      "rail": 16,
+      "terminal_title": 18,
+      "terminal_body": 14,
+      "action": 24,
+      "micro": 14
+    },
+    "minimum_core_dot_px_at_1280x720": 0.875,
+    "result": "FAIL"
+  },
+  "thresholds": {
+    "minimum_core_dot_px_at_1280x720": 2.0,
+    "minimum_primary_active_height_px": 22,
+    "minimum_body_active_height_px": 18
+  },
+  "required_text_missing_glyphs": [],
+  "profiles": {
+    "candidate_a_coarse": {
+      "label": "A 推荐：10×10 粗灯珠",
+      "note": "优先接近批准预览；减少点阵密度并显著增粗灯珠。",
+      "tile_px": 10,
+      "grid": [
+        10,
+        10
+      ],
+      "cell_px": 1,
+      "source_dot_px": 1,
+      "sizes": {
+        "hud_primary": 28,
+        "hud_secondary": 24,
+        "rail": 22,
+        "terminal_title": 24,
+        "terminal_body": 22,
+        "action": 30,
+        "micro": 22
+      },
+      "tokens": {
+        "hud_primary": {
+          "logical_size": 28,
+          "core_dot_px_at_1280x720": 2.8,
+          "active_bbox_px_at_1280x720": [
+            73,
+            28
+          ],
+          "pass": true
+        },
+        "hud_secondary": {
+          "logical_size": 24,
+          "core_dot_px_at_1280x720": 2.4,
+          "active_bbox_px_at_1280x720": [
+            70,
+            24
+          ],
+          "pass": true
+        },
+        "rail": {
+          "logical_size": 22,
+          "core_dot_px_at_1280x720": 2.2,
+          "active_bbox_px_at_1280x720": [
+            68,
+            22
+          ],
+          "pass": true
+        },
+        "terminal_title": {
+          "logical_size": 24,
+          "core_dot_px_at_1280x720": 2.4,
+          "active_bbox_px_at_1280x720": [
+            95,
+            24
+          ],
+          "pass": true
+        },
+        "terminal_body": {
+          "logical_size": 22,
+          "core_dot_px_at_1280x720": 2.2,
+          "active_bbox_px_at_1280x720": [
+            271,
+            22
+          ],
+          "pass": true
+        },
+        "action": {
+          "logical_size": 30,
+          "core_dot_px_at_1280x720": 3.0,
+          "active_bbox_px_at_1280x720": [
+            173,
+            26
+          ],
+          "pass": true
+        },
+        "micro": {
+          "logical_size": 22,
+          "core_dot_px_at_1280x720": 2.2,
+          "active_bbox_px_at_1280x720": [
+            88,
+            22
+          ],
+          "pass": true
+        }
+      },
+      "layout_fits_1280x720": true,
+      "missing_glyphs": [],
+      "layout_metrics": {
+        "1920x1080": {
+          "hud_primary": {
+            "line_count": 1,
+            "measured_width_design": 241.36,
+            "measured_height_design": 34.72,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "hud_secondary": {
+            "line_count": 1,
+            "measured_width_design": 84.96,
+            "measured_height_design": 29.76,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "rail": {
+            "line_count": 1,
+            "measured_width_design": 83.16,
+            "measured_height_design": 27.28,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "terminal_title": {
+            "line_count": 1,
+            "measured_width_design": 96.0,
+            "measured_height_design": 29.76,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "terminal_body": {
+            "line_count": 3,
+            "measured_width_design": 132.0,
+            "measured_height_design": 81.84,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "micro": {
+            "line_count": 1,
+            "measured_width_design": 220.0,
+            "measured_height_design": 27.28,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "action": {
+            "line_count": 1,
+            "measured_width_design": 192.6,
+            "measured_height_design": 37.2,
+            "fits_width": true,
+            "fits_height": true
+          }
+        },
+        "1280x720": {
+          "hud_primary": {
+            "line_count": 1,
+            "measured_width_design": 241.36,
+            "measured_height_design": 34.72,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "hud_secondary": {
+            "line_count": 1,
+            "measured_width_design": 84.96,
+            "measured_height_design": 29.76,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "rail": {
+            "line_count": 1,
+            "measured_width_design": 83.16,
+            "measured_height_design": 27.28,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "terminal_title": {
+            "line_count": 1,
+            "measured_width_design": 96.0,
+            "measured_height_design": 29.76,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "terminal_body": {
+            "line_count": 3,
+            "measured_width_design": 132.0,
+            "measured_height_design": 81.84,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "micro": {
+            "line_count": 1,
+            "measured_width_design": 220.0,
+            "measured_height_design": 27.28,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "action": {
+            "line_count": 1,
+            "measured_width_design": 192.6,
+            "measured_height_design": 37.2,
+            "fits_width": true,
+            "fits_height": true
+          }
+        }
+      },
+      "result": "PASS"
+    },
+    "candidate_b_compact": {
+      "label": "B 保守：11×11 紧凑灯珠",
+      "note": "保留更多中文字形细节；尺寸较克制，核心灯珠仍不低于 2px。",
+      "tile_px": 11,
+      "grid": [
+        11,
+        11
+      ],
+      "cell_px": 1,
+      "source_dot_px": 1,
+      "sizes": {
+        "hud_primary": 26,
+        "hud_secondary": 23,
+        "rail": 22,
+        "terminal_title": 24,
+        "terminal_body": 22,
+        "action": 28,
+        "micro": 22
+      },
+      "tokens": {
+        "hud_primary": {
+          "logical_size": 26,
+          "core_dot_px_at_1280x720": 2.364,
+          "active_bbox_px_at_1280x720": [
+            68,
+            29
+          ],
+          "pass": true
+        },
+        "hud_secondary": {
+          "logical_size": 23,
+          "core_dot_px_at_1280x720": 2.091,
+          "active_bbox_px_at_1280x720": [
+            66,
+            24
+          ],
+          "pass": true
+        },
+        "rail": {
+          "logical_size": 22,
+          "core_dot_px_at_1280x720": 2.0,
+          "active_bbox_px_at_1280x720": [
+            68,
+            23
+          ],
+          "pass": true
+        },
+        "terminal_title": {
+          "logical_size": 24,
+          "core_dot_px_at_1280x720": 2.182,
+          "active_bbox_px_at_1280x720": [
+            93,
+            25
+          ],
+          "pass": true
+        },
+        "terminal_body": {
+          "logical_size": 22,
+          "core_dot_px_at_1280x720": 2.0,
+          "active_bbox_px_at_1280x720": [
+            271,
+            25
+          ],
+          "pass": true
+        },
+        "action": {
+          "logical_size": 28,
+          "core_dot_px_at_1280x720": 2.545,
+          "active_bbox_px_at_1280x720": [
+            160,
+            28
+          ],
+          "pass": true
+        },
+        "micro": {
+          "logical_size": 22,
+          "core_dot_px_at_1280x720": 2.0,
+          "active_bbox_px_at_1280x720": [
+            88,
+            23
+          ],
+          "pass": true
+        }
+      },
+      "layout_fits_1280x720": true,
+      "missing_glyphs": [],
+      "layout_metrics": {
+        "1920x1080": {
+          "hud_primary": {
+            "line_count": 1,
+            "measured_width_design": 224.12,
+            "measured_height_design": 32.24,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "hud_secondary": {
+            "line_count": 1,
+            "measured_width_design": 81.42,
+            "measured_height_design": 28.52,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "rail": {
+            "line_count": 1,
+            "measured_width_design": 83.16,
+            "measured_height_design": 27.28,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "terminal_title": {
+            "line_count": 1,
+            "measured_width_design": 96.0,
+            "measured_height_design": 29.76,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "terminal_body": {
+            "line_count": 3,
+            "measured_width_design": 132.0,
+            "measured_height_design": 81.84,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "micro": {
+            "line_count": 1,
+            "measured_width_design": 220.0,
+            "measured_height_design": 27.28,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "action": {
+            "line_count": 1,
+            "measured_width_design": 179.76,
+            "measured_height_design": 34.72,
+            "fits_width": true,
+            "fits_height": true
+          }
+        },
+        "1280x720": {
+          "hud_primary": {
+            "line_count": 1,
+            "measured_width_design": 224.12,
+            "measured_height_design": 32.24,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "hud_secondary": {
+            "line_count": 1,
+            "measured_width_design": 81.42,
+            "measured_height_design": 28.52,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "rail": {
+            "line_count": 1,
+            "measured_width_design": 83.16,
+            "measured_height_design": 27.28,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "terminal_title": {
+            "line_count": 1,
+            "measured_width_design": 96.0,
+            "measured_height_design": 29.76,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "terminal_body": {
+            "line_count": 3,
+            "measured_width_design": 132.0,
+            "measured_height_design": 81.84,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "micro": {
+            "line_count": 1,
+            "measured_width_design": 220.0,
+            "measured_height_design": 27.28,
+            "fits_width": true,
+            "fits_height": true
+          },
+          "action": {
+            "line_count": 1,
+            "measured_width_design": 179.76,
+            "measured_height_design": 34.72,
+            "fits_width": true,
+            "fits_height": true
+          }
+        }
+      },
+      "result": "PASS"
+    }
+  },
+  "outputs": [
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_calibration_board_v1_1920x1080_source_20260717.png",
+      "bytes": 1661425,
+      "sha256": "B4B3C0CABB1AEC85A9C754E1A39C0A3AF84B1F44B9B5ED7B8E71B8064A73D736"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_calibration_board_v1_1280x720_source_20260717.png",
+      "bytes": 1135431,
+      "sha256": "13AB205FE66FF3CE65106AB61923B7CA0B90205330BA024C241255728A7C0046"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_calibration_board_v1_1920x1080_preview_20260717.png",
+      "bytes": 850272,
+      "sha256": "1A20420C850F5B2A3DC8062F32E955B27638045B5BC0A9727E56864F102E3246"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_calibration_board_v1_1280x720_preview_20260717.png",
+      "bytes": 800653,
+      "sha256": "7B1A90D10AACB0F73212548D953E2928C81E854DE29426D63BD2E15A14C8BBD8"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_candidate_a_coarse_atlas_v1.png",
+      "bytes": 23313,
+      "sha256": "CA5579EED60866E1E4EE691F7D90796B0985FBEBD0458EF900BF372DA9F7BC6A"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_candidate_a_coarse_map_v1.csv",
+      "bytes": 20319,
+      "sha256": "2CFD43E22911D5811F9450459218103ECC95B255210DD22FDA9D44DB107CA775"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_candidate_a_coarse_ready_1920x1080_v1.png",
+      "bytes": 2202528,
+      "sha256": "0F3570ADEFB87FF5A7D7EB042B82AD92D14142962CDD88CEF95ADE335194F1C9"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_candidate_a_coarse_ready_1280x720_v1.png",
+      "bytes": 1297116,
+      "sha256": "AB05B2F4D08F649CA7CDA6C474EFB45C7FB3CBD83620522956F6C68A869EC6EE"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_candidate_b_compact_atlas_v1.png",
+      "bytes": 26710,
+      "sha256": "979382438AFEE1C2694211B689AA0EA60D3E3A67738FFBE00948D59CB7124077"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_candidate_b_compact_map_v1.csv",
+      "bytes": 20319,
+      "sha256": "3CBD379359959C071C496632C5C5E5E2F2FA11A0302580C78DEEC8683674C86D"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_candidate_b_compact_ready_1920x1080_v1.png",
+      "bytes": 2206250,
+      "sha256": "E4F151A824F7E08FAC64D1FD65F1DB484E60284DA3F353C364BF15B89071ABFF"
+    },
+    {
+      "path": "Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontCalibrationV1/led_font_candidate_b_compact_ready_1280x720_v1.png",
+      "bytes": 1298033,
+      "sha256": "99508443B0BCFE0C47F7890EFD6C64D8E916BC1824ABB65488D797A830551949"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+[0:v]format=rgba,split=2[base][window_src];
+[window_src]crop=405:900:1515:0,median=radius=10:radiusV=2,eq=contrast=0.97:saturation=0.94:brightness=-0.008,format=rgba,
+geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='255*max(0,min(1,min(X-66,min(Y-(210-0.53*X),(615+0.25*X)-Y))/8))',split=2[clean_patch_for_base][patch_out];
+[base][clean_patch_for_base]overlay=1515:0:shortest=1,format=rgba[clean_base]
