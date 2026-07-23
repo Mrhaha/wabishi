@@ -1,0 +1,4 @@
+FAIL
+System.InvalidOperationException: ScreenCapture returned no texture for 20260717_type_core_ready_1920x1080.png within the timeout.
+  at WabishTypeCoreRuntimeCapture.TryCaptureFrame (System.String fileName) [0x001c0] in F:\unity\wabish\Assets\Editor\WabishTypeCoreRuntimeCapture.cs:454 
+  at WabishTypeCoreRuntimeCapture.Update () [0x0015e] in F:\unity\wabish\Assets\Editor\WabishTypeCoreRuntimeCapture.cs:200 

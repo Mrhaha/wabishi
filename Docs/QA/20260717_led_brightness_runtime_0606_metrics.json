@@ -1,0 +1,298 @@
+{
+  "scale": 0.606,
+  "source_size": [
+    1920,
+    1080
+  ],
+  "stress_size": [
+    1164,
+    654
+  ],
+  "resampler": "Pillow Image.Resampling.BILINEAR",
+  "screens": {
+    "main_menu": {
+      "primary_cards": {
+        "normalized_box": [
+          0.29,
+          0.26,
+          0.71,
+          0.69
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 0,
+          "focus_teal": 5642,
+          "primary_amber": 5453,
+          "secondary_amber": 2500,
+          "secondary_warm": 3251
+        },
+        "stress": {
+          "p95_luminance": 0.530013,
+          "p99_luminance": 0.700915,
+          "bright_chroma_pixels": 9792,
+          "bright_chroma_ratio": 0.071408
+        },
+        "before_stress": {
+          "p95_luminance": 0.394983,
+          "p99_luminance": 0.641977,
+          "bright_chroma_pixels": 6353,
+          "bright_chroma_ratio": 0.046329
+        }
+      },
+      "confirm_key": {
+        "normalized_box": [
+          0.3,
+          0.74,
+          0.7,
+          0.91
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 2413,
+          "focus_teal": 0,
+          "primary_amber": 0,
+          "secondary_amber": 0,
+          "secondary_warm": 0
+        },
+        "stress": {
+          "p95_luminance": 0.300403,
+          "p99_luminance": 0.578752,
+          "bright_chroma_pixels": 1071,
+          "bright_chroma_ratio": 0.020705
+        },
+        "before_stress": {
+          "p95_luminance": 0.236968,
+          "p99_luminance": 0.363304,
+          "bright_chroma_pixels": 272,
+          "bright_chroma_ratio": 0.005258
+        }
+      }
+    },
+    "run_ready": {
+      "top_hud": {
+        "normalized_box": [
+          0.0,
+          0.0,
+          1.0,
+          0.13
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 0,
+          "focus_teal": 0,
+          "primary_amber": 9390,
+          "secondary_amber": 0,
+          "secondary_warm": 0
+        },
+        "stress": {
+          "p95_luminance": 0.282016,
+          "p99_luminance": 0.647813,
+          "bright_chroma_pixels": 2803,
+          "bright_chroma_ratio": 0.02833
+        },
+        "before_stress": {
+          "p95_luminance": 0.143873,
+          "p99_luminance": 0.337861,
+          "bright_chroma_pixels": 696,
+          "bright_chroma_ratio": 0.007035
+        }
+      },
+      "target_panel": {
+        "normalized_box": [
+          0.0,
+          0.12,
+          0.17,
+          0.76
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 0,
+          "focus_teal": 0,
+          "primary_amber": 1376,
+          "secondary_amber": 0,
+          "secondary_warm": 0
+        },
+        "stress": {
+          "p95_luminance": 0.206599,
+          "p99_luminance": 0.434415,
+          "bright_chroma_pixels": 1018,
+          "bright_chroma_ratio": 0.012271
+        },
+        "before_stress": {
+          "p95_luminance": 0.192229,
+          "p99_luminance": 0.434415,
+          "bright_chroma_pixels": 1082,
+          "bright_chroma_ratio": 0.013042
+        }
+      },
+      "terminal": {
+        "normalized_box": [
+          0.77,
+          0.15,
+          1.0,
+          0.63
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 0,
+          "focus_teal": 0,
+          "primary_amber": 1017,
+          "secondary_amber": 0,
+          "secondary_warm": 3075
+        },
+        "stress": {
+          "p95_luminance": 0.186469,
+          "p99_luminance": 0.327552,
+          "bright_chroma_pixels": 273,
+          "bright_chroma_ratio": 0.003244
+        },
+        "before_stress": {
+          "p95_luminance": 0.147064,
+          "p99_luminance": 0.346424,
+          "bright_chroma_pixels": 571,
+          "bright_chroma_ratio": 0.006785
+        }
+      },
+      "action_key": {
+        "normalized_box": [
+          0.28,
+          0.75,
+          0.72,
+          0.98
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 4572,
+          "focus_teal": 0,
+          "primary_amber": 0,
+          "secondary_amber": 0,
+          "secondary_warm": 0
+        },
+        "stress": {
+          "p95_luminance": 0.325268,
+          "p99_luminance": 0.599536,
+          "bright_chroma_pixels": 3223,
+          "bright_chroma_ratio": 0.041688
+        },
+        "before_stress": {
+          "p95_luminance": 0.126056,
+          "p99_luminance": 0.275528,
+          "bright_chroma_pixels": 458,
+          "bright_chroma_ratio": 0.005924
+        }
+      }
+    },
+    "market": {
+      "top_hud": {
+        "normalized_box": [
+          0.0,
+          0.0,
+          1.0,
+          0.14
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 0,
+          "focus_teal": 0,
+          "primary_amber": 14424,
+          "secondary_amber": 0,
+          "secondary_warm": 0
+        },
+        "stress": {
+          "p95_luminance": 0.385344,
+          "p99_luminance": 0.675515,
+          "bright_chroma_pixels": 4855,
+          "bright_chroma_ratio": 0.045337
+        },
+        "before_stress": {
+          "p95_luminance": 0.30575,
+          "p99_luminance": 0.572127,
+          "bright_chroma_pixels": 3102,
+          "bright_chroma_ratio": 0.028967
+        }
+      },
+      "product_names": {
+        "normalized_box": [
+          0.18,
+          0.47,
+          0.97,
+          0.71
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 0,
+          "focus_teal": 0,
+          "primary_amber": 11940,
+          "secondary_amber": 2855,
+          "secondary_warm": 0
+        },
+        "stress": {
+          "p95_luminance": 0.562203,
+          "p99_luminance": 0.669389,
+          "bright_chroma_pixels": 21579,
+          "bright_chroma_ratio": 0.14956
+        },
+        "before_stress": {
+          "p95_luminance": 0.548898,
+          "p99_luminance": 0.599348,
+          "bright_chroma_pixels": 17835,
+          "bright_chroma_ratio": 0.123611
+        }
+      },
+      "refresh_key": {
+        "normalized_box": [
+          0.0,
+          0.79,
+          0.27,
+          1.0
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 0,
+          "focus_teal": 3911,
+          "primary_amber": 0,
+          "secondary_amber": 0,
+          "secondary_warm": 0
+        },
+        "stress": {
+          "p95_luminance": 0.430686,
+          "p99_luminance": 0.688013,
+          "bright_chroma_pixels": 2188,
+          "bright_chroma_ratio": 0.050862
+        },
+        "before_stress": {
+          "p95_luminance": 0.278151,
+          "p99_luminance": 0.484237,
+          "bright_chroma_pixels": 739,
+          "bright_chroma_ratio": 0.017179
+        }
+      },
+      "feedback": {
+        "normalized_box": [
+          0.2,
+          0.8,
+          0.79,
+          1.0
+        ],
+        "raw_exact_role_core_pixels": {
+          "focus_amber": 0,
+          "focus_teal": 377,
+          "primary_amber": 0,
+          "secondary_amber": 2875,
+          "secondary_warm": 0
+        },
+        "stress": {
+          "p95_luminance": 0.47971,
+          "p99_luminance": 0.542758,
+          "bright_chroma_pixels": 5527,
+          "bright_chroma_ratio": 0.061413
+        },
+        "before_stress": {
+          "p95_luminance": 0.473303,
+          "p99_luminance": 0.539939,
+          "bright_chroma_pixels": 5224,
+          "bright_chroma_ratio": 0.058046
+        }
+      }
+    }
+  },
+  "contact_sheet": "20260717_led_brightness_runtime_0606_before_after.png",
+  "outputs": {
+    "main_menu": "20260717_led_brightness_runtime_main_menu_0606.png",
+    "run_ready": "20260717_led_brightness_runtime_run_ready_0606.png",
+    "market": "20260717_led_brightness_runtime_market_0606.png"
+  },
+  "status": "PASS",
+  "failures": []
+}

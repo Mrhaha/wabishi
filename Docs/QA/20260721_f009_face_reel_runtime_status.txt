@@ -1,0 +1,2 @@
+2026-07-21 21:26:16
+PASS: fixed square shells, face-only reel motion, left-to-right stop wave and automatic scoring captured at both target resolutions.

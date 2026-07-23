@@ -1,0 +1,72 @@
+{
+  "date": "2026-07-22",
+  "unity_version": "2019.4.33f1",
+  "compile": {
+    "isolated_batchmode_exit_code": 0,
+    "csharp_errors": 0
+  },
+  "runtime_capture": {
+    "status": "PASS",
+    "native_resolutions": [
+      "1920x1080",
+      "1280x720"
+    ],
+    "pressure_resolution": "1164x654",
+    "pressure_scale_from_1920x1080": 0.60625,
+    "scenarios": [
+      "养猪·触发器",
+      "再触发·三只小猪",
+      "响应·盟约"
+    ]
+  },
+  "font_contract": {
+    "atlas_changed": false,
+    "map_changed": false,
+    "missing_glyph_count": 0,
+    "source_role": "SecondaryAmber",
+    "cursor_role": "SecondaryWarm",
+    "native_720_geometry": "Micro",
+    "native_720_core_dot_px": 1,
+    "baseline_contract": "approved V4 unchanged"
+  },
+  "fit_checks": [
+    {
+      "text": "养猪·触发器",
+      "micro_width_px": 83,
+      "available_width_px": 116,
+      "fits": true
+    },
+    {
+      "text": "再触发·三只小猪",
+      "micro_width_px": 116,
+      "available_width_px": 116,
+      "fits": true
+    },
+    {
+      "text": "响应·盟约",
+      "micro_width_px": 67,
+      "available_width_px": 116,
+      "fits": true
+    },
+    {
+      "text": "主槽·二重唱",
+      "micro_width_px": 81,
+      "available_width_px": 106,
+      "fits": true
+    }
+  ],
+  "visual_contract": {
+    "exact_per_die_score_visible": false,
+    "tier_name_visible": false,
+    "die_to_die_link_visible": false,
+    "physical_die_displacement": false,
+    "simultaneous_score_halo_limit": 1,
+    "source_tag_anchored_to_actual_die": true,
+    "cursor_context_visible_during_local_chain": true,
+    "legacy_bottom_banner_suppressed": true
+  },
+  "issues": {
+    "p0": 0,
+    "p1": 0
+  }
+}

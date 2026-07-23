@@ -1,0 +1,1517 @@
+[LicensingClient] ERROR Failed to connect to local IPC
+[Licensing::Module] Failed to connect to channel: LicenseClient-admin
+[Licensing::Module] Successfully launched the LicensingClient
+[LicensingClient] ERROR Error 1 while verifying Licensing Client signature (path: 49908, process Id: F:/unity/Unity20190433_release/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe)
+[Licensing::Module] LicensingClient has failed validation
+IPC channel to LicensingClient doesn't exist; falling back to Legacy licensing
+[LicensingClient] ERROR Failed to disconnect local IPC connection
+
+LICENSE SYSTEM [2026723 17:51:22] Current license is already valid and activated. Skipping license activation process (Provided username/password will be ignored).
+[Moonton] DeviceId:2d07e8dbf9adf31237a4f2360ec5ca704959c37e
+Built from 'pre_release' branch; Version is '2019.4.33f1 (c2fa268b6) revision 12778022'; Using compiler version '191627012'
+OS: 'Windows 10  (10.0.19044) 64bit EnterpriseS' Language: 'zh' Physical Memory: 65309 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 1
+[Package Manager] Server::Start -- Port 56511 was selected
+
+COMMAND LINE ARGUMENTS:
+F:\unity\Unity20190433_release\Editor\Unity.exe
+-batchmode
+-projectPath
+C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c
+-executeMethod
+WabishF009SettlementFinaleCapture.Capture
+-logFile
+F:\unity\wabish\Docs\QA\20260723_f006_critical_force_curve_unity.log
+Successfully changed project path to: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c
+C:/Users/admin/AppData/Local/Temp/wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c
+Using Asset Import Pipeline V2.
+LZ: Create the old Remapper
+Socket: bind failed, error: 以一种访问权限不允许的方式做了一个访问套接字的尝试。
+(10013) 
+(Filename: D:\CI\ml\20190433\pre_release\Runtime/Network/Sockets.cpp Line: 415)
+
+Unable to join player connection multicast group. 
+(Filename: D:\CI\ml\20190433\pre_release\Runtime/Network/PlayerCommunicator/EditorConnection.cpp Line: 50)
+
+DisplayProgressbar: Unity Package Manager
+Adding genesis user token Adding genesis user token [Package Manager] Done resolving packages in 0.89s seconds
+[Package Manager] Done checking package constraints in 0.00s seconds
+[Package Manager] 
+Registered 57 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.2d.animation@3.2.13 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.2d.animation@3.2.13)
+    com.unity.2d.pixel-perfect@2.1.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.2d.pixel-perfect@2.1.0)
+    com.unity.2d.psdimporter@2.1.9 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.2d.psdimporter@2.1.9)
+    com.unity.2d.spriteshape@3.0.17 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.2d.spriteshape@3.0.17)
+    com.unity.ads@3.7.5 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.ads@3.7.5)
+    com.unity.analytics@3.6.12 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.analytics@3.6.12)
+    com.unity.collab-proxy@1.14.1 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.collab-proxy@1.14.1)
+    com.unity.ide.rider@1.2.1 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.ide.rider@1.2.1)
+    com.unity.ide.visualstudio@2.0.11 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.ide.visualstudio@2.0.11)
+    com.unity.ide.vscode@1.2.4 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.ide.vscode@1.2.4)
+    com.unity.multiplayer-hlapi@1.0.8 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.multiplayer-hlapi@1.0.8)
+    com.unity.purchasing@4.1.1 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.purchasing@4.1.1)
+    com.unity.test-framework@1.1.29 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.test-framework@1.1.29)
+    com.unity.textmeshpro@2.1.6 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.textmeshpro@2.1.6)
+    com.unity.timeline@1.2.18 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.timeline@1.2.18)
+    com.unity.xr.legacyinputhelpers@2.1.8 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.xr.legacyinputhelpers@2.1.8)
+    com.unity.ext.nunit@1.0.6 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.ext.nunit@1.0.6)
+    com.unity.services.core@1.0.1 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.services.core@1.0.1)
+    nuget.mono-cecil@0.1.6-preview (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\nuget.mono-cecil@0.1.6-preview)
+    com.unity.2d.path@2.1.1 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.2d.path@2.1.1)
+    com.unity.2d.common@2.1.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.2d.common@2.1.0)
+    com.unity.mathematics@1.1.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.mathematics@1.1.0)
+  Built-in packages:
+    com.unity.2d.sprite@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.2d.sprite@1.0.0)
+    com.unity.2d.tilemap@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.2d.tilemap@1.0.0)
+    com.unity.ugui@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.ugui@1.0.0)
+    com.unity.modules.ai@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.ai@1.0.0)
+    com.unity.modules.androidjni@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.androidjni@1.0.0)
+    com.unity.modules.animation@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.animation@1.0.0)
+    com.unity.modules.assetbundle@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.assetbundle@1.0.0)
+    com.unity.modules.audio@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.audio@1.0.0)
+    com.unity.modules.cloth@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.cloth@1.0.0)
+    com.unity.modules.director@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.director@1.0.0)
+    com.unity.modules.imageconversion@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.imageconversion@1.0.0)
+    com.unity.modules.imgui@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.imgui@1.0.0)
+    com.unity.modules.jsonserialize@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.jsonserialize@1.0.0)
+    com.unity.modules.particlesystem@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.particlesystem@1.0.0)
+    com.unity.modules.physics@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.physics@1.0.0)
+    com.unity.modules.physics2d@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.physics2d@1.0.0)
+    com.unity.modules.screencapture@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.screencapture@1.0.0)
+    com.unity.modules.terrain@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.terrain@1.0.0)
+    com.unity.modules.terrainphysics@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.terrainphysics@1.0.0)
+    com.unity.modules.tilemap@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.tilemap@1.0.0)
+    com.unity.modules.ui@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.ui@1.0.0)
+    com.unity.modules.uielements@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.uielements@1.0.0)
+    com.unity.modules.umbra@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.umbra@1.0.0)
+    com.unity.modules.unityanalytics@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.unityanalytics@1.0.0)
+    com.unity.modules.unitywebrequest@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.unitywebrequest@1.0.0)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.unitywebrequestassetbundle@1.0.0)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.unitywebrequestaudio@1.0.0)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.unitywebrequesttexture@1.0.0)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.unitywebrequestwww@1.0.0)
+    com.unity.modules.vehicles@1.0.0 (location: C:\Users\admin\AppData\Local\Temp\wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c\Library\PackageCache\com.unity.modules.vehicles@1.0.0)
+    [Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.08s seconds
+Refreshing native plugins compatible for Editor in 69.94 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Engine release: build date = Mar 26 2026,time = 16:36:39.Initialize engine version: 2019.4.33f1 (c2fa268b6) mt pre_release 2.01.0055.04 build c2fa268b6684e79fac7499489dcd527796a450c6
+
+[PlayerPrefs]:ios17_shader_compile_optimize=0
+
+[PlayerPrefs]:waitfor_renderjobs=1
+
+[PlayerPrefs]:jobfied_rendering=0
+
+[PlayerPrefs]:auto_render_null_gpubound_threshold=0
+
+[PlayerPrefs]:auto_render_null_cpubound_threshold=0
+
+[PlayerPrefs]:auto_render_null_mode=0
+
+[PlayerPrefs]:gfx_enable_ios_vrr=0
+
+[PlayerPrefs]:draw_custom_buffer_mode=0
+
+[PlayerPrefs]:ps_enable_udpate_on_demand=0
+
+[PlayerPrefs]:ps_alpha_clip_less_value=0
+
+[PlayerPrefs]:ps_looping_alpha_clip_less_value=1
+[Subsystems] Discovering subsystems at path F:/unity/Unity20190433_release/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path C:/Users/admin/AppData/Local/Temp/wabish-f009-settlement-qa-c38f7547cb4347a3add020f85d8a859c/Assets
+GfxLog:CalculateGfxDeviceThreadingMode():
+  ENABLE_MULTITHREADED_CODE = 1
+  UNITY_GFX_FORCE_DIRECT_THREADING = 0
+  BootConfig force-gfx-direct = null
+  BootConfig force-gfx-st = null
+  BootConfig force-gfx-mt = null
+  GFX_SUPPORTS_JOBIFIED_RENDERING = 0
+  BootConfig force-gfx-jobs = null
+  BootConfig gfx-enable-native-gfx-jobs = null
+  UNITY_GFX_PLAYERSETTINGS_CONTROL_MULTITHREADED = 1
+  BootConfig gfx-disable-mt-rendering = null
+  GFX_SUPPORTS_JOBIFIED_RENDERING = 0
+  BootConfig gfx-enable-gfx-jobs = null
+  PlayerPrefs::GetInt(gfx-enable-gfx-jobs)=0
+  PlayerPrefs::GetInt(gfx-enable-native-gfx-jobs)=0
+SetGfxThreadingMode: mode = 0->1
+GfxLog:AdjustThreadingModeForAPI(mode,api,flags):
+  SupportsGraphicsJobs(api) = 1
+  SupportsLegacyGraphicsJobs(api) = 0
+  SupportsNativeGraphicsJobs(api) = 0
+  IsUsingJobifiedRendering() = 0
+  IsUsingNativeGraphicsJobs() = 0
+  Selected threading mode = 1
+SetGfxThreadingMode: mode = 1->1
+GfxDevice: creating device client; threaded=0
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce RTX 4060 Ti (ID=0x2803)
+    Vendor:   
+    VRAM:     7949 MB
+    Driver:   32.0.15.8180
+Initialize mono
+Mono path[0] = 'F:/unity/Unity20190433_release/Editor/Data/Managed'
+Mono path[1] = 'F:/unity/Unity20190433_release/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = 'F:/unity/Unity20190433_release/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56192
+[FunctionTable] InitFunctionTable OnStart.
+ImportWorker Server TCP listen port: 56521
+[zorro] APIUpdaterManager::Initialize 
+(Filename: D:\CI\ml\20190433\pre_release\Editor/Src/Application/Application.cpp Line: 1134)
+
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: F:/unity/Unity20190433_release/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Register platform support module: F:/unity/Unity20190433_release/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/UnityEditor.LinuxStandalone.Extensions.dll
+Register platform support module: F:/unity/Unity20190433_release/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll
+Register platform support module: F:/unity/Unity20190433_release/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.dll
+Registered in 0.001185 seconds.
+Failed to load: F:/unity/Unity20190433_release/Editor/Data/PlaybackEngines/iOSSupport\x86_64\UnityEditor.iOS.Native.dll
+Native extension for iOS target not found
+Native extension for Android target not found
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 34.57 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.598 seconds
+Domain Reload Profiling:
+	ReloadAssembly (612ms)
+		BeginReloadAssembly (34ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (0ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (1ms)
+		EndReloadAssembly (257ms)
+			LoadAssemblies (33ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (87ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (18ms)
+			SetupLoadedEditorAssemblies (121ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (20ms)
+				SetLoadedEditorAssemblies (0ms)
+				RefreshPlugins (35ms)
+				BeforeProcessingInitializeOnLoad (1ms)
+				ProcessInitializeOnLoadAttributes (55ms)
+				ProcessInitializeOnLoadMethodAttributes (10ms)
+				AfterProcessingInitializeOnLoad (0ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (0ms)
+Registering precompiled user dll's ...
+Registered in 0.085290 seconds.
+Platform modules already initialized, skipping
+Validating Project structure ... 0.002450 seconds.
+Shader import version has changed; will reimport all shaders...
+Upgrading shader files ...0.002890 seconds.
+Start importing Assets/Scripts/DiceKingDemo.cs using Guid(2b60ad79bb714c748b64e7fd70f04efe) Importer(-1,00000000000000000000000000000000)
+Done importing asset: 'Assets/Scripts/DiceKingDemo.cs' (target hash: '0a0c5dfc2b8aae679d4688b283b1cd25') in 0.656258 seconds
+Begin MonoManager ReloadAssembly
+Failed to load: F:/unity/Unity20190433_release/Editor/Data/PlaybackEngines/iOSSupport\x86_64\UnityEditor.iOS.Native.dll
+Native extension for iOS target not found
+Native extension for Android target not found
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 40.00 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+mypath=F:\unity\Unity20190433_release\Editor\Data\Managed\UnityEditor.dll
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:LogWarning(Object)
+UnityEditor.popupLOD:InitCfgFile() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:381)
+UnityEditor.popupLOD:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:376)
+System.Object:__icall_wrapper_mono_generic_class_init(IntPtr)
+UnityEditor.Toolbar:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:582)
+CollabProxy.UI.Bootstrap:.cctor() (at Library\PackageCache\com.unity.collab-proxy@1.14.1\Editor\Collaborate\Collab\Bootstrap.cs:21)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(IntPtr)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes(Type[]) (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorAssemblies.cs:134)
+ 
+(Filename: Library/PackageCache/com.unity.collab-proxy@1.14.1/Editor/Collaborate/Collab/Bootstrap.cs Line: 21)
+
+Load from CfgFile=F:\unity\Unity20190433_release\Editor\lodinfo.txt
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:LogWarning(Object)
+UnityEditor.popupLOD:InitCfgFile() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:404)
+UnityEditor.popupLOD:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:376)
+System.Object:__icall_wrapper_mono_generic_class_init(IntPtr)
+UnityEditor.Toolbar:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:582)
+CollabProxy.UI.Bootstrap:.cctor() (at Library\PackageCache\com.unity.collab-proxy@1.14.1\Editor\Collaborate\Collab\Bootstrap.cs:21)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(IntPtr)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes(Type[]) (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorAssemblies.cs:134)
+ 
+(Filename: Library/PackageCache/com.unity.collab-proxy@1.14.1/Editor/Collaborate/Collab/Bootstrap.cs Line: 21)
+
+Adding genesis user token Mono: successfully reloaded assembly
+- Completed reload, in  0.679 seconds
+Domain Reload Profiling:
+	ReloadAssembly (705ms)
+		BeginReloadAssembly (51ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (1ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (17ms)
+		EndReloadAssembly (614ms)
+			LoadAssemblies (57ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (193ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (35ms)
+			SetupLoadedEditorAssemblies (297ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (20ms)
+				SetLoadedEditorAssemblies (0ms)
+				RefreshPlugins (40ms)
+				BeforeProcessingInitializeOnLoad (61ms)
+				ProcessInitializeOnLoadAttributes (150ms)
+				ProcessInitializeOnLoadMethodAttributes (23ms)
+				AfterProcessingInitializeOnLoad (2ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (1ms)
+Platform modules already initialized, skipping
+AssetDatabase: script compilation time: 0.023446s
+- Starting script compilation
+- Starting compile Library/ScriptAssemblies/Assembly-CSharp.dll
+- Finished compile Library/ScriptAssemblies/Assembly-CSharp.dll in 1.005969 seconds
+- Starting compile Library/ScriptAssemblies/Assembly-CSharp-Editor.dll
+- Finished compile Library/ScriptAssemblies/Assembly-CSharp-Editor.dll in 0.331964 seconds
+- Finished script compilation in 1.379482 seconds
+Assets\Scripts\DiceKingDemo.cs(1930,18): warning CS0162: Unreachable code detected
+Assets\Scripts\DiceKingDemo.cs(8567,14): warning CS0162: Unreachable code detected
+Assets\Scripts\DiceKingDemo.cs(8591,13): warning CS0162: Unreachable code detected
+Assets\Scripts\DiceKingDemo.cs(8933,13): warning CS0162: Unreachable code detected
+Assets\Scripts\DiceKingDemo.cs(9347,9): warning CS0162: Unreachable code detected
+Assets\Scripts\DiceKingDemo.cs(20077,17): warning CS0162: Unreachable code detected
+Assets\Scripts\DiceKingDemo.cs(24408,9): warning CS0162: Unreachable code detected
+Assets\Scripts\DiceKingDemo.cs(24505,9): warning CS0162: Unreachable code detected
+Assets\Scripts\DiceKingDemo.cs(24555,9): warning CS0162: Unreachable code detected
+Reloading assemblies after forced synchronous recompile.
+Begin MonoManager ReloadAssembly
+Failed to load: F:/unity/Unity20190433_release/Editor/Data/PlaybackEngines/iOSSupport\x86_64\UnityEditor.iOS.Native.dll
+Native extension for iOS target not found
+Native extension for Android target not found
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.63 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+mypath=F:\unity\Unity20190433_release\Editor\Data\Managed\UnityEditor.dll
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:LogWarning(Object)
+UnityEditor.popupLOD:InitCfgFile() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:381)
+UnityEditor.popupLOD:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:376)
+System.Object:__icall_wrapper_mono_generic_class_init(IntPtr)
+UnityEditor.Toolbar:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:582)
+CollabProxy.UI.Bootstrap:.cctor() (at Library\PackageCache\com.unity.collab-proxy@1.14.1\Editor\Collaborate\Collab\Bootstrap.cs:21)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(IntPtr)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes(Type[]) (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorAssemblies.cs:134)
+ 
+(Filename: Library/PackageCache/com.unity.collab-proxy@1.14.1/Editor/Collaborate/Collab/Bootstrap.cs Line: 21)
+
+Load from CfgFile=F:\unity\Unity20190433_release\Editor\lodinfo.txt
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:LogWarning(Object)
+UnityEditor.popupLOD:InitCfgFile() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:404)
+UnityEditor.popupLOD:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:376)
+System.Object:__icall_wrapper_mono_generic_class_init(IntPtr)
+UnityEditor.Toolbar:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:582)
+CollabProxy.UI.Bootstrap:.cctor() (at Library\PackageCache\com.unity.collab-proxy@1.14.1\Editor\Collaborate\Collab\Bootstrap.cs:21)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(IntPtr)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes(Type[]) (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorAssemblies.cs:134)
+ 
+(Filename: Library/PackageCache/com.unity.collab-proxy@1.14.1/Editor/Collaborate/Collab/Bootstrap.cs Line: 21)
+
+Adding genesis user token Mono: successfully reloaded assembly
+- Completed reload, in  0.873 seconds
+Domain Reload Profiling:
+	ReloadAssembly (897ms)
+		BeginReloadAssembly (65ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (1ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (34ms)
+		EndReloadAssembly (789ms)
+			LoadAssemblies (184ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (206ms)
+			ReleaseScriptCaches (1ms)
+			RebuildScriptCaches (45ms)
+			SetupLoadedEditorAssemblies (310ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (18ms)
+				SetLoadedEditorAssemblies (0ms)
+				RefreshPlugins (1ms)
+				BeforeProcessingInitializeOnLoad (78ms)
+				ProcessInitializeOnLoadAttributes (181ms)
+				ProcessInitializeOnLoadMethodAttributes (29ms)
+				AfterProcessingInitializeOnLoad (2ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (1ms)
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.74 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+RefreshInfo: InitialScriptRefreshV2(NoUpdateAssetOptions)
+RefreshProfiler: Total: 4758.925ms
+	InvokeBeforeRefreshCallbacks: 0.793ms
+	ApplyChangesToAssetFolders: 0.076ms
+	WriteModifiedImportersToTextMetaFiles: 0.000ms
+	CleanLegacyArtifacts: 0.000ms
+	Scan: 63.897ms
+	OnSourceAssetsModified: 1.098ms
+	UnregisterDeletedAssets: 0.000ms
+	InitializeImportedAssetsSnapshot: 0.241ms
+	GetAllGuidsForCategorization: 0.000ms
+	CategorizeAssets: 54.331ms
+	ImportAndPostprocessOutOfDateAssets: 4625.167ms (2397.740ms without children)
+		ImportManagerImport: 658.073ms (0.618ms without children)
+			ImportInProcess: 657.430ms
+			ImportOutOfProcess: 0.000ms
+			UpdateCategorizedAssets: 0.025ms
+			RemoteAssetCacheGetArtifact: 0.000ms (0.000ms without children)
+				RemoteAssetCacheResolve: 0.000ms
+				RemoteAssetCacheDownloadFile: 0.000ms
+		CompileScripts: 1479.534ms
+		PostProcessAllAssets: 80.846ms
+		ReloadImportedAssets: 0.001ms
+		VerifyAssetsAreUpToDateAndCorrect: 0.000ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.291ms
+		InitializingProgressBar: 0.002ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.418ms
+		OnDemandSchedulerStart: 0.000ms
+		RestoreLoadedAssetsState: 0.088ms
+	InvokeProjectHasChanged: 0.000ms
+	UpdateImportedAssetsSnapshot: 8.176ms
+	ReloadSourceAssets: 1.127ms
+	UnloadImportedAssets: 0.005ms
+	Hotreload: 1.824ms
+	FixTempGuids: 0.004ms
+	VerifyGuidPMRegistrations: 0.000ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.000ms
+	UnloadStreamsBegin: 0.628ms
+	LoadedImportedAssetsSnapshotReleaseGCHandles: 0.365ms
+	GetLoadedSourceAssetsSnapshot: 0.727ms
+	PersistCurrentRevisions: 0.000ms
+	UnloadStreamsEnd: 8.767ms
+	GenerateScriptTypeHashes: 0.509ms
+	Untracked: -0.127ms
+Refresh completed in 0.121445 seconds.
+RefreshInfo: RefreshV2(ForceSynchronousImport)
+RefreshProfiler: Total: 121.429ms
+	InvokeBeforeRefreshCallbacks: 0.426ms
+	ApplyChangesToAssetFolders: 0.052ms
+	WriteModifiedImportersToTextMetaFiles: 0.000ms
+	CleanLegacyArtifacts: 0.000ms
+	Scan: 53.849ms
+	OnSourceAssetsModified: 0.000ms
+	UnregisterDeletedAssets: 0.000ms
+	InitializeImportedAssetsSnapshot: 3.616ms
+	GetAllGuidsForCategorization: 0.001ms
+	CategorizeAssets: 52.802ms
+	ImportAndPostprocessOutOfDateAssets: 4.960ms (1.577ms without children)
+		ImportManagerImport: 0.000ms (0.000ms without children)
+			ImportInProcess: 0.000ms
+			ImportOutOfProcess: 0.000ms
+			UpdateCategorizedAssets: 0.000ms
+			RemoteAssetCacheGetArtifact: 0.000ms (0.000ms without children)
+				RemoteAssetCacheResolve: 0.000ms
+				RemoteAssetCacheDownloadFile: 0.000ms
+		CompileScripts: 0.000ms
+		PostProcessAllAssets: 0.000ms
+		ReloadImportedAssets: 0.000ms
+		VerifyAssetsAreUpToDateAndCorrect: 0.000ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.451ms
+		InitializingProgressBar: 0.000ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.162ms
+		OnDemandSchedulerStart: 0.667ms
+		RestoreLoadedAssetsState: 2.102ms
+	InvokeProjectHasChanged: 0.000ms
+	UpdateImportedAssetsSnapshot: 0.000ms
+	ReloadSourceAssets: 0.432ms
+	UnloadImportedAssets: 0.183ms
+	Hotreload: 0.034ms
+	FixTempGuids: 0.006ms
+	VerifyGuidPMRegistrations: 0.000ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.308ms
+	UnloadStreamsBegin: 0.020ms
+	LoadedImportedAssetsSnapshotReleaseGCHandles: 1.579ms
+	GetLoadedSourceAssetsSnapshot: 2.676ms
+	PersistCurrentRevisions: 0.000ms
+	UnloadStreamsEnd: 0.038ms
+	GenerateScriptTypeHashes: 0.065ms
+	Untracked: 0.447ms
+RefreshInfo: StopAssetImportingV2(ForceSynchronousImport)
+RefreshProfiler: Total: 11.474ms
+	InvokeBeforeRefreshCallbacks: 0.417ms
+	ApplyChangesToAssetFolders: 0.051ms
+	WriteModifiedImportersToTextMetaFiles: 0.000ms
+	CleanLegacyArtifacts: 0.000ms
+	Scan: 4.484ms
+	OnSourceAssetsModified: 0.000ms
+	UnregisterDeletedAssets: 0.000ms
+	InitializeImportedAssetsSnapshot: 3.165ms
+	GetAllGuidsForCategorization: 0.000ms
+	CategorizeAssets: 0.000ms
+	ImportAndPostprocessOutOfDateAssets: 0.000ms (0.000ms without children)
+		ImportManagerImport: 0.000ms (0.000ms without children)
+			ImportInProcess: 0.000ms
+			ImportOutOfProcess: 0.000ms
+			UpdateCategorizedAssets: 0.000ms
+			RemoteAssetCacheGetArtifact: 0.000ms (0.000ms without children)
+				RemoteAssetCacheResolve: 0.000ms
+				RemoteAssetCacheDownloadFile: 0.000ms
+		CompileScripts: 0.000ms
+		PostProcessAllAssets: 0.000ms
+		ReloadImportedAssets: 0.000ms
+		VerifyAssetsAreUpToDateAndCorrect: 0.000ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.000ms
+		InitializingProgressBar: 0.000ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.000ms
+		OnDemandSchedulerStart: 0.000ms
+		RestoreLoadedAssetsState: 0.000ms
+	InvokeProjectHasChanged: 0.000ms
+	UpdateImportedAssetsSnapshot: 0.000ms
+	ReloadSourceAssets: 0.000ms
+	UnloadImportedAssets: 0.000ms
+	Hotreload: 0.030ms
+	FixTempGuids: 0.005ms
+	VerifyGuidPMRegistrations: 0.000ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.305ms
+	UnloadStreamsBegin: 0.102ms
+	LoadedImportedAssetsSnapshotReleaseGCHandles: 0.741ms
+	GetLoadedSourceAssetsSnapshot: 1.250ms
+	PersistCurrentRevisions: 0.000ms
+	UnloadStreamsEnd: 0.021ms
+	GenerateScriptTypeHashes: 0.000ms
+	Untracked: 0.902ms
+Unaligned transfer in 'PSOCollection' at variable 'size'.
+Next unaligned data path:  ->  ->  -> Base(PSOCollection) m_PipelineStates(vector) Array(Array) size(int)  
+(Filename: D:\CI\ml\20190433\pre_release\Runtime/Serialize/TransferFunctions/GenerateTypeTreeTransfer.cpp Line: 274)
+
+Refresh completed in 0.101543 seconds.
+RefreshInfo: RefreshV2(NoUpdateAssetOptions)
+RefreshProfiler: Total: 101.528ms
+	InvokeBeforeRefreshCallbacks: 0.001ms
+	ApplyChangesToAssetFolders: 0.064ms
+	WriteModifiedImportersToTextMetaFiles: 0.000ms
+	CleanLegacyArtifacts: 0.000ms
+	Scan: 48.112ms
+	OnSourceAssetsModified: 0.000ms
+	UnregisterDeletedAssets: 0.000ms
+	InitializeImportedAssetsSnapshot: 3.962ms
+	GetAllGuidsForCategorization: 0.001ms
+	CategorizeAssets: 42.610ms
+	ImportAndPostprocessOutOfDateAssets: 2.903ms (0.719ms without children)
+		ImportManagerImport: 0.000ms (0.000ms without children)
+			ImportInProcess: 0.000ms
+			ImportOutOfProcess: 0.000ms
+			UpdateCategorizedAssets: 0.000ms
+			RemoteAssetCacheGetArtifact: 0.000ms (0.000ms without children)
+				RemoteAssetCacheResolve: 0.000ms
+				RemoteAssetCacheDownloadFile: 0.000ms
+		CompileScripts: 0.000ms
+		PostProcessAllAssets: 0.000ms
+		ReloadImportedAssets: 0.000ms
+		VerifyAssetsAreUpToDateAndCorrect: 0.000ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.386ms
+		InitializingProgressBar: 0.000ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.160ms
+		OnDemandSchedulerStart: 0.246ms
+		RestoreLoadedAssetsState: 1.392ms
+	InvokeProjectHasChanged: 0.000ms
+	UpdateImportedAssetsSnapshot: 0.000ms
+	ReloadSourceAssets: 0.700ms
+	UnloadImportedAssets: 0.156ms
+	Hotreload: 0.048ms
+	FixTempGuids: 0.004ms
+	VerifyGuidPMRegistrations: 0.000ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.316ms
+	UnloadStreamsBegin: 0.061ms
+	LoadedImportedAssetsSnapshotReleaseGCHandles: 0.727ms
+	GetLoadedSourceAssetsSnapshot: 2.167ms
+	PersistCurrentRevisions: 0.000ms
+	UnloadStreamsEnd: 0.022ms
+	GenerateScriptTypeHashes: 0.000ms
+	Untracked: -0.326ms
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.06 seconds
+Initializing Unity extensions:
+ 'F:/unity/Unity20190433_release/Editor/Data/UnityExtensions/Unity/UnityVR/Editor/UnityEditor.VR.dll'  GUID: 4ba2329b63d54f0187bcaa12486b1b0f
+Unloading 88 Unused Serialized files (Serialized files now loaded: 0)
+Opening scene 'Assets/Scenes/SampleScene.unity'
+LightmapEditorSettings: switching bake backend from 1 to 0.
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+Loaded scene 'Assets/Scenes/SampleScene.unity'
+	Deserialize:            0.689 ms
+	Integration:            6.372 ms
+	Integration of assets:  0.006 ms
+	Thread Wait Time:       30.792 ms
+	Total Operation Time:   37.859 ms
+[Project] Loading completed in 11.065 seconds
+	Project init time: 				0.300 seconds
+		Template init time: 		0.000 seconds
+		Services packages init time: 	0.000 seconds
+		Package Manager init time: 		0.000 seconds
+		Asset Database init time: 		0.000 seconds
+		Global illumination init time: 	0.000 seconds
+		Assemblies load time: 			0.000 seconds
+		Unity extensions init time: 	0.001 seconds
+		Asset Database refresh time: 	0.000 seconds
+	Scene opening time: 			0.185 seconds
+Reloading assemblies for play mode.
+Begin MonoManager ReloadAssembly
+Failed to load: F:/unity/Unity20190433_release/Editor/Data/PlaybackEngines/iOSSupport\x86_64\UnityEditor.iOS.Native.dll
+Native extension for iOS target not found
+Native extension for Android target not found
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 17.04 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+mypath=F:\unity\Unity20190433_release\Editor\Data\Managed\UnityEditor.dll
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:LogWarning(Object)
+UnityEditor.popupLOD:InitCfgFile() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:381)
+UnityEditor.popupLOD:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:376)
+System.Object:__icall_wrapper_mono_generic_class_init(IntPtr)
+UnityEditor.Toolbar:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:582)
+CollabProxy.UI.Bootstrap:.cctor() (at Library\PackageCache\com.unity.collab-proxy@1.14.1\Editor\Collaborate\Collab\Bootstrap.cs:21)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(IntPtr)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes(Type[]) (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorAssemblies.cs:134)
+ 
+(Filename: Library/PackageCache/com.unity.collab-proxy@1.14.1/Editor/Collaborate/Collab/Bootstrap.cs Line: 21)
+
+Load from CfgFile=F:\unity\Unity20190433_release\Editor\lodinfo.txt
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:LogWarning(Object)
+UnityEditor.popupLOD:InitCfgFile() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:404)
+UnityEditor.popupLOD:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:376)
+System.Object:__icall_wrapper_mono_generic_class_init(IntPtr)
+UnityEditor.Toolbar:.cctor() (at D:\CI\ml\20190433\pre_release\Editor\Mono\GUI\Toolbar.cs:582)
+CollabProxy.UI.Bootstrap:.cctor() (at Library\PackageCache\com.unity.collab-proxy@1.14.1\Editor\Collaborate\Collab\Bootstrap.cs:21)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(IntPtr)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor(RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes(Type[]) (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorAssemblies.cs:134)
+ 
+(Filename: Library/PackageCache/com.unity.collab-proxy@1.14.1/Editor/Collaborate/Collab/Bootstrap.cs Line: 21)
+
+Adding genesis user token Mono: successfully reloaded assembly
+- Completed reload, in  0.765 seconds
+Domain Reload Profiling:
+	ReloadAssembly (788ms)
+		BeginReloadAssembly (76ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (1ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (38ms)
+		EndReloadAssembly (672ms)
+			LoadAssemblies (54ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (205ms)
+			ReleaseScriptCaches (1ms)
+			RebuildScriptCaches (53ms)
+			SetupLoadedEditorAssemblies (302ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (21ms)
+				SetLoadedEditorAssemblies (0ms)
+				RefreshPlugins (17ms)
+				BeforeProcessingInitializeOnLoad (85ms)
+				ProcessInitializeOnLoadAttributes (153ms)
+				ProcessInitializeOnLoadMethodAttributes (23ms)
+				AfterProcessingInitializeOnLoad (2ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (3ms)
+Platform modules already initialized, skipping
+LightmapEditorSettings: switching bake backend from 1 to 0.
+DiceKingDemo: roll feedback config loaded from Resources/Data/roll_feedback_config. Override path: C:/Users/admin/AppData/LocalLow/DefaultCompany/wabish\roll_feedback_config.csv. Resource rows 22, skipped 0; override rows 0, skipped 0. 基础滚动 0.56 秒，窗口 0 秒，冲量上限 8，回落 0.66 秒。
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+DiceKingDemo:LoadRollFeedbackConfig(Boolean) (at Assets\Scripts\DiceKingDemo.cs:25480)
+DiceKingDemo:Awake() (at Assets\Scripts\DiceKingDemo.cs:1776)
+UnityEngine.GameObject:Internal_AddComponentWithType(Type)
+UnityEngine.GameObject:AddComponent(Type) (at D:\CI\ml\20190433\pre_release\Runtime\Export\Scripting\GameObject.bindings.cs:246)
+UnityEngine.GameObject:AddComponent() (at D:\CI\ml\20190433\pre_release\Runtime\Export\Scripting\GameObject.bindings.cs:251)
+DiceKingDemo:Bootstrap() (at Assets\Scripts\DiceKingDemo.cs:1758)
+ 
+(Filename: Assets/Scripts/DiceKingDemo.cs Line: 25480)
+
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            0.600 ms
+	Integration:            163.069 ms
+	Integration of assets:  0.004 ms
+	Thread Wait Time:       18.494 ms
+	Total Operation Time:   182.167 ms
+[FunctionTable] EnterPlay.
+[MODES] Loading mode Default (0) for mode-current-id-wabish
+Created GICache directory at C:/Users/admin/AppData/LocalLow/Unity/Caches/GiCache. Took: 0.035s, timestamps: [12.091 - 12.126]
+Setting up 14 worker threads for Enlighten.
+  Thread -> id: ffcc -> priority: 1 
+  Thread -> id: e91c -> priority: 1 
+  Thread -> id: 2d5c -> priority: 1 
+  Thread -> id: f870 -> priority: 1 
+  Thread -> id: c530 -> priority: 1 
+  Thread -> id: 2a7c -> priority: 1 
+  Thread -> id: caac -> priority: 1 
+  Thread -> id: 9504 -> priority: 1 
+  Thread -> id: a8d8 -> priority: 1 
+  Thread -> id: 4be4 -> priority: 1 
+  Thread -> id: d194 -> priority: 1 
+  Thread -> id: d0d4 -> priority: 1 
+  Thread -> id: 25cc -> priority: 1 
+  Thread -> id: e5b4 -> priority: 1 
+<RI> Initialized touch support.
+Refresh completed in 0.095497 seconds.
+RefreshInfo: RefreshV2(ForceSynchronousImport)
+RefreshProfiler: Total: 95.394ms
+	InvokeBeforeRefreshCallbacks: 0.555ms
+	ApplyChangesToAssetFolders: 0.073ms
+	WriteModifiedImportersToTextMetaFiles: 0.000ms
+	CleanLegacyArtifacts: 0.000ms
+	Scan: 38.940ms
+	OnSourceAssetsModified: 0.000ms
+	UnregisterDeletedAssets: 0.000ms
+	InitializeImportedAssetsSnapshot: 4.133ms
+	GetAllGuidsForCategorization: 0.001ms
+	CategorizeAssets: 42.592ms
+	ImportAndPostprocessOutOfDateAssets: 3.647ms (1.319ms without children)
+		ImportManagerImport: 0.000ms (0.000ms without children)
+			ImportInProcess: 0.000ms
+			ImportOutOfProcess: 0.000ms
+			UpdateCategorizedAssets: 0.000ms
+			RemoteAssetCacheGetArtifact: 0.000ms (0.000ms without children)
+				RemoteAssetCacheResolve: 0.000ms
+				RemoteAssetCacheDownloadFile: 0.000ms
+		CompileScripts: 0.000ms
+		PostProcessAllAssets: 0.000ms
+		ReloadImportedAssets: 0.000ms
+		VerifyAssetsAreUpToDateAndCorrect: 0.000ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.427ms
+		InitializingProgressBar: 0.000ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.158ms
+		OnDemandSchedulerStart: 0.301ms
+		RestoreLoadedAssetsState: 1.440ms
+	InvokeProjectHasChanged: 0.000ms
+	UpdateImportedAssetsSnapshot: 0.000ms
+	ReloadSourceAssets: 0.504ms
+	UnloadImportedAssets: 0.154ms
+	Hotreload: 0.049ms
+	FixTempGuids: 0.006ms
+	VerifyGuidPMRegistrations: 0.000ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.299ms
+	UnloadStreamsBegin: 0.834ms
+	LoadedImportedAssetsSnapshotReleaseGCHandles: 0.852ms
+	GetLoadedSourceAssetsSnapshot: 2.115ms
+	PersistCurrentRevisions: 0.000ms
+	UnloadStreamsEnd: 0.029ms
+	GenerateScriptTypeHashes: 0.428ms
+	Untracked: 0.612ms
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_miss_reverse_release_1920x1080.png at TargetSettle/Miss.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_pass_single_latch_1920x1080.png at TargetSettle/Pass.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_exceed_relay_outbound_1920x1080.png at TargetSettle/Exceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_exceed_double_relay_1920x1080.png at TargetSettle/Exceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_farexceed_cabinet_overload_1920x1080.png at TargetSettle/FarExceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_farexceed_cabinet_reseat_1920x1080.png at TargetSettle/FarExceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_crouch_1920x1080.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_vacuum_1920x1080.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_hard_lock_1920x1080.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_breakthrough_1920x1080.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_eruption_apex_1920x1080.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_rebound_1920x1080.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_aftershock_1920x1080.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_pass_single_latch_reduced_1920x1080.png at TargetSettle/Pass.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_exceed_double_relay_reduced_1920x1080.png at TargetSettle/Exceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_farexceed_cabinet_overload_reduced_1920x1080.png at TargetSettle/FarExceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_hard_lock_reduced_1920x1080.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_eruption_apex_reduced_1920x1080.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_miss_reverse_release_1280x720.png at TargetSettle/Miss.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_pass_single_latch_1280x720.png at TargetSettle/Pass.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_exceed_relay_outbound_1280x720.png at TargetSettle/Exceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_exceed_double_relay_1280x720.png at TargetSettle/Exceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_farexceed_cabinet_overload_1280x720.png at TargetSettle/FarExceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_farexceed_cabinet_reseat_1280x720.png at TargetSettle/FarExceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+Refresh completed in 0.051422 seconds.
+RefreshInfo: RefreshV2(ForceSynchronousImport)
+RefreshProfiler: Total: 51.373ms
+	InvokeBeforeRefreshCallbacks: 0.550ms
+	ApplyChangesToAssetFolders: 0.089ms
+	WriteModifiedImportersToTextMetaFiles: 0.000ms
+	CleanLegacyArtifacts: 0.000ms
+	Scan: 41.086ms
+	OnSourceAssetsModified: 0.000ms
+	UnregisterDeletedAssets: 0.000ms
+	InitializeImportedAssetsSnapshot: 4.148ms
+	GetAllGuidsForCategorization: 0.000ms
+	CategorizeAssets: 0.000ms
+	ImportAndPostprocessOutOfDateAssets: 0.000ms (0.000ms without children)
+		ImportManagerImport: 0.000ms (0.000ms without children)
+			ImportInProcess: 0.000ms
+			ImportOutOfProcess: 0.000ms
+			UpdateCategorizedAssets: 0.000ms
+			RemoteAssetCacheGetArtifact: 0.000ms (0.000ms without children)
+				RemoteAssetCacheResolve: 0.000ms
+				RemoteAssetCacheDownloadFile: 0.000ms
+		CompileScripts: 0.000ms
+		PostProcessAllAssets: 0.000ms
+		ReloadImportedAssets: 0.000ms
+		VerifyAssetsAreUpToDateAndCorrect: 0.000ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.000ms
+		InitializingProgressBar: 0.000ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.000ms
+		OnDemandSchedulerStart: 0.000ms
+		RestoreLoadedAssetsState: 0.000ms
+	InvokeProjectHasChanged: 0.000ms
+	UpdateImportedAssetsSnapshot: 0.000ms
+	ReloadSourceAssets: 0.000ms
+	UnloadImportedAssets: 0.000ms
+	Hotreload: 0.045ms
+	FixTempGuids: 0.007ms
+	VerifyGuidPMRegistrations: 0.000ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.618ms
+	UnloadStreamsBegin: 0.812ms
+	LoadedImportedAssetsSnapshotReleaseGCHandles: 1.622ms
+	GetLoadedSourceAssetsSnapshot: 0.812ms
+	PersistCurrentRevisions: 0.000ms
+	UnloadStreamsEnd: 0.037ms
+	GenerateScriptTypeHashes: 0.000ms
+	Untracked: 1.546ms
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_crouch_1280x720.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+Refresh completed in 0.048564 seconds.
+RefreshInfo: RefreshV2(ForceSynchronousImport)
+RefreshProfiler: Total: 48.526ms
+	InvokeBeforeRefreshCallbacks: 0.541ms
+	ApplyChangesToAssetFolders: 0.067ms
+	WriteModifiedImportersToTextMetaFiles: 0.000ms
+	CleanLegacyArtifacts: 0.000ms
+	Scan: 39.789ms
+	OnSourceAssetsModified: 0.000ms
+	UnregisterDeletedAssets: 0.000ms
+	InitializeImportedAssetsSnapshot: 4.128ms
+	GetAllGuidsForCategorization: 0.000ms
+	CategorizeAssets: 0.000ms
+	ImportAndPostprocessOutOfDateAssets: 0.000ms (0.000ms without children)
+		ImportManagerImport: 0.000ms (0.000ms without children)
+			ImportInProcess: 0.000ms
+			ImportOutOfProcess: 0.000ms
+			UpdateCategorizedAssets: 0.000ms
+			RemoteAssetCacheGetArtifact: 0.000ms (0.000ms without children)
+				RemoteAssetCacheResolve: 0.000ms
+				RemoteAssetCacheDownloadFile: 0.000ms
+		CompileScripts: 0.000ms
+		PostProcessAllAssets: 0.000ms
+		ReloadImportedAssets: 0.000ms
+		VerifyAssetsAreUpToDateAndCorrect: 0.000ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.000ms
+		InitializingProgressBar: 0.000ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.000ms
+		OnDemandSchedulerStart: 0.000ms
+		RestoreLoadedAssetsState: 0.000ms
+	InvokeProjectHasChanged: 0.000ms
+	UpdateImportedAssetsSnapshot: 0.000ms
+	ReloadSourceAssets: 0.000ms
+	UnloadImportedAssets: 0.000ms
+	Hotreload: 0.043ms
+	FixTempGuids: 0.006ms
+	VerifyGuidPMRegistrations: 0.000ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.344ms
+	UnloadStreamsBegin: 0.029ms
+	LoadedImportedAssetsSnapshotReleaseGCHandles: 1.438ms
+	GetLoadedSourceAssetsSnapshot: 0.788ms
+	PersistCurrentRevisions: 0.000ms
+	UnloadStreamsEnd: 0.039ms
+	GenerateScriptTypeHashes: 0.000ms
+	Untracked: 1.315ms
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_vacuum_1280x720.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_hard_lock_1280x720.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_breakthrough_1280x720.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_eruption_apex_1280x720.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_rebound_1280x720.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_aftershock_1280x720.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_pass_single_latch_reduced_1280x720.png at TargetSettle/Pass.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_exceed_double_relay_reduced_1280x720.png at TargetSettle/Exceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_farexceed_cabinet_overload_reduced_1280x720.png at TargetSettle/FarExceed.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_hard_lock_reduced_1280x720.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+WabishF009SettlementFinaleCapture: captured 20260723_f006_critical_force_curve_critical_eruption_apex_reduced_1280x720.png at TargetSettle/Critical.
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.DebugLogHandler:LogFormat(LogType, Object, String, Object[])
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+WabishF009SettlementFinaleCapture:CaptureFrame(String) (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:484)
+WabishF009SettlementFinaleCapture:Update() (at Assets\Editor\WabishF009SettlementFinaleCapture.cs:173)
+System.Reflection.MonoMethod:InternalInvoke(Object, Object[], Exception&)
+System.Reflection.MonoMethod:Invoke(Object, BindingFlags, Binder, Object[], CultureInfo)
+System.Reflection.MethodBase:Invoke(Object, Object[])
+System.Delegate:DynamicInvokeImpl(Object[])
+System.MulticastDelegate:DynamicInvokeImpl(Object[])
+System.Delegate:DynamicInvoke(Object[])
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions() (at D:\CI\ml\20190433\pre_release\Editor\Mono\EditorApplication.cs:310)
+ 
+(Filename: Assets/Editor/WabishF009SettlementFinaleCapture.cs Line: 484)
+
+[Performance] WinEditorMain                                               :        1 samples, Peak.  1.14 s (1.0x), Avg.  1.14 s, Total. 1.142 s (0.8%)
+[Performance] WinEditorMain.ConfigureCrashHandler                         :        1 samples, Peak.  21.1 us (1.0x), Avg.  21.1 us, Total. 21.10 us (0.0%)
+[Performance] WinEditorMain.CurlRequestInitialize                         :        1 samples, Peak.   864 us (1.0x), Avg.   864 us, Total. 863.7 us (0.0%)
+[Performance] WinEditorMain.SetupLogFile                                  :        1 samples, Peak.   290 us (1.0x), Avg.   290 us, Total. 290.5 us (0.0%)
+[Performance] WinEditorMain.RunNativeTestsIfRequiredAndExit               :        1 samples, Peak.  2.20 us (1.0x), Avg.  2.20 us, Total. 2.200 us (0.0%)
+[Performance] WinEditorMain.Licensing                                     :        1 samples, Peak.   813 ms (1.0x), Avg.   813 ms, Total. 812.7 ms (0.6%)
+[Performance] WinEditorMain.InitializeCrashHandler                        :        1 samples, Peak.   706 us (1.0x), Avg.   706 us, Total. 706.2 us (0.0%)
+[Performance] WinEditorMain.CreateApplication                             :        1 samples, Peak.  1.38 ms (1.0x), Avg.  1.38 ms, Total. 1.384 ms (0.0%)
+[Performance] Application.InitializeProject                               :        1 samples, Peak.  9.67 s (1.0x), Avg.  9.67 s, Total. 9.674 s (6.6%)
+[Performance] Application.PackageManager.StartServer                      :        1 samples, Peak.  4.66 ms (1.0x), Avg.  4.66 ms, Total. 4.664 ms (0.0%)
+[Performance] Application.IsBrowserCacheEmpty                             :        1 samples, Peak.   563 us (1.0x), Avg.   563 us, Total. 563.5 us (0.0%)
+[Performance] Application.AcquireProjectLock                              :        1 samples, Peak.  6.58 ms (1.0x), Avg.  6.58 ms, Total. 6.582 ms (0.0%)
+[Performance] Application.InitializeEngineNoGraphics                      :        1 samples, Peak.  15.8 ms (1.0x), Avg.  15.8 ms, Total. 15.75 ms (0.0%)
+[Performance] Application.PackageManager.Initialize                       :        1 samples, Peak.  1.08 s (1.0x), Avg.  1.08 s, Total. 1.076 s (0.7%)
+[Performance] CurlRequestCheck                                            :       18 samples, Peak.  48.1 us (2.7x), Avg.  17.7 us, Total. 319.5 us (0.0%)
+[Performance] PackageManager::RunRequestSynchronously                     :       34 samples, Peak.   591 us (18.4x), Avg.  32.1 us, Total. 1.091 ms (0.0%)
+[Performance] Application.EngineGraphics.Initialize                       :        1 samples, Peak.   199 ms (1.0x), Avg.   199 ms, Total. 198.6 ms (0.1%)
+[Performance] Application.GI.Initialize                                   :        1 samples, Peak.  2.90 ms (1.0x), Avg.  2.90 ms, Total. 2.902 ms (0.0%)
+[Performance] Application.LoadAllDefaultResourcesFromEditor               :        1 samples, Peak.  1.62 ms (1.0x), Avg.  1.62 ms, Total. 1.618 ms (0.0%)
+[Performance] Application.LoadMonoAssemblies                              :        1 samples, Peak.   708 ms (1.0x), Avg.   708 ms, Total. 707.9 ms (0.5%)
+[Performance] RestoreManagedReferences                                    :        4 samples, Peak.  19.0 ms (2.8x), Avg.  6.78 ms, Total. 27.11 ms (0.0%)
+[Performance] ProcessService.EditorAfterLoadAllAssemblies                 :        4 samples, Peak.  24.8 ms (1.2x), Avg.  21.0 ms, Total. 84.11 ms (0.1%)
+[Performance] Application.ReadLicenseInfo                                 :        1 samples, Peak.   282 us (1.0x), Avg.   282 us, Total. 282.1 us (0.0%)
+[Performance] Application.InitialScriptRefresh                            :        1 samples, Peak.  4.76 s (1.0x), Avg.  4.76 s, Total. 4.761 s (3.2%)
+[Performance] BuildCatalog                                                :        2 samples, Peak.  65.0 ms (1.4x), Avg.  48.2 ms, Total. 96.31 ms (0.1%)
+[Performance] Application.AssetDatabase.Refresh                           :        1 samples, Peak.   122 ms (1.0x), Avg.   122 ms, Total. 121.7 ms (0.1%)
+[Performance] Application.ImportAssetsWithMismatchingAssetImporterVersion :        1 samples, Peak.   124 ms (1.0x), Avg.   124 ms, Total. 124.5 ms (0.1%)
+[Performance] Application.SyncCurrentColorSpace                           :        1 samples, Peak.  89.8 ms (1.0x), Avg.  89.8 ms, Total. 89.80 ms (0.1%)
+[Performance] Application.OnUsbDevicesChanged                             :        1 samples, Peak.  3.51 ms (1.0x), Avg.  3.51 ms, Total. 3.511 ms (0.0%)
+[Performance] Application.AssetInstanceCacheUpdate                        :        1 samples, Peak.   500 ns (1.0x), Avg.   500 ns, Total. 500.0 ns (0.0%)
+[Performance] Application.UnityExtensions.Initialize                      :        1 samples, Peak.   959 us (1.0x), Avg.   959 us, Total. 958.9 us (0.0%)
+[Performance] Application.InitializeManagedCompilationPipeline            :        1 samples, Peak.  72.8 ms (1.0x), Avg.  72.8 ms, Total. 72.82 ms (0.0%)
+[Performance] Application.ExecuteStartups                                 :        1 samples, Peak.  48.1 ms (1.0x), Avg.  48.1 ms, Total. 48.12 ms (0.0%)
+[Performance] Application.RebuildOSMenu                                   :        1 samples, Peak.  73.3 ms (1.0x), Avg.  73.3 ms, Total. 73.34 ms (0.0%)
+[Performance] UpdateAllMenus                                              :       14 samples, Peak.  72.1 ms (7.7x), Avg.  9.37 ms, Total. 131.2 ms (0.1%)
+[Performance] Application.editorInitializingProject                       :        1 samples, Peak.  11.2 us (1.0x), Avg.  11.2 us, Total. 11.20 us (0.0%)
+[Performance] Application.FinishLoadingProject                            :        1 samples, Peak.   185 ms (1.0x), Avg.   185 ms, Total. 185.2 ms (0.1%)
+[Performance] GUIView.RepaintAll.PlayerLoopController                     :    32427 samples, Peak.   375 ms (113.8x), Avg.  3.30 ms, Total. 107.0 s (72.7%)
+[Performance] Application.InvokeFinishedLoadingProject                    :        1 samples, Peak.  32.5 ms (1.0x), Avg.  32.5 ms, Total. 32.51 ms (0.0%)
+[Performance] ProcessService.OnProjectLoaded                              :        1 samples, Peak.  27.6 ms (1.0x), Avg.  27.6 ms, Total. 27.57 ms (0.0%)
+[Performance] Application.InvokeProjectWasLoaded                          :        1 samples, Peak.   215 us (1.0x), Avg.   215 us, Total. 214.8 us (0.0%)
+[Performance] Application.Message                                         :    32426 samples, Peak.  7.95 ms (5207.7x), Avg.  1.53 us, Total. 49.48 ms (0.0%)
+[Performance] Application.Message.WM_0031F                                :        2 samples, Peak.  2.66 ms (2.0x), Avg.  1.34 ms, Total. 2.676 ms (0.0%)
+[Performance] Application.Tick                                            :    32425 samples, Peak.  1.25 s (304.4x), Avg.  4.10 ms, Total. 133.0 s (90.5%)
+[Performance] License.Tick                                                :     5914 samples, Peak.  67.5 us (29.5x), Avg.  2.29 us, Total. 13.55 ms (0.0%)
+[Performance] VCProvider                                                  :    32426 samples, Peak.  97.0 us (65.0x), Avg.  1.49 us, Total. 48.42 ms (0.0%)
+[Performance] MonoCompiler.Tick                                           :      661 samples, Peak.  1.02 s (655.1x), Avg.  1.56 ms, Total. 1.031 s (0.7%)
+[Performance] Application.Reload                                          :        1 samples, Peak.   792 ms (1.0x), Avg.   792 ms, Total. 791.6 ms (0.5%)
+[Performance] Package.AsyncRequest                                        :        5 samples, Peak.  1.31 ms (5.0x), Avg.   263 us, Total. 1.313 ms (0.0%)
+[Performance] UnityConnect.Tick                                           :        1 samples, Peak.  1.54 ms (1.0x), Avg.  1.54 ms, Total. 1.540 ms (0.0%)
+[Performance] Collab.Tick                                                 :        1 samples, Peak.  3.10 us (1.0x), Avg.  3.10 us, Total. 3.100 us (0.0%)
+[Performance] CurlRequest.Tick                                            :     1301 samples, Peak.   372 us (333.0x), Avg.  1.12 us, Total. 1.453 ms (0.0%)
+[Performance] WebView.Tick                                                :     5913 samples, Peak.   228 us (3.6x), Avg.  64.0 us, Total. 378.4 ms (0.3%)
+[Performance] WebSocketClient.Tick                                        :     1301 samples, Peak.  4.40 us (11.9x), Avg.   369 ns, Total. 479.5 us (0.0%)
+[Performance] SceneBackgroundTask.Tick                                    :      878 samples, Peak.   400 ns (5.6x), Avg.  71.0 ns, Total. 62.30 us (0.0%)
+[Performance] Scheduler.Tick                                              :    10700 samples, Peak.  1.64 ms (89.8x), Avg.  18.3 us, Total. 195.9 ms (0.1%)
+[Performance] RepaintAllProfilerWindows                                   :      268 samples, Peak.   290 us (64.8x), Avg.  4.48 us, Total. 1.200 ms (0.0%)
+[Performance] PlayerUpdates.Tick                                          :     2531 samples, Peak.   114 us (5.4x), Avg.  21.1 us, Total. 53.46 ms (0.0%)
+[Performance] GlobalCallbacks                                             :    32426 samples, Peak.   345 us (12.2x), Avg.  28.3 us, Total. 918.1 ms (0.6%)
+[Performance] EditorAnalytics.Tick                                        :      533 samples, Peak.  2.40 us (4.5x), Avg.   528 ns, Total. 281.5 us (0.0%)
+[Performance] Video.Update                                                :    32426 samples, Peak.  32.8 us (61.2x), Avg.   536 ns, Total. 17.38 ms (0.0%)
+[Performance] SceneTracker                                                :    32425 samples, Peak.   265 ms (479.9x), Avg.   552 us, Total. 17.90 s (12.2%)
+[Performance] ConsoleLog.Tick                                             :      662 samples, Peak.   118 us (37.9x), Avg.  3.12 us, Total. 2.065 ms (0.0%)
+[Performance] HierarchyWindow.Tick                                        :      879 samples, Peak.  2.48 ms (844.8x), Avg.  2.93 us, Total. 2.579 ms (0.0%)
+[Performance] Inspector.Tick                                              :      879 samples, Peak.  27.7 ms (205.3x), Avg.   135 us, Total. 118.7 ms (0.1%)
+[Performance] Tooltip.Tick                                                :     2530 samples, Peak.  3.50 us (6.2x), Avg.   563 ns, Total. 1.425 ms (0.0%)
+[Performance] RequestRepaintForPanels                                     :    32425 samples, Peak.   238 us (98.7x), Avg.  2.42 us, Total. 78.35 ms (0.1%)
+[Performance] UpdateScene                                                 :    32425 samples, Peak.   376 ms (108.8x), Avg.  3.45 ms, Total. 111.9 s (76.1%)
+[Performance] PackageImporter.Tick                                        :      660 samples, Peak.  10.2 us (22.5x), Avg.   453 ns, Total. 298.7 us (0.0%)
+[Performance] InspectorBackground.Tick                                    :      877 samples, Peak.  26.2 us (19.3x), Avg.  1.36 us, Total. 1.189 ms (0.0%)
+[Performance] ChangeLayoutIfNeeded                                        :    32425 samples, Peak.  29.2 us (165.7x), Avg.   176 ns, Total. 5.713 ms (0.0%)
+[Performance] AsyncReadManager.ForceCloseFiles                            :      134 samples, Peak.   147 us (39.9x), Avg.  3.69 us, Total. 494.8 us (0.0%)
+[Performance] GameView.Paint                                              :    30864 samples, Peak.   375 ms (108.3x), Avg.  3.46 ms, Total. 106.9 s (72.7%)
+[Performance] RefreshSkin                                                 :        1 samples, Peak.  45.6 ms (1.0x), Avg.  45.6 ms, Total. 45.62 ms (0.0%)
+[Performance] GameView.OnGUI.Layout                                       :    30864 samples, Peak.  10.8 ms (50.5x), Avg.   213 us, Total. 6.574 s (4.5%)
+[Performance] GameView.OnGUI.repaint                                      :    30864 samples, Peak.   236 ms (126.0x), Avg.  1.87 ms, Total. 57.84 s (39.3%)
+[Performance] Application.Message.Paint                                   :        2 samples, Peak.  5.03 ms (2.0x), Avg.  2.52 ms, Total. 5.048 ms (0.0%)
+[Performance] Application.Message.Timer                                   :        5 samples, Peak.  11.8 us (1.6x), Avg.  7.32 us, Total. 36.60 us (0.0%)
+Cleanup mono
+Checking for leaked weakptr:
+  Found no leaked weakptrs.
+[Package Manager] Server::Kill -- Server was shutdown
+##utp:{"type":"MemoryLeaks","version":2,"phase":"Immediate","time":1784800429079,"processId":50192,"allocatedMemory":1130478,"memoryLabels":[{"Default":276},{"Permanent":384},{"NewDelete":401750},{"Thread":23},{"Manager":3976},{"VertexData":144},{"GfxDevice":80},{"Physics":81},{"Serialization":416},{"BaseObject":280},{"File":144},{"String":383873},{"DynamicArray":221322},{"HashMap":24396},{"Curl":1376},{"PoolAlloc":184},{"ScriptManager":57477},{"GI":736},{"VR":4268},{"Subsystems":-664},{"EditorGui":56},{"EditorUtility":672},{"AssetDatabase":6052},{"RestService":64},{"UnityConnect":20504},{"Collab":728},{"Upm":1392},{"ScriptStrLRUCache":200},{"MTMeshCache":288}]}

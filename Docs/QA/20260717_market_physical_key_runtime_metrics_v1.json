@@ -1,0 +1,464 @@
+{
+  "schema": "wabish-market-physical-key-runtime-validation-v1",
+  "passed": true,
+  "enabled_ink_rgb": [
+    24,
+    14,
+    8
+  ],
+  "disabled_ink_rgb": [
+    48,
+    38,
+    29
+  ],
+  "font_resource": "Assets/Resources/Art/MainGame/Flow/wabish_physical_key_sans_sc_semibold.ttf",
+  "font_sha256": "72e0a6b2ef7ba7adf9ee05d6c28269fa9e9e637a46ebb1c5e9525f605ac5c7c5",
+  "font_manifest_sha256": "72e0a6b2ef7ba7adf9ee05d6c28269fa9e9e637a46ebb1c5e9525f605ac5c7c5",
+  "captures": {
+    "1280x720": {
+      "normal_enabled_ink": {
+        "sell": {
+          "exact_core_pixels": 364,
+          "bbox": [
+            30,
+            13,
+            115,
+            32
+          ],
+          "core_width": 85,
+          "core_height": 19,
+          "core_center_y": 22.5,
+          "safe_rect_center_y": 22.0,
+          "center_offset_y": 0.5,
+          "padding": {
+            "left": 30,
+            "right": 33,
+            "top": 13,
+            "bottom": 12
+          },
+          "non_ink_luminance_stddev": 23.988435680552374
+        },
+        "buy_1": {
+          "exact_core_pixels": 335,
+          "bbox": [
+            52,
+            10,
+            137,
+            29
+          ],
+          "core_width": 85,
+          "core_height": 19,
+          "core_center_y": 19.5,
+          "safe_rect_center_y": 18.5,
+          "center_offset_y": 1.0,
+          "padding": {
+            "left": 52,
+            "right": 54,
+            "top": 10,
+            "bottom": 8
+          },
+          "non_ink_luminance_stddev": 21.891256666748415
+        },
+        "buy_2": {
+          "exact_core_pixels": 347,
+          "bbox": [
+            52,
+            10,
+            137,
+            29
+          ],
+          "core_width": 85,
+          "core_height": 19,
+          "core_center_y": 19.5,
+          "safe_rect_center_y": 18.5,
+          "center_offset_y": 1.0,
+          "padding": {
+            "left": 52,
+            "right": 54,
+            "top": 10,
+            "bottom": 8
+          },
+          "non_ink_luminance_stddev": 22.011025551771997
+        },
+        "buy_3": {
+          "exact_core_pixels": 342,
+          "bbox": [
+            52,
+            10,
+            137,
+            29
+          ],
+          "core_width": 85,
+          "core_height": 19,
+          "core_center_y": 19.5,
+          "safe_rect_center_y": 18.5,
+          "center_offset_y": 1.0,
+          "padding": {
+            "left": 52,
+            "right": 54,
+            "top": 10,
+            "bottom": 8
+          },
+          "non_ink_luminance_stddev": 22.00565548129185
+        },
+        "leave": {
+          "exact_core_pixels": 490,
+          "bbox": [
+            88,
+            17,
+            180,
+            39
+          ],
+          "core_width": 92,
+          "core_height": 22,
+          "core_center_y": 28.0,
+          "safe_rect_center_y": 27.0,
+          "center_offset_y": 1.0,
+          "padding": {
+            "left": 88,
+            "right": 89,
+            "top": 17,
+            "bottom": 15
+          },
+          "non_ink_luminance_stddev": 21.805242446073848
+        }
+      },
+      "leave_disabled_ink": {
+        "sell": {
+          "exact_core_pixels": 537,
+          "bbox": [
+            21,
+            13,
+            127,
+            32
+          ],
+          "core_width": 106,
+          "core_height": 19,
+          "core_center_y": 22.5,
+          "safe_rect_center_y": 22.0,
+          "center_offset_y": 0.5,
+          "padding": {
+            "left": 21,
+            "right": 21,
+            "top": 13,
+            "bottom": 12
+          },
+          "non_ink_luminance_stddev": 18.126604498207907
+        },
+        "buy_1": {
+          "exact_core_pixels": 360,
+          "bbox": [
+            64,
+            10,
+            125,
+            29
+          ],
+          "core_width": 61,
+          "core_height": 19,
+          "core_center_y": 19.5,
+          "safe_rect_center_y": 18.5,
+          "center_offset_y": 1.0,
+          "padding": {
+            "left": 64,
+            "right": 66,
+            "top": 10,
+            "bottom": 8
+          },
+          "non_ink_luminance_stddev": 12.048896141971474
+        },
+        "buy_2": {
+          "exact_core_pixels": 360,
+          "bbox": [
+            64,
+            10,
+            125,
+            29
+          ],
+          "core_width": 61,
+          "core_height": 19,
+          "core_center_y": 19.5,
+          "safe_rect_center_y": 18.5,
+          "center_offset_y": 1.0,
+          "padding": {
+            "left": 64,
+            "right": 66,
+            "top": 10,
+            "bottom": 8
+          },
+          "non_ink_luminance_stddev": 11.594843088284689
+        },
+        "buy_3": {
+          "exact_core_pixels": 473,
+          "bbox": [
+            53,
+            10,
+            138,
+            29
+          ],
+          "core_width": 85,
+          "core_height": 19,
+          "core_center_y": 19.5,
+          "safe_rect_center_y": 18.5,
+          "center_offset_y": 1.0,
+          "padding": {
+            "left": 53,
+            "right": 53,
+            "top": 10,
+            "bottom": 8
+          },
+          "non_ink_luminance_stddev": 14.796762999873463
+        },
+        "leave": {
+          "exact_core_pixels": 675,
+          "bbox": [
+            76,
+            17,
+            191,
+            39
+          ],
+          "core_width": 115,
+          "core_height": 22,
+          "core_center_y": 28.0,
+          "safe_rect_center_y": 27.0,
+          "center_offset_y": 1.0,
+          "padding": {
+            "left": 76,
+            "right": 78,
+            "top": 17,
+            "bottom": 15
+          },
+          "non_ink_luminance_stddev": 16.55552134636589
+        }
+      },
+      "buy_label_center_line_spread_px": 0.0,
+      "native_capture_states": [
+        "leave",
+        "normal",
+        "purchase"
+      ]
+    },
+    "1920x1080": {
+      "normal_enabled_ink": {
+        "sell": {
+          "exact_core_pixels": 1013,
+          "bbox": [
+            48,
+            19,
+            175,
+            48
+          ],
+          "core_width": 127,
+          "core_height": 29,
+          "core_center_y": 33.5,
+          "safe_rect_center_y": 33.0,
+          "center_offset_y": 0.5,
+          "padding": {
+            "left": 48,
+            "right": 47,
+            "top": 19,
+            "bottom": 18
+          },
+          "non_ink_luminance_stddev": 23.299645001530315
+        },
+        "buy_1": {
+          "exact_core_pixels": 984,
+          "bbox": [
+            79,
+            14,
+            207,
+            43
+          ],
+          "core_width": 128,
+          "core_height": 29,
+          "core_center_y": 28.5,
+          "safe_rect_center_y": 28.0,
+          "center_offset_y": 0.5,
+          "padding": {
+            "left": 79,
+            "right": 79,
+            "top": 14,
+            "bottom": 13
+          },
+          "non_ink_luminance_stddev": 20.613707783509454
+        },
+        "buy_2": {
+          "exact_core_pixels": 984,
+          "bbox": [
+            79,
+            14,
+            207,
+            43
+          ],
+          "core_width": 128,
+          "core_height": 29,
+          "core_center_y": 28.5,
+          "safe_rect_center_y": 28.0,
+          "center_offset_y": 0.5,
+          "padding": {
+            "left": 79,
+            "right": 79,
+            "top": 14,
+            "bottom": 13
+          },
+          "non_ink_luminance_stddev": 20.082242281681204
+        },
+        "buy_3": {
+          "exact_core_pixels": 990,
+          "bbox": [
+            79,
+            14,
+            207,
+            43
+          ],
+          "core_width": 128,
+          "core_height": 29,
+          "core_center_y": 28.5,
+          "safe_rect_center_y": 28.0,
+          "center_offset_y": 0.5,
+          "padding": {
+            "left": 79,
+            "right": 79,
+            "top": 14,
+            "bottom": 13
+          },
+          "non_ink_luminance_stddev": 20.396572991013056
+        },
+        "leave": {
+          "exact_core_pixels": 1438,
+          "bbox": [
+            133,
+            26,
+            272,
+            59
+          ],
+          "core_width": 139,
+          "core_height": 33,
+          "core_center_y": 42.5,
+          "safe_rect_center_y": 40.5,
+          "center_offset_y": 2.0,
+          "padding": {
+            "left": 133,
+            "right": 132,
+            "top": 26,
+            "bottom": 22
+          },
+          "non_ink_luminance_stddev": 20.791334091635594
+        }
+      },
+      "leave_disabled_ink": {
+        "sell": {
+          "exact_core_pixels": 1374,
+          "bbox": [
+            30,
+            18,
+            190,
+            48
+          ],
+          "core_width": 160,
+          "core_height": 30,
+          "core_center_y": 33.0,
+          "safe_rect_center_y": 33.0,
+          "center_offset_y": 0.0,
+          "padding": {
+            "left": 30,
+            "right": 32,
+            "top": 18,
+            "bottom": 18
+          },
+          "non_ink_luminance_stddev": 18.789891842781778
+        },
+        "buy_1": {
+          "exact_core_pixels": 926,
+          "bbox": [
+            96,
+            14,
+            188,
+            43
+          ],
+          "core_width": 92,
+          "core_height": 29,
+          "core_center_y": 28.5,
+          "safe_rect_center_y": 28.0,
+          "center_offset_y": 0.5,
+          "padding": {
+            "left": 96,
+            "right": 98,
+            "top": 14,
+            "bottom": 13
+          },
+          "non_ink_luminance_stddev": 11.477162931043152
+        },
+        "buy_2": {
+          "exact_core_pixels": 926,
+          "bbox": [
+            95,
+            14,
+            187,
+            43
+          ],
+          "core_width": 92,
+          "core_height": 29,
+          "core_center_y": 28.5,
+          "safe_rect_center_y": 28.0,
+          "center_offset_y": 0.5,
+          "padding": {
+            "left": 95,
+            "right": 99,
+            "top": 14,
+            "bottom": 13
+          },
+          "non_ink_luminance_stddev": 11.040845112826794
+        },
+        "buy_3": {
+          "exact_core_pixels": 1247,
+          "bbox": [
+            79,
+            14,
+            207,
+            43
+          ],
+          "core_width": 128,
+          "core_height": 29,
+          "core_center_y": 28.5,
+          "safe_rect_center_y": 28.0,
+          "center_offset_y": 0.5,
+          "padding": {
+            "left": 79,
+            "right": 79,
+            "top": 14,
+            "bottom": 13
+          },
+          "non_ink_luminance_stddev": 13.942530276642884
+        },
+        "leave": {
+          "exact_core_pixels": 1886,
+          "bbox": [
+            115,
+            26,
+            288,
+            59
+          ],
+          "core_width": 173,
+          "core_height": 33,
+          "core_center_y": 42.5,
+          "safe_rect_center_y": 40.5,
+          "center_offset_y": 2.0,
+          "padding": {
+            "left": 115,
+            "right": 116,
+            "top": 26,
+            "bottom": 22
+          },
+          "non_ink_luminance_stddev": 16.667417046043646
+        }
+      },
+      "buy_label_center_line_spread_px": 0.0,
+      "native_capture_states": [
+        "leave",
+        "normal",
+        "purchase"
+      ]
+    }
+  },
+  "failures": []
+}

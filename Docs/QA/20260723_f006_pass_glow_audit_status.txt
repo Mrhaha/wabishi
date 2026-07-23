@@ -1,0 +1,2 @@
+2026-07-23 11:38:45
+PASS: normal-speed Pass finale timeline, carryover controls, and StageClear residue were captured.

@@ -1,0 +1,2 @@
+2026-07-23 11:45:08
+PASS: exact-threshold final-hit Pass overlap and carryover controls were captured at normal speed.

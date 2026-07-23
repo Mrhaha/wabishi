@@ -1,0 +1,2 @@
+2026-07-23 17:53:48
+PASS: stages 1-4 kept zero Critical world transform; stage 5 crouch, hard lock, breakthrough, eruption apex, rebound, aftershock, and reduced-effects force directions were classified, timed, numerically checked, and captured at 1920x1080 and 1280x720.

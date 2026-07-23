@@ -1,0 +1,2 @@
+2026-07-17 21:18:00
+PASS: ten screenshots captured at 1920x1080 and 1280x720, including 123 / 1234 digit capacity and the main menu.

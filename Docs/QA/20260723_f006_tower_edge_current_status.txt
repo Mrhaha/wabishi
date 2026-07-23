@@ -1,0 +1,2 @@
+2026-07-23 16:07:59
+PASS: ordinary SlotScore tower-edge current captured at early, mid and late phases in both target resolutions.
