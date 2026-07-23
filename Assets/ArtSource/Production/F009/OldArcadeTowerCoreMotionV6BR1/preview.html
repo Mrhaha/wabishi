@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F009 V6B-R1 老式街机塔芯连击动态样片</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #010203;
+  }
+  #capture {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: #010203;
+  }
+  #stage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform-origin: 0 0;
+    transform: scale(0.6666667);
+  }
+  #world {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform: translate(0, 0);
+  }
+  #base {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    object-fit: fill;
+    user-select: none;
+  }
+  #globalDim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .18);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #towerClip {
+    position: absolute;
+    left: 57px;
+    top: 211px;
+    width: 187px;
+    height: 558px;
+    overflow: hidden;
+    border-radius: 34px;
+    pointer-events: none;
+  }
+  #towerBrownout {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    background: rgba(0, 0, 0, .94);
+    opacity: 0;
+  }
+  #towerBloom {
+    position: absolute;
+    left: -36px;
+    top: -10px;
+    width: 260px;
+    height: 590px;
+    z-index: 1;
+    background:
+      radial-gradient(ellipse at 53% 64%, rgba(255, 244, 202, .58) 0 7%, rgba(255, 189, 57, .38) 18%, rgba(255, 119, 24, .12) 36%, transparent 62%);
+    filter: blur(5px);
+    opacity: 0;
+  }
+  #towerLamps {
+    position: absolute;
+    left: 34px;
+    top: 225px;
+    width: 108px;
+    height: 296px;
+    z-index: 4;
+  }
+  .tower-lamp {
+    position: absolute;
+    left: 0;
+    width: 108px;
+    height: 14px;
+    border: 2px solid rgba(105, 67, 24, .74);
+    border-radius: 2px;
+    background:
+      radial-gradient(circle, rgba(85, 49, 15, .78) 0 31%, transparent 38%) 0 0 / 8px 7px,
+      rgba(14, 10, 5, .82);
+    box-shadow: inset 0 0 7px rgba(0, 0, 0, .92);
+    opacity: .52;
+  }
+  .scan-band {
+    position: absolute;
+    left: 25px;
+    width: 126px;
+    height: 5px;
+    z-index: 5;
+    background: linear-gradient(90deg, transparent, rgba(255, 177, 42, .2) 8%, rgba(255, 209, 88, .96) 50%, rgba(255, 135, 27, .22) 92%, transparent);
+    box-shadow: 0 0 8px rgba(255, 159, 30, .68);
+    opacity: 0;
+  }
+  #targetLatch {
+    position: absolute;
+    left: 60px;
+    top: 52px;
+    width: 66px;
+    height: 66px;
+    z-index: 6;
+    border: 7px solid rgba(126, 65, 17, .72);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 7px rgba(12, 10, 7, .95);
+    opacity: .68;
+  }
+  #targetLatch::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    width: 22px;
+    height: 22px;
+    border: 6px solid rgba(143, 73, 20, .74);
+    border-radius: 50%;
+  }
+  #targetLatch::after {
+    content: "";
+    position: absolute;
+    left: 25px;
+    top: 25px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(114, 61, 20, .85);
+  }
+  #crtTear {
+    position: absolute;
+    left: 5px;
+    top: 334px;
+    width: 178px;
+    height: 8px;
+    z-index: 10;
+    background:
+      linear-gradient(180deg,
+        rgba(241, 255, 245, .12) 0 1px,
+        rgba(255, 244, 196, .94) 1px 3px,
+        rgba(255, 133, 27, .5) 3px 5px,
+        rgba(63, 173, 164, .22) 5px 7px,
+        transparent 7px);
+    box-shadow: 0 0 11px rgba(255, 197, 75, .84);
+    opacity: 0;
+  }
+  #intakeFlash {
+    position: absolute;
+    left: 205px;
+    top: 641px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fffbe4 0 10%, #ffe19a 18%, #f8a529 34%, rgba(247, 119, 18, .3) 58%, transparent 72%);
+    filter: drop-shadow(0 0 9px rgba(255, 177, 51, .88));
+    opacity: 0;
+    pointer-events: none;
+  }
+  .chaser {
+    position: absolute;
+    width: 174px;
+    height: 220px;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .chaser.echo { width: 176px; height: 222px; }
+  .chaser-bulb {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #6e3b12;
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, .88);
+  }
+  .chaser.echo .chaser-bulb:nth-child(2n) { display: none; }
+  .score-packet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 62px;
+    height: 52px;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .score-pip {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 1px;
+    background: #f6a52f;
+    box-shadow: 0 0 4px rgba(255, 164, 32, .74);
+  }
+  .score-packet.heavy .score-pip { width: 12px; height: 12px; }
+  .score-packet.heavy .score-pip.core {
+    background: #fff8d4;
+    box-shadow: 0 0 5px #fff4bf, 0 0 14px rgba(255, 181, 48, .94);
+  }
+  #rightWave {
+    position: absolute;
+    left: 1650px;
+    top: 386px;
+    width: 154px;
+    height: 178px;
+    pointer-events: none;
+  }
+  .wave-dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: #e79a26;
+    box-shadow: 0 0 3px rgba(255, 158, 26, .56);
+    opacity: 0;
+  }
+  #sparkLayer {
+    position: absolute;
+    left: 60px;
+    top: 190px;
+    width: 230px;
+    height: 610px;
+    pointer-events: none;
+  }
+  .spark {
+    position: absolute;
+    width: 26px;
+    height: 3px;
+    border-radius: 2px;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, #fff7d0, #ffb238 45%, transparent);
+    box-shadow: 0 0 5px rgba(255, 164, 37, .8);
+    opacity: 0;
+  }
+</style>
+</head>
+<body>
+<div id="capture">
+  <div id="stage">
+    <div id="world">
+      <img id="base" src="f009_v6b_r1_old_arcade_clean_base_20260721.png" alt="">
+      <div id="globalDim"></div>
+      <div id="towerClip">
+        <div id="towerBloom"></div>
+        <div id="towerLamps"></div>
+        <div id="scanA" class="scan-band"></div>
+        <div id="scanB" class="scan-band"></div>
+        <div id="scanC" class="scan-band"></div>
+        <div id="targetLatch"></div>
+        <div id="crtTear"></div>
+        <div id="towerBrownout"></div>
+      </div>
+      <div id="chaserPrimary" class="chaser"></div>
+      <div id="chaserEcho" class="chaser echo"></div>
+      <div id="chaserHeavy" class="chaser"></div>
+      <div id="packetPrimary" class="score-packet"></div>
+      <div id="packetEcho" class="score-packet"></div>
+      <div id="packetHeavy" class="score-packet heavy"></div>
+      <div id="intakeFlash"></div>
+      <div id="rightWave"></div>
+      <div id="sparkLayer"></div>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const duration = 1.5;
+  const slotCenters = [448, 643, 838, 1035, 1230, 1425];
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const smooth = (a, b, v) => {
+    const x = clamp((v - a) / (b - a));
+    return x * x * (3 - 2 * x);
+  };
+  const pulse = (x, width) => {
+    const p = clamp(1 - Math.abs(x) / width);
+    return p * p;
+  };
+  const envelope = (t, start, rise, fall, end) => clamp(smooth(start, rise, t) * (1 - smooth(fall, end, t)));
+  const $ = id => document.getElementById(id);
+  const els = {
+    world: $('world'), globalDim: $('globalDim'), towerBloom: $('towerBloom'), towerLamps: $('towerLamps'),
+    towerBrownout: $('towerBrownout'), targetLatch: $('targetLatch'), crtTear: $('crtTear'),
+    scanA: $('scanA'), scanB: $('scanB'), scanC: $('scanC'), intakeFlash: $('intakeFlash'),
+    chaserPrimary: $('chaserPrimary'), chaserEcho: $('chaserEcho'), chaserHeavy: $('chaserHeavy'),
+    packetPrimary: $('packetPrimary'), packetEcho: $('packetEcho'), packetHeavy: $('packetHeavy'),
+    rightWave: $('rightWave'), sparkLayer: $('sparkLayer')
+  };
+
+  function perimeterPoints(width, height, count, inset = 7) {
+    const w = width - inset * 2;
+    const h = height - inset * 2;
+    const perimeter = 2 * (w + h);
+    const points = [];
+    for (let i = 0; i < count; i += 1) {
+      let d = i / count * perimeter;
+      let x;
+      let y;
+      if (d < w) { x = inset + d; y = inset; }
+      else if ((d -= w) < h) { x = inset + w; y = inset + d; }
+      else if ((d -= h) < w) { x = inset + w - d; y = inset + h; }
+      else { d -= w; x = inset; y = inset + h - d; }
+      points.push([x - 4.5, y - 4.5]);
+    }
+    return points;
+  }
+
+  function buildChaser(el, centerX, extraInset = 0) {
+    el.style.left = `${centerX - 87 - extraInset}px`;
+    el.style.top = `${438 - extraInset}px`;
+    const points = perimeterPoints(174 + extraInset * 2, 220 + extraInset * 2, 42, 8);
+    points.forEach(([x, y], index) => {
+      const bulb = document.createElement('i');
+      bulb.className = 'chaser-bulb';
+      bulb.dataset.index = String(index);
+      bulb.style.left = `${x}px`;
+      bulb.style.top = `${y}px`;
+      el.appendChild(bulb);
+    });
+  }
+
+  function buildPacket(el, count, seed) {
+    for (let i = 0; i < count; i += 1) {
+      const pip = document.createElement('i');
+      pip.className = `score-pip${i === 0 && el.classList.contains('heavy') ? ' core' : ''}`;
+      const column = (i * 5 + seed) % 5;
+      const row = (i * 3 + Math.floor(i / 5) + seed) % 4;
+      const jitterX = ((i * 7 + seed * 3) % 5) - 2;
+      const jitterY = ((i * 11 + seed) % 5) - 2;
+      pip.style.left = `${column * 12 + jitterX}px`;
+      pip.style.top = `${row * 12 + jitterY}px`;
+      el.appendChild(pip);
+    }
+  }
+
+  function buildTower() {
+    const count = 13;
+    for (let i = 0; i < count; i += 1) {
+      const lamp = document.createElement('i');
+      lamp.className = 'tower-lamp';
+      lamp.dataset.index = String(i);
+      lamp.style.bottom = `${i * 22}px`;
+      els.towerLamps.appendChild(lamp);
+    }
+  }
+
+  function buildWave() {
+    const cols = 24;
+    const rows = 15;
+    for (let x = 0; x < cols; x += 1) {
+      for (let y = 0; y < rows; y += 1) {
+        const dot = document.createElement('i');
+        dot.className = 'wave-dot';
+        dot.dataset.x = String(x);
+        dot.dataset.y = String(y);
+        dot.style.left = `${x * 6.4}px`;
+        dot.style.top = `${y * 11.4}px`;
+        els.rightWave.appendChild(dot);
+      }
+    }
+  }
+
+  function buildSparks() {
+    const specs = [
+      [126, 93, -58], [174, 74, -20], [197, 128, 27], [154, 535, 14],
+      [107, 518, 142], [188, 548, 58], [84, 566, 170], [214, 490, -12]
+    ];
+    specs.forEach(([x, y, angle], index) => {
+      const spark = document.createElement('i');
+      spark.className = 'spark';
+      spark.dataset.index = String(index);
+      spark.dataset.angle = String(angle);
+      spark.style.left = `${x}px`;
+      spark.style.top = `${y}px`;
+      els.sparkLayer.appendChild(spark);
+    });
+  }
+
+  buildChaser(els.chaserPrimary, slotCenters[2]);
+  buildChaser(els.chaserEcho, slotCenters[0], 4);
+  buildChaser(els.chaserHeavy, slotCenters[4]);
+  buildPacket(els.packetPrimary, 11, 1);
+  buildPacket(els.packetEcho, 8, 3);
+  buildPacket(els.packetHeavy, 18, 5);
+  buildTower();
+  buildWave();
+  buildSparks();
+
+  const events = [
+    { chaser: els.chaserPrimary, packet: els.packetPrimary, center: slotCenters[2], start: .07, rise: .12, fall: .34, end: .43, travelStart: .13, impact: .34, strength: .72, phase: 0 },
+    { chaser: els.chaserEcho, packet: els.packetEcho, center: slotCenters[0], start: .25, rise: .30, fall: .50, end: .60, travelStart: .32, impact: .54, strength: .58, phase: 12 },
+    { chaser: els.chaserHeavy, packet: els.packetHeavy, center: slotCenters[4], start: .45, rise: .50, fall: .72, end: .83, travelStart: .52, impact: .76, strength: 1, phase: 24 }
+  ];
+
+  function renderChaser(event, t) {
+    const activity = envelope(t, event.start, event.rise, event.fall, event.end);
+    event.chaser.style.opacity = String(activity);
+    const bulbs = [...event.chaser.children];
+    const runner = (t * 52 + event.phase) % bulbs.length;
+    bulbs.forEach((bulb, index) => {
+      const raw = Math.abs(index - runner);
+      const distance = Math.min(raw, bulbs.length - raw);
+      const hot = clamp(1 - distance / 5);
+      const alpha = activity * (.18 + hot * .82);
+      const white = event.strength > .9 && hot > .7 ? clamp((hot - .7) / .3) : 0;
+      bulb.style.background = white > 0 ? `rgb(255, ${Math.round(193 + white * 48)}, ${Math.round(74 + white * 146)})` : '#f4a22b';
+      bulb.style.opacity = String(alpha);
+      bulb.style.boxShadow = alpha > .2 ? `0 0 ${3 + hot * 7}px rgba(255, 157, 31, ${.35 + hot * .55})` : 'none';
+      bulb.style.transform = `scale(${.82 + hot * .34})`;
+    });
+  }
+
+  function renderPacket(event, t) {
+    const p = smooth(event.travelStart, event.impact, t);
+    const appearing = smooth(event.travelStart - .025, event.travelStart + .035, t);
+    const vanishing = 1 - smooth(event.impact - .018, event.impact + .055, t);
+    const opacity = clamp(appearing * vanishing);
+    const startX = event.center - 75;
+    const startY = 628;
+    const endX = 190;
+    const endY = 645;
+    const x = startX + (endX - startX) * p;
+    const y = startY + (endY - startY) * p - Math.sin(Math.PI * p) * (18 + event.strength * 16);
+    const scale = .74 + event.strength * .22 + Math.sin(Math.PI * p) * .08;
+    event.packet.style.opacity = String(opacity);
+    event.packet.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    [...event.packet.children].forEach((pip, index) => {
+      const stagger = .74 + .26 * Math.sin((index + 1) * 2.2 + p * 9);
+      pip.style.opacity = String(opacity * stagger);
+    });
+  }
+
+  function lampFillAt(t) {
+    return 3 * smooth(.18, .35, t) + 3 * smooth(.38, .55, t) + 5 * smooth(.57, .78, t) + 2 * smooth(.89, .96, t);
+  }
+
+  function renderTower(t) {
+    const brownout = envelope(t, .815, .84, .865, .902);
+    const critical = pulse(t - .955, .115);
+    const relay = Math.max(pulse(t - .34, .035), pulse(t - .54, .035) * .82, pulse(t - .76, .045), pulse(t - .915, .035));
+    const fill = lampFillAt(t);
+    const lamps = [...els.towerLamps.children];
+    lamps.forEach((lamp, index) => {
+      const on = clamp(fill - index);
+      const activationFlash = pulse(t - ([.24, .29, .34, .43, .49, .54, .61, .65, .69, .73, .77, .91, .95][index] || .95), .055);
+      const intensity = clamp(on * (.74 + activationFlash * .34) * (1 - brownout * .92));
+      const hot = clamp(critical * (.72 + index / lamps.length * .35));
+      const core = hot > .38 ? `rgba(255, ${Math.round(191 + hot * 57)}, ${Math.round(78 + hot * 162)}, .98)` : 'rgba(255, 169, 37, .96)';
+      lamp.style.opacity = String(.50 + intensity * .50);
+      lamp.style.borderColor = `rgba(188, 105, 24, ${.55 + intensity * .42})`;
+      lamp.style.background = intensity > .05
+        ? `radial-gradient(circle, ${core} 0 34%, rgba(255, 122, 22, .34) 42%, transparent 50%) 0 0 / 8px 7px, rgba(72, 34, 8, .9)`
+        : `radial-gradient(circle, rgba(85,49,15,.78) 0 31%, transparent 38%) 0 0 / 8px 7px, rgba(14,10,5,.82)`;
+      lamp.style.boxShadow = intensity > .05
+        ? `0 0 ${4 + intensity * 8 + hot * 9}px rgba(255, 152, 27, ${.28 + intensity * .46}), inset 0 0 5px rgba(255, 235, 173, ${.08 + hot * .28})`
+        : 'inset 0 0 7px rgba(0,0,0,.92)';
+      lamp.style.transform = `scaleX(${1 + activationFlash * .035})`;
+    });
+    els.towerBrownout.style.opacity = String(brownout * .9);
+    els.globalDim.style.opacity = String(brownout * .16);
+    els.towerBloom.style.opacity = String(clamp(critical * .92 + relay * .16));
+    els.intakeFlash.style.opacity = String(clamp(relay));
+    els.intakeFlash.style.transform = `scale(${.68 + relay * .8})`;
+
+    const frontier = 500 - clamp(fill / 13) * 258;
+    const scanMemory = clamp(smooth(.28, .38, t) * (1 - smooth(1.18, 1.48, t)));
+    [els.scanA, els.scanB, els.scanC].forEach((band, index) => {
+      const lag = index * 18;
+      band.style.top = `${frontier + lag}px`;
+      band.style.opacity = String(scanMemory * (.35 - index * .085) * (1 - brownout));
+    });
+
+    const latch = smooth(.90, .965, t);
+    els.targetLatch.style.opacity = String(.62 + latch * .38);
+    els.targetLatch.style.borderColor = latch > .02 ? `rgba(255, ${Math.round(139 + latch * 72)}, ${Math.round(27 + latch * 68)}, .98)` : 'rgba(126,65,17,.72)';
+    els.targetLatch.style.boxShadow = latch > .02
+      ? `0 0 ${8 + critical * 20}px rgba(255, 159, 28, ${.46 + critical * .44}), inset 0 0 0 7px rgba(12,10,7,.95)`
+      : 'inset 0 0 0 7px rgba(12,10,7,.95)';
+
+    const tear = pulse(t - 1.005, .095);
+    els.crtTear.style.opacity = String(tear * .92);
+    els.crtTear.style.top = `${320 + Math.sin(t * 141) * 12}px`;
+    els.crtTear.style.transform = `translateX(${Math.sin(t * 119) * 7}px) scaleX(${.82 + tear * .22})`;
+
+    const kick = critical * Math.sin(t * 172) * 1.7;
+    els.world.style.transform = `translate(${kick}px, ${-Math.abs(kick) * .35}px)`;
+  }
+
+  function renderWave(t) {
+    const eventEnergy = clamp(
+      envelope(t, .07, .12, .34, .43) * .34 +
+      envelope(t, .25, .30, .50, .60) * .42 +
+      envelope(t, .45, .50, .72, .83) * .58 +
+      pulse(t - .955, .15) * .72
+    );
+    const dots = [...els.rightWave.children];
+    dots.forEach(dot => {
+      const x = Number(dot.dataset.x);
+      const y = Number(dot.dataset.y);
+      const amplitude = 1.1 + eventEnergy * 4.2;
+      const center = 7 + Math.sin(x * .72 + t * 15) * amplitude * (.35 + .65 * Math.sin(x * .31 + 1.2) ** 2);
+      const distance = Math.abs(y - center);
+      const on = clamp(1 - distance / 1.15);
+      dot.style.opacity = String(on * (.08 + eventEnergy * .50));
+      dot.style.transform = `scale(${.78 + on * .28})`;
+    });
+  }
+
+  function renderSparks(t) {
+    const energy = pulse(t - .955, .135);
+    [...els.sparkLayer.children].forEach((spark, index) => {
+      const delay = index * .008;
+      const local = clamp((t - (.91 + delay)) / .13);
+      const fade = local <= 0 ? 0 : (1 - local) * energy;
+      const angle = Number(spark.dataset.angle);
+      const distance = local * (18 + index * 3);
+      spark.style.opacity = String(clamp(fade * 1.25));
+      spark.style.transform = `rotate(${angle}deg) translateX(${distance}px) scaleX(${.55 + fade})`;
+    });
+  }
+
+  function renderAt(rawTime) {
+    const t = clamp(Number(rawTime) || 0, 0, duration);
+    events.forEach(event => {
+      renderChaser(event, t);
+      renderPacket(event, t);
+    });
+    renderTower(t);
+    renderWave(t);
+    renderSparks(t);
+  }
+
+  Promise.all([...document.images].map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
+    img.addEventListener('load', resolve, { once: true });
+    img.addEventListener('error', resolve, { once: true });
+  }))).then(() => {
+    window.renderAt = renderAt;
+    window.previewDuration = duration;
+    window.previewReady = true;
+    renderAt(0);
+  });
+})();
+</script>
+</body>
+</html>

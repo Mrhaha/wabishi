@@ -1,0 +1,2237 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F009 V7 最高档压抑—爆发动态样片</title>
+<style>
+  @font-face {
+    font-family: "ArcadeSolid";
+    src: url("../../../../Resources/Art/MainGame/Flow/wabish_physical_key_sans_sc_semibold.ttf") format("truetype");
+    font-weight: 600;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #010203;
+  }
+  #capture {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: #010203;
+  }
+  #stage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform-origin: 0 0;
+    transform: scale(0.6666667);
+  }
+  #world {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+  }
+  #cabinetScan {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(180deg, rgba(255, 225, 158, .016) 0 1px, transparent 1px 4px),
+      linear-gradient(180deg, transparent 0 36%, rgba(255, 180, 62, .022) 48%, transparent 61%);
+    mix-blend-mode: screen;
+    opacity: .34;
+    will-change: transform, opacity;
+  }
+  #base {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    object-fit: fill;
+    user-select: none;
+  }
+  .led {
+    font-family: "ArcadeSolid", "Microsoft YaHei", sans-serif;
+    color: #e7a72d;
+    letter-spacing: 3px;
+    text-shadow: 0 0 2px rgba(255, 178, 47, .86), 0 0 7px rgba(255, 137, 24, .22);
+  }
+  .led.low {
+    color: #b87827;
+    text-shadow: 0 0 2px rgba(226, 136, 30, .48);
+  }
+  #topHud {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+  #phaseCode {
+    position: absolute;
+    left: 50px;
+    top: 38px;
+    width: 102px;
+    text-align: center;
+    font-size: 55px;
+    line-height: 70px;
+    opacity: .88;
+  }
+  #chapterText {
+    position: absolute;
+    left: 182px;
+    top: 47px;
+    font-size: 37px;
+    line-height: 58px;
+    opacity: .78;
+  }
+  #lifeText {
+    position: absolute;
+    left: 1268px;
+    top: 49px;
+    width: 252px;
+    text-align: center;
+    font-size: 34px;
+    line-height: 54px;
+    opacity: .66;
+  }
+  #coinText {
+    position: absolute;
+    left: 1572px;
+    top: 49px;
+    width: 265px;
+    text-align: center;
+    font-size: 34px;
+    line-height: 54px;
+    opacity: .72;
+  }
+  #scoreContext {
+    position: absolute;
+    left: 67px;
+    top: 326px;
+    width: 165px;
+    z-index: 7;
+    text-align: center;
+    pointer-events: none;
+  }
+  .score-line {
+    height: 45px;
+    font-size: 28px;
+    line-height: 42px;
+    white-space: nowrap;
+    opacity: .70;
+  }
+  .score-line span {
+    display: inline-block;
+    min-width: 56px;
+    text-align: right;
+  }
+  #terminalCopy {
+    position: absolute;
+    left: 1606px;
+    top: 264px;
+    width: 238px;
+    height: 440px;
+    z-index: 7;
+    text-align: center;
+    pointer-events: none;
+  }
+  #ruleHeading {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    font-size: 31px;
+    line-height: 48px;
+    opacity: .76;
+  }
+  #ruleBody {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    top: 176px;
+    font-size: 22px;
+    line-height: 36px;
+    letter-spacing: 1px;
+    opacity: .48;
+  }
+  #terminalResult {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 80px;
+    opacity: 0;
+  }
+  #terminalResult .result-title {
+    font-size: 39px;
+    line-height: 64px;
+    color: #ffc252;
+  }
+  #terminalResult .result-sub {
+    margin-top: 34px;
+    font-size: 23px;
+    line-height: 40px;
+    color: #c98d36;
+    opacity: .76;
+  }
+  #actionArea {
+    position: absolute;
+    left: 694px;
+    top: 872px;
+    width: 522px;
+    height: 108px;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  #actionGlow {
+    position: absolute;
+    inset: 10px 14px;
+    border: 3px solid rgba(193, 115, 27, .26);
+    border-radius: 14px;
+    background: rgba(78, 40, 8, .07);
+    box-shadow: 0 0 0 rgba(255, 173, 40, 0);
+  }
+  #actionText {
+    position: relative;
+    font-size: 39px;
+    line-height: 76px;
+    opacity: .58;
+  }
+  #diceLayer, #focusLayer, #packetLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  #diceLayer { z-index: 5; }
+  #focusLayer { z-index: 6; }
+  #packetLayer { z-index: 9; }
+  .die {
+    position: absolute;
+    width: 192px;
+    height: 192px;
+  }
+  .die-shell {
+    position: absolute;
+    inset: 0;
+    width: 192px;
+    height: 192px;
+    object-fit: contain;
+    user-select: none;
+  }
+  .face-window {
+    position: absolute;
+    left: 34px;
+    top: 31px;
+    width: 124px;
+    height: 120px;
+    overflow: hidden;
+    border-radius: 21px;
+    z-index: 2;
+  }
+  .face-window::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 21px;
+    box-shadow: inset 0 10px 12px rgba(77, 43, 19, .08), inset 0 -9px 12px rgba(76, 39, 16, .08);
+    pointer-events: none;
+  }
+  .reel-digit {
+    position: absolute;
+    left: 0;
+    width: 124px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "ArcadeSolid", "Arial Narrow", sans-serif;
+    font-size: 93px;
+    line-height: 110px;
+    letter-spacing: -3px;
+    color: #17130f;
+    text-shadow: 0 2px 0 rgba(255, 245, 218, .28), 0 -1px 0 rgba(0, 0, 0, .5);
+    will-change: transform, opacity, filter;
+  }
+  .type-core {
+    position: absolute;
+    left: 74px;
+    top: 134px;
+    width: 44px;
+    height: 44px;
+    z-index: 3;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .68));
+    will-change: left, top, width, height, opacity;
+  }
+  .stop-flash {
+    position: absolute;
+    left: 6px;
+    top: 5px;
+    width: 180px;
+    height: 180px;
+    border: 3px solid rgba(255, 190, 67, .92);
+    border-radius: 31px;
+    box-shadow: 0 0 9px rgba(255, 162, 37, .62), inset 0 0 7px rgba(255, 205, 100, .28);
+    z-index: 4;
+    opacity: 0;
+  }
+  .chaser {
+    position: absolute;
+    width: 202px;
+    height: 210px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .chaser-bulb {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #754318;
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, .9);
+  }
+  .chaser.echo .chaser-bulb {
+    width: 7px;
+    height: 7px;
+  }
+  .chaser.echo .chaser-bulb:nth-child(2n + 1) { display: none; }
+  .source-pulse {
+    position: absolute;
+    width: 62px;
+    height: 62px;
+    border: 3px solid rgba(255, 170, 43, .86);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 143, 25, .46), inset 0 0 8px rgba(255, 208, 98, .24);
+    opacity: 0;
+  }
+  .source-pulse.echo {
+    border-style: dashed;
+    border-width: 2px;
+  }
+  .face-motes {
+    position: absolute;
+    width: 58px;
+    height: 58px;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .face-mote {
+    position: absolute;
+    left: 26px;
+    top: 26px;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: #f0a332;
+    box-shadow: 0 0 5px rgba(255, 157, 35, .72);
+    will-change: transform, opacity;
+  }
+  .face-mote.core {
+    width: 7px;
+    height: 7px;
+    background: #fff0b2;
+    box-shadow: 0 0 5px rgba(255, 245, 200, .88), 0 0 9px rgba(255, 160, 35, .58);
+  }
+  .score-packet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 78px;
+    height: 68px;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .score-pip {
+    position: absolute;
+    border-radius: 2px;
+    background: #e99b2a;
+    box-shadow: 0 0 4px rgba(255, 153, 32, .70);
+  }
+  .score-pip.core {
+    background: #fff1bb;
+    box-shadow: 0 0 5px rgba(255, 245, 198, .94), 0 0 12px rgba(255, 166, 40, .82);
+  }
+  .score-packet.echo .score-pip:nth-child(3n) { opacity: .32; }
+  .packet-tail-mote {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 1px;
+    background: #dd8623;
+    box-shadow: 0 0 4px rgba(255, 137, 25, .56);
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  #towerFx {
+    position: absolute;
+    left: 54px;
+    top: 180px;
+    width: 202px;
+    height: 570px;
+    z-index: 8;
+    overflow: hidden;
+    border-radius: 34px;
+    pointer-events: none;
+    transform-origin: 50% 78%;
+  }
+  #towerBloom {
+    position: absolute;
+    left: -24px;
+    top: 50px;
+    width: 250px;
+    height: 530px;
+    background: radial-gradient(ellipse at 54% 68%, rgba(255, 243, 190, .50) 0 7%, rgba(255, 176, 47, .30) 18%, rgba(255, 107, 22, .09) 38%, transparent 63%);
+    filter: blur(5px);
+    opacity: 0;
+  }
+  #towerGlassReflection {
+    position: absolute;
+    left: 48px;
+    top: 264px;
+    width: 98px;
+    height: 292px;
+    border-radius: 7px;
+    background: linear-gradient(112deg, transparent 0 38%, rgba(255, 222, 149, .18) 44%, rgba(255, 251, 222, .34) 48%, rgba(255, 171, 44, .12) 52%, transparent 58%);
+    transform: translateX(-72px);
+    opacity: 0;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  #towerLamps {
+    position: absolute;
+    left: 45px;
+    top: 280px;
+    width: 108px;
+    height: 282px;
+  }
+  .tower-lamp {
+    position: absolute;
+    left: 0;
+    width: 108px;
+    height: 14px;
+    border: 2px solid rgba(89, 54, 22, .72);
+    border-radius: 2px;
+    background: radial-gradient(circle, rgba(70, 42, 18, .68) 0 31%, transparent 38%) 0 0 / 8px 7px, rgba(10, 9, 6, .88);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .9);
+    opacity: .48;
+  }
+  #targetLatch {
+    position: absolute;
+    left: 69px;
+    top: 58px;
+    width: 64px;
+    height: 64px;
+    border: 7px solid rgba(128, 70, 23, .74);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 7px rgba(8, 9, 8, .94);
+    opacity: .72;
+  }
+  #targetLatch::after {
+    content: "";
+    position: absolute;
+    left: 17px;
+    top: 17px;
+    width: 16px;
+    height: 16px;
+    border: 7px solid rgba(138, 76, 26, .80);
+    border-radius: 50%;
+  }
+  .tower-scan {
+    position: absolute;
+    left: 35px;
+    width: 128px;
+    height: 5px;
+    background: linear-gradient(90deg, transparent, rgba(255, 175, 43, .26) 12%, rgba(255, 215, 106, .92) 50%, rgba(255, 127, 25, .20) 88%, transparent);
+    box-shadow: 0 0 7px rgba(255, 151, 31, .58);
+    opacity: 0;
+  }
+  #glassContactBloom {
+    position: absolute;
+    left: 112px;
+    top: 442px;
+    width: 84px;
+    height: 82px;
+    background: radial-gradient(ellipse at 58% 52%, rgba(255, 252, 222, .96) 0 3%, rgba(255, 210, 104, .72) 7%, rgba(239, 139, 31, .27) 22%, transparent 58%);
+    filter: blur(.7px) drop-shadow(0 0 7px rgba(255, 159, 34, .62));
+    mix-blend-mode: screen;
+    opacity: 0;
+  }
+  #glassSurfaceSheen {
+    position: absolute;
+    left: 116px;
+    top: 443px;
+    width: 70px;
+    height: 78px;
+    background: linear-gradient(104deg, transparent 0 42%, rgba(255, 186, 66, .10) 46%, rgba(255, 250, 214, .76) 49%, rgba(255, 174, 47, .16) 52%, transparent 57%);
+    filter: blur(.35px);
+    mix-blend-mode: screen;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  #glassCompressionLine {
+    position: absolute;
+    left: 151px;
+    top: 460px;
+    width: 4px;
+    height: 43px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, transparent, rgba(255, 190, 61, .70) 18%, #fff8d7 48%, rgba(255, 150, 31, .62) 78%, transparent);
+    box-shadow: 0 0 5px rgba(255, 174, 45, .74), 0 0 12px rgba(255, 123, 21, .36);
+    transform-origin: 50% 50%;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  #internalRisePulse {
+    position: absolute;
+    left: 55px;
+    top: 469px;
+    width: 92px;
+    height: 7px;
+    background: linear-gradient(90deg, transparent, rgba(255, 153, 31, .30) 10%, #fff4be 50%, rgba(255, 134, 24, .28) 90%, transparent);
+    box-shadow: 0 0 6px rgba(255, 177, 51, .72), 0 0 12px rgba(255, 105, 18, .28);
+    mix-blend-mode: screen;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  #internalRisePulse::after {
+    content: "";
+    position: absolute;
+    left: 43px;
+    top: 4px;
+    width: 6px;
+    height: 52px;
+    background: linear-gradient(180deg, rgba(255, 237, 166, .54), rgba(240, 132, 28, .18) 38%, transparent);
+    filter: blur(1px);
+  }
+  #towerCriticalCore {
+    position: absolute;
+    left: 66px;
+    top: 256px;
+    width: 70px;
+    height: 315px;
+    background: linear-gradient(90deg, transparent, rgba(255, 245, 206, .86) 42%, #fff9dc 50%, rgba(255, 190, 64, .70) 58%, transparent);
+    filter: blur(1px);
+    opacity: 0;
+  }
+  #criticalBurst {
+    position: absolute;
+    left: -89px;
+    top: 273px;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, rgba(255, 255, 232, .98) 0 2%, rgba(255, 218, 112, .78) 2.5% 5%, transparent 6% 24%, rgba(255, 197, 65, .88) 24.5% 27%, rgba(255, 104, 17, .30) 28% 31%, transparent 32%),
+      conic-gradient(from 8deg, transparent 0 5deg, rgba(255, 238, 172, .82) 6deg 7deg, transparent 8deg 24deg, rgba(255, 142, 31, .46) 25deg 27deg, transparent 28deg 54deg, rgba(255, 244, 196, .70) 55deg 56deg, transparent 57deg 90deg);
+    filter: drop-shadow(0 0 12px rgba(255, 157, 30, .76));
+    opacity: 0;
+    transform: scale(.24) rotate(-7deg);
+  }
+  #criticalBurst::before,
+  #criticalBurst::after {
+    content: "";
+    position: absolute;
+    left: 32px;
+    top: 185px;
+    width: 316px;
+    height: 8px;
+    background: linear-gradient(90deg, transparent, rgba(255, 183, 48, .58) 15%, #fff8d9 50%, rgba(255, 137, 24, .52) 85%, transparent);
+    box-shadow: 0 0 11px rgba(255, 184, 59, .82);
+  }
+  #criticalBurst::after {
+    transform: rotate(90deg);
+  }
+  #towerBrownout {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .92);
+    opacity: 0;
+    z-index: 20;
+  }
+  #brownoutFilament {
+    position: absolute;
+    left: 96px;
+    top: 382px;
+    width: 6px;
+    height: 76px;
+    z-index: 21;
+    border-radius: 3px;
+    background: linear-gradient(180deg, transparent, #d07b21 18%, #fff0aa 50%, #b75b18 82%, transparent);
+    box-shadow: 0 0 5px rgba(255, 141, 29, .72);
+    opacity: 0;
+  }
+  .relay-contact {
+    position: absolute;
+    top: 430px;
+    width: 42px;
+    height: 7px;
+    z-index: 22;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #5f3414, #d98228 68%, #fff0b0);
+    box-shadow: 0 0 5px rgba(255, 145, 27, .52);
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  #relayContactLeft { left: 29px; transform-origin: 100% 50%; }
+  #relayContactRight { right: 29px; transform-origin: 0 50%; }
+  #crtTear {
+    position: absolute;
+    left: 9px;
+    top: 334px;
+    width: 184px;
+    height: 9px;
+    background: linear-gradient(180deg, rgba(255, 250, 222, .12) 0 1px, rgba(255, 244, 191, .96) 1px 3px, rgba(255, 125, 26, .48) 3px 6px, rgba(80, 199, 186, .19) 6px 8px, transparent 8px);
+    box-shadow: 0 0 10px rgba(255, 183, 59, .72);
+    opacity: 0;
+    z-index: 22;
+  }
+  #sparkLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 23;
+  }
+  .spark {
+    position: absolute;
+    width: 26px;
+    height: 3px;
+    border-radius: 2px;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, #fff5c4, #ffae35 46%, transparent);
+    box-shadow: 0 0 4px rgba(255, 148, 29, .72);
+    opacity: 0;
+  }
+  .phosphor-dust {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 1px;
+    background: #f0a12f;
+    box-shadow: 0 0 4px rgba(255, 139, 27, .58);
+    opacity: 0;
+    z-index: 23;
+    will-change: transform, opacity;
+  }
+  #cabinetLoadFx {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #outerCircuit {
+    position: absolute;
+    left: 12px;
+    top: 148px;
+    width: 1896px;
+    height: 832px;
+    border: 3px solid rgba(151, 84, 24, .48);
+    border-radius: 22px;
+    box-shadow: inset 0 0 12px rgba(255, 147, 31, .16), 0 0 8px rgba(255, 130, 24, .12);
+    opacity: 0;
+    will-change: opacity, border-color, box-shadow, transform;
+  }
+  #outerCircuit::before {
+    content: "";
+    position: absolute;
+    left: 292px;
+    right: 292px;
+    top: 30px;
+    bottom: 52px;
+    border-top: 2px solid rgba(225, 135, 31, .34);
+    border-bottom: 2px solid rgba(225, 135, 31, .24);
+    border-radius: 10px;
+  }
+  .load-bus {
+    position: absolute;
+    height: 7px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, transparent 0, rgba(198, 104, 22, .24) 8%, rgba(255, 176, 46, .94) 50%, rgba(198, 104, 22, .24) 92%, transparent 100%);
+    box-shadow: 0 0 7px rgba(255, 137, 28, .48);
+    opacity: 0;
+    transform-origin: 0 50%;
+    will-change: transform, opacity, filter;
+  }
+  #hudBus { left: 30px; top: 125px; width: 1860px; }
+  #actionBus { left: 318px; top: 824px; width: 1234px; }
+  #trayLoadFrame {
+    position: absolute;
+    left: 286px;
+    top: 451px;
+    width: 1250px;
+    height: 328px;
+    border: 4px solid rgba(232, 137, 31, .50);
+    border-radius: 44px;
+    box-shadow: inset 0 0 18px rgba(255, 164, 38, .12), 0 0 14px rgba(255, 128, 24, .16);
+    opacity: 0;
+    will-change: opacity, transform, box-shadow;
+  }
+  #trayUnderlight {
+    position: absolute;
+    left: 328px;
+    top: 738px;
+    width: 1164px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, transparent, rgba(218, 113, 23, .22) 8%, rgba(255, 190, 61, .90) 48%, rgba(255, 131, 25, .28) 92%, transparent);
+    filter: blur(4px);
+    opacity: 0;
+    will-change: opacity, transform, filter;
+  }
+  .chassis-load {
+    position: absolute;
+    top: 180px;
+    width: 318px;
+    height: 728px;
+    opacity: 0;
+    mix-blend-mode: screen;
+    will-change: opacity, transform;
+  }
+  #leftChassisLoad {
+    left: 0;
+    background: radial-gradient(ellipse at 35% 54%, rgba(255, 179, 48, .28), rgba(216, 96, 20, .08) 34%, transparent 68%);
+  }
+  #rightChassisLoad {
+    right: 0;
+    background: radial-gradient(ellipse at 67% 48%, rgba(255, 176, 46, .24), rgba(218, 99, 20, .07) 38%, transparent 70%);
+  }
+  #terminalLoadFrame {
+    position: absolute;
+    left: 1584px;
+    top: 244px;
+    width: 287px;
+    height: 481px;
+    border: 3px solid rgba(232, 139, 32, .58);
+    border-radius: 28px;
+    box-shadow: inset 0 0 15px rgba(255, 163, 37, .18), 0 0 11px rgba(255, 134, 25, .18);
+    opacity: 0;
+    will-change: opacity, transform, box-shadow;
+  }
+  .tray-sweep {
+    position: absolute;
+    left: 322px;
+    top: 729px;
+    width: 154px;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, transparent, rgba(255, 185, 57, .32), #fff0ad 52%, rgba(255, 126, 23, .18), transparent);
+    box-shadow: 0 0 8px rgba(255, 163, 35, .72);
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+  #traySweepB { top: 746px; transform-origin: 100% 50%; }
+  #cabinetRelayLayer {
+    position: absolute;
+    inset: 0;
+  }
+  .cabinet-relay {
+    position: absolute;
+    width: 18px;
+    height: 7px;
+    border: 1px solid rgba(97, 52, 19, .88);
+    border-radius: 2px;
+    background: #48250f;
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, .86);
+    opacity: .22;
+    will-change: opacity, transform, background, box-shadow;
+  }
+  .cabinet-relay.vertical {
+    width: 7px;
+    height: 18px;
+  }
+  .crt-slice {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    object-fit: fill;
+    z-index: 15;
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity, transform, clip-path;
+  }
+  #crtSliceA { filter: sepia(1) saturate(2.1) hue-rotate(-18deg) brightness(1.20); }
+  #crtSliceB { filter: sepia(1) saturate(1.65) hue-rotate(112deg) brightness(.92); }
+  #crtSliceC { filter: sepia(.55) saturate(1.40) brightness(1.24) contrast(1.08); }
+  #crtGlobalBand {
+    position: absolute;
+    left: 0;
+    top: 520px;
+    width: 1920px;
+    height: 13px;
+    z-index: 16;
+    background: linear-gradient(180deg, transparent, rgba(255, 246, 202, .92) 18%, rgba(239, 132, 28, .62) 43%, rgba(68, 195, 185, .20) 67%, transparent);
+    box-shadow: 0 0 14px rgba(255, 165, 37, .58);
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity, top, transform;
+  }
+  #crtEdgeSplit {
+    position: absolute;
+    inset: 3px;
+    z-index: 16;
+    border-left: 5px solid rgba(235, 111, 29, .48);
+    border-right: 5px solid rgba(70, 187, 180, .28);
+    box-shadow: inset 9px 0 13px rgba(255, 116, 26, .10), inset -9px 0 13px rgba(67, 185, 178, .08);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #crtPhosphorWash {
+    position: absolute;
+    inset: 0;
+    z-index: 16;
+    background:
+      repeating-linear-gradient(180deg, transparent 0 3px, rgba(255, 226, 153, .085) 3px 4px),
+      radial-gradient(ellipse at 50% 56%, rgba(255, 187, 57, .12), transparent 47%),
+      radial-gradient(ellipse at 88% 47%, rgba(68, 187, 177, .06), transparent 24%);
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #compressionVignette {
+    position: absolute;
+    inset: 0;
+    z-index: 17;
+    background:
+      radial-gradient(circle at 9% 58%, transparent 0 4%, rgba(2, 3, 3, .24) 12%, rgba(0, 0, 0, .72) 48%, rgba(0, 0, 0, .94) 100%),
+      linear-gradient(180deg, rgba(0, 0, 0, .44), transparent 28%, transparent 72%, rgba(0, 0, 0, .52));
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  #suctionRays {
+    position: absolute;
+    inset: -120px;
+    z-index: 17;
+    background: conic-gradient(from 91deg at 14% 61%,
+      transparent 0 7deg, rgba(255, 142, 30, .18) 7.4deg 8deg, transparent 8.4deg 20deg,
+      rgba(255, 220, 118, .13) 20.4deg 21deg, transparent 21.5deg 43deg,
+      rgba(202, 91, 19, .16) 43.3deg 44deg, transparent 44.5deg 67deg,
+      rgba(255, 178, 45, .14) 67.2deg 68deg, transparent 68.5deg 91deg,
+      rgba(255, 231, 145, .15) 91.3deg 92deg, transparent 92.5deg 121deg,
+      rgba(201, 87, 18, .14) 121.4deg 122deg, transparent 122.5deg 152deg,
+      rgba(255, 177, 43, .15) 152.3deg 153deg, transparent 153.5deg 189deg,
+      rgba(255, 230, 142, .13) 189.3deg 190deg, transparent 190.5deg 230deg,
+      rgba(208, 93, 19, .16) 230.3deg 231deg, transparent 231.5deg 275deg,
+      rgba(255, 176, 41, .14) 275.3deg 276deg, transparent 276.5deg 322deg,
+      rgba(255, 228, 137, .15) 322.3deg 323deg, transparent 323.5deg 360deg);
+    mix-blend-mode: screen;
+    opacity: 0;
+    transform-origin: 14% 61%;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  #pressureCore {
+    position: absolute;
+    left: 47px;
+    top: 495px;
+    width: 244px;
+    height: 244px;
+    z-index: 20;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fffbe0 0 3%, rgba(255, 233, 143, .98) 4% 7%, rgba(255, 150, 34, .72) 11%, rgba(216, 76, 14, .26) 24%, transparent 58%);
+    filter: blur(.7px) drop-shadow(0 0 12px rgba(255, 132, 24, .72));
+    mix-blend-mode: screen;
+    opacity: 0;
+    transform-origin: 50% 50%;
+    pointer-events: none;
+    will-change: opacity, transform, filter;
+  }
+  .pressure-ring {
+    position: absolute;
+    left: 101px;
+    top: 549px;
+    width: 136px;
+    height: 136px;
+    z-index: 20;
+    border: 5px solid rgba(255, 182, 54, .80);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(255, 135, 27, .58), inset 0 0 10px rgba(255, 218, 113, .24);
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  #burstWash {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background:
+      radial-gradient(circle at 9% 58%, rgba(255, 255, 238, 1) 0 2%, rgba(255, 235, 149, .96) 3%, rgba(255, 157, 37, .66) 8%, rgba(239, 95, 14, .23) 20%, transparent 55%),
+      radial-gradient(ellipse at 50% 58%, rgba(255, 213, 103, .30), rgba(255, 123, 24, .11) 35%, transparent 72%);
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  #blastRays {
+    position: absolute;
+    inset: -180px;
+    z-index: 20;
+    background: conic-gradient(from 86deg at 16% 62%, transparent 0 3deg, rgba(255, 250, 207, .96) 3.3deg 4deg, transparent 4.4deg 12deg, rgba(255, 145, 30, .55) 12.3deg 14deg, transparent 14.4deg 29deg, rgba(255, 236, 164, .82) 29.3deg 30deg, transparent 30.4deg 48deg, rgba(239, 102, 18, .48) 48.3deg 51deg, transparent 51.5deg 75deg, rgba(255, 246, 196, .86) 75.3deg 76deg, transparent 76.4deg 105deg, rgba(255, 137, 26, .52) 105.3deg 108deg, transparent 108.5deg 144deg, rgba(255, 240, 176, .78) 144.3deg 145deg, transparent 145.5deg 184deg, rgba(230, 90, 15, .46) 184.3deg 187deg, transparent 187.5deg 229deg, rgba(255, 239, 174, .75) 229.3deg 230deg, transparent 230.5deg 276deg, rgba(255, 130, 23, .50) 276.3deg 279deg, transparent 279.5deg 326deg, rgba(255, 244, 190, .84) 326.3deg 327deg, transparent 327.5deg 360deg);
+    mix-blend-mode: screen;
+    opacity: 0;
+    transform-origin: 16% 62%;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  .shockwave {
+    position: absolute;
+    left: -124px;
+    top: 334px;
+    width: 590px;
+    height: 590px;
+    z-index: 21;
+    border: 10px solid rgba(255, 242, 178, .92);
+    border-radius: 50%;
+    box-shadow: 0 0 22px rgba(255, 159, 34, .72), inset 0 0 18px rgba(255, 110, 19, .46);
+    opacity: 0;
+    transform: scale(.12);
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  #shockwaveB {
+    border-width: 5px;
+    border-color: rgba(77, 199, 190, .54);
+    box-shadow: 0 0 17px rgba(80, 200, 190, .30);
+  }
+  #impactBand {
+    position: absolute;
+    left: 0;
+    top: 620px;
+    width: 1920px;
+    height: 24px;
+    z-index: 21;
+    background: linear-gradient(90deg, rgba(255, 255, 226, .98), rgba(255, 219, 118, .86) 12%, rgba(255, 139, 28, .46) 38%, rgba(255, 241, 173, .72) 58%, rgba(65, 190, 183, .22) 82%, transparent);
+    box-shadow: 0 0 18px rgba(255, 172, 42, .78), 0 0 34px rgba(255, 101, 16, .32);
+    opacity: 0;
+    transform-origin: 0 50%;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  #blastFrame {
+    position: absolute;
+    inset: 8px;
+    z-index: 21;
+    border: 10px solid rgba(255, 222, 130, .90);
+    border-radius: 18px;
+    box-shadow: inset 0 0 35px rgba(255, 145, 29, .52), 0 0 24px rgba(255, 198, 77, .66);
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+  #v7DebrisLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 22;
+    pointer-events: none;
+  }
+  .v7-shard {
+    position: absolute;
+    left: 168px;
+    top: 628px;
+    height: 4px;
+    border-radius: 2px;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, #fffbd6, #ffb13c 38%, rgba(224, 78, 13, .60) 72%, transparent);
+    box-shadow: 0 0 6px rgba(255, 151, 31, .76);
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+  #terminalWave {
+    position: absolute;
+    left: 1635px;
+    top: 510px;
+    width: 180px;
+    height: 160px;
+    z-index: 6;
+    pointer-events: none;
+  }
+  .wave-dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: #d58d29;
+    box-shadow: 0 0 3px rgba(255, 147, 27, .42);
+    opacity: 0;
+  }
+  #globalDim {
+    position: absolute;
+    inset: 0;
+    z-index: 18;
+    background: rgba(0, 0, 0, .98);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #criticalStrobe {
+    position: absolute;
+    inset: 0;
+    z-index: 19;
+    background:
+      radial-gradient(circle at 8.2% 55%, rgba(255, 255, 232, .96) 0 2.5%, rgba(255, 194, 58, .42) 5%, rgba(255, 116, 18, .16) 13%, transparent 38%),
+      rgba(255, 183, 56, .08);
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #resultWarmth {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    z-index: 4;
+    background: radial-gradient(ellipse at 14% 55%, rgba(255, 165, 39, .08), transparent 37%), radial-gradient(ellipse at 88% 50%, rgba(255, 154, 36, .045), transparent 28%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #terminalCursor {
+    position: absolute;
+    left: 1718px;
+    top: 665px;
+    width: 34px;
+    height: 6px;
+    z-index: 8;
+    border-radius: 1px;
+    background: #d9942f;
+    box-shadow: 0 0 5px rgba(255, 156, 37, .48);
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div id="capture">
+  <div id="stage">
+    <div id="world">
+      <img id="base" src="../../../../Resources/Art/MainGame/arcade_main_game_common_base.png" alt="">
+      <div id="cabinetScan"></div>
+      <div id="resultWarmth"></div>
+      <div id="topHud">
+        <div id="phaseCode" class="led">01</div>
+        <div id="chapterText" class="led">第1章 · 第1关</div>
+        <div id="lifeText" class="led low">生命 --</div>
+        <div id="coinText" class="led">金币 8</div>
+      </div>
+      <div id="scoreContext">
+        <div class="score-line led low">目标 <span id="targetValue">22</span></div>
+        <div class="score-line led low">当前 <span id="currentValue">0</span></div>
+      </div>
+      <div id="terminalCopy">
+        <div id="ruleHeading" class="led">本关规则</div>
+        <div id="ruleBody" class="led low">无额外规则<br>按槽位顺序结算</div>
+        <div id="terminalResult" class="led">
+          <div id="resultTitle" class="result-title">本关通过</div>
+          <div id="resultSub" class="result-sub">结算完成<br>回路稳定</div>
+        </div>
+      </div>
+      <div id="actionArea">
+        <div id="actionGlow"></div>
+        <div id="actionText" class="led">SPACE 投掷</div>
+      </div>
+      <div id="diceLayer"></div>
+      <div id="focusLayer"></div>
+      <div id="packetLayer"></div>
+      <div id="towerFx">
+        <div id="towerBloom"></div>
+        <div id="towerGlassReflection"></div>
+        <div id="towerLamps"></div>
+        <div id="scanA" class="tower-scan"></div>
+        <div id="scanB" class="tower-scan"></div>
+        <div id="scanC" class="tower-scan"></div>
+        <div id="targetLatch"></div>
+        <div id="towerCriticalCore"></div>
+        <div id="criticalBurst"></div>
+        <div id="glassSurfaceSheen"></div>
+        <div id="glassContactBloom"></div>
+        <div id="glassCompressionLine"></div>
+        <div id="internalRisePulse"></div>
+        <div id="crtTear"></div>
+        <div id="sparkLayer"></div>
+        <div id="towerBrownout"></div>
+        <div id="brownoutFilament"></div>
+        <i id="relayContactLeft" class="relay-contact"></i>
+        <i id="relayContactRight" class="relay-contact"></i>
+      </div>
+      <div id="cabinetLoadFx">
+        <div id="outerCircuit"></div>
+        <div id="hudBus" class="load-bus"></div>
+        <div id="actionBus" class="load-bus"></div>
+        <div id="trayLoadFrame"></div>
+        <div id="trayUnderlight"></div>
+        <div id="leftChassisLoad" class="chassis-load"></div>
+        <div id="rightChassisLoad" class="chassis-load"></div>
+        <div id="terminalLoadFrame"></div>
+        <div id="traySweepA" class="tray-sweep"></div>
+        <div id="traySweepB" class="tray-sweep"></div>
+        <div id="cabinetRelayLayer"></div>
+      </div>
+      <div id="terminalWave"></div>
+      <div id="terminalCursor"></div>
+      <img id="crtSliceA" class="crt-slice" src="../../../../Resources/Art/MainGame/arcade_main_game_common_base.png" alt="">
+      <img id="crtSliceB" class="crt-slice" src="../../../../Resources/Art/MainGame/arcade_main_game_common_base.png" alt="">
+      <img id="crtSliceC" class="crt-slice" src="../../../../Resources/Art/MainGame/arcade_main_game_common_base.png" alt="">
+      <div id="crtGlobalBand"></div>
+      <div id="crtEdgeSplit"></div>
+      <div id="crtPhosphorWash"></div>
+      <div id="compressionVignette"></div>
+      <div id="suctionRays"></div>
+      <div id="globalDim"></div>
+      <div id="criticalStrobe"></div>
+      <div id="pressureCore"></div>
+      <div id="pressureRingA" class="pressure-ring"></div>
+      <div id="pressureRingB" class="pressure-ring"></div>
+      <div id="burstWash"></div>
+      <div id="blastRays"></div>
+      <div id="shockwaveA" class="shockwave"></div>
+      <div id="shockwaveB" class="shockwave"></div>
+      <div id="impactBand"></div>
+      <div id="blastFrame"></div>
+      <div id="v7DebrisLayer"></div>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const previewParams = new URLSearchParams(window.location.search);
+  const previewVariant = previewParams.get('variant') === 'normal' ? 'normal' : 'original';
+  const normalSpeed = previewVariant === 'normal';
+  const duration = normalSpeed ? 7.9 : 5.2;
+  const settlementStart = 1.42;
+  const compressionReleaseBase = 4.115;
+  const normalSpeedFactor = 2;
+  const compressionReleasePlayback = settlementStart + (compressionReleaseBase - settlementStart) * normalSpeedFactor;
+  const timelineTime = playbackTime => {
+    if (!normalSpeed || playbackTime <= settlementStart) return playbackTime;
+    if (playbackTime <= compressionReleasePlayback) {
+      return settlementStart + (playbackTime - settlementStart) / normalSpeedFactor;
+    }
+    return compressionReleaseBase + (playbackTime - compressionReleasePlayback);
+  };
+  const requestedTier = previewParams.get('tier') || 'critical';
+  const allowedTiers = new Set(['miss', 'pass', 'exceed', 'far', 'critical']);
+  const tierKey = allowedTiers.has(requestedTier) ? requestedTier : 'critical';
+  const tierConfigs = {
+    miss: {
+      index: 1, targetScore: 22, deltas: [2, 2, 3, 3, 2, 3, 3], weights: [.18, .16, .24, .24, .18, .26, .32],
+      resultTitle: '本关未过', resultSub: '结算完成<br>回路未闭合', resultAction: 'SPACE 继续', resultStrength: .42
+    },
+    pass: {
+      index: 2, targetScore: 22, deltas: [3, 2, 4, 4, 4, 5, 5], weights: [.24, .18, .33, .33, .35, .42, .45],
+      resultTitle: '本关通过', resultSub: '结算完成<br>回路稳定', resultAction: 'SPACE 进入市场', resultStrength: .58
+    },
+    exceed: {
+      index: 3, targetScore: 22, deltas: [4, 3, 5, 5, 6, 7, 8], weights: [.32, .24, .42, .40, .48, .58, .68],
+      resultTitle: '本关通过', resultSub: '结算完成<br>回路稳定', resultAction: 'SPACE 进入市场', resultStrength: .72
+    },
+    far: {
+      index: 4, targetScore: 22, deltas: [5, 4, 7, 7, 8, 11, 13], weights: [.40, .32, .55, .55, .62, .78, .90],
+      resultTitle: '本关通过', resultSub: '结算完成<br>回路稳定', resultAction: 'SPACE 进入市场', resultStrength: .86
+    },
+    critical: {
+      index: 5, targetScore: 22, deltas: [6, 5, 8, 9, 10, 13, 18], weights: [.32, .26, .50, .43, .48, .70, 1.00],
+      resultTitle: '本关通过', resultSub: '结算完成<br>回路稳定', resultAction: 'SPACE 进入市场', resultStrength: 1
+    }
+  };
+  const tier = tierConfigs[tierKey] || tierConfigs.critical;
+  const targetScore = tier.targetScore;
+  const slotCenters = [448, 640, 832, 1024, 1216, 1408];
+  const slotY = 552;
+  const dieSize = 192;
+  const reelSequence = [1, 4, 2, 6, 3, 5];
+  const diceData = [
+    { family: 'pig', core: 'three_little_pigs', value: 4 },
+    { family: 'neutral', core: 'duet', value: 3 },
+    { family: 'turtle', core: 'lucky_turtle', value: 6 },
+    { family: 'devil', core: 'devourer', value: 5 },
+    { family: 'pirate', core: 'pirate_king', value: 8 },
+    { family: 'neutral', core: 'crown', value: 12 }
+  ];
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, p) => a + (b - a) * p;
+  const smooth = (a, b, v) => {
+    const x = clamp((v - a) / Math.max(.00001, b - a));
+    return x * x * (3 - 2 * x);
+  };
+  const easeOutCubic = p => 1 - Math.pow(1 - clamp(p), 3);
+  const pulse = (x, width) => {
+    const p = clamp(1 - Math.abs(x) / width);
+    return p * p;
+  };
+  const envelope = (t, start, rise, fall, end) => clamp(smooth(start, rise, t) * (1 - smooth(fall, end, t)));
+  const $ = id => document.getElementById(id);
+  const els = {
+    world: $('world'), diceLayer: $('diceLayer'), focusLayer: $('focusLayer'), packetLayer: $('packetLayer'),
+    cabinetScan: $('cabinetScan'),
+    phaseCode: $('phaseCode'), currentValue: $('currentValue'), targetValue: $('targetValue'),
+    actionText: $('actionText'), actionGlow: $('actionGlow'), ruleHeading: $('ruleHeading'), ruleBody: $('ruleBody'),
+    terminalResult: $('terminalResult'), resultTitle: $('resultTitle'), resultSub: $('resultSub'), resultWarmth: $('resultWarmth'), terminalWave: $('terminalWave'),
+    towerFx: $('towerFx'), towerLamps: $('towerLamps'), towerBloom: $('towerBloom'), towerGlassReflection: $('towerGlassReflection'),
+    targetLatch: $('targetLatch'), towerCriticalCore: $('towerCriticalCore'), criticalBurst: $('criticalBurst'),
+    criticalStrobe: $('criticalStrobe'), glassContactBloom: $('glassContactBloom'),
+    glassSurfaceSheen: $('glassSurfaceSheen'), glassCompressionLine: $('glassCompressionLine'), internalRisePulse: $('internalRisePulse'),
+    towerBrownout: $('towerBrownout'), brownoutFilament: $('brownoutFilament'), crtTear: $('crtTear'),
+    relayContactLeft: $('relayContactLeft'), relayContactRight: $('relayContactRight'),
+    sparkLayer: $('sparkLayer'), globalDim: $('globalDim'), scanA: $('scanA'), scanB: $('scanB'), scanC: $('scanC'),
+    terminalCursor: $('terminalCursor'),
+    outerCircuit: $('outerCircuit'), hudBus: $('hudBus'), actionBus: $('actionBus'),
+    trayLoadFrame: $('trayLoadFrame'), trayUnderlight: $('trayUnderlight'),
+    leftChassisLoad: $('leftChassisLoad'), rightChassisLoad: $('rightChassisLoad'), terminalLoadFrame: $('terminalLoadFrame'),
+    traySweepA: $('traySweepA'), traySweepB: $('traySweepB'), cabinetRelayLayer: $('cabinetRelayLayer'),
+    crtSliceA: $('crtSliceA'), crtSliceB: $('crtSliceB'), crtSliceC: $('crtSliceC'),
+    crtGlobalBand: $('crtGlobalBand'), crtEdgeSplit: $('crtEdgeSplit'), crtPhosphorWash: $('crtPhosphorWash'),
+    compressionVignette: $('compressionVignette'), suctionRays: $('suctionRays'), pressureCore: $('pressureCore'),
+    pressureRingA: $('pressureRingA'), pressureRingB: $('pressureRingB'), burstWash: $('burstWash'), blastRays: $('blastRays'),
+    shockwaveA: $('shockwaveA'), shockwaveB: $('shockwaveB'), impactBand: $('impactBand'), blastFrame: $('blastFrame'),
+    v7DebrisLayer: $('v7DebrisLayer')
+  };
+
+  const tierTitles = {
+    miss: '01 未达到',
+    pass: '02 过关',
+    exceed: '03 超过',
+    far: '04 远超过',
+    critical: '05 最高暴击'
+  };
+  document.title = normalSpeed
+    ? `F009 V7-R2 ${tierTitles[tierKey]}游戏正常速动态样片`
+    : `F009 V7 ${tierTitles[tierKey]}动态样片`;
+  els.resultTitle.textContent = tier.resultTitle;
+  els.resultSub.innerHTML = tier.resultSub;
+  if (tierKey === 'miss') {
+    els.resultTitle.style.color = '#c9783b';
+    els.resultSub.style.color = '#9e623a';
+    els.resultWarmth.style.background = 'radial-gradient(ellipse at 14% 55%, rgba(153, 58, 30, .12), transparent 34%), radial-gradient(ellipse at 88% 50%, rgba(113, 55, 31, .05), transparent 28%)';
+    els.terminalCursor.style.background = '#a9673b';
+    els.terminalCursor.style.boxShadow = '0 0 5px rgba(184, 87, 44, .38)';
+  }
+
+  function perimeterPoints(width, height, count, inset = 8) {
+    const w = width - inset * 2;
+    const h = height - inset * 2;
+    const perimeter = 2 * (w + h);
+    const points = [];
+    for (let i = 0; i < count; i += 1) {
+      let d = i / count * perimeter;
+      let x;
+      let y;
+      if (d < w) { x = inset + d; y = inset; }
+      else if ((d -= w) < h) { x = inset + w; y = inset + d; }
+      else if ((d -= h) < w) { x = inset + w - d; y = inset + h; }
+      else { d -= w; x = inset; y = inset + h - d; }
+      points.push([x - 4, y - 4]);
+    }
+    return points;
+  }
+
+  function buildDice() {
+    diceData.forEach((data, index) => {
+      const die = document.createElement('div');
+      die.className = 'die';
+      die.style.left = `${slotCenters[index] - dieSize / 2}px`;
+      die.style.top = `${slotY - dieSize / 2}px`;
+
+      const shell = document.createElement('img');
+      shell.className = 'die-shell';
+      shell.src = `../../../../Resources/Art/MainGame/arcade_main_game_die_shell_${data.family}.png`;
+      die.appendChild(shell);
+
+      const face = document.createElement('div');
+      face.className = 'face-window';
+      for (let i = 0; i < 3; i += 1) {
+        const digit = document.createElement('div');
+        digit.className = 'reel-digit';
+        face.appendChild(digit);
+      }
+      die.appendChild(face);
+
+      const core = document.createElement('img');
+      core.className = 'type-core';
+      core.src = `../../../../Resources/Art/DiceTypes/arcade_type_core_${data.core}.png`;
+      die.appendChild(core);
+
+      const stopFlash = document.createElement('div');
+      stopFlash.className = 'stop-flash';
+      die.appendChild(stopFlash);
+
+      els.diceLayer.appendChild(die);
+      data.el = die;
+      data.face = face;
+      data.digits = [...face.children];
+      data.coreEl = core;
+      data.stopFlash = stopFlash;
+    });
+  }
+
+  function buildTower() {
+    for (let i = 0; i < 13; i += 1) {
+      const lamp = document.createElement('i');
+      lamp.className = 'tower-lamp';
+      lamp.dataset.index = String(i);
+      lamp.style.bottom = `${i * 21}px`;
+      els.towerLamps.appendChild(lamp);
+    }
+  }
+
+  function buildWave() {
+    const cols = 27;
+    const rows = 14;
+    for (let x = 0; x < cols; x += 1) {
+      for (let y = 0; y < rows; y += 1) {
+        const dot = document.createElement('i');
+        dot.className = 'wave-dot';
+        dot.dataset.x = String(x);
+        dot.dataset.y = String(y);
+        dot.style.left = `${x * 6.5}px`;
+        dot.style.top = `${y * 11.2}px`;
+        els.terminalWave.appendChild(dot);
+      }
+    }
+  }
+
+  function buildSparks() {
+    const specs = [
+      [118, 112, -58], [162, 94, -22], [183, 139, 27], [151, 513, 18],
+      [102, 498, 144], [174, 529, 61], [77, 536, 171], [192, 473, -13]
+    ];
+    specs.forEach(([x, y, angle], index) => {
+      const spark = document.createElement('i');
+      spark.className = 'spark';
+      spark.dataset.index = String(index);
+      spark.dataset.angle = String(angle);
+      spark.style.left = `${x}px`;
+      spark.style.top = `${y}px`;
+      els.sparkLayer.appendChild(spark);
+    });
+    const dustSpecs = [
+      [72, 348, -18], [92, 322, 9], [119, 301, 24], [146, 337, 38],
+      [165, 374, 57], [128, 402, 81], [88, 418, 112], [53, 389, 146],
+      [155, 448, 68], [109, 469, 104], [66, 455, 139], [178, 408, 42]
+    ];
+    dustSpecs.forEach(([x, y, angle], index) => {
+      const dust = document.createElement('i');
+      dust.className = 'phosphor-dust';
+      dust.dataset.index = String(index);
+      dust.dataset.angle = String(angle);
+      dust.style.left = `${x}px`;
+      dust.style.top = `${y}px`;
+      els.sparkLayer.appendChild(dust);
+    });
+  }
+
+  function buildCabinetRelays() {
+    const specs = [];
+    for (let i = 0; i < 18; i += 1) specs.push([42 + i * 104, 153, false]);
+    for (let i = 0; i < 8; i += 1) specs.push([1896, 230 + i * 88, true]);
+    for (let i = 17; i >= 0; i -= 1) specs.push([42 + i * 104, 965, false]);
+    for (let i = 7; i >= 0; i -= 1) specs.push([17, 230 + i * 88, true]);
+    for (let i = 0; i < 12; i += 1) specs.push([342 + i * 104, 794, false]);
+    specs.forEach(([x, y, vertical], index) => {
+      const relay = document.createElement('i');
+      relay.className = `cabinet-relay${vertical ? ' vertical' : ''}`;
+      relay.dataset.index = String(index);
+      relay.style.left = `${x}px`;
+      relay.style.top = `${y}px`;
+      els.cabinetRelayLayer.appendChild(relay);
+    });
+  }
+
+  function buildV7Debris() {
+    for (let i = 0; i < 46; i += 1) {
+      const shard = document.createElement('i');
+      shard.className = 'v7-shard';
+      const angle = -76 + ((i * 137.508 + (i % 5) * 11) % 282);
+      shard.dataset.index = String(i);
+      shard.dataset.angle = String(angle);
+      shard.dataset.distance = String(150 + (i % 9) * 72 + Math.floor(i / 9) * 24);
+      shard.dataset.delay = String((i % 7) * .004 + Math.floor(i / 13) * .006);
+      shard.style.width = `${16 + (i % 6) * 8}px`;
+      shard.style.height = `${2 + (i % 3)}px`;
+      els.v7DebrisLayer.appendChild(shard);
+    }
+  }
+
+  function buildChaser(event) {
+    const chaser = document.createElement('div');
+    chaser.className = `chaser${event.echo ? ' echo' : ''}`;
+    chaser.style.left = `${slotCenters[event.slot] - 101}px`;
+    chaser.style.top = `${slotY - 105}px`;
+    perimeterPoints(202, 210, 44, event.echo ? 12 : 8).forEach(([x, y], index) => {
+      const bulb = document.createElement('i');
+      bulb.className = 'chaser-bulb';
+      bulb.dataset.index = String(index);
+      bulb.style.left = `${x}px`;
+      bulb.style.top = `${y}px`;
+      chaser.appendChild(bulb);
+    });
+    els.focusLayer.appendChild(chaser);
+    event.chaser = chaser;
+
+    const source = document.createElement('div');
+    source.className = `source-pulse${event.echo ? ' echo' : ''}`;
+    source.style.left = `${slotCenters[event.slot] - 31}px`;
+    source.style.top = `${slotY - 31}px`;
+    els.packetLayer.appendChild(source);
+    event.source = source;
+
+    const motes = document.createElement('div');
+    motes.className = 'face-motes';
+    motes.style.left = `${slotCenters[event.slot] - 29}px`;
+    motes.style.top = `${slotY - 29}px`;
+    for (let i = 0; i < 5; i += 1) {
+      const mote = document.createElement('i');
+      mote.className = `face-mote${i === 0 ? ' core' : ''}`;
+      mote.dataset.index = String(i);
+      motes.appendChild(mote);
+    }
+    els.packetLayer.appendChild(motes);
+    event.motes = motes;
+
+    const packet = document.createElement('div');
+    packet.className = `score-packet${event.echo ? ' echo' : ''}`;
+    const count = Math.round(7 + event.weight * 16);
+    const pipSize = 7 + event.weight * 4;
+    for (let i = 0; i < count; i += 1) {
+      const pip = document.createElement('i');
+      const isCore = i < Math.max(1, Math.round(event.weight * 4));
+      pip.className = `score-pip${isCore ? ' core' : ''}`;
+      const column = (i * 5 + event.slot * 2 + (event.echo ? 3 : 0)) % 6;
+      const row = (i * 3 + Math.floor(i / 5) + event.slot) % 5;
+      const jitterX = ((i * 7 + event.slot * 3) % 7) - 3;
+      const jitterY = ((i * 11 + event.slot) % 7) - 3;
+      pip.style.width = `${pipSize}px`;
+      pip.style.height = `${pipSize}px`;
+      pip.style.left = `${column * 11 + jitterX}px`;
+      pip.style.top = `${row * 11 + jitterY}px`;
+      packet.appendChild(pip);
+    }
+    for (let i = 0; i < 4; i += 1) {
+      const tail = document.createElement('i');
+      tail.className = 'packet-tail-mote';
+      tail.dataset.index = String(i);
+      packet.appendChild(tail);
+    }
+    els.packetLayer.appendChild(packet);
+    event.packet = packet;
+  }
+
+  const eventTemplate = [
+    { slot: 0, start: 1.42, rise: 1.46, fall: 1.72, end: 1.82, travelStart: 1.51, impact: 1.70 },
+    { slot: 1, start: 1.68, rise: 1.72, fall: 2.18, end: 2.28, travelStart: 1.78, impact: 1.96, hold: true },
+    { slot: 0, start: 1.95, rise: 1.99, fall: 2.20, end: 2.27, travelStart: 2.03, impact: 2.20, echo: true },
+    { slot: 2, start: 2.24, rise: 2.28, fall: 2.50, end: 2.58, travelStart: 2.33, impact: 2.49 },
+    { slot: 3, start: 2.51, rise: 2.55, fall: 2.80, end: 2.88, travelStart: 2.62, impact: 2.78 },
+    { slot: 4, start: 2.79, rise: 2.83, fall: 3.10, end: 3.18, travelStart: 2.91, impact: 3.08 },
+    { slot: 5, start: 3.06, rise: 3.11, fall: 3.45, end: 3.55, travelStart: 3.20, impact: 3.43 }
+  ];
+  const events = eventTemplate.map((event, index) => ({
+    ...event,
+    weight: tier.weights[index],
+    delta: tier.deltas[index]
+  }));
+  let cumulativeScore = 0;
+  let targetCrossImpact = null;
+  events.forEach(event => {
+    const before = cumulativeScore;
+    cumulativeScore += event.delta;
+    if (targetCrossImpact === null && before < targetScore && cumulativeScore >= targetScore) {
+      targetCrossImpact = event.impact;
+      event.targetCross = true;
+    }
+  });
+
+  buildDice();
+  buildTower();
+  buildWave();
+  buildSparks();
+  buildCabinetRelays();
+  buildV7Debris();
+  events.forEach(buildChaser);
+
+  function renderReel(data, index, t) {
+    const rollStart = .08;
+    const revealStart = .64 + index * .06;
+    const revealEnd = revealStart + .25;
+    const readyToRoll = smooth(.055, .14, t);
+    const coreSize = lerp(86, 44, readyToRoll);
+    data.coreEl.style.width = `${coreSize}px`;
+    data.coreEl.style.height = `${coreSize}px`;
+    data.coreEl.style.left = `${96 - coreSize / 2}px`;
+    data.coreEl.style.top = `${lerp(48, 134, readyToRoll)}px`;
+    data.coreEl.style.opacity = String(.94 - readyToRoll * .16);
+
+    const stopFlash = pulse(t - revealEnd, .075);
+    data.stopFlash.style.opacity = String(stopFlash * .86);
+    data.stopFlash.style.transform = `scale(${1 + stopFlash * .025})`;
+
+    if (t < rollStart) {
+      data.digits.forEach(digit => { digit.style.opacity = '0'; });
+      return;
+    }
+
+    if (t < revealStart) {
+      const slow = smooth(.48, revealStart, t);
+      const phase = (t - rollStart) * (20.5 - slow * 6.5) + index * .77 + slow * 1.8;
+      const whole = Math.floor(phase);
+      const fraction = phase - whole;
+      const motionBlur = 1.25 - slow * .88;
+      data.digits.forEach((digit, cell) => {
+        const relative = cell - 1;
+        const valueIndex = ((whole + relative + index * 2) % reelSequence.length + reelSequence.length) % reelSequence.length;
+        digit.textContent = String(reelSequence[valueIndex]);
+        const y = (relative + fraction) * 120;
+        digit.style.transform = `translateY(${y}px)`;
+        digit.style.opacity = String(.82 - Math.abs(relative + fraction) * .16);
+        digit.style.filter = `blur(${motionBlur}px)`;
+      });
+      return;
+    }
+
+    const p = clamp((t - revealStart) / (revealEnd - revealStart));
+    let finalY;
+    if (p < .72) finalY = lerp(-120, 7, easeOutCubic(p / .72));
+    else finalY = lerp(7, 0, smooth(.72, 1, p));
+    data.digits[0].textContent = String(reelSequence[(index + 2) % reelSequence.length]);
+    data.digits[0].style.transform = `translateY(${finalY + 120}px)`;
+    data.digits[0].style.opacity = String(1 - smooth(.45, .92, p));
+    data.digits[0].style.filter = `blur(${lerp(.65, 0, p)}px)`;
+    data.digits[1].textContent = String(data.value);
+    data.digits[1].style.transform = `translateY(${finalY}px)`;
+    data.digits[1].style.opacity = '1';
+    data.digits[1].style.filter = `blur(${lerp(.55, 0, p)}px)`;
+    data.digits[2].textContent = String(reelSequence[(index + 5) % reelSequence.length]);
+    data.digits[2].style.transform = `translateY(${finalY - 120}px)`;
+    data.digits[2].style.opacity = String(1 - smooth(.1, .62, p));
+    data.digits[2].style.filter = `blur(${lerp(.65, 0, p)}px)`;
+  }
+
+  function renderChaser(event, t) {
+    const activity = envelope(t, event.start, event.rise, event.fall, event.end);
+    event.chaser.style.opacity = String(activity * (event.echo ? .82 : 1));
+    const bulbs = [...event.chaser.children];
+    const direction = event.echo ? -1 : 1;
+    const runner = ((t * 54 * direction + event.slot * 9) % bulbs.length + bulbs.length) % bulbs.length;
+    bulbs.forEach((bulb, index) => {
+      const raw = Math.abs(index - runner);
+      const distance = Math.min(raw, bulbs.length - raw);
+      const hot = clamp(1 - distance / (event.echo ? 3.4 : 5.2));
+      const alpha = activity * (.14 + hot * .86);
+      const white = event.weight > .74 && hot > .68 ? clamp((hot - .68) / .32) : 0;
+      bulb.style.background = white > 0
+        ? `rgb(255, ${Math.round(191 + white * 54)}, ${Math.round(71 + white * 150)})`
+        : (event.echo ? '#d98d2a' : '#f1a02d');
+      bulb.style.opacity = String(alpha);
+      bulb.style.boxShadow = alpha > .18 ? `0 0 ${3 + hot * 7}px rgba(255, 151, 28, ${.30 + hot * .48})` : 'none';
+      bulb.style.transform = `scale(${.82 + hot * .30})`;
+    });
+  }
+
+  function renderPacket(event, t) {
+    const condenseStart = event.travelStart - .115;
+    const condenseP = smooth(condenseStart, event.travelStart + .012, t);
+    const condense = clamp(condenseP * (1 - smooth(event.travelStart + .008, event.travelStart + .082, t)));
+    event.source.style.opacity = String(condense * (.46 + event.weight * .24));
+    event.source.style.transform = `scale(${.29 + condense * (.48 + event.weight * .14)}) rotate(${(t - event.travelStart) * (event.echo ? -210 : 170)}deg)`;
+    event.motes.style.opacity = String(condense * (event.echo ? .78 : 1));
+    [...event.motes.children].forEach((mote, index) => {
+      const radius = lerp(25 + index * 1.6, index === 0 ? 1.5 : 4.5, condenseP);
+      const angle = (index / 5) * Math.PI * 2 + (t - condenseStart) * (event.echo ? -9.5 : 8.2) + event.slot * .31;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius * .70;
+      const blink = .72 + .28 * Math.sin(t * 43 + index * 2.7) ** 2;
+      mote.style.opacity = String(condense * blink * (index === 0 ? 1 : .82));
+      mote.style.transform = `translate(${x}px, ${y}px) scale(${lerp(.66, 1.05 + event.weight * .22, condenseP)})`;
+    });
+
+    const rawP = smooth(event.travelStart, event.impact, t);
+    const p = rawP < .72 ? rawP * .92 : lerp(.6624, 1, easeOutCubic((rawP - .72) / .28));
+    const appearing = smooth(event.travelStart - .012, event.travelStart + .035, t);
+    const vanishing = 1 - smooth(event.impact + .006, event.impact + .055, t);
+    const opacity = clamp(appearing * vanishing);
+    const startX = slotCenters[event.slot] - 39;
+    const startY = slotY - 34;
+    const endX = 171;
+    const endY = 630;
+    const x = lerp(startX, endX, p);
+    const lift = 58 + Math.abs(startX - endX) * .035 + event.weight * 20;
+    const y = lerp(startY, endY, p) - Math.sin(Math.PI * p) * lift;
+    const scale = .32 + event.weight * .48 + Math.sin(Math.PI * p) * .12;
+    const contactCompression = smooth(.82, 1, p);
+    const scaleX = scale * lerp(1, .22, contactCompression);
+    const scaleY = scale * lerp(1, 1.18, contactCompression);
+    const flightRotation = (event.echo ? -24 : 20) * Math.sin(Math.PI * p);
+    event.packet.style.opacity = String(opacity);
+    event.packet.style.transform = `translate(${x}px, ${y}px) rotate(${flightRotation}deg) scale(${scaleX}, ${scaleY})`;
+    [...event.packet.querySelectorAll('.score-pip')].forEach((pip, index) => {
+      const stagger = .74 + .26 * Math.sin((index + 1) * 2.1 + p * 10.5);
+      pip.style.opacity = String(opacity * stagger * (event.echo ? .84 : 1));
+    });
+    [...event.packet.querySelectorAll('.packet-tail-mote')].forEach((tail, index) => {
+      const spacing = 8 + event.weight * 5;
+      const tailFade = clamp((1 - p) * 1.7) * (1 - index * .16);
+      const flutter = Math.sin(t * 34 + index * 2.15 + event.slot) * (2.2 + index * .65);
+      tail.style.opacity = String(opacity * tailFade * (.50 + event.weight * .34));
+      tail.style.transform = `translate(${50 + index * spacing}px, ${28 + flutter}px) scale(${1 - index * .13})`;
+    });
+  }
+
+  function scoreAt(t) {
+    return events.reduce((score, event) => score + event.delta * smooth(event.impact - .015, event.impact + .085, t), 0);
+  }
+
+  function impactEnergyAt(t) {
+    return events.reduce((energy, event) => Math.max(energy, pulse(t - event.impact, .075) * (.34 + event.weight * .66)), 0);
+  }
+
+  function impactMemoryAt(t) {
+    return clamp(events.reduce((memory, event) => memory + envelope(
+      t,
+      event.impact,
+      event.impact + .025,
+      event.impact + .18 + event.weight * .12,
+      event.impact + .38 + event.weight * .18
+    ) * (.10 + event.weight * .16), 0));
+  }
+
+  function glassApproachAt(t) {
+    return events.reduce((energy, event) => Math.max(energy, envelope(
+      t,
+      event.impact - .135,
+      event.impact - .078,
+      event.impact + .012,
+      event.impact + .085
+    ) * (.58 + event.weight * .42)), 0);
+  }
+
+  function directAbsorptionAt(t) {
+    let best = { energy: 0, progress: 0, weight: 0 };
+    events.forEach(event => {
+      const duration = .18 + event.weight * .055;
+      if (t < event.impact || t > event.impact + duration) return;
+      const progress = clamp((t - event.impact) / duration);
+      const energy = Math.sin(Math.PI * progress) * (.52 + event.weight * .48) * (1 - progress * .18);
+      if (energy > best.energy) best = { energy, progress, weight: event.weight };
+    });
+    return best;
+  }
+
+  function finaleRiseAt(t) {
+    const pulses = tierKey === 'exceed'
+      ? [{ start: 3.57, duration: .19, weight: .56 }, { start: 3.73, duration: .22, weight: .42 }]
+      : (tierKey === 'far' ? [{ start: 3.55, duration: .39, weight: .86 }] : []);
+    let best = { energy: 0, progress: 0, weight: 0 };
+    pulses.forEach(item => {
+      if (t < item.start || t > item.start + item.duration) return;
+      const progress = clamp((t - item.start) / item.duration);
+      const energy = Math.sin(Math.PI * progress) * item.weight * (1 - progress * .12);
+      if (energy > best.energy) best = { energy, progress, weight: item.weight };
+    });
+    return best;
+  }
+
+  function lampRippleAt(t, index) {
+    return events.reduce((energy, event) => Math.max(
+      energy,
+      pulse(t - (event.impact + index * (.0072 - event.weight * .0017)), .047 + event.weight * .028) * (.42 + event.weight * .58)
+    ), 0);
+  }
+
+  function renderTower(t) {
+    const score = scoreAt(t);
+    const fill = clamp(score / targetScore) * 13;
+    const overload = clamp((score / targetScore - 1) / 1.05);
+    const impactEnergy = impactEnergyAt(t);
+    const impactMemory = impactMemoryAt(t);
+    const glassApproach = glassApproachAt(t);
+    const absorption = directAbsorptionAt(t);
+    const finaleRise = finaleRiseAt(t);
+    const missUnload = tierKey === 'miss' ? smooth(3.56, 3.76, t) * (1 - smooth(4.18, 4.48, t)) : 0;
+    const passSettle = tierKey === 'pass' ? envelope(t, 3.54, 3.63, 3.90, 4.22) : 0;
+    const exceedRebound = tierKey === 'exceed' ? clamp(pulse(t - 3.60, .15) + pulse(t - 3.77, .18) * .66) : 0;
+    const farLoad = tierKey === 'far' ? envelope(t, 3.52, 3.66, 4.00, 4.32) : 0;
+    const brownout = tierKey === 'critical' ? envelope(t, 3.615, 3.655, 3.690, 3.750) : 0;
+    const critical = tierKey === 'critical' ? pulse(t - 3.785, .145) : 0;
+    const criticalAfter = tierKey === 'critical' ? envelope(t, 3.735, 3.785, 4.02, 4.24) : 0;
+    const coolingWindow = t >= 3.82 ? 1 - smooth(3.82, 4.18, t) : 0;
+    const coolingFlicker = coolingWindow * (.5 + .5 * Math.sin((t - 3.82) * Math.PI * 19));
+    const targetCross = targetCrossImpact === null ? 0 : smooth(targetCrossImpact + .032, targetCrossImpact + .102, t);
+    const result = smooth(4.07, 4.22, t);
+
+    [...els.towerLamps.children].forEach((lamp, index) => {
+      const on = clamp(fill - index);
+      const ripple = lampRippleAt(t, index);
+      const criticalChase = tierKey === 'critical' ? pulse(t - (3.795 + index * .0105), .052) * (1 - brownout) : 0;
+      const finalBoost = passSettle * .08 + exceedRebound * .18 + farLoad * (.18 + index / 12 * .18);
+      const hot = clamp(overload * (.30 + index / 12 * .58) + farLoad * (.24 + index / 12 * .36) + critical * (.42 + index / 12 * .58) + ripple * .20 + criticalChase * .40);
+      let intensity = clamp(on * (1 - brownout * .88) + finalBoost + critical * .32 + ripple * .18 + criticalChase * .34);
+      intensity *= 1 - missUnload * (.34 + index / 12 * .22);
+      const warm = missUnload > .08
+        ? `rgba(${Math.round(192 - missUnload * 28)}, ${Math.round(104 - missUnload * 34)}, ${Math.round(39 - missUnload * 12)}, .94)`
+        : hot > .42
+        ? `rgba(255, ${Math.round(183 + hot * 66)}, ${Math.round(58 + hot * 178)}, .98)`
+        : 'rgba(249, 156, 35, .96)';
+      lamp.style.opacity = String(.48 + intensity * .52);
+      lamp.style.borderColor = `rgba(187, 102, 26, ${.50 + intensity * .46})`;
+      lamp.style.background = intensity > .035
+        ? `radial-gradient(circle, ${warm} 0 34%, rgba(255, 115, 23, .30) 42%, transparent 50%) 0 0 / 8px 7px, rgba(67, 31, 8, .92)`
+        : `radial-gradient(circle, rgba(70,42,18,.68) 0 31%, transparent 38%) 0 0 / 8px 7px, rgba(10,9,6,.88)`;
+      lamp.style.boxShadow = intensity > .035
+        ? `0 0 ${3 + intensity * 7 + hot * 8}px rgba(255, 143, 27, ${.22 + intensity * .43}), inset 0 0 5px rgba(255, 236, 180, ${.06 + hot * .24})`
+        : 'inset 0 0 6px rgba(0,0,0,.9)';
+      lamp.style.transform = `scaleX(${1 + impactEnergy * (.012 + index / 12 * .024) + ripple * .034 + exceedRebound * .025 + farLoad * .032 + criticalChase * .052}) translateX(${criticalChase * (index % 2 === 0 ? 1.6 : -1.6)}px)`;
+    });
+
+    const frontier = 529 - clamp(fill / 13) * 260;
+    const scanMemory = clamp(impactMemory * .74 + overload * (1 - brownout) * (1 - smooth(4.30, 4.72, t)) + passSettle * .08 + exceedRebound * .20 + farLoad * .32 + result * .18 + coolingFlicker * .13);
+    [els.scanA, els.scanB, els.scanC].forEach((band, index) => {
+      const crawl = ((t * (17 + index * 3) + index * 4) % 18) - 9;
+      band.style.top = `${frontier + index * 19 + crawl + missUnload * (22 + index * 9) + coolingFlicker * (index - 1) * 7}px`;
+      band.style.opacity = String(scanMemory * (.44 - index * .105) * (1 - missUnload * .38));
+    });
+
+    els.towerBrownout.style.opacity = String(brownout * .84);
+    els.globalDim.style.opacity = String(brownout * .31);
+    const filament = envelope(t, 3.628, 3.651, 3.724, 3.792);
+    els.brownoutFilament.style.opacity = String(filament * (.38 + .24 * Math.sin(t * 113) ** 2));
+    els.brownoutFilament.style.transform = `scaleY(${.72 + filament * .34}) translateX(${Math.sin(t * 97) * .7}px)`;
+    els.towerCriticalCore.style.opacity = String(clamp(farLoad * .34 + critical * .90 + criticalAfter * .20 + coolingFlicker * .16) * (1 - brownout));
+    const strike = pulse(t - 3.782, .052);
+    const burstOpen = smooth(3.748, 3.902, t);
+    els.criticalBurst.style.opacity = String(clamp(strike * .98 + critical * .78 + criticalAfter * .10 + coolingFlicker * .11) * (1 - brownout));
+    els.criticalBurst.style.transform = `scale(${.24 + burstOpen * 1.04 + critical * .10 + coolingFlicker * .018}) rotate(${-7 + burstOpen * 12 + coolingFlicker * 2.2}deg)`;
+    els.criticalStrobe.style.opacity = String(clamp(pulse(t - 3.777, .042) * .78 + pulse(t - 3.812, .035) * .30));
+    els.towerBloom.style.background = tierKey === 'miss'
+      ? 'radial-gradient(ellipse at 54% 68%, rgba(177, 78, 35, .34) 0 7%, rgba(126, 51, 27, .18) 18%, rgba(72, 31, 19, .08) 38%, transparent 63%)'
+      : 'radial-gradient(ellipse at 54% 68%, rgba(255, 243, 190, .50) 0 7%, rgba(255, 176, 47, .30) 18%, rgba(255, 107, 22, .09) 38%, transparent 63%)';
+    els.towerBloom.style.opacity = String(clamp(impactEnergy * .15 + overload * .12 + missUnload * .18 + passSettle * .08 + exceedRebound * .24 + farLoad * .42 + critical * .84 + result * .13) * (1 - brownout));
+    els.glassContactBloom.style.opacity = String(clamp(impactEnergy * .92));
+    els.glassContactBloom.style.transform = `scale(${.48 + impactEnergy * .74}, ${.72 + impactEnergy * .38})`;
+    const compressionLine = clamp(glassApproach * .22 + impactEnergy * .96);
+    els.glassCompressionLine.style.opacity = String(compressionLine);
+    els.glassCompressionLine.style.transform = `scaleY(${.42 + compressionLine * .94}) scaleX(${.70 + impactEnergy * .48})`;
+    els.glassSurfaceSheen.style.opacity = String(clamp(glassApproach * .18 + impactEnergy * .48));
+    els.glassSurfaceSheen.style.transform = `translateX(${-10 + glassApproach * 7 + impactEnergy * 10}px) skewY(-4deg) scaleY(${.76 + impactEnergy * .38})`;
+    const activeRise = finaleRise.energy > absorption.energy ? finaleRise : absorption;
+    els.internalRisePulse.style.opacity = String(activeRise.energy * (1 - brownout));
+    els.internalRisePulse.style.transform = `translateY(${-activeRise.progress * 164}px) scaleX(${.48 + activeRise.weight * .54 + activeRise.energy * .18})`;
+    const reflection = clamp(impactEnergy * .40 + impactMemory * .14 + critical * .64 + result * .05) * (1 - brownout);
+    els.towerGlassReflection.style.opacity = String(reflection);
+    els.towerGlassReflection.style.transform = `translateX(${-68 + ((t * 74) % 136)}px)`;
+
+    els.targetLatch.style.borderColor = targetCross > .02
+      ? `rgba(${Math.round(255 - targetCross * 86)}, ${Math.round(165 + targetCross * 67)}, ${Math.round(52 + targetCross * 166)}, .98)`
+      : 'rgba(128,70,23,.74)';
+    els.targetLatch.style.boxShadow = targetCross > .02
+      ? `0 0 ${7 + critical * 16}px rgba(109, 212, 204, ${.28 + critical * .18}), inset 0 0 0 7px rgba(8,9,8,.94)`
+      : 'inset 0 0 0 7px rgba(8,9,8,.94)';
+    const latchSnap = pulse(t - 2.854, .095);
+    els.targetLatch.style.transform = `rotate(${targetCross * 12 - latchSnap * 6}deg) scale(${1 + latchSnap * .055})`;
+
+    const contactClose = smooth(3.718, 3.776, t) * (1 - smooth(3.915, 4.02, t));
+    const contactGlow = envelope(t, 3.70, 3.746, 3.86, 4.00);
+    els.relayContactLeft.style.opacity = String(contactGlow * .92);
+    els.relayContactRight.style.opacity = String(contactGlow * .92);
+    els.relayContactLeft.style.transform = `translateX(${contactClose * 25}px) rotate(${9 - contactClose * 7}deg)`;
+    els.relayContactRight.style.transform = `translateX(${-contactClose * 25}px) rotate(${-9 + contactClose * 7}deg) scaleX(-1)`;
+
+    const tear = Math.max(pulse(t - 3.805, .095), pulse(t - 3.965, .075) * .25);
+    els.crtTear.style.opacity = String(tear * .90);
+    els.crtTear.style.top = `${320 + Math.sin(t * 137) * 13}px`;
+    els.crtTear.style.transform = `translateX(${Math.sin(t * 113) * 8}px) scaleX(${.78 + tear * .26})`;
+
+    const localKick = events.reduce((kick, event) => kick + Math.sin((t - event.impact) * 92) * pulse(t - event.impact, .09) * event.weight * 2.4, 0);
+    const coolingKick = coolingFlicker * Math.sin(t * 149) * .95;
+    const tierKick = exceedRebound * Math.sin(t * 102) * .72 + farLoad * Math.sin(t * 118) * 1.42;
+    els.towerFx.style.transform = `translateX(${localKick + tierKick + critical * Math.sin(t * 185) * 3.2 + coolingKick}px) scaleX(${1 - brownout * .012 + farLoad * .004 + critical * .012})`;
+
+    [...els.sparkLayer.querySelectorAll('.spark')].forEach((spark, index) => {
+      const local = clamp((t - (3.752 + index * .006)) / .15);
+      const fade = local <= 0 ? 0 : (1 - local) * criticalAfter;
+      const angle = Number(spark.dataset.angle);
+      const distance = local * (17 + index * 3);
+      spark.style.opacity = String(clamp(fade * 1.12));
+      spark.style.transform = `rotate(${angle}deg) translateX(${distance}px) scaleX(${.48 + fade})`;
+    });
+
+    [...els.sparkLayer.querySelectorAll('.phosphor-dust')].forEach((dust, index) => {
+      const local = clamp((t - (3.785 + index * .006)) / (.32 + (index % 3) * .035));
+      const fade = local <= 0 ? 0 : (1 - local) * criticalAfter;
+      const angle = Number(dust.dataset.angle) * Math.PI / 180;
+      const distance = local * (18 + (index % 5) * 6);
+      const x = Math.cos(angle) * distance;
+      const y = Math.sin(angle) * distance - local * (8 + index % 4 * 3);
+      dust.style.opacity = String(clamp(fade * (.54 + (index % 3) * .16)));
+      dust.style.transform = `translate(${x}px, ${y}px) scale(${.64 + fade * .56})`;
+    });
+
+    const worldKick = critical * Math.sin(t * 164) * 4.2;
+    els.world.style.transform = `translate(${worldKick}px, ${-Math.abs(worldKick) * .30}px)`;
+    els.cabinetScan.style.transform = `translateY(${(t * 27) % 12}px)`;
+    els.cabinetScan.style.opacity = String(.24 + impactMemory * .16 + exceedRebound * .04 + farLoad * .08 + critical * .16);
+  }
+
+  function renderCabinet(t) {
+    const scoreRatio = scoreAt(t) / targetScore;
+    const scoreLoad = clamp(scoreRatio / 3.15);
+    const impact = impactEnergyAt(t);
+    const memory = impactMemoryAt(t);
+    const result = smooth(4.07, 4.22, t);
+    const tierStrength = [.18, .34, .56, .78, 1][tier.index - 1];
+    const missUnload = tierKey === 'miss' ? envelope(t, 3.54, 3.64, 4.02, 4.46) : 0;
+    const passLatch = tierKey === 'pass' ? envelope(t, 3.54, 3.62, 3.98, 4.26) : 0;
+    const exceedRelay = tierKey === 'exceed' ? clamp(pulse(t - 3.60, .17) + pulse(t - 3.78, .20) * .78) : 0;
+    const farSurge = tierKey === 'far' ? envelope(t, 3.48, 3.60, 4.10, 4.48) : 0;
+    const brownout = tierKey === 'critical' ? envelope(t, 3.605, 3.645, 3.695, 3.755) : 0;
+    const criticalStrike = tierKey === 'critical' ? pulse(t - 3.805, .165) : 0;
+    const criticalResidue = tierKey === 'critical' ? envelope(t, 3.735, 3.805, 4.24, 4.58) : 0;
+    const finalEnergy = clamp(missUnload * .18 + passLatch * .34 + exceedRelay * .60 + farSurge * .82 + criticalStrike + criticalResidue * .54);
+    const liveLoad = clamp(scoreLoad * .64 + memory * .42 + impact * .18 + finalEnergy * .46);
+    const failGain = tierKey === 'miss' ? 1 - missUnload * .42 : 1;
+    const circuit = clamp((liveLoad * .32 + finalEnergy * .55 + result * tierStrength * .08) * failGain) * (1 - brownout * .82);
+
+    const traceR = tierKey === 'miss' ? 184 : 244;
+    const traceG = tierKey === 'miss' ? 88 : Math.round(137 + circuit * 63);
+    const traceB = tierKey === 'miss' ? 42 : Math.round(29 + circuit * 56);
+    els.outerCircuit.style.opacity = String(.02 + circuit * .62);
+    els.outerCircuit.style.borderColor = `rgba(${traceR}, ${traceG}, ${traceB}, ${.28 + circuit * .66})`;
+    els.outerCircuit.style.boxShadow = `inset 0 0 ${8 + circuit * 22}px rgba(${traceR}, ${traceG}, ${traceB}, ${.08 + circuit * .22}), 0 0 ${5 + circuit * 13}px rgba(255, 129, 24, ${circuit * .24})`;
+    els.outerCircuit.style.transform = `scale(${1 + finalEnergy * .0018}, ${1 + finalEnergy * .0032})`;
+
+    const busProgress = clamp(.05 + scoreLoad * .70 + finalEnergy * .28);
+    els.hudBus.style.opacity = String(clamp(liveLoad * .18 + finalEnergy * .64) * (1 - brownout));
+    els.hudBus.style.transform = `scaleX(${busProgress}) translateY(${Math.sin(t * 104) * finalEnergy * .7}px)`;
+    els.hudBus.style.filter = `brightness(${.82 + finalEnergy * .88})`;
+    els.actionBus.style.opacity = String(clamp(liveLoad * .13 + finalEnergy * .58 + result * .06 * tierStrength) * (1 - brownout));
+    els.actionBus.style.transform = `scaleX(${clamp(.04 + busProgress * .92)})`;
+
+    const trayEnergy = clamp(liveLoad * .18 + finalEnergy * .76 + result * .06 * tierStrength) * (1 - brownout);
+    els.trayLoadFrame.style.opacity = String(trayEnergy * .82);
+    els.trayLoadFrame.style.transform = `scale(${1 + farSurge * .003 + criticalStrike * .006})`;
+    els.trayLoadFrame.style.boxShadow = `inset 0 0 ${10 + trayEnergy * 26}px rgba(255, 165, 39, ${.07 + trayEnergy * .22}), 0 0 ${7 + trayEnergy * 19}px rgba(255, 126, 24, ${.08 + trayEnergy * .24})`;
+    els.trayUnderlight.style.opacity = String(clamp(liveLoad * .16 + finalEnergy * .92 + result * .05 * tierStrength) * (1 - brownout));
+    els.trayUnderlight.style.transform = `scaleX(${.22 + scoreLoad * .55 + finalEnergy * .35}) scaleY(${.76 + finalEnergy * .62})`;
+    els.trayUnderlight.style.filter = `blur(${3.8 + finalEnergy * 2.2}px) brightness(${.82 + finalEnergy * .92})`;
+
+    els.leftChassisLoad.style.opacity = String(clamp(liveLoad * .12 + finalEnergy * .44) * (1 - brownout));
+    els.rightChassisLoad.style.opacity = String(clamp(liveLoad * .08 + finalEnergy * .66) * (1 - brownout));
+    els.leftChassisLoad.style.transform = `scale(${1 + finalEnergy * .018})`;
+    els.rightChassisLoad.style.transform = `scale(${1 + finalEnergy * .024})`;
+    const terminalEnergy = clamp(liveLoad * .11 + finalEnergy * .68 + result * .08 * tierStrength) * (1 - brownout);
+    els.terminalLoadFrame.style.opacity = String(terminalEnergy);
+    els.terminalLoadFrame.style.transform = `translateX(${(exceedRelay + farSurge + criticalStrike) * Math.sin(t * 111) * 1.5}px) scale(${1 + finalEnergy * .004})`;
+    els.terminalLoadFrame.style.boxShadow = `inset 0 0 ${9 + terminalEnergy * 24}px rgba(255, 164, 38, ${.08 + terminalEnergy * .20}), 0 0 ${6 + terminalEnergy * 15}px rgba(255, 132, 25, ${.08 + terminalEnergy * .20})`;
+
+    let sweepAP = 0;
+    let sweepAOpacity = 0;
+    let sweepBP = 0;
+    let sweepBOpacity = 0;
+    if (tierKey === 'miss') {
+      sweepAP = 1 - smooth(3.57, 4.02, t);
+      sweepAOpacity = envelope(t, 3.56, 3.64, 3.94, 4.12) * .44;
+    } else if (tierKey === 'pass') {
+      sweepAP = smooth(3.56, 3.96, t);
+      sweepAOpacity = envelope(t, 3.55, 3.62, 3.94, 4.10) * .78;
+    } else if (tierKey === 'exceed') {
+      sweepAP = smooth(3.52, 3.82, t);
+      sweepAOpacity = envelope(t, 3.51, 3.57, 3.84, 4.06) * .88;
+      sweepBP = 1 - smooth(3.68, 4.02, t);
+      sweepBOpacity = envelope(t, 3.67, 3.73, 4.00, 4.17) * .64;
+    } else if (tierKey === 'far') {
+      sweepAP = (smooth(3.47, 3.78, t) + ((t * 1.8) % 1)) % 1;
+      sweepAOpacity = farSurge * .92;
+      sweepBP = 1 - ((smooth(3.56, 3.84, t) + ((t * 1.35) % 1)) % 1);
+      sweepBOpacity = farSurge * .72;
+    } else {
+      sweepAP = smooth(3.735, 3.93, t);
+      sweepAOpacity = criticalResidue * .95 * (1 - brownout);
+      sweepBP = 1 - smooth(3.76, 4.04, t);
+      sweepBOpacity = criticalResidue * .82 * (1 - brownout);
+    }
+    els.traySweepA.style.opacity = String(sweepAOpacity * (1 - brownout));
+    els.traySweepA.style.transform = `translateX(${sweepAP * 1010}px) scaleX(${.68 + finalEnergy * .72})`;
+    els.traySweepB.style.opacity = String(sweepBOpacity * (1 - brownout));
+    els.traySweepB.style.transform = `translateX(${sweepBP * 1010}px) scaleX(${.58 + finalEnergy * .64})`;
+
+    const relays = [...els.cabinetRelayLayer.children];
+    relays.forEach((relay, index) => {
+      const eventRipple = events.reduce((energy, event) => Math.max(
+        energy,
+        pulse(t - (event.impact + index * .0024), .080) * (.20 + event.weight * .34)
+      ), 0);
+      const waveIndex = tierKey === 'miss' ? relays.length - 1 - index : index;
+      const passWave = tierKey === 'pass' ? pulse(t - (3.56 + waveIndex * .0074), .095) : 0;
+      const exceedWave = tierKey === 'exceed' ? Math.max(pulse(t - (3.53 + waveIndex * .0058), .085), pulse(t - (3.73 + waveIndex * .0045), .075) * .74) : 0;
+      const farWave = tierKey === 'far' ? Math.max(pulse(t - (3.49 + waveIndex * .0042), .10), farSurge * (.18 + .18 * Math.sin(t * 19 + index * .71) ** 2)) : 0;
+      const criticalWave = tierKey === 'critical' ? Math.max(pulse(t - (3.735 + waveIndex * .0035), .105), criticalResidue * (.18 + .22 * Math.sin(t * 27 + index * .83) ** 2)) * (1 - brownout) : 0;
+      const missWave = tierKey === 'miss' ? pulse(t - (3.58 + waveIndex * .0060), .082) * .64 : 0;
+      const intensity = clamp(scoreLoad * .08 + eventRipple + passWave * .62 + exceedWave * .76 + farWave * .88 + criticalWave + missWave);
+      const hot = clamp(intensity + criticalStrike * .42);
+      const relayR = tierKey === 'miss' ? 184 : 255;
+      const relayG = tierKey === 'miss' ? Math.round(74 + hot * 52) : Math.round(121 + hot * 116);
+      const relayB = tierKey === 'miss' ? 35 : Math.round(24 + hot * 129);
+      relay.style.opacity = String((.16 + intensity * .84) * (1 - brownout * .88));
+      relay.style.background = `rgb(${relayR}, ${relayG}, ${relayB})`;
+      relay.style.boxShadow = intensity > .12 ? `0 0 ${3 + hot * 9}px rgba(${relayR}, ${relayG}, ${relayB}, ${.24 + hot * .58})` : 'inset 0 0 3px rgba(0,0,0,.86)';
+      relay.style.transform = `scale(${.82 + intensity * .54})`;
+    });
+
+    const exceedCrt = tierKey === 'exceed' ? pulse(t - 3.79, .082) * .20 : 0;
+    const farCrt = tierKey === 'far' ? Math.max(pulse(t - 3.69, .074) * .32, pulse(t - 3.83, .115) * .68) : 0;
+    const criticalCrt = tierKey === 'critical' ? Math.max(pulse(t - 3.776, .072) * .78, pulse(t - 3.817, .145), criticalResidue * .20) * (1 - brownout) : 0;
+    const crt = clamp(exceedCrt + farCrt + criticalCrt);
+    const sliceTops = [318 + Math.sin(t * 127) * 28, 522 + Math.sin(t * 151 + 1.7) * 36, 706 + Math.sin(t * 139 + 3.2) * 24];
+    const slices = [els.crtSliceA, els.crtSliceB, els.crtSliceC];
+    slices.forEach((slice, index) => {
+      const local = clamp(crt * (1 - index * .14));
+      const height = 10 + local * (18 + index * 7);
+      const top = clamp(sliceTops[index], 0, 1080 - height);
+      slice.style.clipPath = `inset(${top}px 0 ${1080 - top - height}px 0)`;
+      slice.style.opacity = String(local * (.58 - index * .09));
+      slice.style.transform = `translateX(${Math.sin(t * (101 + index * 17)) * local * (9 + index * 4)}px)`;
+    });
+    els.crtGlobalBand.style.opacity = String(crt * .84);
+    els.crtGlobalBand.style.top = `${438 + Math.sin(t * 143) * 142}px`;
+    els.crtGlobalBand.style.transform = `translateX(${Math.sin(t * 119) * crt * 11}px) scaleX(${.82 + crt * .24})`;
+    els.crtEdgeSplit.style.opacity = String(clamp(exceedCrt * .34 + farCrt * .58 + criticalCrt * .86));
+    els.crtPhosphorWash.style.opacity = String(clamp(farCrt * .32 + criticalResidue * .25 + criticalCrt * .52));
+
+    els.globalDim.style.opacity = String(clamp(brownout * .64 + missUnload * .055));
+    const passKick = passLatch * Math.sin(t * 91) * .22;
+    const exceedKick = exceedRelay * Math.sin(t * 113) * .92;
+    const farKick = farSurge * Math.sin(t * 127) * 1.85;
+    const criticalKick = criticalStrike * Math.sin(t * 173) * 4.35;
+    const kickX = passKick + exceedKick + farKick + criticalKick;
+    const kickY = -(Math.abs(exceedKick) * .18 + Math.abs(farKick) * .24 + Math.abs(criticalKick) * .31);
+    const scale = 1 + exceedRelay * .0005 + farSurge * .0012 + criticalStrike * .0032;
+    els.world.style.transform = `translate(${kickX}px, ${kickY}px) scale(${scale})`;
+    els.cabinetScan.style.opacity = String(.24 + memory * .15 + finalEnergy * .20 + crt * .18);
+  }
+
+  function renderV7(t) {
+    const scoreLoad = clamp(scoreAt(t) / targetScore / 3.15);
+    const impact = impactEnergyAt(t);
+    const memory = impactMemoryAt(t);
+    const lock = envelope(t, 3.425, 3.475, 3.62, 3.78);
+    const compressionRise = smooth(3.50, 3.91, t);
+    const releaseCut = 1 - smooth(4.105, 4.175, t);
+    const compression = compressionRise * releaseCut;
+    const deepCompression = smooth(3.68, 3.95, t) * releaseCut;
+    const vacuum = envelope(t, 3.855, 3.965, 4.095, 4.155);
+    const flash = pulse(t - 4.137, .026);
+    const detonate = pulse(t - 4.165, .135);
+    const blastHold = envelope(t, 4.115, 4.165, 4.285, 4.43);
+    const relightA = envelope(t, 4.135, 4.205, 4.48, 4.78);
+    const relightB = envelope(t, 4.245, 4.315, 4.63, 4.92);
+    const aftershock = pulse(t - 4.425, .16) * .62;
+    const residue = envelope(t, 4.145, 4.245, 4.82, 5.18);
+    const result = smooth(4.48, 4.66, t);
+    const releaseProgress = smooth(4.115, 4.31, t);
+    const dimRelease = 1 - smooth(4.115, 4.175, t);
+    const dim = Math.max(compression * .73, vacuum * .88) * dimRelease;
+
+    els.globalDim.style.opacity = String(clamp(dim));
+    els.compressionVignette.style.opacity = String(clamp(deepCompression * .92 + vacuum * .10));
+    els.compressionVignette.style.transform = `scale(${1 + deepCompression * .025})`;
+    els.suctionRays.style.opacity = String(clamp(deepCompression * .62 + lock * .12) * (1 - vacuum * .34));
+    els.suctionRays.style.transform = `rotate(${(t - 3.5) * -8.5}deg) scale(${1.14 - deepCompression * .16})`;
+
+    const ringCycleA = ((Math.max(0, t - 3.50) * 2.25) % 1);
+    const ringCycleB = ((Math.max(0, t - 3.50) * 2.25 + .48) % 1);
+    const coreCharge = clamp(deepCompression * .68 + vacuum * .82);
+    const coreScale = 1.44 - deepCompression * 1.08 + flash * .30 + detonate * 1.32;
+    els.pressureCore.style.opacity = String(clamp(coreCharge * .88 + flash + detonate * .88 + residue * .10));
+    els.pressureCore.style.transform = `scale(${coreScale})`;
+    els.pressureCore.style.filter = `blur(${.65 + vacuum * .15}px) drop-shadow(0 0 ${11 + coreCharge * 18 + detonate * 31}px rgba(255, 132, 24, ${.54 + detonate * .38}))`;
+    els.pressureRingA.style.opacity = String(compression * (.18 + ringCycleA * .60));
+    els.pressureRingA.style.transform = `scale(${1.92 - ringCycleA * 1.46}) rotate(${t * 38}deg)`;
+    els.pressureRingB.style.opacity = String(compression * (.16 + ringCycleB * .52));
+    els.pressureRingB.style.transform = `scale(${1.72 - ringCycleB * 1.30}) rotate(${-t * 31}deg)`;
+
+    els.burstWash.style.opacity = String(clamp(flash * .98 + detonate * .52 + aftershock * .14));
+    els.burstWash.style.transform = `scale(${.92 + releaseProgress * .17 + aftershock * .03})`;
+    els.blastRays.style.opacity = String(clamp(detonate * .88 + blastHold * .24 + aftershock * .22));
+    els.blastRays.style.transform = `rotate(${(t - 4.13) * 10}deg) scale(${.70 + releaseProgress * .72})`;
+    const shockAProgress = smooth(4.125, 4.41, t);
+    const shockAFade = envelope(t, 4.125, 4.17, 4.27, 4.43);
+    const shockBProgress = smooth(4.19, 4.56, t);
+    const shockBFade = envelope(t, 4.18, 4.25, 4.40, 4.60);
+    els.shockwaveA.style.opacity = String(shockAFade * .92);
+    els.shockwaveA.style.transform = `scale(${.10 + shockAProgress * 3.48})`;
+    els.shockwaveB.style.opacity = String(shockBFade * .64);
+    els.shockwaveB.style.transform = `scale(${.08 + shockBProgress * 3.88})`;
+    els.impactBand.style.opacity = String(clamp(detonate * .96 + aftershock * .38));
+    els.impactBand.style.transform = `scaleX(${.03 + smooth(4.125, 4.285, t) * 1.10}) scaleY(${.62 + detonate * 1.15}) translateX(${detonate * 4}px)`;
+    els.blastFrame.style.opacity = String(clamp(flash * .86 + detonate * .72 + aftershock * .24));
+    els.blastFrame.style.transform = `scale(${1 - detonate * .008 + aftershock * .004})`;
+
+    const preCircuit = clamp(scoreLoad * .12 + memory * .14 + impact * .14);
+    const afterPower = clamp(detonate * .78 + blastHold * .58 + relightA * .68 + relightB * .48 + aftershock * .34 + residue * .20);
+    const darknessGate = 1 - clamp(compression * .97 + vacuum * .20);
+    const circuitPower = clamp(preCircuit * darknessGate + afterPower);
+    els.outerCircuit.style.opacity = String(circuitPower * .90);
+    els.outerCircuit.style.borderColor = `rgba(255, ${Math.round(148 + circuitPower * 92)}, ${Math.round(34 + circuitPower * 135)}, ${.34 + circuitPower * .62})`;
+    els.outerCircuit.style.boxShadow = `inset 0 0 ${10 + circuitPower * 42}px rgba(255, 166, 39, ${.08 + circuitPower * .30}), 0 0 ${7 + circuitPower * 31}px rgba(255, 120, 21, ${.08 + circuitPower * .34})`;
+    els.outerCircuit.style.transform = `scale(${1 + detonate * .010 + aftershock * .004})`;
+    els.hudBus.style.opacity = String(clamp(preCircuit * .42 * darknessGate + afterPower * .94));
+    els.hudBus.style.transform = `scaleX(${clamp(.05 + scoreLoad * .32 * darknessGate + releaseProgress * 1.02)}) scaleY(${.74 + afterPower * .86})`;
+    els.hudBus.style.filter = `brightness(${.72 + afterPower * 1.62})`;
+    els.actionBus.style.opacity = String(clamp(preCircuit * .26 * darknessGate + afterPower * .84));
+    els.actionBus.style.transform = `scaleX(${clamp(.04 + scoreLoad * .26 * darknessGate + releaseProgress)}) scaleY(${.72 + afterPower * .72})`;
+    els.trayLoadFrame.style.opacity = String(clamp(preCircuit * .30 * darknessGate + afterPower * .96));
+    els.trayLoadFrame.style.transform = `scale(${1 + detonate * .014 + aftershock * .006})`;
+    els.trayLoadFrame.style.boxShadow = `inset 0 0 ${12 + afterPower * 45}px rgba(255, 177, 52, ${.08 + afterPower * .32}), 0 0 ${8 + afterPower * 37}px rgba(255, 116, 19, ${.08 + afterPower * .34})`;
+    els.trayUnderlight.style.opacity = String(clamp(preCircuit * .32 * darknessGate + afterPower));
+    els.trayUnderlight.style.transform = `scaleX(${.12 + scoreLoad * .20 * darknessGate + releaseProgress * .96}) scaleY(${.65 + afterPower * 1.22})`;
+    els.trayUnderlight.style.filter = `blur(${3.5 + afterPower * 4.8}px) brightness(${.70 + afterPower * 1.70})`;
+    els.leftChassisLoad.style.opacity = String(clamp(preCircuit * .22 * darknessGate + afterPower * .96));
+    els.rightChassisLoad.style.opacity = String(clamp(preCircuit * .12 * darknessGate + afterPower * .86));
+    els.leftChassisLoad.style.transform = `scale(${1 + detonate * .070})`;
+    els.rightChassisLoad.style.transform = `scale(${1 + detonate * .055})`;
+    els.terminalLoadFrame.style.opacity = String(clamp(preCircuit * .18 * darknessGate + afterPower * .94));
+    els.terminalLoadFrame.style.transform = `translateX(${detonate * 5 + aftershock * -2}px) scale(${1 + detonate * .014})`;
+    els.terminalLoadFrame.style.boxShadow = `inset 0 0 ${10 + afterPower * 37}px rgba(255, 176, 48, ${.08 + afterPower * .30}), 0 0 ${7 + afterPower * 29}px rgba(255, 126, 22, ${.08 + afterPower * .30})`;
+
+    const sweepAP = smooth(4.135, 4.36, t);
+    const sweepBP = 1 - smooth(4.23, 4.53, t);
+    els.traySweepA.style.opacity = String(envelope(t, 4.125, 4.17, 4.37, 4.51) * .98);
+    els.traySweepA.style.transform = `translateX(${sweepAP * 1010}px) scaleX(${1.16 + detonate * .90}) scaleY(${1 + detonate * .75})`;
+    els.traySweepB.style.opacity = String(envelope(t, 4.215, 4.27, 4.49, 4.66) * .78);
+    els.traySweepB.style.transform = `translateX(${sweepBP * 1010}px) scaleX(${.96 + aftershock * .74}) scaleY(${1 + aftershock * .58})`;
+
+    const relays = [...els.cabinetRelayLayer.children];
+    relays.forEach((relay, index) => {
+      const eventRipple = events.reduce((energy, event) => Math.max(
+        energy,
+        pulse(t - (event.impact + index * .0015), .052) * (.08 + event.weight * .12)
+      ), 0);
+      const blastWave = pulse(t - (4.145 + index * .0027), .072);
+      const secondWave = pulse(t - (4.285 + (relays.length - 1 - index) * .0019), .065) * .66;
+      const live = clamp((scoreLoad * .035 + eventRipple) * darknessGate + blastWave + secondWave + residue * (.08 + .13 * Math.sin(t * 24 + index * .73) ** 2));
+      relay.style.opacity = String(.08 + live * .92);
+      relay.style.background = `rgb(255, ${Math.round(126 + live * 118)}, ${Math.round(25 + live * 152)})`;
+      relay.style.boxShadow = live > .08 ? `0 0 ${4 + live * 14}px rgba(255, 169, 43, ${.28 + live * .62})` : 'inset 0 0 3px rgba(0,0,0,.9)';
+      relay.style.transform = `scale(${.72 + live * .80})`;
+    });
+
+    if (t >= 3.425) {
+      [...els.towerLamps.children].forEach((lamp, index) => {
+        const towerWave = pulse(t - (4.142 + index * .009), .095);
+        const secondTowerWave = pulse(t - (4.34 + (12 - index) * .007), .085) * .62;
+        const basePower = (1 - compression * .96) * (.30 + index / 12 * .34);
+        const power = clamp(basePower * (1 - vacuum * .85) + towerWave + secondTowerWave + relightA * (.36 + index / 12 * .48) + aftershock * .44);
+        const hot = clamp(power + detonate * .54);
+        lamp.style.opacity = String(.10 + power * .90);
+        lamp.style.borderColor = `rgba(255, ${Math.round(120 + hot * 125)}, ${Math.round(25 + hot * 160)}, ${.36 + hot * .62})`;
+        lamp.style.background = `radial-gradient(circle, rgba(255,${Math.round(137 + hot * 108)},${Math.round(31 + hot * 185)},.99) 0 35%, rgba(255,106,18,.34) 43%, transparent 51%) 0 0 / 8px 7px, rgba(47,22,7,.94)`;
+        lamp.style.boxShadow = `0 0 ${2 + hot * 15}px rgba(255, 143, 26, ${.16 + hot * .66}), inset 0 0 5px rgba(255, 241, 193, ${hot * .30})`;
+        lamp.style.transform = `scaleX(${.92 + power * .18 + detonate * .10}) translateX(${towerWave * (index % 2 ? -2.5 : 2.5)}px)`;
+      });
+      els.towerBrownout.style.opacity = String(clamp(compression * .90 + vacuum * .08) * (1 - smooth(4.115, 4.17, t)));
+      els.brownoutFilament.style.opacity = String(clamp(deepCompression * .22 + vacuum * .94));
+      els.brownoutFilament.style.transform = `scaleY(${.54 + vacuum * .82}) scaleX(${.64 + vacuum * .46})`;
+      els.towerCriticalCore.style.opacity = String(clamp(coreCharge * .56 + detonate + relightA * .42));
+      els.criticalBurst.style.opacity = String(clamp(flash + detonate * .92 + aftershock * .24));
+      els.criticalBurst.style.transform = `scale(${.20 + releaseProgress * 1.55 + detonate * .35}) rotate(${-8 + releaseProgress * 18}deg)`;
+      els.towerBloom.style.opacity = String(clamp(detonate * .98 + blastHold * .52 + relightA * .34 + aftershock * .28));
+      els.towerBloom.style.background = 'radial-gradient(ellipse at 54% 68%, rgba(255, 255, 221, .78) 0 8%, rgba(255, 187, 56, .56) 18%, rgba(255, 97, 15, .22) 40%, transparent 70%)';
+      els.targetLatch.style.borderColor = `rgba(${Math.round(92 + vacuum * 125 + detonate * 38)}, ${Math.round(187 + vacuum * 60)}, ${Math.round(179 + vacuum * 61)}, .99)`;
+      els.targetLatch.style.boxShadow = `0 0 ${8 + vacuum * 17 + detonate * 31}px rgba(105, 224, 213, ${.28 + vacuum * .45 + detonate * .20}), inset 0 0 0 7px rgba(4,6,6,.96)`;
+      els.targetLatch.style.transform = `rotate(${deepCompression * -18 + releaseProgress * 34}deg) scale(${.92 + vacuum * .12 + detonate * .22})`;
+      const contactClose = smooth(3.72, 3.94, t) * (1 - smooth(4.115, 4.17, t));
+      els.relayContactLeft.style.opacity = String(clamp(deepCompression * .54 + detonate));
+      els.relayContactRight.style.opacity = String(clamp(deepCompression * .54 + detonate));
+      els.relayContactLeft.style.transform = `translateX(${contactClose * 28 - detonate * 17}px) rotate(${8 - contactClose * 7 - detonate * 18}deg)`;
+      els.relayContactRight.style.transform = `translateX(${-contactClose * 28 + detonate * 17}px) rotate(${-8 + contactClose * 7 + detonate * 18}deg) scaleX(-1)`;
+      els.criticalStrobe.style.opacity = String(clamp(flash * .96 + detonate * .32 + aftershock * .13));
+    }
+
+    const crt = Math.max(pulse(t - 4.185, .125), pulse(t - 4.355, .095) * .62, aftershock * .28);
+    const sliceTops = [264 + Math.sin(t * 157) * 48, 514 + Math.sin(t * 181 + 1.2) * 61, 742 + Math.sin(t * 163 + 2.7) * 39];
+    [els.crtSliceA, els.crtSliceB, els.crtSliceC].forEach((slice, index) => {
+      const local = clamp(crt * (1 - index * .10));
+      const height = 18 + local * (34 + index * 11);
+      const top = clamp(sliceTops[index], 0, 1080 - height);
+      slice.style.clipPath = `inset(${top}px 0 ${1080 - top - height}px 0)`;
+      slice.style.opacity = String(local * (.82 - index * .10));
+      slice.style.transform = `translateX(${Math.sin(t * (133 + index * 23)) * local * (24 + index * 9)}px) scaleX(${1 + local * .012})`;
+    });
+    els.crtGlobalBand.style.opacity = String(crt * .96);
+    els.crtGlobalBand.style.top = `${424 + Math.sin(t * 167) * 176}px`;
+    els.crtGlobalBand.style.transform = `translateX(${Math.sin(t * 149) * crt * 22}px) scaleX(${.74 + crt * .42}) scaleY(${1 + crt * .72})`;
+    els.crtEdgeSplit.style.opacity = String(clamp(crt * .94 + detonate * .25));
+    els.crtPhosphorWash.style.opacity = String(clamp(crt * .54 + residue * .34));
+    els.crtTear.style.opacity = String(crt * .98);
+    els.crtTear.style.top = `${300 + Math.sin(t * 177) * 82}px`;
+    els.crtTear.style.transform = `translateX(${Math.sin(t * 151) * crt * 17}px) scaleX(${.78 + crt * .42}) scaleY(${1 + crt})`;
+
+    [...els.v7DebrisLayer.children].forEach((shard, index) => {
+      const delay = Number(shard.dataset.delay);
+      const local = clamp((t - (4.135 + delay)) / (.39 + (index % 5) * .035));
+      const active = t >= 4.135 + delay && local < 1 ? 1 : 0;
+      const fade = active * Math.pow(1 - local, 1.45);
+      const distance = Number(shard.dataset.distance) * easeOutCubic(local);
+      const angle = Number(shard.dataset.angle);
+      shard.style.opacity = String(fade * (.54 + (index % 4) * .13));
+      shard.style.transform = `rotate(${angle}deg) translateX(${distance}px) rotate(${local * (index % 2 ? -140 : 170)}deg) scaleX(${.62 + fade * 1.04})`;
+    });
+
+    if (t >= 3.425) {
+      [...els.terminalWave.children].forEach(dot => {
+        const x = Number(dot.dataset.x);
+        const y = Number(dot.dataset.y);
+        const blastEnergy = clamp(detonate + blastHold * .62 + aftershock * .48 + residue * .12);
+        const compressionCenter = 6.5 + Math.sin(x * .42 + t * 4) * (1 - deepCompression) * .55;
+        const blastCenter = 6.5 + Math.sin(x * .76 - t * 31) * (1.8 + blastEnergy * 6.2) * (.28 + .72 * Math.sin(x * .31 + .9) ** 2);
+        const center = lerp(compressionCenter, blastCenter, blastEnergy);
+        const distance = Math.abs(y - center);
+        const on = clamp(1 - distance / (deepCompression > .72 ? .54 : 1.26));
+        dot.style.opacity = String(on * ((1 - compression) * .12 + vacuum * .08 + blastEnergy * .86));
+        dot.style.transform = `scale(${.64 + on * (.18 + blastEnergy * .54)})`;
+      });
+    }
+
+    if (t >= 3.425) {
+      els.phaseCode.textContent = result > .02 ? '06' : '05';
+      els.actionText.textContent = result > .02 ? tier.resultAction : '结算处理中';
+      els.actionText.style.opacity = String(result > .02 ? result * .96 : (1 - dim) * .24);
+      els.actionGlow.style.borderColor = `rgba(238, 151, 40, ${result * .74})`;
+      els.actionGlow.style.background = `rgba(119, 60, 11, ${result * .20})`;
+      els.actionGlow.style.boxShadow = result > .02 ? `0 0 ${9 + result * 18}px rgba(255, 157, 29, ${result * .34}), inset 0 0 9px rgba(255, 211, 112, ${result * .16})` : 'none';
+      els.ruleHeading.style.opacity = String((1 - result) * .76);
+      els.ruleBody.style.opacity = String((1 - result) * .48);
+      els.terminalResult.style.opacity = String(result);
+      els.resultWarmth.style.opacity = String(clamp(residue * .20 + result * .92));
+      const cursorBlink = t < 4.70 ? 0 : (.26 + .74 * (Math.sin((t - 4.70) * Math.PI * 4.5) > -.18 ? 1 : .16));
+      els.terminalCursor.style.opacity = String(result * cursorBlink * .62);
+    }
+
+    const compressionJitter = compression * (1 - vacuum) * Math.sin(t * 149) * 1.35;
+    const impactKick = t >= 4.125 ? Math.sin((t - 4.125) * Math.PI * 21) * detonate * 18.5 : 0;
+    const secondKick = t >= 4.34 ? Math.sin((t - 4.34) * Math.PI * 16) * aftershock * 9.2 : 0;
+    const kickX = compressionJitter + impactKick + secondKick;
+    const kickY = -Math.abs(impactKick) * .34 - Math.abs(secondKick) * .22 + compressionJitter * .18;
+    const worldScale = 1 - deepCompression * .012 + detonate * .021 + aftershock * .008;
+    els.world.style.transformOrigin = '9% 58%';
+    els.world.style.transform = `translate(${kickX}px, ${kickY}px) scale(${worldScale})`;
+    els.towerFx.style.transform = `translateX(${impactKick * .42 + secondKick * .28}px) scale(${1 - compression * .014 + detonate * .036 + aftershock * .012})`;
+    els.cabinetScan.style.transform = `translateY(${(t * (27 + blastHold * 46)) % 12}px)`;
+    els.cabinetScan.style.opacity = String(clamp(.20 * (1 - compression) + detonate * .48 + residue * .30));
+  }
+
+  function renderWave(t) {
+    const rollEnergy = envelope(t, .08, .18, 1.12, 1.31) * .16;
+    const eventEnergy = events.reduce((energy, event) => energy + envelope(t, event.start, event.rise, event.fall, event.end) * (.08 + event.weight * .13), 0);
+    const echoAccent = envelope(t, 1.95, 1.99, 2.20, 2.27) * .18;
+    const relayAfterecho = events.reduce((energy, event) => Math.max(energy, pulse(t - (event.impact + .095), .13) * (.05 + event.weight * .08)), 0);
+    const missUnload = tierKey === 'miss' ? smooth(3.56, 3.76, t) * (1 - smooth(4.18, 4.48, t)) : 0;
+    const passSettle = tierKey === 'pass' ? envelope(t, 3.54, 3.63, 3.90, 4.22) : 0;
+    const exceedRebound = tierKey === 'exceed' ? clamp(pulse(t - 3.60, .15) + pulse(t - 3.77, .18) * .66) : 0;
+    const farLoad = tierKey === 'far' ? envelope(t, 3.52, 3.66, 4.00, 4.32) : 0;
+    const critical = tierKey === 'critical' ? pulse(t - 3.79, .20) * .55 : 0;
+    const resultFade = 1 - smooth(4.02, 4.24, t);
+    const tierFinalEnergy = missUnload * .025 + passSettle * .05 + exceedRebound * .14 + farLoad * .25;
+    const energy = clamp((.08 + rollEnergy + eventEnergy + echoAccent + relayAfterecho + tierFinalEnergy + critical) * resultFade);
+    [...els.terminalWave.children].forEach(dot => {
+      const x = Number(dot.dataset.x);
+      const y = Number(dot.dataset.y);
+      const amplitude = 1.2 + energy * 4.4;
+      const echoRipple = echoAccent * Math.sin(x * 1.55 + t * 26) * 1.8;
+      const afterRipple = relayAfterecho * Math.sin(x * 1.18 - t * 19.5) * 1.25;
+      const center = 6.5 + Math.sin(x * .68 + t * 12.5) * amplitude * (.34 + .66 * Math.sin(x * .28 + 1.1) ** 2) + echoRipple + afterRipple;
+      const distance = Math.abs(y - center);
+      const on = clamp(1 - distance / 1.18);
+      dot.style.opacity = String(on * (.06 + energy * .46));
+      dot.style.transform = `scale(${.78 + on * .28})`;
+    });
+  }
+
+  function renderHud(t) {
+    const score = Math.round(scoreAt(t));
+    els.currentValue.textContent = String(score);
+    els.targetValue.textContent = String(targetScore);
+
+    let code = '01';
+    let action = 'SPACE 投掷';
+    let actionOpacity = .96;
+    let glow = 1;
+    if (t >= .08 && t < 1.20) {
+      code = t < .64 ? '02' : '03';
+      action = '骰面滚动';
+      actionOpacity = .34;
+      glow = 0;
+    } else if (t >= 1.20 && t < 1.42) {
+      code = '04';
+      action = '结果锁定 · 自动结算';
+      actionOpacity = .44;
+      glow = 0;
+    } else if (t >= 1.42 && t < 4.08) {
+      code = '05';
+      action = '结算处理中';
+      actionOpacity = .28;
+      glow = 0;
+    } else if (t >= 4.08) {
+      code = '06';
+      action = tier.resultAction;
+      actionOpacity = smooth(4.08, 4.24, t) * .96;
+      glow = smooth(4.10, 4.28, t);
+    }
+    els.phaseCode.textContent = code;
+    els.actionText.textContent = action;
+    els.actionText.style.opacity = String(actionOpacity);
+    els.actionGlow.style.borderColor = `rgba(226, 137, 34, ${.22 + glow * .52})`;
+    els.actionGlow.style.background = `rgba(119, 60, 11, ${.04 + glow * .16})`;
+    els.actionGlow.style.boxShadow = glow > .02 ? `0 0 ${8 + glow * 12}px rgba(255, 156, 28, ${glow * .28}), inset 0 0 8px rgba(255, 205, 97, ${glow * .12})` : 'none';
+
+    const result = smooth(4.07, 4.22, t);
+    els.ruleHeading.style.opacity = String((1 - result) * .76);
+    els.ruleBody.style.opacity = String((1 - result) * .48);
+    els.terminalResult.style.opacity = String(result);
+    els.resultWarmth.style.opacity = String(result * tier.resultStrength);
+    const cursorBlink = t < 4.24 ? 0 : (.26 + .74 * (Math.sin((t - 4.24) * Math.PI * 4.5) > -.18 ? 1 : .16));
+    els.terminalCursor.style.opacity = String(result * cursorBlink * .56);
+  }
+
+  function renderAt(rawTime) {
+    const playbackTime = clamp(Number(rawTime) || 0, 0, duration);
+    const t = timelineTime(playbackTime);
+    diceData.forEach((data, index) => renderReel(data, index, t));
+    events.forEach(event => {
+      renderChaser(event, t);
+      renderPacket(event, t);
+    });
+    renderTower(t);
+    renderWave(t);
+    renderHud(t);
+    if (tierKey === 'critical') renderV7(t);
+    else renderCabinet(t);
+  }
+
+  Promise.all([...document.images].map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
+    img.addEventListener('load', resolve, { once: true });
+    img.addEventListener('error', resolve, { once: true });
+  }))).then(() => {
+    window.renderAt = renderAt;
+    window.previewDuration = duration;
+    window.previewTier = tierKey;
+    window.previewVariant = previewVariant;
+    window.previewReady = true;
+    renderAt(0);
+  });
+})();
+</script>
+</body>
+</html>
