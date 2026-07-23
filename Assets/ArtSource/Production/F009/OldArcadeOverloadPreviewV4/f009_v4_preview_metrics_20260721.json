@@ -1,0 +1,54 @@
+{
+  "status": "样张待验收",
+  "runtime_asset": false,
+  "boards": [
+    {
+      "file": "f009_v4_style_fit_review_board_20260721.png",
+      "size": [
+        2048,
+        1280
+      ],
+      "sha256": "9ED8028E47B8D4B59EC28C14E00E33CB33BCC57E5E8124F7B20ECABC5E478B6E",
+      "source_sizes": {
+        "f009_v4_pass_preview_20260721.png": [
+          1672,
+          941
+        ],
+        "f009_v4_far_exceed_preview_20260721.png": [
+          1670,
+          941
+        ],
+        "f009_v4_critical_impact_preview_20260721.png": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "file": "f009_v4_critical_four_frame_review_board_20260721.png",
+      "size": [
+        2048,
+        1280
+      ],
+      "sha256": "B38989DC1C47C679201DF8AAE70248B9A0D3B43E8F8CCE01D13F7FC59907F40E",
+      "source_sizes": {
+        "f009_v4_critical_precompress_preview_20260721.png": [
+          1672,
+          941
+        ],
+        "f009_v4_critical_impact_preview_20260721.png": [
+          1672,
+          941
+        ],
+        "f009_v4_critical_aftershock_preview_20260721.png": [
+          1672,
+          941
+        ],
+        "f009_v4_far_exceed_preview_20260721.png": [
+          1670,
+          941
+        ]
+      }
+    }
+  ]
+}

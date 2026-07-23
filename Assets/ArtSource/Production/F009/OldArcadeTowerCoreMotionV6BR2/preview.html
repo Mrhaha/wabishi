@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F009 V6B-R2 完整老式街机结算导演样片</title>
+<style>
+  @font-face {
+    font-family: "ArcadeSolid";
+    src: url("../../../../Resources/Art/MainGame/Flow/wabish_physical_key_sans_sc_semibold.ttf") format("truetype");
+    font-weight: 600;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #010203;
+  }
+  #capture {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: #010203;
+  }
+  #stage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform-origin: 0 0;
+    transform: scale(0.6666667);
+  }
+  #world {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+  }
+  #base {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    object-fit: fill;
+    user-select: none;
+  }
+  .led {
+    font-family: "ArcadeSolid", "Microsoft YaHei", sans-serif;
+    color: #e7a72d;
+    letter-spacing: 3px;
+    text-shadow: 0 0 2px rgba(255, 178, 47, .86), 0 0 7px rgba(255, 137, 24, .22);
+  }
+  .led.low {
+    color: #b87827;
+    text-shadow: 0 0 2px rgba(226, 136, 30, .48);
+  }
+  #topHud {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+  #phaseCode {
+    position: absolute;
+    left: 50px;
+    top: 38px;
+    width: 102px;
+    text-align: center;
+    font-size: 55px;
+    line-height: 70px;
+    opacity: .88;
+  }
+  #chapterText {
+    position: absolute;
+    left: 182px;
+    top: 47px;
+    font-size: 37px;
+    line-height: 58px;
+    opacity: .78;
+  }
+  #lifeText {
+    position: absolute;
+    left: 1268px;
+    top: 49px;
+    width: 252px;
+    text-align: center;
+    font-size: 34px;
+    line-height: 54px;
+    opacity: .66;
+  }
+  #coinText {
+    position: absolute;
+    left: 1572px;
+    top: 49px;
+    width: 265px;
+    text-align: center;
+    font-size: 34px;
+    line-height: 54px;
+    opacity: .72;
+  }
+  #scoreContext {
+    position: absolute;
+    left: 67px;
+    top: 326px;
+    width: 165px;
+    z-index: 7;
+    text-align: center;
+    pointer-events: none;
+  }
+  .score-line {
+    height: 45px;
+    font-size: 28px;
+    line-height: 42px;
+    white-space: nowrap;
+    opacity: .70;
+  }
+  .score-line span {
+    display: inline-block;
+    min-width: 56px;
+    text-align: right;
+  }
+  #terminalCopy {
+    position: absolute;
+    left: 1606px;
+    top: 264px;
+    width: 238px;
+    height: 440px;
+    z-index: 7;
+    text-align: center;
+    pointer-events: none;
+  }
+  #ruleHeading {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    font-size: 31px;
+    line-height: 48px;
+    opacity: .76;
+  }
+  #ruleBody {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    top: 176px;
+    font-size: 22px;
+    line-height: 36px;
+    letter-spacing: 1px;
+    opacity: .48;
+  }
+  #terminalResult {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 80px;
+    opacity: 0;
+  }
+  #terminalResult .result-title {
+    font-size: 39px;
+    line-height: 64px;
+    color: #ffc252;
+  }
+  #terminalResult .result-sub {
+    margin-top: 34px;
+    font-size: 23px;
+    line-height: 40px;
+    color: #c98d36;
+    opacity: .76;
+  }
+  #actionArea {
+    position: absolute;
+    left: 694px;
+    top: 872px;
+    width: 522px;
+    height: 108px;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  #actionGlow {
+    position: absolute;
+    inset: 10px 14px;
+    border: 3px solid rgba(193, 115, 27, .26);
+    border-radius: 14px;
+    background: rgba(78, 40, 8, .07);
+    box-shadow: 0 0 0 rgba(255, 173, 40, 0);
+  }
+  #actionText {
+    position: relative;
+    font-size: 39px;
+    line-height: 76px;
+    opacity: .58;
+  }
+  #diceLayer, #focusLayer, #packetLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  #diceLayer { z-index: 5; }
+  #focusLayer { z-index: 6; }
+  #packetLayer { z-index: 9; }
+  .die {
+    position: absolute;
+    width: 192px;
+    height: 192px;
+  }
+  .die-shell {
+    position: absolute;
+    inset: 0;
+    width: 192px;
+    height: 192px;
+    object-fit: contain;
+    user-select: none;
+  }
+  .face-window {
+    position: absolute;
+    left: 34px;
+    top: 31px;
+    width: 124px;
+    height: 120px;
+    overflow: hidden;
+    border-radius: 21px;
+    z-index: 2;
+  }
+  .face-window::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 21px;
+    box-shadow: inset 0 10px 12px rgba(77, 43, 19, .08), inset 0 -9px 12px rgba(76, 39, 16, .08);
+    pointer-events: none;
+  }
+  .reel-digit {
+    position: absolute;
+    left: 0;
+    width: 124px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "ArcadeSolid", "Arial Narrow", sans-serif;
+    font-size: 93px;
+    line-height: 110px;
+    letter-spacing: -3px;
+    color: #17130f;
+    text-shadow: 0 2px 0 rgba(255, 245, 218, .28), 0 -1px 0 rgba(0, 0, 0, .5);
+    will-change: transform, opacity, filter;
+  }
+  .type-core {
+    position: absolute;
+    left: 74px;
+    top: 134px;
+    width: 44px;
+    height: 44px;
+    z-index: 3;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .68));
+    will-change: left, top, width, height, opacity;
+  }
+  .stop-flash {
+    position: absolute;
+    left: 6px;
+    top: 5px;
+    width: 180px;
+    height: 180px;
+    border: 3px solid rgba(255, 190, 67, .92);
+    border-radius: 31px;
+    box-shadow: 0 0 9px rgba(255, 162, 37, .62), inset 0 0 7px rgba(255, 205, 100, .28);
+    z-index: 4;
+    opacity: 0;
+  }
+  .chaser {
+    position: absolute;
+    width: 202px;
+    height: 210px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .chaser-bulb {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #754318;
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, .9);
+  }
+  .chaser.echo .chaser-bulb {
+    width: 7px;
+    height: 7px;
+  }
+  .chaser.echo .chaser-bulb:nth-child(2n + 1) { display: none; }
+  .source-pulse {
+    position: absolute;
+    width: 62px;
+    height: 62px;
+    border: 3px solid rgba(255, 170, 43, .86);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 143, 25, .46), inset 0 0 8px rgba(255, 208, 98, .24);
+    opacity: 0;
+  }
+  .source-pulse.echo {
+    border-style: dashed;
+    border-width: 2px;
+  }
+  .score-packet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 78px;
+    height: 68px;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .score-pip {
+    position: absolute;
+    border-radius: 2px;
+    background: #e99b2a;
+    box-shadow: 0 0 4px rgba(255, 153, 32, .70);
+  }
+  .score-pip.core {
+    background: #fff1bb;
+    box-shadow: 0 0 5px rgba(255, 245, 198, .94), 0 0 12px rgba(255, 166, 40, .82);
+  }
+  .score-packet.echo .score-pip:nth-child(3n) { opacity: .32; }
+  #towerFx {
+    position: absolute;
+    left: 54px;
+    top: 180px;
+    width: 202px;
+    height: 570px;
+    z-index: 8;
+    overflow: hidden;
+    border-radius: 34px;
+    pointer-events: none;
+    transform-origin: 50% 78%;
+  }
+  #towerBloom {
+    position: absolute;
+    left: -24px;
+    top: 50px;
+    width: 250px;
+    height: 530px;
+    background: radial-gradient(ellipse at 54% 68%, rgba(255, 243, 190, .50) 0 7%, rgba(255, 176, 47, .30) 18%, rgba(255, 107, 22, .09) 38%, transparent 63%);
+    filter: blur(5px);
+    opacity: 0;
+  }
+  #towerLamps {
+    position: absolute;
+    left: 45px;
+    top: 280px;
+    width: 108px;
+    height: 282px;
+  }
+  .tower-lamp {
+    position: absolute;
+    left: 0;
+    width: 108px;
+    height: 14px;
+    border: 2px solid rgba(89, 54, 22, .72);
+    border-radius: 2px;
+    background: radial-gradient(circle, rgba(70, 42, 18, .68) 0 31%, transparent 38%) 0 0 / 8px 7px, rgba(10, 9, 6, .88);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .9);
+    opacity: .48;
+  }
+  #targetLatch {
+    position: absolute;
+    left: 69px;
+    top: 58px;
+    width: 64px;
+    height: 64px;
+    border: 7px solid rgba(128, 70, 23, .74);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 7px rgba(8, 9, 8, .94);
+    opacity: .72;
+  }
+  #targetLatch::after {
+    content: "";
+    position: absolute;
+    left: 17px;
+    top: 17px;
+    width: 16px;
+    height: 16px;
+    border: 7px solid rgba(138, 76, 26, .80);
+    border-radius: 50%;
+  }
+  .tower-scan {
+    position: absolute;
+    left: 35px;
+    width: 128px;
+    height: 5px;
+    background: linear-gradient(90deg, transparent, rgba(255, 175, 43, .26) 12%, rgba(255, 215, 106, .92) 50%, rgba(255, 127, 25, .20) 88%, transparent);
+    box-shadow: 0 0 7px rgba(255, 151, 31, .58);
+    opacity: 0;
+  }
+  #intakeFlash {
+    position: absolute;
+    left: 133px;
+    top: 459px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff7d1 0 8%, #ffd271 19%, #ee982a 38%, rgba(236, 105, 20, .24) 60%, transparent 74%);
+    filter: drop-shadow(0 0 8px rgba(255, 164, 38, .8));
+    opacity: 0;
+  }
+  #impactRing {
+    position: absolute;
+    left: 126px;
+    top: 452px;
+    width: 56px;
+    height: 56px;
+    border: 4px solid rgba(255, 190, 63, .78);
+    border-radius: 50%;
+    opacity: 0;
+  }
+  #towerCriticalCore {
+    position: absolute;
+    left: 66px;
+    top: 256px;
+    width: 70px;
+    height: 315px;
+    background: linear-gradient(90deg, transparent, rgba(255, 245, 206, .86) 42%, #fff9dc 50%, rgba(255, 190, 64, .70) 58%, transparent);
+    filter: blur(1px);
+    opacity: 0;
+  }
+  #criticalBurst {
+    position: absolute;
+    left: -89px;
+    top: 273px;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, rgba(255, 255, 232, .98) 0 2%, rgba(255, 218, 112, .78) 2.5% 5%, transparent 6% 24%, rgba(255, 197, 65, .88) 24.5% 27%, rgba(255, 104, 17, .30) 28% 31%, transparent 32%),
+      conic-gradient(from 8deg, transparent 0 5deg, rgba(255, 238, 172, .82) 6deg 7deg, transparent 8deg 24deg, rgba(255, 142, 31, .46) 25deg 27deg, transparent 28deg 54deg, rgba(255, 244, 196, .70) 55deg 56deg, transparent 57deg 90deg);
+    filter: drop-shadow(0 0 12px rgba(255, 157, 30, .76));
+    opacity: 0;
+    transform: scale(.24) rotate(-7deg);
+  }
+  #criticalBurst::before,
+  #criticalBurst::after {
+    content: "";
+    position: absolute;
+    left: 32px;
+    top: 185px;
+    width: 316px;
+    height: 8px;
+    background: linear-gradient(90deg, transparent, rgba(255, 183, 48, .58) 15%, #fff8d9 50%, rgba(255, 137, 24, .52) 85%, transparent);
+    box-shadow: 0 0 11px rgba(255, 184, 59, .82);
+  }
+  #criticalBurst::after {
+    transform: rotate(90deg);
+  }
+  #towerBrownout {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .92);
+    opacity: 0;
+    z-index: 20;
+  }
+  #crtTear {
+    position: absolute;
+    left: 9px;
+    top: 334px;
+    width: 184px;
+    height: 9px;
+    background: linear-gradient(180deg, rgba(255, 250, 222, .12) 0 1px, rgba(255, 244, 191, .96) 1px 3px, rgba(255, 125, 26, .48) 3px 6px, rgba(80, 199, 186, .19) 6px 8px, transparent 8px);
+    box-shadow: 0 0 10px rgba(255, 183, 59, .72);
+    opacity: 0;
+    z-index: 22;
+  }
+  #sparkLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 23;
+  }
+  .spark {
+    position: absolute;
+    width: 26px;
+    height: 3px;
+    border-radius: 2px;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, #fff5c4, #ffae35 46%, transparent);
+    box-shadow: 0 0 4px rgba(255, 148, 29, .72);
+    opacity: 0;
+  }
+  #terminalWave {
+    position: absolute;
+    left: 1635px;
+    top: 510px;
+    width: 180px;
+    height: 160px;
+    z-index: 6;
+    pointer-events: none;
+  }
+  .wave-dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: #d58d29;
+    box-shadow: 0 0 3px rgba(255, 147, 27, .42);
+    opacity: 0;
+  }
+  #globalDim {
+    position: absolute;
+    inset: 0;
+    z-index: 18;
+    background: rgba(0, 0, 0, .35);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #criticalStrobe {
+    position: absolute;
+    inset: 0;
+    z-index: 19;
+    background:
+      radial-gradient(circle at 8.2% 55%, rgba(255, 255, 232, .96) 0 2.5%, rgba(255, 194, 58, .42) 5%, rgba(255, 116, 18, .16) 13%, transparent 38%),
+      rgba(255, 183, 56, .08);
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #resultWarmth {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    z-index: 4;
+    background: radial-gradient(ellipse at 14% 55%, rgba(255, 165, 39, .08), transparent 37%), radial-gradient(ellipse at 88% 50%, rgba(255, 154, 36, .045), transparent 28%);
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div id="capture">
+  <div id="stage">
+    <div id="world">
+      <img id="base" src="../../../../Resources/Art/MainGame/arcade_main_game_common_base.png" alt="">
+      <div id="resultWarmth"></div>
+      <div id="topHud">
+        <div id="phaseCode" class="led">01</div>
+        <div id="chapterText" class="led">第1章 · 第1关</div>
+        <div id="lifeText" class="led low">生命 --</div>
+        <div id="coinText" class="led">金币 8</div>
+      </div>
+      <div id="scoreContext">
+        <div class="score-line led low">目标 <span id="targetValue">22</span></div>
+        <div class="score-line led low">当前 <span id="currentValue">0</span></div>
+      </div>
+      <div id="terminalCopy">
+        <div id="ruleHeading" class="led">本关规则</div>
+        <div id="ruleBody" class="led low">无额外规则<br>按槽位顺序结算</div>
+        <div id="terminalResult" class="led">
+          <div class="result-title">本关通过</div>
+          <div class="result-sub">结算完成<br>回路稳定</div>
+        </div>
+      </div>
+      <div id="actionArea">
+        <div id="actionGlow"></div>
+        <div id="actionText" class="led">SPACE 投掷</div>
+      </div>
+      <div id="diceLayer"></div>
+      <div id="focusLayer"></div>
+      <div id="packetLayer"></div>
+      <div id="towerFx">
+        <div id="towerBloom"></div>
+        <div id="towerLamps"></div>
+        <div id="scanA" class="tower-scan"></div>
+        <div id="scanB" class="tower-scan"></div>
+        <div id="scanC" class="tower-scan"></div>
+        <div id="targetLatch"></div>
+        <div id="towerCriticalCore"></div>
+        <div id="criticalBurst"></div>
+        <div id="intakeFlash"></div>
+        <div id="impactRing"></div>
+        <div id="crtTear"></div>
+        <div id="sparkLayer"></div>
+        <div id="towerBrownout"></div>
+      </div>
+      <div id="terminalWave"></div>
+      <div id="globalDim"></div>
+      <div id="criticalStrobe"></div>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const duration = 4.8;
+  const targetScore = 22;
+  const slotCenters = [448, 640, 832, 1024, 1216, 1408];
+  const slotY = 552;
+  const dieSize = 192;
+  const reelSequence = [1, 4, 2, 6, 3, 5];
+  const diceData = [
+    { family: 'pig', core: 'three_little_pigs', value: 4 },
+    { family: 'neutral', core: 'duet', value: 3 },
+    { family: 'turtle', core: 'lucky_turtle', value: 6 },
+    { family: 'devil', core: 'devourer', value: 5 },
+    { family: 'pirate', core: 'pirate_king', value: 8 },
+    { family: 'neutral', core: 'crown', value: 12 }
+  ];
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, p) => a + (b - a) * p;
+  const smooth = (a, b, v) => {
+    const x = clamp((v - a) / Math.max(.00001, b - a));
+    return x * x * (3 - 2 * x);
+  };
+  const easeOutCubic = p => 1 - Math.pow(1 - clamp(p), 3);
+  const pulse = (x, width) => {
+    const p = clamp(1 - Math.abs(x) / width);
+    return p * p;
+  };
+  const envelope = (t, start, rise, fall, end) => clamp(smooth(start, rise, t) * (1 - smooth(fall, end, t)));
+  const $ = id => document.getElementById(id);
+  const els = {
+    world: $('world'), diceLayer: $('diceLayer'), focusLayer: $('focusLayer'), packetLayer: $('packetLayer'),
+    phaseCode: $('phaseCode'), currentValue: $('currentValue'), targetValue: $('targetValue'),
+    actionText: $('actionText'), actionGlow: $('actionGlow'), ruleHeading: $('ruleHeading'), ruleBody: $('ruleBody'),
+    terminalResult: $('terminalResult'), resultWarmth: $('resultWarmth'), terminalWave: $('terminalWave'),
+    towerFx: $('towerFx'), towerLamps: $('towerLamps'), towerBloom: $('towerBloom'),
+    targetLatch: $('targetLatch'), towerCriticalCore: $('towerCriticalCore'), criticalBurst: $('criticalBurst'),
+    criticalStrobe: $('criticalStrobe'), intakeFlash: $('intakeFlash'),
+    impactRing: $('impactRing'), towerBrownout: $('towerBrownout'), crtTear: $('crtTear'),
+    sparkLayer: $('sparkLayer'), globalDim: $('globalDim'), scanA: $('scanA'), scanB: $('scanB'), scanC: $('scanC')
+  };
+
+  function perimeterPoints(width, height, count, inset = 8) {
+    const w = width - inset * 2;
+    const h = height - inset * 2;
+    const perimeter = 2 * (w + h);
+    const points = [];
+    for (let i = 0; i < count; i += 1) {
+      let d = i / count * perimeter;
+      let x;
+      let y;
+      if (d < w) { x = inset + d; y = inset; }
+      else if ((d -= w) < h) { x = inset + w; y = inset + d; }
+      else if ((d -= h) < w) { x = inset + w - d; y = inset + h; }
+      else { d -= w; x = inset; y = inset + h - d; }
+      points.push([x - 4, y - 4]);
+    }
+    return points;
+  }
+
+  function buildDice() {
+    diceData.forEach((data, index) => {
+      const die = document.createElement('div');
+      die.className = 'die';
+      die.style.left = `${slotCenters[index] - dieSize / 2}px`;
+      die.style.top = `${slotY - dieSize / 2}px`;
+
+      const shell = document.createElement('img');
+      shell.className = 'die-shell';
+      shell.src = `../../../../Resources/Art/MainGame/arcade_main_game_die_shell_${data.family}.png`;
+      die.appendChild(shell);
+
+      const face = document.createElement('div');
+      face.className = 'face-window';
+      for (let i = 0; i < 3; i += 1) {
+        const digit = document.createElement('div');
+        digit.className = 'reel-digit';
+        face.appendChild(digit);
+      }
+      die.appendChild(face);
+
+      const core = document.createElement('img');
+      core.className = 'type-core';
+      core.src = `../../../../Resources/Art/DiceTypes/arcade_type_core_${data.core}.png`;
+      die.appendChild(core);
+
+      const stopFlash = document.createElement('div');
+      stopFlash.className = 'stop-flash';
+      die.appendChild(stopFlash);
+
+      els.diceLayer.appendChild(die);
+      data.el = die;
+      data.face = face;
+      data.digits = [...face.children];
+      data.coreEl = core;
+      data.stopFlash = stopFlash;
+    });
+  }
+
+  function buildTower() {
+    for (let i = 0; i < 13; i += 1) {
+      const lamp = document.createElement('i');
+      lamp.className = 'tower-lamp';
+      lamp.dataset.index = String(i);
+      lamp.style.bottom = `${i * 21}px`;
+      els.towerLamps.appendChild(lamp);
+    }
+  }
+
+  function buildWave() {
+    const cols = 27;
+    const rows = 14;
+    for (let x = 0; x < cols; x += 1) {
+      for (let y = 0; y < rows; y += 1) {
+        const dot = document.createElement('i');
+        dot.className = 'wave-dot';
+        dot.dataset.x = String(x);
+        dot.dataset.y = String(y);
+        dot.style.left = `${x * 6.5}px`;
+        dot.style.top = `${y * 11.2}px`;
+        els.terminalWave.appendChild(dot);
+      }
+    }
+  }
+
+  function buildSparks() {
+    const specs = [
+      [118, 112, -58], [162, 94, -22], [183, 139, 27], [151, 513, 18],
+      [102, 498, 144], [174, 529, 61], [77, 536, 171], [192, 473, -13]
+    ];
+    specs.forEach(([x, y, angle], index) => {
+      const spark = document.createElement('i');
+      spark.className = 'spark';
+      spark.dataset.index = String(index);
+      spark.dataset.angle = String(angle);
+      spark.style.left = `${x}px`;
+      spark.style.top = `${y}px`;
+      els.sparkLayer.appendChild(spark);
+    });
+  }
+
+  function buildChaser(event) {
+    const chaser = document.createElement('div');
+    chaser.className = `chaser${event.echo ? ' echo' : ''}`;
+    chaser.style.left = `${slotCenters[event.slot] - 101}px`;
+    chaser.style.top = `${slotY - 105}px`;
+    perimeterPoints(202, 210, 44, event.echo ? 12 : 8).forEach(([x, y], index) => {
+      const bulb = document.createElement('i');
+      bulb.className = 'chaser-bulb';
+      bulb.dataset.index = String(index);
+      bulb.style.left = `${x}px`;
+      bulb.style.top = `${y}px`;
+      chaser.appendChild(bulb);
+    });
+    els.focusLayer.appendChild(chaser);
+    event.chaser = chaser;
+
+    const source = document.createElement('div');
+    source.className = `source-pulse${event.echo ? ' echo' : ''}`;
+    source.style.left = `${slotCenters[event.slot] - 31}px`;
+    source.style.top = `${slotY - 31}px`;
+    els.packetLayer.appendChild(source);
+    event.source = source;
+
+    const packet = document.createElement('div');
+    packet.className = `score-packet${event.echo ? ' echo' : ''}`;
+    const count = Math.round(7 + event.weight * 16);
+    const pipSize = 7 + event.weight * 4;
+    for (let i = 0; i < count; i += 1) {
+      const pip = document.createElement('i');
+      const isCore = i < Math.max(1, Math.round(event.weight * 4));
+      pip.className = `score-pip${isCore ? ' core' : ''}`;
+      const column = (i * 5 + event.slot * 2 + (event.echo ? 3 : 0)) % 6;
+      const row = (i * 3 + Math.floor(i / 5) + event.slot) % 5;
+      const jitterX = ((i * 7 + event.slot * 3) % 7) - 3;
+      const jitterY = ((i * 11 + event.slot) % 7) - 3;
+      pip.style.width = `${pipSize}px`;
+      pip.style.height = `${pipSize}px`;
+      pip.style.left = `${column * 11 + jitterX}px`;
+      pip.style.top = `${row * 11 + jitterY}px`;
+      packet.appendChild(pip);
+    }
+    els.packetLayer.appendChild(packet);
+    event.packet = packet;
+  }
+
+  const events = [
+    { slot: 0, start: 1.42, rise: 1.46, fall: 1.72, end: 1.82, travelStart: 1.51, impact: 1.70, weight: .32, delta: 4 },
+    { slot: 1, start: 1.68, rise: 1.72, fall: 2.18, end: 2.28, travelStart: 1.78, impact: 1.96, weight: .26, delta: 3, hold: true },
+    { slot: 0, start: 1.95, rise: 1.99, fall: 2.20, end: 2.27, travelStart: 2.03, impact: 2.20, weight: .50, delta: 6, echo: true },
+    { slot: 2, start: 2.24, rise: 2.28, fall: 2.50, end: 2.58, travelStart: 2.33, impact: 2.49, weight: .43, delta: 6 },
+    { slot: 3, start: 2.51, rise: 2.55, fall: 2.80, end: 2.88, travelStart: 2.62, impact: 2.78, weight: .48, delta: 5, targetCross: true },
+    { slot: 4, start: 2.79, rise: 2.83, fall: 3.10, end: 3.18, travelStart: 2.91, impact: 3.08, weight: .70, delta: 8 },
+    { slot: 5, start: 3.06, rise: 3.11, fall: 3.45, end: 3.55, travelStart: 3.20, impact: 3.43, weight: 1.00, delta: 12 }
+  ];
+
+  buildDice();
+  buildTower();
+  buildWave();
+  buildSparks();
+  events.forEach(buildChaser);
+
+  function renderReel(data, index, t) {
+    const rollStart = .08;
+    const revealStart = .64 + index * .06;
+    const revealEnd = revealStart + .25;
+    const readyToRoll = smooth(.055, .14, t);
+    const coreSize = lerp(86, 44, readyToRoll);
+    data.coreEl.style.width = `${coreSize}px`;
+    data.coreEl.style.height = `${coreSize}px`;
+    data.coreEl.style.left = `${96 - coreSize / 2}px`;
+    data.coreEl.style.top = `${lerp(48, 134, readyToRoll)}px`;
+    data.coreEl.style.opacity = String(.94 - readyToRoll * .16);
+
+    const stopFlash = pulse(t - revealEnd, .075);
+    data.stopFlash.style.opacity = String(stopFlash * .86);
+    data.stopFlash.style.transform = `scale(${1 + stopFlash * .025})`;
+
+    if (t < rollStart) {
+      data.digits.forEach(digit => { digit.style.opacity = '0'; });
+      return;
+    }
+
+    if (t < revealStart) {
+      const slow = smooth(.48, revealStart, t);
+      const phase = (t - rollStart) * (20.5 - slow * 6.5) + index * .77 + slow * 1.8;
+      const whole = Math.floor(phase);
+      const fraction = phase - whole;
+      const motionBlur = 1.25 - slow * .88;
+      data.digits.forEach((digit, cell) => {
+        const relative = cell - 1;
+        const valueIndex = ((whole + relative + index * 2) % reelSequence.length + reelSequence.length) % reelSequence.length;
+        digit.textContent = String(reelSequence[valueIndex]);
+        const y = (relative + fraction) * 120;
+        digit.style.transform = `translateY(${y}px)`;
+        digit.style.opacity = String(.82 - Math.abs(relative + fraction) * .16);
+        digit.style.filter = `blur(${motionBlur}px)`;
+      });
+      return;
+    }
+
+    const p = clamp((t - revealStart) / (revealEnd - revealStart));
+    let finalY;
+    if (p < .72) finalY = lerp(-120, 7, easeOutCubic(p / .72));
+    else finalY = lerp(7, 0, smooth(.72, 1, p));
+    data.digits[0].textContent = String(reelSequence[(index + 2) % reelSequence.length]);
+    data.digits[0].style.transform = `translateY(${finalY + 120}px)`;
+    data.digits[0].style.opacity = String(1 - smooth(.45, .92, p));
+    data.digits[0].style.filter = `blur(${lerp(.65, 0, p)}px)`;
+    data.digits[1].textContent = String(data.value);
+    data.digits[1].style.transform = `translateY(${finalY}px)`;
+    data.digits[1].style.opacity = '1';
+    data.digits[1].style.filter = `blur(${lerp(.55, 0, p)}px)`;
+    data.digits[2].textContent = String(reelSequence[(index + 5) % reelSequence.length]);
+    data.digits[2].style.transform = `translateY(${finalY - 120}px)`;
+    data.digits[2].style.opacity = String(1 - smooth(.1, .62, p));
+    data.digits[2].style.filter = `blur(${lerp(.65, 0, p)}px)`;
+  }
+
+  function renderChaser(event, t) {
+    const activity = envelope(t, event.start, event.rise, event.fall, event.end);
+    event.chaser.style.opacity = String(activity * (event.echo ? .82 : 1));
+    const bulbs = [...event.chaser.children];
+    const direction = event.echo ? -1 : 1;
+    const runner = ((t * 54 * direction + event.slot * 9) % bulbs.length + bulbs.length) % bulbs.length;
+    bulbs.forEach((bulb, index) => {
+      const raw = Math.abs(index - runner);
+      const distance = Math.min(raw, bulbs.length - raw);
+      const hot = clamp(1 - distance / (event.echo ? 3.4 : 5.2));
+      const alpha = activity * (.14 + hot * .86);
+      const white = event.weight > .74 && hot > .68 ? clamp((hot - .68) / .32) : 0;
+      bulb.style.background = white > 0
+        ? `rgb(255, ${Math.round(191 + white * 54)}, ${Math.round(71 + white * 150)})`
+        : (event.echo ? '#d98d2a' : '#f1a02d');
+      bulb.style.opacity = String(alpha);
+      bulb.style.boxShadow = alpha > .18 ? `0 0 ${3 + hot * 7}px rgba(255, 151, 28, ${.30 + hot * .48})` : 'none';
+      bulb.style.transform = `scale(${.82 + hot * .30})`;
+    });
+  }
+
+  function renderPacket(event, t) {
+    const condense = envelope(t, event.travelStart - .085, event.travelStart - .035, event.travelStart + .01, event.travelStart + .075);
+    event.source.style.opacity = String(condense * (.64 + event.weight * .28));
+    event.source.style.transform = `scale(${.34 + condense * (.54 + event.weight * .18)}) rotate(${(t - event.travelStart) * (event.echo ? -210 : 170)}deg)`;
+
+    const p = smooth(event.travelStart, event.impact, t);
+    const appearing = smooth(event.travelStart - .012, event.travelStart + .035, t);
+    const vanishing = 1 - smooth(event.impact - .018, event.impact + .055, t);
+    const opacity = clamp(appearing * vanishing);
+    const startX = slotCenters[event.slot] - 39;
+    const startY = slotY - 34;
+    const endX = 171;
+    const endY = 630;
+    const x = lerp(startX, endX, p);
+    const lift = 58 + Math.abs(startX - endX) * .035 + event.weight * 20;
+    const y = lerp(startY, endY, p) - Math.sin(Math.PI * p) * lift;
+    const scale = .32 + event.weight * .48 + Math.sin(Math.PI * p) * .12;
+    event.packet.style.opacity = String(opacity);
+    event.packet.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${lerp(0, event.echo ? -28 : 22, p)}deg)`;
+    [...event.packet.children].forEach((pip, index) => {
+      const stagger = .74 + .26 * Math.sin((index + 1) * 2.1 + p * 10.5);
+      pip.style.opacity = String(opacity * stagger * (event.echo ? .84 : 1));
+    });
+  }
+
+  function scoreAt(t) {
+    return events.reduce((score, event) => score + event.delta * smooth(event.impact - .015, event.impact + .085, t), 0);
+  }
+
+  function impactEnergyAt(t) {
+    return events.reduce((energy, event) => Math.max(energy, pulse(t - event.impact, .075) * (.34 + event.weight * .66)), 0);
+  }
+
+  function renderTower(t) {
+    const score = scoreAt(t);
+    const fill = clamp(score / targetScore) * 13;
+    const overload = clamp((score / targetScore - 1) / 1.05);
+    const impactEnergy = impactEnergyAt(t);
+    const brownout = envelope(t, 3.615, 3.655, 3.690, 3.750);
+    const critical = pulse(t - 3.785, .145);
+    const criticalAfter = envelope(t, 3.735, 3.785, 4.02, 4.24);
+    const coolingWindow = t >= 3.82 ? 1 - smooth(3.82, 4.18, t) : 0;
+    const coolingFlicker = coolingWindow * (.5 + .5 * Math.sin((t - 3.82) * Math.PI * 19));
+    const targetCross = smooth(2.812, 2.882, t);
+    const result = smooth(4.07, 4.22, t);
+
+    [...els.towerLamps.children].forEach((lamp, index) => {
+      const on = clamp(fill - index);
+      const hot = clamp(overload * (.36 + index / 12 * .70) + critical * (.42 + index / 12 * .58));
+      const intensity = clamp(on * (1 - brownout * .88) + critical * .32);
+      const warm = hot > .42
+        ? `rgba(255, ${Math.round(183 + hot * 66)}, ${Math.round(58 + hot * 178)}, .98)`
+        : 'rgba(249, 156, 35, .96)';
+      lamp.style.opacity = String(.48 + intensity * .52);
+      lamp.style.borderColor = `rgba(187, 102, 26, ${.50 + intensity * .46})`;
+      lamp.style.background = intensity > .035
+        ? `radial-gradient(circle, ${warm} 0 34%, rgba(255, 115, 23, .30) 42%, transparent 50%) 0 0 / 8px 7px, rgba(67, 31, 8, .92)`
+        : `radial-gradient(circle, rgba(70,42,18,.68) 0 31%, transparent 38%) 0 0 / 8px 7px, rgba(10,9,6,.88)`;
+      lamp.style.boxShadow = intensity > .035
+        ? `0 0 ${3 + intensity * 7 + hot * 8}px rgba(255, 143, 27, ${.22 + intensity * .43}), inset 0 0 5px rgba(255, 236, 180, ${.06 + hot * .24})`
+        : 'inset 0 0 6px rgba(0,0,0,.9)';
+      lamp.style.transform = `scaleX(${1 + impactEnergy * (.012 + index / 12 * .024)})`;
+    });
+
+    const frontier = 529 - clamp(fill / 13) * 260;
+    const scanMemory = clamp(overload * (1 - brownout) * (1 - smooth(4.30, 4.72, t)) + result * .18 + coolingFlicker * .13);
+    [els.scanA, els.scanB, els.scanC].forEach((band, index) => {
+      band.style.top = `${frontier + index * 19 + coolingFlicker * (index - 1) * 7}px`;
+      band.style.opacity = String(scanMemory * (.50 - index * .12));
+    });
+
+    els.towerBrownout.style.opacity = String(brownout * .84);
+    els.globalDim.style.opacity = String(brownout * .31);
+    els.towerCriticalCore.style.opacity = String(clamp(critical * .90 + criticalAfter * .20 + coolingFlicker * .16) * (1 - brownout));
+    const strike = pulse(t - 3.782, .052);
+    const burstOpen = smooth(3.748, 3.902, t);
+    els.criticalBurst.style.opacity = String(clamp(strike * .98 + critical * .78 + criticalAfter * .10 + coolingFlicker * .11) * (1 - brownout));
+    els.criticalBurst.style.transform = `scale(${.24 + burstOpen * 1.04 + critical * .10 + coolingFlicker * .018}) rotate(${-7 + burstOpen * 12 + coolingFlicker * 2.2}deg)`;
+    els.criticalStrobe.style.opacity = String(clamp(pulse(t - 3.777, .042) * .78 + pulse(t - 3.812, .035) * .30));
+    els.towerBloom.style.opacity = String(clamp(impactEnergy * .15 + overload * .18 + critical * .84 + result * .13) * (1 - brownout));
+    els.intakeFlash.style.opacity = String(clamp(impactEnergy * .86 + critical * .72));
+    els.intakeFlash.style.transform = `scale(${.62 + impactEnergy * .62 + critical * .60})`;
+    els.impactRing.style.opacity = String(clamp(impactEnergy * .70 + critical * .75));
+    els.impactRing.style.transform = `scale(${.58 + impactEnergy * 1.0 + critical * 1.15})`;
+
+    els.targetLatch.style.borderColor = targetCross > .02
+      ? `rgba(${Math.round(255 - targetCross * 86)}, ${Math.round(165 + targetCross * 67)}, ${Math.round(52 + targetCross * 166)}, .98)`
+      : 'rgba(128,70,23,.74)';
+    els.targetLatch.style.boxShadow = targetCross > .02
+      ? `0 0 ${7 + critical * 16}px rgba(109, 212, 204, ${.28 + critical * .18}), inset 0 0 0 7px rgba(8,9,8,.94)`
+      : 'inset 0 0 0 7px rgba(8,9,8,.94)';
+
+    const tear = Math.max(pulse(t - 3.805, .095), pulse(t - 3.965, .075) * .25);
+    els.crtTear.style.opacity = String(tear * .90);
+    els.crtTear.style.top = `${320 + Math.sin(t * 137) * 13}px`;
+    els.crtTear.style.transform = `translateX(${Math.sin(t * 113) * 8}px) scaleX(${.78 + tear * .26})`;
+
+    const localKick = events.reduce((kick, event) => kick + Math.sin((t - event.impact) * 92) * pulse(t - event.impact, .09) * event.weight * 2.4, 0);
+    const coolingKick = coolingFlicker * Math.sin(t * 149) * .95;
+    els.towerFx.style.transform = `translateX(${localKick + critical * Math.sin(t * 185) * 3.2 + coolingKick}px) scaleX(${1 - brownout * .012 + critical * .012})`;
+
+    [...els.sparkLayer.children].forEach((spark, index) => {
+      const local = clamp((t - (3.752 + index * .006)) / .15);
+      const fade = local <= 0 ? 0 : (1 - local) * criticalAfter;
+      const angle = Number(spark.dataset.angle);
+      const distance = local * (17 + index * 3);
+      spark.style.opacity = String(clamp(fade * 1.12));
+      spark.style.transform = `rotate(${angle}deg) translateX(${distance}px) scaleX(${.48 + fade})`;
+    });
+
+    const worldKick = critical * Math.sin(t * 164) * 4.2;
+    els.world.style.transform = `translate(${worldKick}px, ${-Math.abs(worldKick) * .30}px)`;
+  }
+
+  function renderWave(t) {
+    const rollEnergy = envelope(t, .08, .18, 1.12, 1.31) * .16;
+    const eventEnergy = events.reduce((energy, event) => energy + envelope(t, event.start, event.rise, event.fall, event.end) * (.08 + event.weight * .13), 0);
+    const echoAccent = envelope(t, 1.95, 1.99, 2.20, 2.27) * .18;
+    const critical = pulse(t - 3.79, .20) * .55;
+    const resultFade = 1 - smooth(4.02, 4.24, t);
+    const energy = clamp((.08 + rollEnergy + eventEnergy + echoAccent + critical) * resultFade);
+    [...els.terminalWave.children].forEach(dot => {
+      const x = Number(dot.dataset.x);
+      const y = Number(dot.dataset.y);
+      const amplitude = 1.2 + energy * 4.4;
+      const echoRipple = echoAccent * Math.sin(x * 1.55 + t * 26) * 1.8;
+      const center = 6.5 + Math.sin(x * .68 + t * 12.5) * amplitude * (.34 + .66 * Math.sin(x * .28 + 1.1) ** 2) + echoRipple;
+      const distance = Math.abs(y - center);
+      const on = clamp(1 - distance / 1.18);
+      dot.style.opacity = String(on * (.06 + energy * .46));
+      dot.style.transform = `scale(${.78 + on * .28})`;
+    });
+  }
+
+  function renderHud(t) {
+    const score = Math.round(scoreAt(t));
+    els.currentValue.textContent = String(score);
+    els.targetValue.textContent = String(targetScore);
+
+    let code = '01';
+    let action = 'SPACE 投掷';
+    let actionOpacity = .96;
+    let glow = 1;
+    if (t >= .08 && t < 1.20) {
+      code = t < .64 ? '02' : '03';
+      action = '骰面滚动';
+      actionOpacity = .34;
+      glow = 0;
+    } else if (t >= 1.20 && t < 1.42) {
+      code = '04';
+      action = '结果锁定 · 自动结算';
+      actionOpacity = .44;
+      glow = 0;
+    } else if (t >= 1.42 && t < 4.08) {
+      code = '05';
+      action = '结算处理中';
+      actionOpacity = .28;
+      glow = 0;
+    } else if (t >= 4.08) {
+      code = '06';
+      action = 'SPACE 进入市场';
+      actionOpacity = smooth(4.08, 4.24, t) * .96;
+      glow = smooth(4.10, 4.28, t);
+    }
+    els.phaseCode.textContent = code;
+    els.actionText.textContent = action;
+    els.actionText.style.opacity = String(actionOpacity);
+    els.actionGlow.style.borderColor = `rgba(226, 137, 34, ${.22 + glow * .52})`;
+    els.actionGlow.style.background = `rgba(119, 60, 11, ${.04 + glow * .16})`;
+    els.actionGlow.style.boxShadow = glow > .02 ? `0 0 ${8 + glow * 12}px rgba(255, 156, 28, ${glow * .28}), inset 0 0 8px rgba(255, 205, 97, ${glow * .12})` : 'none';
+
+    const result = smooth(4.07, 4.22, t);
+    els.ruleHeading.style.opacity = String((1 - result) * .76);
+    els.ruleBody.style.opacity = String((1 - result) * .48);
+    els.terminalResult.style.opacity = String(result);
+    els.resultWarmth.style.opacity = String(result);
+  }
+
+  function renderAt(rawTime) {
+    const t = clamp(Number(rawTime) || 0, 0, duration);
+    diceData.forEach((data, index) => renderReel(data, index, t));
+    events.forEach(event => {
+      renderChaser(event, t);
+      renderPacket(event, t);
+    });
+    renderTower(t);
+    renderWave(t);
+    renderHud(t);
+  }
+
+  Promise.all([...document.images].map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
+    img.addEventListener('load', resolve, { once: true });
+    img.addEventListener('error', resolve, { once: true });
+  }))).then(() => {
+    window.renderAt = renderAt;
+    window.previewDuration = duration;
+    window.previewReady = true;
+    renderAt(0);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F009 自动结算与分级破线预览 V1</title>
+<style>
+  :root {
+    color-scheme: dark;
+    font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #020405;
+  }
+  #capture {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: #020405;
+  }
+  #stage {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: 0 0;
+    transform: scale(0.6666667);
+    overflow: hidden;
+    background: #020405;
+  }
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    object-fit: cover;
+    opacity: 0;
+    will-change: opacity, transform, filter;
+  }
+  #darken {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 49% 46%, transparent 30%, rgba(0,0,0,.12) 62%, rgba(0,0,0,.36) 100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #scanline {
+    position: absolute;
+    left: 250px;
+    top: 510px;
+    width: 1260px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(104,235,229,.18) 4%, rgba(255,205,93,.95) 45%, rgba(104,235,229,.24) 78%, transparent);
+    box-shadow: 0 0 18px rgba(91,224,220,.54), 0 0 6px rgba(255,192,69,.9);
+    opacity: 0;
+    transform-origin: center;
+  }
+  #slotGlow {
+    position: absolute;
+    width: 174px;
+    height: 218px;
+    left: 310px;
+    top: 338px;
+    border: 5px solid rgba(255,196,72,.96);
+    border-radius: 26px;
+    box-shadow: 0 0 12px rgba(255,187,46,.95), inset 0 0 18px rgba(255,184,38,.42), 0 0 34px rgba(255,183,44,.32);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #beam {
+    position: absolute;
+    left: 210px;
+    top: 585px;
+    height: 5px;
+    width: 280px;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, rgba(103,228,224,.96), rgba(255,202,76,.92));
+    box-shadow: 0 0 13px rgba(82,223,219,.72);
+    opacity: 0;
+  }
+  #contribution {
+    position: absolute;
+    min-width: 150px;
+    padding: 10px 20px 12px;
+    border: 3px solid rgba(214,155,41,.86);
+    border-radius: 10px;
+    background: rgba(3,7,8,.94);
+    color: #ffd56f;
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 2px;
+    text-align: center;
+    text-shadow: 0 0 7px rgba(255,180,43,.72);
+    opacity: 0;
+  }
+  #scoreCover {
+    position: absolute;
+    left: 70px;
+    top: 292px;
+    width: 206px;
+    height: 116px;
+    padding: 12px 16px;
+    border: 3px solid rgba(80,73,55,.88);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(3,7,8,.98), rgba(7,12,13,.94));
+    box-shadow: inset 0 0 20px rgba(0,0,0,.9);
+  }
+  .score-label {
+    color: #e7a92d;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 5px;
+    line-height: 1.35;
+    text-shadow: 0 0 5px rgba(255,174,34,.72);
+  }
+  #scoreNow {
+    display: inline-block;
+    min-width: 78px;
+    color: #74dedc;
+    text-align: right;
+  }
+  #meterTrack {
+    position: absolute;
+    left: 91px;
+    top: 392px;
+    width: 128px;
+    height: 472px;
+    border: 4px solid rgba(54,78,78,.92);
+    border-radius: 7px;
+    overflow: hidden;
+    background: rgba(1,7,8,.78);
+    box-shadow: inset 0 0 22px rgba(0,0,0,.92), 0 0 8px rgba(0,0,0,.8);
+  }
+  #meterFill {
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    bottom: 7px;
+    height: 0;
+    background:
+      repeating-linear-gradient(0deg, rgba(98,228,223,.92) 0 16px, rgba(15,82,83,.92) 16px 21px);
+    box-shadow: 0 0 14px rgba(77,230,223,.62), inset 0 0 10px rgba(255,255,255,.17);
+  }
+  #meterTarget {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 144px;
+    height: 5px;
+    background: #e7a92f;
+    box-shadow: 0 0 12px rgba(255,182,39,.92);
+  }
+  #terminal {
+    position: absolute;
+    left: 1523px;
+    top: 204px;
+    width: 316px;
+    height: 430px;
+    padding: 50px 24px 24px;
+    border: 4px solid rgba(54,60,55,.78);
+    border-radius: 10px;
+    background: radial-gradient(circle at 50% 35%, rgba(9,25,25,.97), rgba(2,6,7,.985) 68%);
+    box-shadow: inset 0 0 26px rgba(0,0,0,.95), 0 0 6px rgba(0,0,0,.9);
+    text-align: center;
+  }
+  .led {
+    color: transparent;
+    background-image: radial-gradient(circle, currentColor 0 42%, transparent 48%);
+    background-size: 5px 5px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 4px currentColor);
+  }
+  #tierTitle {
+    color: #dfa52f;
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: 7px;
+    line-height: 1.15;
+  }
+  #tierPercent {
+    margin-top: 34px;
+    color: #78dedb;
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 72px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+  #tierSub {
+    margin-top: 34px;
+    color: #d6a445;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 4px;
+  }
+  #autoDock {
+    position: absolute;
+    left: 648px;
+    top: 795px;
+    width: 625px;
+    height: 134px;
+    border: 4px solid rgba(83,64,37,.88);
+    border-radius: 13px;
+    background: linear-gradient(180deg, rgba(5,8,8,.98), rgba(2,4,5,.99));
+    box-shadow: inset 0 0 22px rgba(0,0,0,.92), 0 0 8px rgba(0,0,0,.8);
+    opacity: 0;
+  }
+  #autoDots {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 190px;
+    height: 20px;
+    transform: translate(-50%,-50%);
+    background:
+      radial-gradient(circle at 12px 10px, #f4b83e 0 7px, transparent 8px) 0 0 / 38px 20px repeat-x;
+    filter: drop-shadow(0 0 6px rgba(255,181,49,.8));
+  }
+  #autoLabel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e9ae39;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 9px;
+    opacity: 0;
+  }
+  #burst {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 49%, rgba(255,240,193,.28), transparent 18%),
+      radial-gradient(circle at 50% 49%, transparent 34%, rgba(83,229,223,.16) 35%, transparent 37%),
+      linear-gradient(90deg, transparent 5%, rgba(255,185,46,.14) 50%, transparent 95%);
+    border: 8px solid rgba(113,231,227,.6);
+    box-shadow: inset 0 0 45px rgba(78,224,220,.26), inset 0 0 120px rgba(255,183,51,.12);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #phaseCaption {
+    position: absolute;
+    left: 34px;
+    bottom: 26px;
+    min-width: 300px;
+    padding: 12px 18px;
+    border-left: 5px solid #d89e31;
+    background: rgba(1,4,5,.82);
+    color: #e6ad41;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    opacity: .92;
+  }
+  #specTag {
+    position: absolute;
+    right: 30px;
+    bottom: 25px;
+    color: rgba(216,169,75,.76);
+    font: 700 20px/1 "DejaVu Sans Mono", monospace;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div id="capture">
+  <div id="stage">
+    <img id="ready" class="scene" src="../../ArcadeDiceKing/MainGameFlowV1/MotionPreviewsV1/_sources/01_ready_1920x1080.png" alt="">
+    <img id="shaking" class="scene" src="../../ArcadeDiceKing/MainGameFlowV1/MotionPreviewsV1/_sources/02_shaking_1920x1080.png" alt="">
+    <img id="stopping" class="scene" src="../../ArcadeDiceKing/MainGameFlowV1/MotionPreviewsV1/_sources/03_stopping_slot3_1920x1080.png" alt="">
+    <img id="result" class="scene" src="../../ArcadeDiceKing/MainGameFlowV1/MotionPreviewsV1/_sources/04_result_locked_1920x1080.png" alt="">
+    <div id="darken"></div>
+    <div id="scanline"></div>
+    <div id="beam"></div>
+    <div id="slotGlow"></div>
+    <div id="contribution">+5 分</div>
+    <div id="scoreCover">
+      <div class="score-label led">目标&nbsp;15</div>
+      <div class="score-label led">当前&nbsp;<span id="scoreNow">0</span></div>
+    </div>
+    <div id="meterTrack"><div id="meterFill"></div><div id="meterTarget"></div></div>
+    <div id="terminal">
+      <div id="tierTitle" class="led">蓄压中</div>
+      <div id="tierPercent" class="led">0%</div>
+      <div id="tierSub" class="led">等待真实入账</div>
+    </div>
+    <div id="autoDock"><div id="autoDots"></div><div id="autoLabel" class="led">自动结算</div></div>
+    <div id="burst"></div>
+    <div id="phaseCaption">准备</div>
+    <div id="specTag">F009 · PREVIEW V1 · FORCE WINDOW 0</div>
+  </div>
+</div>
+<script>
+(() => {
+  const duration = 6.2;
+  const slotCenters = [410, 615, 820, 1025, 1230, 1435];
+  const events = [
+    { time: 1.78, add: 5, score: 5, slot: 0, crossed: 0 },
+    { time: 2.32, add: 10, score: 15, slot: 1, crossed: 1 },
+    { time: 2.90, add: 9, score: 24, slot: 2, crossed: 2 },
+    { time: 3.52, add: 10, score: 34, slot: 3, crossed: 3 },
+    { time: 4.18, add: 12, score: 46, slot: 4, crossed: 4 },
+    { time: 4.78, add: 2, score: 48, slot: 5, crossed: 0 }
+  ];
+  const $ = id => document.getElementById(id);
+  const els = {
+    stage: $('stage'), ready: $('ready'), shaking: $('shaking'), stopping: $('stopping'), result: $('result'),
+    darken: $('darken'), scanline: $('scanline'), slotGlow: $('slotGlow'), beam: $('beam'),
+    contribution: $('contribution'), scoreNow: $('scoreNow'), meterFill: $('meterFill'), terminal: $('terminal'),
+    tierTitle: $('tierTitle'), tierPercent: $('tierPercent'), tierSub: $('tierSub'), autoDock: $('autoDock'),
+    autoDots: $('autoDots'), autoLabel: $('autoLabel'), burst: $('burst'), phaseCaption: $('phaseCaption')
+  };
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const smooth = (a, b, v) => {
+    const x = clamp((v - a) / (b - a));
+    return x * x * (3 - 2 * x);
+  };
+  const pulse = (x, width) => {
+    const p = clamp(1 - Math.abs(x) / width);
+    return p * p;
+  };
+  function sceneOpacity(t, start, full, fade, end) {
+    return clamp(smooth(start, full, t) * (1 - smooth(fade, end, t)));
+  }
+  function tierFor(score) {
+    if (score >= 45) return { title: '暴击', color: '#ffd36e', sub: '最高档 · 纯表现', range: 4 };
+    if (score >= 30) return { title: '远超过', color: '#ffe0a0', sub: '三点同步冲击', range: 3 };
+    if (score >= 23) return { title: '超过', color: '#8ce6df', sub: '双拍破级', range: 2 };
+    if (score >= 15) return { title: '过关', color: '#72d9d7', sub: '目标锁定', range: 1 };
+    return { title: '蓄压中', color: '#dda633', sub: '未达区间 · 不提前判败', range: 0 };
+  }
+  function scoreAt(t) {
+    let previous = 0;
+    for (const event of events) {
+      if (t < event.time) return previous;
+      const k = smooth(event.time, event.time + .22, t);
+      const value = previous + (event.score - previous) * k;
+      if (t < event.time + .22) return value;
+      previous = event.score;
+    }
+    return previous;
+  }
+  function activeEvent(t) {
+    let active = null;
+    for (const event of events) if (t >= event.time) active = event;
+    return active;
+  }
+  function setColor(element, color) {
+    element.style.color = color;
+  }
+  function renderAt(rawTime) {
+    const t = clamp(Number(rawTime) || 0, 0, duration);
+    const spin = sceneOpacity(t, .16, .21, .60, .72);
+    const stop = sceneOpacity(t, .57, .68, 1.11, 1.22);
+    const result = smooth(1.02, 1.18, t);
+    els.ready.style.opacity = String(clamp(1 - smooth(.16, .24, t)));
+    els.shaking.style.opacity = String(spin);
+    els.stopping.style.opacity = String(stop);
+    els.result.style.opacity = String(result);
+
+    const spinShake = spin * (1 - smooth(.60, .72, t));
+    const spinX = Math.sin(t * 92) * 4.2 * spinShake;
+    const spinY = Math.sin(t * 71 + .8) * 2.2 * spinShake;
+    els.shaking.style.transform = `translate(${spinX}px, ${spinY}px) scale(${1 + spinShake * .004})`;
+    els.shaking.style.filter = `blur(${spinShake * 1.3}px) saturate(${1 + spinShake * .12})`;
+
+    const stopProgress = smooth(.64, 1.18, t);
+    els.scanline.style.opacity = String(clamp(pulse(t - .79, .23) * .86 + pulse(t - 1.08, .18) * .42));
+    els.scanline.style.transform = `translateX(${(stopProgress - .5) * 410}px) scaleX(${.72 + stopProgress * .35})`;
+
+    const score = scoreAt(t);
+    const roundedScore = Math.round(score);
+    const ratio = roundedScore / 15;
+    const tier = tierFor(roundedScore);
+    els.scoreNow.textContent = String(roundedScore);
+    els.meterFill.style.height = `${clamp(ratio / 3.2) * 458}px`;
+    els.tierTitle.textContent = tier.title;
+    els.tierPercent.textContent = `${Math.round(ratio * 100)}%`;
+    els.tierSub.textContent = tier.sub;
+    setColor(els.tierTitle, tier.color);
+    setColor(els.tierPercent, tier.range >= 4 ? '#fff0c8' : tier.color);
+
+    const scoring = smooth(1.62, 1.76, t);
+    els.darken.style.opacity = String(clamp((smooth(1.25, 1.42, t) * (1 - smooth(1.68, 1.78, t))) * .56));
+    els.autoDock.style.opacity = String(clamp(smooth(.16, .23, t) * (1 - smooth(5.82, 6.12, t))));
+    els.autoDots.style.opacity = String(clamp(1 - smooth(1.62, 1.76, t)));
+    els.autoLabel.style.opacity = String(clamp(smooth(1.62, 1.76, t)));
+    els.autoLabel.textContent = t >= 5.12 ? '结算完成' : '自动结算';
+    const dotShift = Math.floor(t * 15) % 5;
+    els.autoDots.style.transform = `translate(calc(-50% + ${dotShift * 5}px), -50%)`;
+
+    const active = activeEvent(t);
+    let eventPulse = 0;
+    let burstPulse = 0;
+    let shakeAmp = 0;
+    if (active && t < active.time + .50) {
+      const age = t - active.time;
+      eventPulse = pulse(age - .11, .22);
+      burstPulse = active.crossed ? pulse(age - .08, .17) : 0;
+      shakeAmp = active.crossed * burstPulse * .9;
+      const center = slotCenters[active.slot];
+      els.slotGlow.style.left = `${center - 87}px`;
+      els.slotGlow.style.opacity = String(clamp(eventPulse * (.72 + active.crossed * .08)));
+      els.slotGlow.style.transform = `scale(${.92 + eventPulse * .10})`;
+      els.contribution.textContent = `+${active.add} 分`;
+      els.contribution.style.left = `${center - 78}px`;
+      els.contribution.style.top = `${592 - eventPulse * 22}px`;
+      els.contribution.style.opacity = String(clamp(eventPulse * 1.15));
+      const width = Math.max(60, center - 215);
+      els.beam.style.width = `${width}px`;
+      els.beam.style.opacity = String(clamp(eventPulse * .82));
+      els.beam.style.transform = `scaleX(${.80 + eventPulse * .20})`;
+    } else {
+      els.slotGlow.style.opacity = '0';
+      els.contribution.style.opacity = '0';
+      els.beam.style.opacity = '0';
+    }
+    els.burst.style.opacity = String(clamp(burstPulse * (.16 + tier.range * .13)));
+    const shakeX = Math.sin(t * 113) * shakeAmp;
+    const shakeY = Math.cos(t * 97) * shakeAmp * .55;
+    els.stage.style.transform = `scale(0.6666667) translate(${shakeX}px, ${shakeY}px)`;
+    els.terminal.style.transform = `scale(${1 + burstPulse * (.003 + tier.range * .003)})`;
+
+    if (t < .16) els.phaseCaption.textContent = '准备 · 一次 SPACE 启动';
+    else if (t < .66) els.phaseCaption.textContent = '基础旋转 · 加力窗口 0';
+    else if (t < 1.20) els.phaseCaption.textContent = '切电停转 · 左到右显点';
+    else if (t < 1.72) els.phaseCaption.textContent = '静默锁定 · 自动读点';
+    else if (t < 5.10) els.phaseCaption.textContent = '自动结算 · 逐槽累压';
+    else els.phaseCaption.textContent = '暴击达成 · 目标的 320%';
+  }
+  function renderScoreState(score) {
+    renderAt(5.35);
+    const roundedScore = Math.round(score);
+    const ratio = roundedScore / 15;
+    const tier = tierFor(roundedScore);
+    let title = tier.title;
+    let color = tier.color;
+    let sub = tier.sub;
+    if (roundedScore < 15) {
+      title = '未达';
+      color = '#d46a48';
+      sub = `还差 ${15 - roundedScore} 分`;
+    }
+    els.scoreNow.textContent = String(roundedScore);
+    els.meterFill.style.height = `${clamp(ratio / 3.2) * 458}px`;
+    els.tierTitle.textContent = title;
+    els.tierPercent.textContent = `${Math.round(ratio * 100)}%`;
+    els.tierSub.textContent = sub;
+    setColor(els.tierTitle, color);
+    setColor(els.tierPercent, roundedScore >= 45 ? '#fff0c8' : color);
+    els.slotGlow.style.opacity = '0';
+    els.contribution.style.opacity = '0';
+    els.beam.style.opacity = '0';
+    els.burst.style.opacity = String(roundedScore < 15 ? .08 : .08 + tier.range * .055);
+    els.autoDock.style.opacity = '1';
+    els.autoDots.style.opacity = '0';
+    els.autoLabel.style.opacity = '1';
+    els.autoLabel.textContent = '结算完成';
+    els.phaseCaption.textContent = `终局分级 · ${title}`;
+  }
+  Promise.all([...document.images].map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
+    img.addEventListener('load', resolve, { once: true });
+    img.addEventListener('error', resolve, { once: true });
+  }))).then(() => {
+    window.renderAt = renderAt;
+    window.renderScoreState = renderScoreState;
+    window.previewDuration = duration;
+    window.previewReady = true;
+    renderAt(0);
+  });
+})();
+</script>
+</body>
+</html>
