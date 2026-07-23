@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9a0f72b91e44ef5aa1a0da61318cda1, type: 3}
+  m_Name: main_game_flow_presentation_profile
+  m_EditorClassIdentifier:
+  Enabled: 1
+  LedGlowIntensity: 0.72
+  RollIgnitionDuration: 0.18
+  FaceReelAccelerationDuration: 0.08
+  FaceReelFastCellsPerSecond: 20
+  FaceReelSlowCellsPerSecond: 5
+  FaceReelLandingStart: 0.64
+  FaceReelOvershootPixels: 7
+  FaceReelReboundPixels: 2.5
+  StopSlotStagger: 0.06
+  StopSlotSettleDuration: 0.36
+  ResultLockPulseDuration: 0.2
+  SettlementSlotDuration: 0.55
+  SettlementRouteDuration: 0.48
+  SettlementMultiplierDuration: 0.58
+  SettlementFinalDuration: 0.68
+  SettlementTargetDuration: 0.72
+  TargetCrossPulseDuration: 0.6
+  SettlementImpactEnabled: 1
+  SettlementCondenseFraction: 0.16
+  SettlementAbsorbFraction: 0.74
+  SettlementGlassCompressionFraction: 0.18
+  SettlementHaloMinSize: 14
+  SettlementHaloMaxSize: 34
+  SettlementTowerAfterglowDuration: 0.46
+  SettlementCriticalKickPixels: 5
+  SettlementAudioVolume: 0.42
+  SettlementMissFinaleDuration: 1.7
+  SettlementPassFinaleDuration: 1.55
+  SettlementExceedFinaleDuration: 1.65
+  SettlementFarExceedFinaleDuration: 1.85
+  SettlementCriticalFinaleDuration: 2.2
+  SettlementCriticalVacuumStart: 0.46
+  SettlementCriticalVacuumFull: 0.54
+  SettlementCriticalBreakthrough: 0.66
+  SettlementCriticalAftershock: 0.82
+  SettlementCriticalGlobalDim: 0.82
+  SettlementCriticalWorldKickPixels: 4.2
+  SettlementReducedEffectsScale: 0.42
+  SettlementPassRatio: 1
+  SettlementExceedRatio: 1.5
+  SettlementFarExceedRatio: 2
+  SettlementCriticalRatio: 3
+  StageClearIntroHold: 0.32
+  StageClearIncomeBeatDuration: 0.38
+  StageClearIncomeBeatGap: 0.1
+  StageClearSettleDuration: 0.24
+  RetryScanDuration: 0.65
+  RunOverKeyTerminalDuration: 0.22
+  RunOverDiceDuration: 0.26
+  RunOverHudDuration: 0.25
+  RunOverCrtCollapseDuration: 0.32
+  RunOverBlackHoldDuration: 0.22

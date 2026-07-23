@@ -32,3 +32,8 @@ sysinfo.txt
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Python generated caches used by local art and QA tooling
+__pycache__/
+__pycache__.meta
+*.py[cod]

@@ -1,170 +1,179 @@
 # F014 程序交接
 
-状态：程序已静态接入，待 Unity 运行验收
+状态：新方向与术语解释已静态实现，待 Unity 运行验收
 功能：骰子悬浮窗 UI
 实现事实来源：Assets/Scripts/DiceKingDemo.cs
+最后更新：2026-07-23
+
+## 当前代码事实
+
+`DiceKingDemo.cs` 已接入统一悬浮窗状态机、市场 / 主流程上下文和数据驱动术语解释：
+
+- `TrySetHoveredTooltip(...)`
+- `UpdateDiceHoverTooltipState()`
+- `DrawDiceHoverTooltip()`
+- `DiceHoverTooltipRect(...)`
+- `DrawDiceHoverTooltipContent(...)`
+
+既有 `0.12s` 延迟、`0.10s` 淡入、`0.08s` 淡出、`0.06s` 内容切换和阶段抑制逻辑可保留。
+
+当前静态实现事实：
+
+- `DiceTooltipContext` 区分市场商品、市场骰袋和主玩法，并携带实际买价。
+- 面板宽度为 `448`，按内容选择 `196 / 244 / 288 / 352 / 416 / 480 / 568` 高度档。
+- 六面显示逐面确定的实际生效点数：长期面组读取 `die.Faces`，再折算喂养最低点和幸运龟最大面；条件计分、邻位、钱包、遭遇和本次随机结果不进入该数组。
+- 六面最大绝对值 `<10,000 / 10,000–99,999 / >=100,000` 时分别使用 `1×6` 完整整数、`3×2` 千分位整数、`3×2` 三位有效数字科学计数与中文快速读取；完整整数始终用于比较和结算。
+- `dice_type_config.csv` 用 `{{kw:key}}` 引用稳定词键；定义、解释、家族色归属、排序和解释显示开关来自 `keyword_glossary_config.csv`，类型 / 状态关系来自 `keyword_binding_config.csv`。
+- `market_floor / family / dual_family` 配置为 `show_explanation=0`，只参与正文替换或身份表达；底部只保留 `feed / devour / shell` 三类机制说明。
+- 可见关键词在规则正文中使用所属家族色并加下划线；底部无通用说明标题，每个关键词只绘制一个家族色标签，解释另起一行。
+- 龟壳类的头部 `化壳时` 标签已移除；其它触发标签继续按现有映射显示。
+- 旧浅色资源与程序化路径仍保留为资源缺失回退；尚缺 Unity Play Mode 与双分辨率截图验收。
 
 ## 输入资源
 
-| 用途 | Unity 加载 key |
-|---|---|
-| 主面板 | `Art/UI/Tooltip/ui_tooltip_panel_clean` |
-| 卖价胶囊 | `Art/UI/Tooltip/ui_tooltip_price_chip` |
-| 骰效标签 | `Art/UI/Tooltip/ui_tooltip_label_chip_blue` |
-| 质效标签 | `Art/UI/Tooltip/ui_tooltip_label_chip_green` |
-| 点面格 | `Art/UI/Tooltip/ui_tooltip_face_cell` |
-| 骰子类型说明 | `Data/dice_type_config` |
+新资源已生成；继续保留旧加载 key 作为回退：
 
-UI 资源位于 `Assets/Resources/Art/UI/Tooltip/`，均已包含 `.meta`。源图位于 `Assets/ArtSource/Production/Tooltip/runtime_ui_sources/`。侧栏细轨和三种页签素材保留在资源目录中，但当前运行时不加载、不绘制。
+| 用途 | Unity 加载 key | 状态 |
+|---|---|---|
+| 简版面板 | `Art/UI/Tooltip/ui_tooltip_arcade_panel_short` | 已生成 |
+| 中版面板 | `Art/UI/Tooltip/ui_tooltip_arcade_panel_medium` | 已生成 |
+| 复杂版面板 | `Art/UI/Tooltip/ui_tooltip_arcade_panel_tall` | 已生成 |
+| 数字面格 | `Art/UI/Tooltip/ui_tooltip_arcade_face_cell` | 已生成 |
+| 类型芯框 | `Art/UI/Tooltip/ui_tooltip_arcade_type_core_frame` | 已生成 |
+| 骰子类型说明 | `Data/dice_type_config` | 已存在 |
+| 关键词定义与解释可见性 | `Data/keyword_glossary_config` | 已接入 |
+| 骰子 / 状态关键词关系 | `Data/keyword_binding_config` | 已接入 |
 
-## 接入位置建议
+如果新资源缺失，仍可用程序化深色面板完成结构验收；不得回退到“把接触图整张加载”为临时方案。
 
-当前相关入口：
+## 建议视图模型
 
-- 市场整体：`DrawMarket(bool chapterMarket)`。
-- 市场货架：`DrawMarketOffer(Rect rect, MarketOffer offer)`。
-- 当前骰袋列表：`DrawCompactDie(Rect rect, Die die, bool selected)`。
-- 主投掷区：`DrawTableDice(Rect area)` 和 `DrawDiceProcessToken(...)`。
-- 数据文案：`DieDisplayName()`、`FaceText()`、`DiceTypeTooltipEffect()`、`MaterialShortRule()`、`SellPrice()`。
+在现有单文件内部增加轻量只读展示模型，不改 `Die` 存档结构：
 
-建议新增一套局部 UI 辅助函数，不重构主流程：
+```text
+DiceTooltipContext
+- MarketOffer
+- MarketBag
+- Run
 
-- `LoadTooltipUiTextures()`。
-- `TrySetHoveredTooltip(Rect rect, Die die, bool allowCurrentStateText, string sourceKey)`。
-- `UpdateDiceHoverTooltipState()`。
-- `DrawDiceHoverTooltip()`。
-- `DrawDiceHoverTooltipContent(Rect rect, Die die, bool allowCurrentStateText)`。
+DiceTooltipViewModel
+- Die
+- Context
+- BuyPrice
+- DisplayName
+- FamilyLabels
+- TriggerLabel
+- EffectiveFaces[6]
+- FaceDisplayMode
+- UniqueHighestFaceIndex
+- RuleText
+- RuleHighlights
+- StateRows
+- ShowBuyPrice
+- ShowSellPrice
+- SellPrice
+- Keywords
+- PanelSize
+```
+
+展示模型只能读取现有状态，不得写回骰面、成长、饲料、吞吃、吸附、价格或结算结果。
 
 ## 数据口径
 
-| 字段 | 建议来源 | 说明 |
+| 字段 | 来源 | 规则 |
 |---|---|---|
-| 名称 | `DieDisplayName(die)` | 包含材质名时直接复用 |
-| 点面 | `die.Faces` | 使用长期面组，不使用本次点数替代 |
-| 骰子效果 | `Assets/Resources/Data/dice_type_config.csv` 的 `tooltip_effect` | 为空或缺失时回退短提示 |
-| 品质效果 | `MaterialShortRule(die.Material)` | 无材质时显示“无品质效果”或留空 |
-| 卖出价 | `SellPrice(die.Type)` | 仍按类型固定回收 |
+| 名称 | `DieDisplayName(die)` | 不足时回退 `TypeName(die.Type)` |
+| 类型芯 | `DieTypeIcon(die.Type)` | 缺失时使用短类型名 |
+| 家族标签 | 现有主体家族判定 | 双家族显示两个；吸附壳不追加宿主家族 |
+| 触发标签 | 按 `DieType` 的只读展示映射 | 龟壳类返回空；不从 `tooltip_effect` 文本解析，不创建玩法触发 |
+| 实际六面 | `die.Faces` + `FeedValue` + 幸运龟壳状态 | 逐面应用 `max(原面, 最低面 + FeedValue)`，有幸运龟时再与当前最高面取大 |
+| 六面格式 | 六面最大绝对值 | `<10,000` 单行整数；`10,000–99,999` 两行千分位整数；`>=100,000` 两行科学计数 + 快速读取 |
+| 静态规则 | `DiceTypeTooltipEffect(die)` | 不再拼接个体状态 |
+| 规则关键词显示名 / 强调 | `keyword_glossary_config.csv` | 解析稳定 `{{kw:key}}`；仅可见词条按 `accent_family` 着色并加下划线 |
+| 底部关键词解释 | 词典 `show_explanation / accent_family` + 绑定表 | 只显示开启项；同键去重并稳定排序；标签与解释分行 |
+| 成长 | `die.Growth` | 仅大于零时显示 |
+| 饲料 | `FeedStateText(die)` 或等价结构数据 | 仅有数据时显示 |
+| 最近吞吃 | `die.LastDevourGain / LastDevourTrigger / LastDevourSource` | 仅加值大于零时显示 |
+| 龟龟吸附 | `die.TurtleAttachments` | 合并摘要，不逐项铺满 |
+| 市场买入价 | `MarketOffer.Price` | 仅 `MarketOffer` 上下文显示 |
+| 当前 / 预计卖出价 | `SellPrice(die)` | 市场商品和市场骰袋显示，主玩法隐藏 |
 
-`dice_type_config.csv` 是悬浮窗展示说明表，不参与 `ScoreDice()`、市场权重、价格或存档。已有短规则不足时，后续只补这张 CSV 的 `tooltip_effect`，不改结算规则。
+不得读取 `die.Score` 作为悬浮窗内容；不得用 `LastValue` 或当前 `EffectiveValue` 替代逐面模拟。科学计数、千分位和快速读取只在展示层生成，不得回写 `Faces`、存档或结算字段。
 
-## 触发点
+## 已实现任务
 
-### 市场
+1. [x] 扩展 hover 候选与活动状态，保存 `DiceTooltipContext` 和可选 `buyPrice`。
+2. [x] 市场货架、市场骰袋和主投掷区分别注册正确上下文。
+3. [x] 用 `BuildDiceTooltipViewModel(...)` 集中生成标签、状态行、价格、关键词和尺寸档位。
+4. [x] 把静态规则与 `Growth / Feed / Devour / TurtleAttachments` 分开绘制。
+5. [x] 六面改为实际生效点数数字格，并接入三档整组格式、唯一最高提示与亿级快速读取。
+6. [x] 面板改为固定宽 `448` 和七档内容高度。
+7. [x] 按上下文接入锚点优先级、避边、新美术资源与程序化回退。
+8. [x] 接入关键词定义 / 绑定配置、占位符替换、去重排序和覆盖校验。
+9. [x] 用配置字段 `show_explanation` 分离正文替换与解释可见性；隐藏 `market_floor / family / dual_family` 时没有写 C# 特例。
+10. [x] 用配置字段 `accent_family` 生成关键词标签色和正文同色下划线，移除通用说明标题。
+11. [x] 使用 Unity 2019.4 Roslyn 响应参数独立编译，并反射验证喂养、幸运龟和四个数字阈值。
+12. [ ] Unity Play Mode、双分辨率截图及实际交互验收。
 
-- 在 `DrawMarketOffer()` 中对骰子商品卡区域注册 hover。
-- 在 `DrawCompactDie()` 中对当前骰袋骰子行注册 hover。
-- 改造道具货架不进入 F014 范围；F013 软关闭期间也不会显示。
+## 触发标签映射边界
 
-### 主投掷区
+首版触发标签只用于快速阅读，推荐集合为：
 
-- 在 `DrawTableDice()` 循环内，对非临时实体骰的 `dieRect` 注册 hover。
-- `rollPhase` 为 `Shaking` 或 `Stopping` 时不显示悬浮窗，避免运动和揭示期间信息闪烁。
-- `Ready / ResultDecision / CheatEdit / StageClear` 可显示。
-- `Scoring` 默认不显示；如果后续已有明确的结算飞字完成状态，可在收束后恢复显示。
-- `StageFailed` 不显示。
+```text
+投掷时 / 结算时 / 购买时 / 卖出时 / 刷新时 / 离场时 / 吸附时 / 常驻
+```
 
-## 时机和渐变状态机
-
-建议用一个轻量状态对象维护悬浮窗，不引入新 UI 框架。
-
-| 字段 | 用途 |
-|---|---|
-| `hoverCandidateKey` | 当前帧鼠标压中的候选对象标识，例如货架序号、骰袋序号或投掷区槽位 |
-| `hoverCandidateStartedAt` | 候选对象第一次被 hover 的时间 |
-| `activeTooltipKey` | 当前已经显示或正在淡出的对象标识 |
-| `activeTooltipDie` | 当前显示内容对应的骰子快照或引用 |
-| `activeTooltipRect` | 当前目标区域，用于计算面板锚点 |
-| `tooltipVisibleStartedAt` | 本次显示开始时间 |
-| `tooltipHideStartedAt` | 本次隐藏开始时间 |
-| `tooltipContentSwapStartedAt` | 已显示状态下切换目标的时间 |
-| `tooltipAlpha` | 当前透明度，绘制时统一作用到面板、文字和图标 |
-| `tooltipState` | `Hidden / Waiting / FadingIn / Visible / Swapping / FadingOut` |
-
-时机常量建议先写成 `const float` 或局部配置常量，后续如果需要再进 CSV：
-
-| 常量 | 建议值 | 说明 |
-|---|---|---|
-| `TooltipHoverDelay` | `0.12f` | 鼠标稳定停留后出现 |
-| `TooltipFadeInDuration` | `0.10f` | 透明度从 `0` 到 `1` |
-| `TooltipFadeOutDuration` | `0.08f` | 鼠标离开后的隐藏时间 |
-| `TooltipContentSwapDuration` | `0.06f` | 已显示时切换目标的内容软替换时间 |
-| `TooltipEnterOffsetY` | `6f` | 淡入时从目标锚点下方轻微上浮 |
-| `TooltipEnterScaleFrom` | `0.98f` | 可选轻微入场缩放，不得更小 |
-
-执行规则：
-
-- 每帧先收集本帧 hover 候选，再在普通 UI 绘制完成后统一调用 `UpdateDiceHoverTooltipState()` 和 `DrawDiceHoverTooltip()`。
-- 候选对象保持不变并超过 `TooltipHoverDelay` 后，进入 `FadingIn`。
-- 鼠标离开所有候选对象后，进入 `FadingOut`。
-- `FadingOut` 期间如果鼠标回到同一个对象，可以直接回到 `Visible` 或 `FadingIn`，不要先清空内容。
-- `Visible` 状态下切换到另一个骰子时，不重新等待 `TooltipHoverDelay`，不重新走完整淡入；更新 `activeTooltipKey / activeTooltipDie / activeTooltipRect`，并在 `TooltipContentSwapDuration` 内完成内容替换。
-- `Shaking`、`Stopping`、`StageFailed` 触发时立即清空 tooltip 状态，不播放完整淡出。
-- `Scoring` 默认视为不可显示；如果程序确认结算飞字完成，可在该时刻后按普通 hover 规则重新开放。
-- 时间使用不受游戏暂停或帧率尖峰影响的当前 UI 时间口径；当前原型可使用 `Time.unscaledTime`。
+一个骰子只显示最主要入口；多入口规则使用“多阶段”，并在静态规则中写清具体条件。所有当前可进入市场池的 `DieType` 都必须有映射或明确回退“常驻”，不能依赖类型名猜测。
 
 ## 绘制规则
 
-- 悬浮窗最后绘制，盖在普通 UI 之上。
-- 悬浮窗不接管鼠标点击。
-- 优先使用运行时素材；如果某个素材缺失，回退到现有程序化 `DrawUiPanel()` / `DrawUiSmallPanel()` 风格，不阻塞运行。
-- 文本全部由程序绘制。
-- 点面格使用 `ui_tooltip_face_cell`，点数 pip 仍由程序绘制。
-- 当前实现不绘制右侧“面 / 效 / 质”页签，也不做页签点击切换。
-- 绘制时把 `tooltipAlpha` 同时作用到背景、文字、点面格和价格胶囊，避免素材先出现、文字后出现。
-- 淡入期间面板整体从最终位置下方 `TooltipEnterOffsetY` 上浮到最终位置；不要做大幅横向滑动。
-- 若实现入场缩放，只允许 `0.98 -> 1.00` 的轻微缩放，不能做夸张弹性曲线。
+- 悬浮窗继续在普通 UI 之后绘制，不接管鼠标。
+- 面板、文字、数字、标签和价格共用同一个 `tooltipAlpha`。
+- 标题和实际六面优先于规则，规则优先于状态，状态与价格优先于最底部关键词解释。
+- 规则不得使用 `TooltipTrim(..., 112)` 之类固定字符裁切；应按实际 GUIStyle 高度测量并选择尺寸档。
+- 同类状态先合并，再选择中版或复杂版；不增加滚动。
+- 新点阵正文必须使用整数像素或已验证的清晰字体路径，辉光与硬核心分开。
 
-## 避边规则
+## 保留的交互状态机
 
-- 基准位置：目标区域右上方。
-- 右侧空间不足时翻到左侧。
-- 上方空间不足时下移。
-- 不得盖住市场购买按钮、底部 `Space` 条和右侧牌型表按钮。
-- 面板必须 clamp 到虚拟画布安全区内。
+- 候选保持 `0.12s` 后进入淡入。
+- 淡入 `0.10s`，离开淡出 `0.08s`。
+- 已显示时切换相邻骰子使用 `0.06s` 内容替换。
+- 排序拖拽、`Shaking`、`Stopping`、`Scoring`、`StageFailed` 立即清空。
+- `Ready`、`ResultDecision`、兼容 `CheatEdit`、`StageClear` 可显示。
 
 ## 不改动
 
-- 不改 `ScoreDice()`。
-- 不改骰子随机、出千、钱包、成长或市场生成。
-- 不改 `SaveVersion`。
-- 不增加存档字段。
-- 不新增材质或类型。
-- 不重新显示 F005 词缀。
+- 不改 `ScoreDice()`、左到右结算队列或单骰贡献反馈。
+- 不改骰子随机、面组、家族效果、饲料、吞吃、吸附或市场价格公式。
+- 不改 `SaveVersion`，不增加存档字段。
+- 不恢复材质或词缀显示。
+- 不删除旧资源回退。
 
-## 静态验证
+## 验证
+
+### 静态
 
 - `git diff --check`。
-- 资源加载 key 能全部命中或有回退。
-- 无新增编译错误。
-- `Resources.Load<Texture2D>("Art/UI/Tooltip/ui_tooltip_panel_clean")` 可加载。
+- 当前可用 `DieType` 的触发标签映射无缺失。
+- 新资源 key 可加载，缺失时程序化回退可用。
+- 新代码不写回 `Die`、`MarketOffer` 或存档。
+- 配表可见词条必须有合法 `accent_family`；隐藏词条允许留空。
+- 覆盖 `9,999 / 10,000 / 99,999 / 100,000` 四个格式边界，最高判断使用完整整数。
 
-## 运行验证
+### 运行
 
-- 市场三个买入货架 hover 均显示悬浮窗。
-- 当前骰袋列表 hover 显示卖价。
-- 主投掷区六颗实体骰 hover 显示悬浮窗。
-- 临时小骰不显示悬浮窗。
-- 鼠标扫过货架不足 `0.12s` 时不弹出。
-- 鼠标稳定停留后约 `0.10s` 淡入完成。
-- 鼠标离开后约 `0.08s` 淡出完成。
-- 已显示时切换到相邻骰子不重复等待和重淡入。
-- `1280x720` 和 `1920x1080` 截图无遮挡、无文本溢出。
-- 靠右货架 hover 时面板向左避边。
-- `Shaking` / `Stopping` 阶段不出现闪烁 tooltip。
-- `Scoring` 默认不显示 tooltip，不遮挡结算飞字。
+- 市场三个货架：买价与预计卖价正确，右侧货架向左避边。
+- 市场骰袋：只显示当前卖出价。
+- 主流程：不显示价格，不显示伪结果或贡献分。
+- 基础、双家族、负数、`9,999 / 10,000 / 99,999 / 100,000 / 128,000,000`、喂养、吞噬、化壳和幸运龟均有覆盖。
+- 科学计数主值、`万 / 亿` 快速读取、唯一最高提示、正文同色下划线和底部关键词标签均清晰；点数区不出现来源标签。
+- `1280x720` 与 `1920x1080` 原始截图中文字锐利、内容不溢出。
+- 延迟、淡入淡出、目标切换、拖拽隐藏和阶段抑制与旧实现一致。
 
 ## 完成后同步
 
-- 已更新 `ACCEPTANCE.md`、`GAME_FLOW.md` 和 `PROJECT_CONTEXT.md` 到静态接入状态。
-- 已同步 `DICE_ARCHETYPES.md` 中的悬浮窗展示数据表边界。
-- UI 截图仍需按 `Docs/UI_ACCEPTANCE_FEEDBACK_WORKFLOW.md` 记录。
-
-## 实现记录
-
-- `DiceKingDemo.cs` 已增加统一 hover 状态机、素材加载、悬浮窗绘制和避边逻辑。
-- 市场待购骰、当前骰袋列表和主投掷区实体骰已注册 hover 候选。
-- 已接入 `0.12s` 停留延迟、`0.10s` 淡入、`0.08s` 淡出和 `0.06s` 目标切换软替换。
-- 已按 `Ready / ResultDecision / CheatEdit / StageClear` 开放，`Shaking / Stopping / Scoring / StageFailed` 抑制。
-- 已新增 `Assets/Resources/Data/dice_type_config.csv`，悬浮窗骰子效果说明改由 CSV 的 `tooltip_effect` 提供。
-- 已移除运行时右侧“面 / 效 / 质”页签绘制和页签素材加载，面板宽度收敛为竖向紧凑简介。
-- 本次未改变 `ScoreDice()`、骰子随机、出千、钱包、成长、市场生成、存档版本或 F005 词缀开关。
+- 更新 `EXECUTION_PLAN.md` 与 `ACCEPTANCE.md`。
+- 如运行行为与当前主文档不同，同步 `PROJECT_CONTEXT.md` 和 `GAME_FLOW.md`。
+- 新资源生成后登记 `ART_ASSETS.md`。
+- 按 `Docs/UI_ACCEPTANCE_FEEDBACK_WORKFLOW.md` 保存截图与人工反馈。

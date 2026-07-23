@@ -1,0 +1,11 @@
+role_id,brightness_grade,target_oklab_l,tolerance,anchor_role,variant_dimension
+focus_amber,L3,0.884625,0.000200,focus_amber,focus-hue
+focus_teal,L3,0.884625,0.000200,focus_amber,focus-hue
+primary_amber,L2,0.845166,0.000200,primary_amber,base
+secondary_amber,L1,0.732400,0.000200,secondary_amber,body-hue
+secondary_warm,L1,0.732400,0.000200,secondary_amber,body-hue
+ambient,L0,0.540435,0.000200,ambient,base
+disabled,Disabled,0.604048,0.000200,disabled,state
+ink_on_light,InkOnLight,0.175499,0.000200,ink_on_light,surface
+warning,L3,0.884625,0.000200,focus_amber,result-hue
+success,L3,0.884625,0.000200,focus_amber,result-hue

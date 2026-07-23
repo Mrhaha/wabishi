@@ -1,7 +1,7 @@
 # F002 程序交接
 
 状态：已实现，待 Unity Play Mode 验证
-功能：F002 商店独特骰系统
+功能：F002 市场独特骰系统
 关联主文档：PROJECT_CONTEXT.md、GAME_FLOW.md、DICE_ARCHETYPES.md
 实现事实来源：Assets/Scripts/DiceKingDemo.cs
 最后更新：2026-06-10
@@ -10,9 +10,9 @@
 
 | 决策 | 状态 | 来源 | 程序影响 |
 |---|---|---|---|
-| 商店商品由类型、面组、材质组成。 | 已确认 | FEATURE_BRIEF.md | 市场生成结构需要扩展。 |
+| 市场商品由类型、面组、材质组成。 | 已确认 | FEATURE_BRIEF.md | 市场生成结构需要扩展。 |
 | 面组差异开放给所有骰子类型。 | 已确认 | 用户确认 | `DiceData` 当前面组继续作为投掷事实来源。 |
-| 每颗商店骰最多一个材质。 | 已确认 | 用户确认 | 只需要材质 key，不需要词缀数组。 |
+| 每颗市场骰最多一个材质。 | 已确认 | 用户确认 | 只需要材质 key，不需要词缀数组。 |
 | 首版五种材质。 | 已确认 | FEATURE_BRIEF.md | 需要五种预览和结算逻辑。 |
 | 词缀系统后置。 | 已确认 | FEATURE_BRIEF.md | 不实现重铸、多词缀、负面词缀。 |
 | 面组模板和价格权重使用审查修订值。 | 已确认 | FEATURE_BRIEF.md、用户确认 | 可进入实现。 |
@@ -92,7 +92,7 @@ Assets/Resources/Data/dice_material_config.csv
 | `weight_ch1_2` | 1-2 章权重 |
 | `weight_ch3_5` | 3-5 章权重 |
 | `weight_ch6_10` | 6-10 章权重 |
-| `short_rule` | 商店短规则 |
+| `short_rule` | 市场短规则 |
 
 首版已确认材质默认值：
 

@@ -1,0 +1,13 @@
+key,value,说明
+lamp_flicker_enabled,1,总开关；0 为关闭吊灯断电事件
+loop_enabled,1,循环开关；0 为每次进入主菜单只演示一次
+first_event_delay,1.00,进入主菜单后首次演示前等待秒数
+idle_interval_min,0.70,一次复亮完成后到下一次断电的最短等待秒数
+idle_interval_max,1.30,一次复亮完成后到下一次断电的最长等待秒数
+power_cut_duration,0.035,常亮到断电的切断时长秒数
+blackout_hold_duration,0.10,完全灯灭的停留时长秒数
+core_relight_duration,0.035,灯芯恢复时长秒数
+glow_relight_duration,0.07,近场光晕恢复时长秒数
+environment_relight_duration,0.14,墙面与地面暖反射恢复时长秒数
+off_strength,1.00,断电强度；0 为无变化；1 为完整灯灭
+input_protection_duration,0.50,菜单输入后暂停触发的保护时长秒数

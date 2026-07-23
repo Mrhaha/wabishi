@@ -1,7 +1,7 @@
 # F002 美术需求
 
 状态：已提案
-功能：F002 商店独特骰系统
+功能：F002 市场独特骰系统
 关联美术文档：PROJECT_CONTEXT.md、ART_ASSETS.md
 最后更新：2026-06-10
 
@@ -12,7 +12,7 @@
 | 首版只做五种材质：`官铁 / 鎏印 / 明釉 / 铅封 / 铜骨`。 | 已确认 | FEATURE_BRIEF.md | 需要五种材质视觉标识。 |
 | 材质不取代骰子类型。 | 已确认 | FEATURE_BRIEF.md | 材质图形必须是辅助标识。 |
 | 不做多词缀装备化。 | 已确认 | FEATURE_BRIEF.md | 不需要复杂稀有边框或大量词条图标。 |
-| 商店卡显示类型、材质、六面和规则。 | 已确认 | FEATURE_BRIEF.md | 材质需要小尺寸可读。 |
+| 市场卡显示类型、材质、六面和规则。 | 已确认 | FEATURE_BRIEF.md | 材质需要小尺寸可读。 |
 
 ## 视觉意图
 
@@ -22,11 +22,11 @@
 
 | 资源 | 用途 | 尺寸 / 格式 | 目标路径 | 来源决策 | 状态 |
 |---|---|---|---|---|---|
-| 官铁材质标识 | 商店卡、骰袋摘要、结果骰角标 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/official_iron_material_icon.png | 官铁规则 | 待生产 |
-| 鎏印材质标识 | 商店卡、骰袋摘要、账本金币触发反馈 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/gilt_seal_material_icon.png | 鎏印规则 | 待生产 |
-| 明釉材质标识 | 商店卡、高点触发反馈 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/clear_glaze_material_icon.png | 明釉规则 | 待生产 |
-| 铅封材质标识 | 商店卡、出千选择反馈 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/lead_seal_material_icon.png | 铅封规则 | 待生产 |
-| 铜骨材质标识 | 商店卡、同点触发反馈 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/copper_bone_material_icon.png | 铜骨规则 | 待生产 |
+| 官铁材质标识 | 市场卡、骰袋摘要、结果骰角标 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/official_iron_material_icon.png | 官铁规则 | 待生产 |
+| 鎏印材质标识 | 市场卡、骰袋摘要、账本金币触发反馈 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/gilt_seal_material_icon.png | 鎏印规则 | 待生产 |
+| 明釉材质标识 | 市场卡、高点触发反馈 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/clear_glaze_material_icon.png | 明釉规则 | 待生产 |
+| 铅封材质标识 | 市场卡、出千选择反馈 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/lead_seal_material_icon.png | 铅封规则 | 待生产 |
+| 铜骨材质标识 | 市场卡、同点触发反馈 | 512x512 透明 PNG | Assets/Resources/Art/DiceMaterials/copper_bone_material_icon.png | 铜骨规则 | 待生产 |
 
 ## 风格关键词
 
@@ -66,7 +66,7 @@
 
 ## 放置 / 运行时用途
 
-- 商店商品卡：材质名旁显示小图标。
+- 市场商品卡：材质名旁显示小图标。
 - 骰袋摘要：可用小角标显示材质。
 - 结果骰：材质触发时高亮对应角标。
 - 结算日志：触发材质时显示材质名和短效果。

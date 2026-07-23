@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f84ba1c1e8d54722a7e6ed345a4b3562, type: 3}
+  m_Name: main_menu_rain_profile
+  m_EditorClassIdentifier: 
+  OutsideRainEnabled: 1
+  GlassWaterEnabled: 1
+  LockPreviewSeed: 1
+  RandomSeed: 777
+  OutsideRainDensity: 1
+  OutsideRainSpeed: 1
+  WindDrift: -0.08
+  FarLayerCount: 34
+  FarSpeedRange: {x: 170, y: 240}
+  FarLengthRange: {x: 18, y: 40}
+  FarWidthRange: {x: 1, y: 2}
+  FarOpacity: 0.18
+  NearLayerCount: 18
+  NearSpeedRange: {x: 480, y: 650}
+  NearLengthRange: {x: 50, y: 105}
+  NearWidthRange: {x: 1.5, y: 3}
+  NearOpacity: 0.3
+  ImpactRate: 1
+  ActiveDropletRange: {x: 8, y: 14}
+  ClusterCountRange: {x: 2, y: 3}
+  SpawnRegionNormalized: {x: 0.06, y: 0.06, z: 0.94, w: 0.72}
+  ClusterSpread: 64
+  ContactImpactChance: 0.4
+  DropletSizeRange: {x: 7, y: 14}
+  DropletLifetimeRange: {x: 8, y: 18}
+  SurfaceHoldRange: {x: 0.55, y: 1.8}
+  SurfaceCreepSpeedRange: {x: 0.35, y: 1.4}
+  MergeRadius: 2
+  MergeSpeed: 52
+  FlowThreshold: 4
+  GlassOpacity: 0.72
+  FlowSpeedRange: {x: 72, y: 120}
+  FlowLengthRange: {x: 0.25, y: 0.55}
+  FlowWidthRange: {x: 5, y: 10}
+  MaxConcurrentFlows: 2
+  BranchChance: 0.15
+  PauseChance: 0.3
+  FlowPauseRange: {x: 0.15, y: 0.48}
+  FlowHoldDuration: 1.6

@@ -1,74 +1,81 @@
 # F014 美术需求
 
-状态：运行时 UI 素材已生成；当前实现不绘制页签
+状态：美术就绪；视觉母版与正式无字运行时素材已完成
 功能：骰子悬浮窗 UI
 关联美术文档：PROJECT_CONTEXT.md、ART_ASSETS.md
+最后更新：2026-07-22
 
-## 输入决策
+## 已通过视觉母版
 
-- 当前实现方向：竖版紧凑悬浮窗，不显示右侧“面 / 效 / 质”页签。
-- 不要纸页厚度、账册装订、书脊、铆钉、多层纸张或翻页感。
-- 商店待购骰和主投掷区骰使用同一套素材。
-- 文字、点数和价格不烘焙进图片，由程序按运行时数据绘制。
+- 源图：`Assets/ArtSource/Production/ArcadeDiceKing/DiceTooltipV1/arcade_dice_king_tooltip_three_state_contact_v1_20260717.png`。
+- 验收结论：用户于 2026-07-17 回复“接受”，样张成为 F014 新方向的视觉与容量母版。
+- 样张覆盖基础简版、复杂动态状态版和市场价格版，并验证双家族、负数、三位数、四位数、饲料、吞吃和吸附信息。
+- 该图仍只位于 `Assets/ArtSource/`，没有 Unity 加载 key；不得直接裁切带字区域进入 `Assets/Resources/Art/`。
 
 ## 视觉意图
 
-悬浮窗应像轻量桌游 UI 控件，而不是一本小账册。主体是单层温暖浅色竖向面板；材质保持明亮、克制、可读，适合压在当前主场景背景上。
-
-## 资源清单
-
-| 资源 | 用途 | 目标路径 | Unity 加载 key | 状态 |
-|---|---|---|---|---|
-| 主面板 | 悬浮窗空面板，程序绘制文字和点数 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_panel_clean.png` | `Art/UI/Tooltip/ui_tooltip_panel_clean` | 已生成 |
-| 侧栏细轨 | 历史页签轨道素材 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_side_rail.png` | 当前不加载 | 已生成，当前未使用 |
-| 当前页签 | 历史页签底素材 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_tab_active.png` | 当前不加载 | 已生成，当前未使用 |
-| 骰效页签 | 历史页签底素材 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_tab_idle_blue.png` | 当前不加载 | 已生成，当前未使用 |
-| 质效页签 | 历史页签底素材 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_tab_idle_green.png` | 当前不加载 | 已生成，当前未使用 |
-| 卖价胶囊 | 卖出价底和金币图形 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_price_chip.png` | `Art/UI/Tooltip/ui_tooltip_price_chip` | 已生成 |
-| 骰效标签 | 骰子效果字段标签底 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_label_chip_blue.png` | `Art/UI/Tooltip/ui_tooltip_label_chip_blue` | 已生成 |
-| 质效标签 | 品质效果字段标签底 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_label_chip_green.png` | `Art/UI/Tooltip/ui_tooltip_label_chip_green` | 已生成 |
-| 点面格 | 单个点面格底，点数由程序绘制 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_face_cell.png` | `Art/UI/Tooltip/ui_tooltip_face_cell` | 已生成 |
-
-## 源图和预览
-
-- 运行时素材源图：`Assets/ArtSource/Production/Tooltip/runtime_ui_sources/`
-- 运行时素材预览：`Assets/ArtSource/Production/Tooltip/tooltip_runtime_ui_assets_preview_20260616.png`
-- V10 接触图：`Assets/ArtSource/Production/Tooltip/tooltip_vertical_side_tabs_clean_v10_20260616.png`
-- V10 说明：`Assets/ArtSource/Production/Tooltip/tooltip_vertical_side_tabs_notes_v10_20260616.md`
+悬浮窗是一块安装在午夜旧机厅竞技台上的轻量检修终端，不是纸卡、账本、军工设备或现代霓虹 HUD。玩家第一眼先识别骰子类型和六面分布，第二眼读取完整规则，最后只在需要时读取个体状态和价格。
 
 ## 风格关键词
 
-- 明亮扁平 2D。
-- 温暖浅色桌游 UI。
-- 单层浮窗。
-- 单层竖向浮窗。
-- 干净、紧凑、少装饰。
+- 深海军蓝老化塑料与暗色喷漆金属。
+- 烟熏玻璃、轻微旧式贴花和克制磨损。
+- 琥珀点阵为主信息色，青白磷光只用于状态和选中提示。
+- 锈红只用于危险或负向提示，不做整块红色警报。
+- 轮廓硬朗但不过度铆钉化，保持旧娱乐街机而非工业控制台。
+- 可爱但不幼态，信息密度高但仍像游戏界面。
 
-## 必须保留
+## 布局母版
 
-- 单层面板感。
-- 不显示右侧页签。
-- 文字和点数由程序绘制。
-- 商店和投掷区共用。
-- 鼠标悬浮时信息清晰，不抢主界面。
+| 档位 | 1280 虚拟尺寸 | 用途 | 内容 |
+|---|---:|---|---|
+| 简版 | 约 `448×196` | 基础骰、无个体状态、主流程 | 头部、六面、静态规则 |
+| 中版 | 约 `448×244` | 有一至两条状态或市场经济栏 | 简版内容加状态或价格 |
+| 复杂版 | 约 `448×288` | 双家族、三条以上状态或复杂市场商品 | 完整状态与经济栏 |
+
+三档宽度固定、高度分档，避免把装饰面板任意纵向拉伸。主画面与市场共用同一套框架，只改变显示模块和锚点。
+
+## 正式运行时素材计划
+
+以下资源已按通过的视觉母版生成并登记，程序已经静态接入；Unity 运行验收仍待执行。程序内容高度超过 `288` 时复用复杂版底件扩展到 `352 / 416 / 480`，需在双分辨率验收中特别检查纵向拉伸观感。
+
+| 资源 | 目标文件 | Unity 加载 key | 规格 | 状态 |
+|---|---|---|---|---|
+| 简版无字面板 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_panel_short.png` | `Art/UI/Tooltip/ui_tooltip_arcade_panel_short` | `896×392` RGBA，按 `2×` 制作 | 已生成 |
+| 中版无字面板 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_panel_medium.png` | `Art/UI/Tooltip/ui_tooltip_arcade_panel_medium` | `896×488` RGBA，按 `2×` 制作 | 已生成 |
+| 复杂版无字面板 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_panel_tall.png` | `Art/UI/Tooltip/ui_tooltip_arcade_panel_tall` | `896×576` RGBA，按 `2×` 制作 | 已生成 |
+| 数字面格 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_face_cell.png` | `Art/UI/Tooltip/ui_tooltip_arcade_face_cell` | `120×88` RGBA，中心深色，能承载 `-12` 与 `8888` | 已生成 |
+| 类型芯框 | `Assets/Resources/Art/UI/Tooltip/ui_tooltip_arcade_type_core_frame.png` | `Art/UI/Tooltip/ui_tooltip_arcade_type_core_frame` | `128×128` RGBA，复用现有骰子类型图标 | 已生成 |
+
+家族、触发、状态和价格胶囊优先由程序绘制可变宽底色与边框，不为每个文案生成固定贴图。分隔线和小螺钉也优先程序绘制，减少拉伸伪影和资源数量。
+
+生产源、构建脚本、透明预览和机器指标位于 `Assets/ArtSource/Production/ArcadeDiceKing/DiceTooltipV1/RuntimeSourcesV1/`。五张运行图的尺寸均与表格一致，绿色残边自动检查为零至两个边缘像素，人工透明棋盘预览未发现可见色键残留。
+
+## 生产边界
+
+- 所有运行时素材必须是无字、无数字、无价格的干净底件。
+- 正式素材需根据已通过样张重绘，不能从生成图硬裁。
+- 三档面板四角透明，边缘无白边或色键残留。
+- 数字格必须同时检查 `-12 / 888 / 8888`，不能只用 `1–6` 验证。
+- 青色外轮廓保持克制，若实机抢过琥珀主信息，可降低约四分之一亮度。
+- 运行时字体必须先通过无辉光硬核心清晰度，再单独添加受限辉光。
 
 ## 避免
 
-- 不做纸页厚度。
-- 不做账册装订。
-- 不做书脊和铆钉。
-- 不做多层纸边。
-- 不做翻页动效暗示。
-- 不把大段中文说明烘焙进图片。
+- 羊皮纸、账本装订、书脊、卷边、印章和王冠。
+- 蒸汽管线、密集铆钉、军工箱体、压力表和机械仪表盘。
+- 现代玻璃拟态、赛博霓虹、全边发光和蓝紫渐变。
+- 把中文规则、数字、家族名或价格烘焙进图片。
+- 页签、滚动条、空材质区和无功能装饰按钮。
 
-## 生成 / 来源备注
+## 旧资源处理
 
-本轮资源是基于 V10 接触图拆出的最小运行时素材包。面板当前可作为固定比例素材使用；如果程序实现时需要更灵活缩放，应优先保留程序化面板绘制，只使用胶囊和标签素材，不强行拉伸整张面板。侧栏和页签素材保留为历史资源，当前 F014 运行时不加载、不绘制。
+`Assets/Resources/Art/UI/Tooltip/` 中现有浅色竖版资源和 `336×400` 程序布局继续作为旧版回退。新方向完成 `1280x720` 与 `1920x1080` 运行验收前不得删除、改名或覆盖旧文件；新资源使用 `ui_tooltip_arcade_*` 独立命名。
 
-## 验收
+## 美术验收
 
-- 预览图可读，没有回到 V9 账册感。
-- 运行时 PNG 四角透明。
-- 已生成 `.meta`。
-- 素材内没有业务文字和骰子点数。
-- 资源已登记到 `ART_ASSETS.md`。
+- 与当前午夜旧机厅主游戏截图放在一起时材质、色温和年代感一致。
+- 基础、中等、复杂三档在实际尺寸下都能一眼分清标题、六面、规则和状态。
+- 面板不抢过骰子本体、目标积分和底部主操作。
+- 透明边缘干净，三档固定比例不依赖危险拉伸。
+- 文件名、尺寸、加载 key 和 `ART_ASSETS.md` 登记一致。

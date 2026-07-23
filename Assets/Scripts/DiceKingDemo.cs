@@ -19,11 +19,86 @@ public sealed class DiceKingDemo : MonoBehaviour
         GameOver
     }
 
+    private enum MainMenuSelection
+    {
+        NewGame,
+        Continue,
+        Settings,
+        Quit
+    }
+
+    private enum SettingsSelection
+    {
+        Volume,
+        SettlementPlayback,
+        DisplayMode,
+        Resolution,
+        DynamicEffects
+    }
+
+    private enum DisplayModeSetting
+    {
+        Windowed = 0,
+        BorderlessFullscreen = 1,
+        ExclusiveFullscreen = 2
+    }
+
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    private struct NativeWindowRect
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern IntPtr GetActiveWindow();
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool IsZoomed(IntPtr windowHandle);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool GetClientRect(IntPtr windowHandle, out NativeWindowRect clientRect);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr windowHandle, int command);
+#endif
+
     private enum DieType
     {
         Basic,
         Piggy,
+        PigFarmer,
+        MeatPig,
+        TradePig,
+        SowPig,
+        ThreeLittlePigs,
+        GreedyPig,
+        FeedWholesaler,
+        Imp,
+        Devourer,
+        Demon,
+        DemonBat,
+        AbyssSummon,
+        Tribute,
         Turtle,
+        MoneyTurtle,
+        TinyTurtle,
+        DoubleTurtle,
+        LuckyTurtle,
+        MagnetTurtle,
+        RallyTurtle,
+        LeaderTurtle,
+        RefreshPirate,
+        PlunderPirate,
+        CrewPirate,
+        PirateCaptain,
+        TrainingPirate,
+        TreasurePirate,
+        RobberyPirate,
+        PirateKing,
         Double,
         Odd,
         Even,
@@ -63,7 +138,46 @@ public sealed class DiceKingDemo : MonoBehaviour
         RingTree,
         FertilizerTree,
         PruningTree,
-        RootTree
+        RootTree,
+        Lightfang,
+        Duet,
+        Trigger,
+        Crown,
+        Relief,
+        Airstrike,
+        Pact,
+        Stitch,
+        BlackSailBat,
+        PackTurtle,
+        TributePig,
+        BlackMarketImp,
+        BloodPactCaptain,
+        ClearancePig,
+        SupplyPig,
+        SharedFeastDemonTurtle,
+        SafetyNetTurtle
+    }
+
+    private enum MainFamily
+    {
+        None,
+        Pig,
+        Devil,
+        Turtle,
+        Pirate
+    }
+
+    private enum FamilySettlementEffectKind
+    {
+        None,
+        PigFarmer,
+        MeatPig,
+        SowPig,
+        ThreeLittlePigs,
+        GreedyPig,
+        PlunderPirate,
+        TreasurePirate,
+        PirateKing
     }
 
     private enum TreePatternTarget
@@ -119,6 +233,19 @@ public sealed class DiceKingDemo : MonoBehaviour
         Danger
     }
 
+    private enum ArcadeMarketButtonResult
+    {
+        None,
+        Activated,
+        Blocked
+    }
+
+    private enum ActionTipSemantic
+    {
+        Success,
+        Warning
+    }
+
     private enum RunUiIcon
     {
         Coin,
@@ -136,6 +263,20 @@ public sealed class DiceKingDemo : MonoBehaviour
         Visible,
         Swapping,
         FadingOut
+    }
+
+    private enum DiceTooltipContext
+    {
+        Run,
+        MarketBag,
+        MarketOffer
+    }
+
+    private enum TooltipFaceDisplayMode
+    {
+        SingleRowExact,
+        GridExact,
+        GridScientific
     }
 
     private enum RunScoreCounterPhase
@@ -164,6 +305,17 @@ public sealed class DiceKingDemo : MonoBehaviour
         Burst
     }
 
+    private enum TypeCoreIdleMotion
+    {
+        Stable,
+        DualPulse,
+        Transmission,
+        Click,
+        Intake,
+        Output,
+        Echo
+    }
+
     private enum SettlementEventKind
     {
         SlotScore,
@@ -189,6 +341,27 @@ public sealed class DiceKingDemo : MonoBehaviour
         Target
     }
 
+    private enum SettlementFeedbackTier
+    {
+        Miss,
+        Pass,
+        Exceed,
+        FarExceed,
+        Critical
+    }
+
+    private enum SettlementAudioCue
+    {
+        Absorb,
+        Negative,
+        Latch,
+        Relay,
+        Overload,
+        Pressure,
+        Breakthrough,
+        Aftershock
+    }
+
     private enum MarketRoute
     {
         None,
@@ -203,8 +376,29 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private enum MarketOfferKind
     {
+        Empty,
         Die,
         CraftingItem
+    }
+
+    private enum MarketActionKind
+    {
+        BuyDie,
+        SellDie
+    }
+
+    private enum DiceOrderDragSurface
+    {
+        None,
+        RunTable,
+        MarketBag
+    }
+
+    private enum TurtleAttachmentSource
+    {
+        RealTurtle,
+        BasicShell,
+        LeaderCopy
     }
 
     private sealed class AffixInstance
@@ -222,6 +416,25 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
     }
 
+    private sealed class TurtleAttachment
+    {
+        public DieType Type;
+        public int FaceGain;
+        public int SellValue;
+        public TurtleAttachmentSource Source;
+
+        public TurtleAttachment Clone()
+        {
+            return new TurtleAttachment
+            {
+                Type = Type,
+                FaceGain = FaceGain,
+                SellValue = SellValue,
+                Source = Source
+            };
+        }
+    }
+
     private sealed class Die
     {
         public int Id;
@@ -233,11 +446,20 @@ public sealed class DiceKingDemo : MonoBehaviour
         public int EffectiveValue;
         public int Score;
         public int Growth;
+        public int FeedCount;
+        public int FeedValue;
+        public int LastDevourGain;
+        public string LastDevourSource;
+        public string LastDevourTrigger;
+        public int InstanceSellValue = -1;
+        public int PigTemporaryScoreBonus;
+        public int NeutralTemporaryScoreBonus;
         public int TargetFace;
         public TreePatternTarget PatternTarget;
         public int GamblerThreshold;
         public int InvestmentGold;
         public bool CollectionTriggeredThisStage;
+        public List<TurtleAttachment> TurtleAttachments = new List<TurtleAttachment>();
         public List<AffixInstance> PrefixAffixes = new List<AffixInstance>();
         public List<AffixInstance> SuffixAffixes = new List<AffixInstance>();
         public bool LoneWitnessRerolled;
@@ -265,11 +487,20 @@ public sealed class DiceKingDemo : MonoBehaviour
                 EffectiveValue = 0,
                 Score = 0,
                 Growth = Growth,
+                FeedCount = FeedCount,
+                FeedValue = FeedValue,
+                LastDevourGain = LastDevourGain,
+                LastDevourSource = LastDevourSource,
+                LastDevourTrigger = LastDevourTrigger,
+                InstanceSellValue = InstanceSellValue,
+                PigTemporaryScoreBonus = 0,
+                NeutralTemporaryScoreBonus = 0,
                 TargetFace = 0,
                 PatternTarget = TreePatternTarget.None,
                 GamblerThreshold = 0,
                 InvestmentGold = 0,
                 CollectionTriggeredThisStage = false,
+                TurtleAttachments = CloneTurtleAttachments(TurtleAttachments),
                 PrefixAffixes = CloneAffixes(PrefixAffixes),
                 SuffixAffixes = CloneAffixes(SuffixAffixes),
                 LoneWitnessRerolled = false,
@@ -284,6 +515,25 @@ public sealed class DiceKingDemo : MonoBehaviour
                 Temporary = Temporary,
                 RoundNote = string.Empty
             };
+        }
+
+        private static List<TurtleAttachment> CloneTurtleAttachments(List<TurtleAttachment> attachments)
+        {
+            List<TurtleAttachment> result = new List<TurtleAttachment>();
+            if (attachments == null)
+            {
+                return result;
+            }
+
+            for (int i = 0; i < attachments.Count; i++)
+            {
+                if (attachments[i] != null)
+                {
+                    result.Add(attachments[i].Clone());
+                }
+            }
+
+            return result;
         }
 
         private static List<AffixInstance> CloneAffixes(List<AffixInstance> affixes)
@@ -304,6 +554,25 @@ public sealed class DiceKingDemo : MonoBehaviour
 
             return result;
         }
+    }
+
+    private sealed class FamilySettlementEffectEvent
+    {
+        public FamilySettlementEffectKind Kind;
+        public MainFamily Family;
+        public int SourceDieId;
+        public bool Copied;
+        public bool Copyable;
+        public string Label;
+    }
+
+    private sealed class FamilySettlementContext
+    {
+        public readonly HashSet<int> SettledIds = new HashSet<int>();
+        public readonly Dictionary<int, FamilySettlementEffectEvent> LatestCopyableBySourceId = new Dictionary<int, FamilySettlementEffectEvent>();
+        public int IndividualScore;
+        public int TriggerDiceCount;
+        public int CopiedEventDepth;
     }
 
     private sealed class Encounter
@@ -353,6 +622,73 @@ public sealed class DiceKingDemo : MonoBehaviour
         public Die Die;
         public CraftingItemDefinition CraftingItem;
         public int Price;
+    }
+
+    private sealed class DiceTooltipViewModel
+    {
+        public Die Die;
+        public DiceTooltipContext Context;
+        public int BuyPrice;
+        public int SellPrice;
+        public string DisplayName;
+        public string TriggerLabel;
+        public string RuleText;
+        public int RuleLineCount;
+        public float RuleHeight;
+        public readonly int[] EffectiveFaces = new int[6];
+        public TooltipFaceDisplayMode FaceDisplayMode;
+        public float FaceGridHeight;
+        public int UniqueHighestFaceIndex = -1;
+        public float KeywordSectionHeight;
+        public float PanelHeight;
+        public readonly List<string> FamilyLabels = new List<string>();
+        public readonly List<string> StateRows = new List<string>();
+        public readonly List<TooltipKeywordViewModel> Keywords = new List<TooltipKeywordViewModel>();
+        public readonly List<MainGameLedFont.HighlightSpan> RuleHighlights = new List<MainGameLedFont.HighlightSpan>();
+
+        public bool ShowBuyPrice
+        {
+            get { return Context == DiceTooltipContext.MarketOffer; }
+        }
+
+        public bool ShowSellPrice
+        {
+            get { return Context == DiceTooltipContext.MarketOffer || Context == DiceTooltipContext.MarketBag; }
+        }
+
+        public bool ShowEconomy
+        {
+            get { return ShowBuyPrice || ShowSellPrice; }
+        }
+    }
+
+    private sealed class TooltipKeywordViewModel
+    {
+        public string Key;
+        public string DisplayName;
+        public string Explanation;
+        public string AccentFamily;
+        public int DisplayOrder;
+        public int DefaultOrder;
+        public int LineCount;
+    }
+
+    private sealed class KeywordGlossaryConfig
+    {
+        public string Key;
+        public string DisplayName;
+        public string Explanation;
+        public string AccentFamily;
+        public int DefaultOrder;
+        public bool ShowExplanation;
+    }
+
+    private sealed class KeywordBindingConfig
+    {
+        public string SourceKind;
+        public string SourceKey;
+        public string KeywordKey;
+        public int DisplayOrder;
     }
 
     private sealed class MarketDieConfig
@@ -450,6 +786,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private sealed class RollFeedbackConfig
     {
         public float StartResponseTime;
+        public float BaseSpinDuration;
         public float InputWindowDuration;
         public float InputDebounce;
         public int MaxImpulseCount;
@@ -476,14 +813,15 @@ public sealed class DiceKingDemo : MonoBehaviour
             return new RollFeedbackConfig
             {
                 StartResponseTime = 0.15f,
-                InputWindowDuration = 1.35f,
+                BaseSpinDuration = 0.56f,
+                InputWindowDuration = 0f,
                 InputDebounce = 0.06f,
                 MaxImpulseCount = 8,
                 BasePower = 0.45f,
                 ImpulsePower = 0.18f,
                 MaxPower = 1.75f,
                 PowerDecayPerSecond = 0.22f,
-                StopDuration = 0.9f,
+                StopDuration = 0.66f,
                 StopMinPower = 0.02f,
                 ExpiredPromptDuration = 0.12f,
                 CupXAmplitude = 32f,
@@ -504,6 +842,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return new RollFeedbackConfig
             {
                 StartResponseTime = StartResponseTime,
+                BaseSpinDuration = BaseSpinDuration,
                 InputWindowDuration = InputWindowDuration,
                 InputDebounce = InputDebounce,
                 MaxImpulseCount = MaxImpulseCount,
@@ -534,8 +873,11 @@ public sealed class DiceKingDemo : MonoBehaviour
                 case "start_response_time":
                     StartResponseTime = ClampConfigFloat(value, 0f, 1f, StartResponseTime);
                     return true;
+                case "base_spin_duration":
+                    BaseSpinDuration = ClampConfigFloat(value, 0.05f, 3f, BaseSpinDuration);
+                    return true;
                 case "input_window_duration":
-                    InputWindowDuration = ClampConfigFloat(value, 0.1f, 5f, InputWindowDuration);
+                    InputWindowDuration = ClampConfigFloat(value, 0f, 5f, InputWindowDuration);
                     return true;
                 case "input_debounce":
                     InputDebounce = ClampConfigFloat(value, 0f, 0.3f, InputDebounce);
@@ -600,6 +942,140 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
     }
 
+    private sealed class MainMenuVisualConfig
+    {
+        public bool LampFlickerEnabled;
+        public bool LoopEnabled;
+        public float FirstEventDelay;
+        public float IdleIntervalMin;
+        public float IdleIntervalMax;
+        public float PowerCutDuration;
+        public float BlackoutHoldDuration;
+        public float CoreRelightDuration;
+        public float GlowRelightDuration;
+        public float EnvironmentRelightDuration;
+        public float OffStrength;
+        public float InputProtectionDuration;
+
+        public static MainMenuVisualConfig CreateDefault()
+        {
+            return new MainMenuVisualConfig
+            {
+                LampFlickerEnabled = true,
+                LoopEnabled = true,
+                FirstEventDelay = 1f,
+                IdleIntervalMin = 0.70f,
+                IdleIntervalMax = 1.30f,
+                PowerCutDuration = 0.035f,
+                BlackoutHoldDuration = 0.10f,
+                CoreRelightDuration = 0.035f,
+                GlowRelightDuration = 0.07f,
+                EnvironmentRelightDuration = 0.14f,
+                OffStrength = 1f,
+                InputProtectionDuration = 0.5f
+            };
+        }
+
+        public bool ApplyValue(string key, float value)
+        {
+            switch (key.Trim().ToLowerInvariant())
+            {
+                case "lamp_flicker_enabled":
+                    LampFlickerEnabled = value > 0f;
+                    return true;
+                case "loop_enabled":
+                    LoopEnabled = value > 0f;
+                    return true;
+                case "first_event_delay":
+                    FirstEventDelay = ClampConfigFloat(value, 0f, 120f, FirstEventDelay);
+                    return true;
+                case "idle_interval_min":
+                    IdleIntervalMin = ClampConfigFloat(value, 0.1f, 600f, IdleIntervalMin);
+                    return true;
+                case "idle_interval_max":
+                    IdleIntervalMax = ClampConfigFloat(value, 0.1f, 600f, IdleIntervalMax);
+                    return true;
+                case "power_cut_duration":
+                    PowerCutDuration = ClampConfigFloat(value, 0.01f, 1f, PowerCutDuration);
+                    return true;
+                case "blackout_hold_duration":
+                    BlackoutHoldDuration = ClampConfigFloat(value, 0f, 3f, BlackoutHoldDuration);
+                    return true;
+                case "core_relight_duration":
+                    CoreRelightDuration = ClampConfigFloat(value, 0.01f, 2f, CoreRelightDuration);
+                    return true;
+                case "glow_relight_duration":
+                    GlowRelightDuration = ClampConfigFloat(value, 0.01f, 3f, GlowRelightDuration);
+                    return true;
+                case "environment_relight_duration":
+                    EnvironmentRelightDuration = ClampConfigFloat(value, 0.01f, 4f, EnvironmentRelightDuration);
+                    return true;
+                case "off_strength":
+                    OffStrength = ClampConfigFloat(value, 0f, 1f, OffStrength);
+                    return true;
+                case "input_protection_duration":
+                    InputProtectionDuration = ClampConfigFloat(value, 0f, 10f, InputProtectionDuration);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void Normalize()
+        {
+            IdleIntervalMax = Mathf.Max(IdleIntervalMin, IdleIntervalMax);
+            GlowRelightDuration = Mathf.Max(CoreRelightDuration, GlowRelightDuration);
+            EnvironmentRelightDuration = Mathf.Max(GlowRelightDuration, EnvironmentRelightDuration);
+        }
+    }
+
+    private sealed class MainMenuRainStreak
+    {
+        public bool Initialized;
+        public float X;
+        public float Y;
+        public float Speed;
+        public float Length;
+        public float Width;
+        public float Phase;
+    }
+
+    private sealed class MainMenuGlassDrop
+    {
+        public bool Active;
+        public int ClusterIndex;
+        public Vector2 Position;
+        public float Age;
+        public float Lifetime;
+        public float SurfaceHoldTime;
+        public float Size;
+        public float Mass;
+        public float CreepSpeed;
+        public float Phase;
+    }
+
+    private sealed class MainMenuGlassFlow
+    {
+        public bool Active;
+        public Vector2 Origin;
+        public float CurrentLength;
+        public float TargetLength;
+        public float Speed;
+        public float Width;
+        public float CurveAmplitude;
+        public float CurvePhase;
+        public float CurveDirection;
+        public bool HasBranch;
+        public float BranchStartFraction;
+        public float BranchDirection;
+        public bool HasPause;
+        public float PauseAtFraction;
+        public bool PauseTriggered;
+        public float PauseRemaining;
+        public float HoldTimer;
+        public float Fade;
+    }
+
     private sealed class TableDieView
     {
         public Die Die;
@@ -616,6 +1092,13 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         public int DieId;
         public float Seed;
+    }
+
+    private sealed class TypeCoreIdlePulse
+    {
+        public int DieId;
+        public float StartedAt;
+        public float Duration;
     }
 
     private sealed class RunScoreCounterState
@@ -646,6 +1129,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         public SettlementEventKind Kind;
         public int SlotIndex = -1;
+        public int CursorSlotIndex = -1;
         public int ScoreIndex = -1;
         public int ScoreIndexEnd = -1;
         public int DieId;
@@ -662,6 +1146,23 @@ public sealed class DiceKingDemo : MonoBehaviour
         public bool ApplyCounterStep;
         public bool ApplyFinal;
         public bool Passed;
+        public bool UseCommittedSnapshot;
+        public bool CounterApplied;
+        public bool LocalChain;
+        public bool IncludesTemporaryScore;
+        public float LocalImpactWeight01;
+        public SettlementFeedbackTier FeedbackTier;
+    }
+
+    private sealed class SettlementContributionRecord
+    {
+        public int SourceDieId;
+        public int SourceSlotIndex = -1;
+        public int CursorSlotIndex = -1;
+        public int SignedBaseDelta;
+        public string SemanticLabel;
+        public bool LocalChain;
+        public bool IncludesTemporaryScore;
     }
 
     private struct TurtlePreviewStats
@@ -686,22 +1187,35 @@ public sealed class DiceKingDemo : MonoBehaviour
     private const float VirtualWidth = 1280f;
     private const float VirtualHeight = 720f;
     private const float PrototypeToDesignScale = 1.5f;
+    private const float ActionTipFlyInDuration = 0.16f;
+    private const float ActionTipHoldDuration = 0.50f;
+    private const float ActionTipFadeOutDuration = 0.25f;
+    private const float ActionTipFlyDistance = 28f;
+    private const float ActionTipFadeDistance = 10f;
+    private const float ActionTipPanelWidth = 320f;
+    private const float ActionTipPanelHeight = 58f;
+    private const float ActionTipUpperCenterX = VirtualWidth * 0.5f;
+    private const float ActionTipUpperCenterY = 200f;
+    private const float ArcadeMarketBlockedFeedbackDuration = 0.18f;
     private const int DiceCapacity = 6;
-    private const int RollsPerStage = 3;
-    private const int CheatsPerStage = 1;
+    private const bool V02HandScoringEnabled = false;
+    private const bool V02CheatEnabled = false;
+    private const int RollsPerStage = 1;
+    private const int CheatsPerStage = 0;
     private const int MaxCheatRerollDice = 3;
     private const int TemporaryDiceDisplayLimit = 8;
     private const int MaxPrefixAffixes = 2;
     private const int MaxSuffixAffixes = 2;
     private const int BaseScorePerPip = 1;
-    private const float ScoreStepDuration = 0.25f;
-    private const float FinalScoreDuration = 0.34f;
-    private const float ScoreCounterPulseDuration = 0.24f;
-    private const float SettlementSlotDuration = 0.2f;
-    private const float SettlementRouteDuration = 0.22f;
-    private const float SettlementMultiplierDuration = 0.24f;
-    private const float SettlementFinalDuration = 0.34f;
-    private const float SettlementTargetDuration = 0.3f;
+    private const float ScoreStepDuration = 0.55f;
+    private const float FinalScoreDuration = 0.68f;
+    private const float ScoreCounterPulseDuration = 0.38f;
+    private const float SettlementSlotDuration = 0.55f;
+    private const float SettlementRouteDuration = 0.48f;
+    private const float SettlementMultiplierDuration = 0.58f;
+    private const float SettlementFinalDuration = 0.68f;
+    private const float SettlementTargetDuration = 0.72f;
+    private const float MarketLeaveEffectDuration = 0.62f;
     private const float DiceVisualEnterDuration = 0.28f;
     private const float DiceVisualEnterStagger = 0.025f;
     private const float DiceVisualRevealDuration = 0.72f;
@@ -713,10 +1227,12 @@ public sealed class DiceKingDemo : MonoBehaviour
     private const int DiceRollStopFrameCount = 8;
     private const int DiceRollResultFaceCount = 6;
     private const string SavePrefix = "DiceKingDemo.";
-    private const int CurrentSaveVersion = 4;
+    private const int CurrentSaveVersion = 12;
     private const string EncounterTableResourcePath = "Data/chapter_score_table";
     private const string MarketDieConfigResourcePath = "Data/dice_market_config";
     private const string DiceTypeConfigResourcePath = "Data/dice_type_config";
+    private const string KeywordGlossaryConfigResourcePath = "Data/keyword_glossary_config";
+    private const string KeywordBindingConfigResourcePath = "Data/keyword_binding_config";
     private const string MarketRuleConfigResourcePath = "Data/market_rule_config";
     private const string DiceMaterialConfigResourcePath = "Data/dice_material_config";
     private const string DiceAffixTierConfigResourcePath = "Data/dice_affix_tier_config";
@@ -725,6 +1241,66 @@ public sealed class DiceKingDemo : MonoBehaviour
     private const string GlobalConfigResourcePath = "Data/global";
     private const string RollFeedbackConfigResourcePath = "Data/roll_feedback_config";
     private const string RollFeedbackConfigOverrideFileName = "roll_feedback_config.csv";
+    private const string MainMenuVisualConfigResourcePath = "Data/main_menu_visual_config";
+    private const string MainMenuArtResourcePrefix = "Art/MainMenu/";
+    private const string MainMenuLampOnResourcePath = MainMenuArtResourcePrefix + "arcade_main_menu_lamp_on";
+    private const string MainMenuLampOffResourcePath = MainMenuArtResourcePrefix + "arcade_main_menu_lamp_off";
+    private const string MainMenuLampGlowResourcePath = MainMenuArtResourcePrefix + "arcade_main_menu_lamp_glow";
+    private const string MainMenuLampCoreResourcePath = MainMenuArtResourcePrefix + "arcade_main_menu_lamp_core";
+    private const string MainMenuWindowCleanPatchResourcePath = MainMenuArtResourcePrefix + "arcade_main_menu_window_clean_patch";
+    private const string MainMenuMarqueeOffResourcePath = MainMenuArtResourcePrefix + "arcade_main_menu_marquee_off_patch";
+    private const string MainMenuMarqueeGlowResourcePath = MainMenuArtResourcePrefix + "arcade_main_menu_marquee_glow_patch";
+    private const string MainGameArtResourcePrefix = "Art/MainGame/";
+    private const string MainGameCommonBaseResourcePath = MainGameArtResourcePrefix + "arcade_main_game_common_base";
+    private const string MainGameNeutralShellResourcePath = MainGameArtResourcePrefix + "arcade_main_game_die_shell_neutral";
+    private const string MainGamePigShellResourcePath = MainGameArtResourcePrefix + "arcade_main_game_die_shell_pig";
+    private const string MainGameTurtleShellResourcePath = MainGameArtResourcePrefix + "arcade_main_game_die_shell_turtle";
+    private const string MainGameDevilShellResourcePath = MainGameArtResourcePrefix + "arcade_main_game_die_shell_devil";
+    private const string MainGamePirateShellResourcePath = MainGameArtResourcePrefix + "arcade_main_game_die_shell_pirate";
+    private const string PhysicalKeyLabelFontResourcePath = MainGameArtResourcePrefix + "Flow/wabish_physical_key_sans_sc_semibold";
+    private const string MarketArtResourcePrefix = "Art/Market/";
+    private const string MarketCommonBaseResourcePath = MarketArtResourcePrefix + "arcade_market_common_base";
+    private const int ArcadeRunPhysicalSlotCount = 6;
+    private const float ArcadeRunDieSlotSize = 128f;
+    private const float ArcadeRunDieSlotGap = 0f;
+    private const float ArcadeRunDieSlotTopInset = 3f;
+    private const float MainGameShellUvX = 32f / 512f;
+    private const float MainGameShellUvY = 27f / 512f;
+    private const float MainGameShellUvWidth = 448f / 512f;
+    private const float MainGameShellUvHeight = 458f / 512f;
+    private const float MainGameShellFaceX = 0.186f;
+    private const float MainGameShellFaceY = 0.153f;
+    private const float MainGameShellFaceWidth = 0.629f;
+    private const float MainGameShellFaceHeight = 0.592f;
+    private static readonly int[] DiceFaceReelGenericValues = { 1, 4, 2, 6, 3, 5 };
+    private const int MainMenuMarqueeMaxFailedPulses = 6;
+    private const float MainMenuMarqueeDesignY = 55f;
+    private const float MainMenuMarqueeDesignHeight = 120f;
+    private const float MainMenuMarqueeDiceDesignX = 640f;
+    private const float MainMenuMarqueeDiceDesignWidth = 310f;
+    private const float MainMenuMarqueeKingDesignX = 970f;
+    private const float MainMenuMarqueeKingDesignWidth = 350f;
+    private const float MainMenuMarqueePatchDesignWidth = 680f;
+    private const int MainMenuRainLayerCapacity = 96;
+    private const int MainMenuGlassDropCapacity = 32;
+    private const int MainMenuGlassFlowCapacity = 4;
+    private const int MainMenuGlassClusterCapacity = 4;
+    private const float MainMenuWindowPatchX = 1010f;
+    private const float MainMenuWindowPatchY = 0f;
+    private const float MainMenuWindowPatchWidth = 270f;
+    private const float MainMenuWindowPatchHeight = 600f;
+    private const float MainMenuPaneMinDesignX = 78f;
+    private const float MainMenuPaneMaxDesignX = 397f;
+    private const float MainMenuPaneEdgeMargin = 10f;
+    private const float SettingsTransitionDuration = 0.22f;
+    private const float SettingsVolumeStep = 0.1f;
+    private const float DisplaySettingsConfirmationDuration = 10f;
+    private const int DefaultWindowWidth = 1280;
+    private const int DefaultWindowHeight = 720;
+    private const int MinimumDisplayWidth = 1280;
+    private const int MinimumDisplayHeight = 720;
+    private const int NativeShowMaximized = 3;
+    private const int NativeWindowRestoreAttemptLimit = 30;
     private const string DiceTypeIconResourcePrefix = "Art/DiceTypes/";
     private const string RuntimeDieFaceBaseResourcePath = "Art/DiceFaces/runtime_die_face_base";
     private const string DiceRollReadySpriteResourcePath = "Art/DiceRoll/f009_unified_ready_die_256";
@@ -743,8 +1319,31 @@ public sealed class DiceKingDemo : MonoBehaviour
     private const float TooltipContentSwapDuration = 0.06f;
     private const float TooltipEnterOffsetY = 6f;
     private const float TooltipEnterScaleFrom = 0.98f;
-    private const float TooltipPanelWidth = 336f;
-    private const float TooltipPanelHeight = 400f;
+    private const float TooltipPanelWidth = 448f;
+    private const float TooltipPanelShortHeight = 196f;
+    private const float TooltipPanelMediumHeight = 244f;
+    private const float TooltipPanelTallHeight = 288f;
+    private const float TooltipPanelExtendedSmallHeight = 352f;
+    private const float TooltipPanelExtendedMediumHeight = 416f;
+    private const float TooltipPanelExtendedTallHeight = 480f;
+    private const float TooltipPanelExtendedMaxHeight = 568f;
+    private const int TooltipSingleRowExactThreshold = 10000;
+    private const int TooltipScientificThreshold = 100000;
+    private const string KeywordBindingSourceDieType = "die_type";
+    private const string KeywordBindingSourceState = "state";
+    private const string KeywordStateFeedStatus = "feed_status";
+    private const string KeywordStateDevourHistory = "devour_history";
+    private const string KeywordStateShellAttachment = "shell_attachment";
+    private const string KeywordTokenPrefix = "{{kw:";
+    private const string KeywordTokenSuffix = "}}";
+    private const float DiceOrderDragStartDistance = 6f;
+    private const float DiceOrderDragLiftScale = 1.08f;
+    private const float TypeCoreIdleMinInterval = 3.5f;
+    private const float TypeCoreIdleMaxInterval = 5.5f;
+    private const int TypeCoreIdleMaxConcurrent = 2;
+
+    // V0.2 redesign placeholder: keep legacy material data/save fields, but disable runtime material rules.
+    private static readonly bool DiceMaterialFeatureEnabled = false;
 
     private static int nextDieId = 1;
 
@@ -752,7 +1351,10 @@ public sealed class DiceKingDemo : MonoBehaviour
     private readonly List<Die> scoringDice = new List<Die>();
     private readonly List<RunScoreCounterStep> runScoreCounterSteps = new List<RunScoreCounterStep>();
     private readonly List<SettlementDisplayEvent> settlementDisplayEvents = new List<SettlementDisplayEvent>();
+    private readonly List<SettlementContributionRecord> committedSettlementContributions = new List<SettlementContributionRecord>();
+    private readonly Dictionary<int, int> pendingSettlementTemporaryScoreByDieId = new Dictionary<int, int>();
     private readonly List<DiceVisualState> diceVisualStates = new List<DiceVisualState>();
+    private readonly List<TypeCoreIdlePulse> typeCoreIdlePulses = new List<TypeCoreIdlePulse>();
     private readonly List<Die> pendingTreeGrowth = new List<Die>();
     private readonly List<int> cheatRerollIds = new List<int>();
     private readonly List<Encounter> encounters = new List<Encounter>();
@@ -761,29 +1363,73 @@ public sealed class DiceKingDemo : MonoBehaviour
     private readonly Dictionary<DieType, MarketDieConfig> marketDieConfigs = new Dictionary<DieType, MarketDieConfig>();
     private readonly Dictionary<DiceMaterial, DiceMaterialConfig> diceMaterialConfigs = new Dictionary<DiceMaterial, DiceMaterialConfig>();
     private readonly Dictionary<DieType, DiceTypeTooltipConfig> diceTypeTooltipConfigs = new Dictionary<DieType, DiceTypeTooltipConfig>();
+    private readonly Dictionary<string, KeywordGlossaryConfig> keywordGlossaryConfigs = new Dictionary<string, KeywordGlossaryConfig>(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<DieType, List<KeywordBindingConfig>> dieKeywordBindings = new Dictionary<DieType, List<KeywordBindingConfig>>();
+    private readonly Dictionary<string, List<KeywordBindingConfig>> stateKeywordBindings = new Dictionary<string, List<KeywordBindingConfig>>(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, AffixTierConfig> affixTierConfigs = new Dictionary<string, AffixTierConfig>(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, AffixDefinition> affixDefinitions = new Dictionary<string, AffixDefinition>(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, CraftingItemDefinition> craftingItemDefinitions = new Dictionary<string, CraftingItemDefinition>(StringComparer.OrdinalIgnoreCase);
     private readonly List<FaceTemplateConfig> faceTemplateConfigs = new List<FaceTemplateConfig>();
     private readonly List<MarketRuleConfig> marketRuleConfigs = new List<MarketRuleConfig>();
     private readonly Dictionary<DieType, Texture2D> dieTypeIconTextures = new Dictionary<DieType, Texture2D>();
+    private readonly Dictionary<DieType, Texture2D> dieTypeActivityTextures = new Dictionary<DieType, Texture2D>();
     private readonly Dictionary<DiceMaterial, UnityEngine.Material> diceMaterialRenderMaterials = new Dictionary<DiceMaterial, UnityEngine.Material>();
+    private readonly System.Random typeCoreVisualRandom = new System.Random(20260717);
+    private FamilySettlementContext activeFamilySettlementContext;
 
     private GameMode mode = GameMode.MainMenu;
     private GameMode settingsReturnMode = GameMode.MainMenu;
     private RollPhase rollPhase = RollPhase.Ready;
     private int selectedReadySlotIndex = -1;
+    private DiceOrderDragSurface diceOrderDragSurface = DiceOrderDragSurface.None;
+    private int diceOrderDragSourceIndex = -1;
+    private int diceOrderDragPreviewIndex = -1;
+    private int diceOrderDragDieId = -1;
+    private int diceOrderDragControlId;
+    private Vector2 diceOrderDragStartMouse;
+    private Vector2 diceOrderDragOffset;
+    private Rect diceOrderDragStartRect;
+    private bool diceOrderDragMoving;
     private bool diceProcessVisualsEnabled = true;
     private float diceVisualEnterStartTime = -999f;
     private float diceVisualRollStartTime = -999f;
     private float diceVisualRevealStartTime = -999f;
     private float diceVisualImpulseTimer;
+    private float diceFaceReelStopTravel;
+    private float typeCoreIdleNextEventAt = -1f;
+    private Vector3 typeCoreLastMousePosition;
+    private bool typeCoreMousePositionInitialized;
 
     private Texture2D whiteTexture;
     private Texture2D pipTexture;
     private Texture2D tableBackgroundTexture;
     private Texture2D diceCupTexture;
     private Texture2D runtimeDieFaceBaseTexture;
+    private Texture2D mainMenuLampOnTexture;
+    private Texture2D mainMenuLampOffTexture;
+    private Texture2D mainMenuLampGlowTexture;
+    private Texture2D mainMenuLampCoreTexture;
+    private Texture2D mainMenuWindowCleanPatchTexture;
+    private Texture2D mainMenuMarqueeOffTexture;
+    private Texture2D mainMenuMarqueeGlowTexture;
+    private Texture2D mainGameCommonBaseTexture;
+    private Texture2D mainGameNeutralShellTexture;
+    private Texture2D mainGamePigShellTexture;
+    private Texture2D mainGameTurtleShellTexture;
+    private Texture2D mainGameDevilShellTexture;
+    private Texture2D mainGamePirateShellTexture;
+    private Texture2D marketCommonBaseTexture;
+    private AudioSource settlementAudioSource;
+    private AudioClip settlementAbsorbClip;
+    private AudioClip settlementNegativeClip;
+    private AudioClip settlementLatchClip;
+    private AudioClip settlementRelayClip;
+    private AudioClip settlementOverloadClip;
+    private AudioClip settlementPressureClip;
+    private AudioClip settlementBreakthroughClip;
+    private AudioClip settlementAftershockClip;
+    private MainGameLedFont mainGameLedFont;
+    private Font physicalKeyLabelFont;
     private Texture2D diceRollReadyTexture;
     private Texture2D diceRollLoopStripTexture;
     private Texture2D diceRollStopStripTexture;
@@ -800,6 +1446,11 @@ public sealed class DiceKingDemo : MonoBehaviour
     private Texture2D tooltipLabelChipBlueTexture;
     private Texture2D tooltipLabelChipGreenTexture;
     private Texture2D tooltipFaceCellTexture;
+    private Texture2D tooltipArcadePanelShortTexture;
+    private Texture2D tooltipArcadePanelMediumTexture;
+    private Texture2D tooltipArcadePanelTallTexture;
+    private Texture2D tooltipArcadeFaceCellTexture;
+    private Texture2D tooltipArcadeTypeCoreFrameTexture;
     private Texture2D affixAddStoneTexture;
     private Texture2D affixRemoveStoneTexture;
     private Texture2D affixReplaceStoneTexture;
@@ -827,12 +1478,14 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private int stageIndex;
     private int chapterGold;
+    private int remainingLives;
     private int rollsLeft;
     private int cheatsLeft;
     private int currentScore;
     private int resolvedScore;
     private int scoreRevealIndex;
     private int settlementEventIndex;
+    private int settlementScoringCursorIndex = -1;
     private int lastStageFlatIncome;
     private int lastStageInterestIncome;
     private int lastStageCompoundInterestIncome;
@@ -876,12 +1529,28 @@ public sealed class DiceKingDemo : MonoBehaviour
     private int selectedMarketDieIndex = -1;
     private bool currentMarketIsChapter;
     private bool marketTestRandomRefresh;
+    private bool v02CoreFamiliesMarketOnly = true;
+    private bool v02PigFamilyMarketOnly;
+    private bool v02DevilFamilyMarketOnly;
+    private bool v02TurtleAttachmentMarketOnly;
+    private bool v02PirateFamilyMarketOnly;
+    private bool v02NeutralFamilyMarketOnly;
+    private bool v02DualFamilyMarketOnly;
     private bool affixFeatureEnabled;
     private string activeCraftingItemKey = string.Empty;
     private int affixAddStoneCount;
     private int affixRemoveStoneCount;
     private int affixReplaceStoneCount;
+    private int currentMarketPaidRefreshCount;
+    private int currentMarketPirateSellCount;
+    private int currentMarketBlackMarketRefreshDiscount;
+    private int tavernBaseMinimumBonus;
+    private int marketTemporaryMinimumBonus;
+    private int feedQuality = 1;
+    private int feedQualityStart = 1;
+    private int marketRefreshCostStep = 1;
     private int startingGold = 18;
+    private int startingLives = 3;
     private int stageClearBaseGold;
     private int rollLeftGoldBonus;
     private int cheatLeftGoldBonus;
@@ -912,6 +1581,9 @@ public sealed class DiceKingDemo : MonoBehaviour
     private float lastMultiplier = 1f;
     private float committedCounterMultiplier = 1f;
     private float animatedCounterMultiplier = 1f;
+    private float settlementTowerAfterglowStartedAt = -999f;
+    private float settlementTowerAfterglowWeight;
+    private float settlementFinaleCompletedAt = -999f;
     private float shakeTimer;
     private float shakePower;
     private float stopTimer;
@@ -925,27 +1597,106 @@ public sealed class DiceKingDemo : MonoBehaviour
     private float counterProgressPulseTimer;
     private float openingTimer;
     private float settingsVolume = 1f;
+    // Keep the legacy field and PlayerPrefs name for capture-tool and settings compatibility.
+    // The value now controls every gameplay presentation sequence, not settlement alone.
+    private float settlementPlaybackSpeed = 1f;
+    private float settingsSnapshotVolume = 1f;
+    private float settingsSnapshotSettlementPlaybackSpeed = 1f;
+    private float settingsTransitionStartedAt = -999f;
+    private float displaySettingsConfirmationDeadline = -999f;
+    private float mainMenuLampEventStartedAt = -1f;
+    private float mainMenuLampNextEventAt = float.PositiveInfinity;
+    private float mainMenuLampProtectionUntil;
+    private float mainMenuLampOffAlpha;
+    private float mainMenuLampGlowAlpha;
+    private float mainMenuLampCoreAlpha;
+    private float mainMenuMarqueeEventStartedAt = -1f;
+    private float mainMenuMarqueeNextEventAt = float.PositiveInfinity;
+    private float mainMenuMarqueeProtectionUntil;
+    private float mainMenuMarqueeEventDuration;
+    private float mainMenuMarqueeDiceBrightness = 1f;
+    private float mainMenuMarqueeKingBrightness = 1f;
+    private float mainMenuMarqueeDiceGlowAlpha;
+    private float mainMenuMarqueeKingGlowAlpha;
+    private float mainMenuGlassSpawnTimer;
     private int shakeImpulseCount;
     private RollFeedbackConfig rollFeedbackConfig = RollFeedbackConfig.CreateDefault();
     private RollFeedbackConfig activeRollFeedbackConfig = RollFeedbackConfig.CreateDefault();
+    private MainMenuVisualConfig mainMenuVisualConfig = MainMenuVisualConfig.CreateDefault();
+    private MainMenuRainProfile mainMenuRainProfile;
+    private MainMenuMarqueeProfile mainMenuMarqueeProfile;
+    private MainGameFlowPresentationProfile mainGameFlowPresentationProfile;
     private string rollFeedbackConfigSource = "代码安全默认值";
     private bool passed;
     private bool dieTypeIconsLoaded;
     private bool rolledThisEncounter;
+    private bool rollResultsLocked;
     private bool finalScoreApplied;
     private bool confirmNewGame;
     private bool hasSave;
     private bool seenOpening;
-    private bool windowed = true;
+    private DisplayModeSetting displayMode = DisplayModeSetting.BorderlessFullscreen;
+    private DisplayModeSetting settingsSnapshotDisplayMode = DisplayModeSetting.BorderlessFullscreen;
+    private int windowWidth = DefaultWindowWidth;
+    private int windowHeight = DefaultWindowHeight;
+    private int exclusiveFullscreenWidth = 1920;
+    private int exclusiveFullscreenHeight = 1080;
+    private int desktopWidth = 1920;
+    private int desktopHeight = 1080;
+    private int settingsSnapshotWindowWidth = DefaultWindowWidth;
+    private int settingsSnapshotWindowHeight = DefaultWindowHeight;
+    private int settingsSnapshotExclusiveFullscreenWidth = 1920;
+    private int settingsSnapshotExclusiveFullscreenHeight = 1080;
+    private bool menuLampFlickerUserEnabled = true;
+    private bool windowMaximized;
+    private bool settingsSnapshotWindowMaximized;
+    private bool settingsSnapshotDynamicEffectsFull = true;
+    private bool settingsSnapshotValid;
+    private bool settingsExitPending;
+    private bool settingsApplyOnExit;
+    private bool displaySettingsConfirmationPending;
+    private bool restoreNativeWindowMaximizedPending;
+    private int restoreNativeWindowMaximizedRequestedFrame;
+    private int restoreNativeWindowMaximizedAttempts;
+    private bool mainMenuTexturesLoadAttempted;
+    private bool mainGameTexturesLoadAttempted;
+    private bool mainMenuRainProfileIsRuntimeFallback;
+    private bool mainMenuMarqueeProfileIsRuntimeFallback;
+    private bool mainGameFlowPresentationProfileIsRuntimeFallback;
+    private bool mainMenuRainInitialized;
     private bool suppressSave;
     private bool previewHasTurtleRandomness;
     private bool committedCounterValid;
     private bool runScoreCounterAnimationActive;
+    private bool settlementImpactPresentationActive;
+    private bool settlementPhysicalContributionCaptureComplete;
+    private bool settlementPrimaryAudioPlayed;
+    private int settlementFinaleAudioStage;
+    private bool settlementFinaleAfterglowActive;
+    private int settlementTowerAfterglowSign = 1;
+    private SettlementFeedbackTier settlementFinaleTier = SettlementFeedbackTier.Miss;
     private bool showHandReference;
+    private bool marketLeaveEffectSequenceActive;
+    private int marketLeaveEffectIndex;
+    private int marketLeaveEffectTotalCount;
+    private int marketLeaveEffectResolvedCount;
+    private float marketLeaveEffectTimer;
     private string rewardBanner = string.Empty;
+    private string marketLeaveEffectFeedback = string.Empty;
+    private string actionTipText = string.Empty;
+    private string actionTipReplaceKey = string.Empty;
+    private ActionTipSemantic actionTipSemantic = ActionTipSemantic.Success;
+    private float actionTipStartedAt = -999f;
+    private float actionTipHoldDuration = ActionTipHoldDuration;
+    private string arcadeMarketBlockedFeedbackKey = string.Empty;
+    private float arcadeMarketBlockedFeedbackStartedAt = -999f;
+    private int marketLeaveEffectVisualHostId = -1;
+    private DieType marketLeaveEffectVisualType = DieType.Basic;
+    private int marketLeaveEffectVisualSourceIndex = -1;
+    private int marketLeaveEffectVisualTargetIndex = -1;
     private string buildName = string.Empty;
     private string buildSummary = string.Empty;
-    private string lastHandName = "无牌型";
+    private string lastHandName = "牌型关闭";
     private SettlementDisplayEvent activeSettlementEvent;
     private DiceTooltipState tooltipState = DiceTooltipState.Hidden;
     private Vector2 uiMousePosition;
@@ -953,17 +1704,46 @@ public sealed class DiceKingDemo : MonoBehaviour
     private string hoverCandidateKey = string.Empty;
     private Die hoverCandidateDie;
     private Rect hoverCandidateRect;
-    private bool hoverCandidateAllowCurrentStateText;
+    private DiceTooltipContext hoverCandidateContext = DiceTooltipContext.Run;
+    private int hoverCandidateBuyPrice = -1;
     private string activeTooltipKey = string.Empty;
     private Die activeTooltipDie;
     private Rect activeTooltipRect;
-    private bool activeTooltipAllowCurrentStateText;
+    private DiceTooltipContext activeTooltipContext = DiceTooltipContext.Run;
+    private int activeTooltipBuyPrice = -1;
     private float hoverCandidateStartedAt = -999f;
     private float tooltipVisibleStartedAt = -999f;
     private float tooltipHideStartedAt = -999f;
     private float tooltipContentSwapStartedAt = -999f;
     private float tooltipAlpha;
     private float tooltipFadeOutStartAlpha;
+    private GameMode mainMenuObservedMode = (GameMode)(-1);
+    private MainMenuSelection mainMenuSelection = MainMenuSelection.NewGame;
+    private SettingsSelection settingsSelection = SettingsSelection.Volume;
+    private readonly List<Vector2Int> displayResolutionOptions = new List<Vector2Int>();
+    private readonly System.Random mainMenuVisualRandom = new System.Random();
+    private System.Random mainMenuRainRandom;
+    private System.Random mainMenuMarqueeRandom;
+    private readonly float[] mainMenuMarqueeFailedPulseDurations = new float[MainMenuMarqueeMaxFailedPulses];
+    private readonly float[] mainMenuMarqueeFailedPulseBrightness = new float[MainMenuMarqueeMaxFailedPulses];
+    private int mainMenuMarqueeActiveFailedPulseCount;
+    private bool mainMenuMarqueeRelightDiceFirst = true;
+    private readonly MainMenuRainStreak[] mainMenuFarRainStreaks = new MainMenuRainStreak[MainMenuRainLayerCapacity];
+    private readonly MainMenuRainStreak[] mainMenuNearRainStreaks = new MainMenuRainStreak[MainMenuRainLayerCapacity];
+    private readonly MainMenuGlassDrop[] mainMenuGlassDrops = new MainMenuGlassDrop[MainMenuGlassDropCapacity];
+    private readonly MainMenuGlassFlow[] mainMenuGlassFlows = new MainMenuGlassFlow[MainMenuGlassFlowCapacity];
+    private readonly Vector2[] mainMenuGlassClusterAnchors = new Vector2[MainMenuGlassClusterCapacity];
+    private readonly int[] mainMenuGlassClusterUses = new int[MainMenuGlassClusterCapacity];
+    private int mainMenuGlassClusterCount;
+    private int mainMenuGlassSpawnCounter;
+    private float mainGameRollIgnitionStartedAt = -999f;
+    private float mainGameTargetCrossStartedAt = -999f;
+    private float stageClearPresentationStartedAt = -999f;
+    private int stageClearGoldBeforeIncome;
+    private bool stageFailureRetryAvailable;
+    private bool stageFailureTransitionActive;
+    private bool stageContinuationPending;
+    private float stageFailureTransitionStartedAt = -999f;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Bootstrap()
@@ -988,16 +1768,59 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         LoadGlobalConfigs();
+        LoadMainMenuVisualConfig(false);
+        LoadMainMenuRainProfile();
+        LoadMainMenuMarqueeProfile();
+        LoadMainGameFlowPresentationProfile();
+        InitializeSettlementAudio();
         LoadRollFeedbackConfig(false);
         LoadMarketConfigs();
         LoadDiceTypeTooltipConfigs();
+        LoadKeywordConfigs();
         LoadAffixConfigs();
         BuildEncounters();
         LoadMenuState();
     }
 
+    private void OnDestroy()
+    {
+        if (mainMenuRainProfileIsRuntimeFallback && mainMenuRainProfile != null)
+        {
+            Destroy(mainMenuRainProfile);
+        }
+
+        if (mainMenuMarqueeProfileIsRuntimeFallback && mainMenuMarqueeProfile != null)
+        {
+            Destroy(mainMenuMarqueeProfile);
+        }
+
+        if (mainGameFlowPresentationProfileIsRuntimeFallback && mainGameFlowPresentationProfile != null)
+        {
+            Destroy(mainGameFlowPresentationProfile);
+        }
+
+        DestroySettlementAudioClip(settlementAbsorbClip);
+        DestroySettlementAudioClip(settlementNegativeClip);
+        DestroySettlementAudioClip(settlementLatchClip);
+        DestroySettlementAudioClip(settlementRelayClip);
+        DestroySettlementAudioClip(settlementOverloadClip);
+        DestroySettlementAudioClip(settlementPressureClip);
+        DestroySettlementAudioClip(settlementBreakthroughClip);
+        DestroySettlementAudioClip(settlementAftershockClip);
+    }
+
+    private void OnApplicationQuit()
+    {
+        CaptureNativeWindowedState();
+        SaveWindowPlacementState();
+    }
+
     private void Update()
     {
+        UpdateMainMenuPresentation();
+        UpdateTypeCoreIdlePresentation();
+        UpdatePendingNativeWindowMaximizeRestore();
+
         if (mode == GameMode.Opening)
         {
             openingTimer += Time.deltaTime;
@@ -1022,8 +1845,54 @@ public sealed class DiceKingDemo : MonoBehaviour
             Debug.Log("DiceKingDemo: F009 dice process visuals " + (diceProcessVisualsEnabled ? "enabled" : "disabled") + ".");
         }
 
+        if (Input.GetKeyDown(KeyCode.F7))
+        {
+            LoadMainMenuVisualConfig(true);
+        }
+
+        if (mode == GameMode.MainMenu && Input.GetKeyDown(KeyCode.F8))
+        {
+            ResetMainMenuRainPresentation();
+            Debug.Log("DiceKingDemo: main menu rain preview restarted from the Inspector profile.");
+        }
+
+        if (mode == GameMode.MainMenu && Input.GetKeyDown(KeyCode.F9))
+        {
+            ResetMainMenuMarqueePresentation();
+            Debug.Log("DiceKingDemo: DICE KING marquee preview restarted from the Inspector profile.");
+        }
+
+        if (mode == GameMode.Settings)
+        {
+            UpdateSettingsTransition();
+            UpdateDisplaySettingsConfirmation();
+            if (mode == GameMode.Settings && !settingsExitPending)
+            {
+                HandleSettingsKeyboardInput();
+            }
+
+            return;
+        }
+
+        if (mode == GameMode.MainMenu && HandleMainMenuKeyboardInput())
+        {
+            return;
+        }
+
+        if ((mode == GameMode.InterStageMarket || mode == GameMode.ChapterShop) && marketLeaveEffectSequenceActive)
+        {
+            UpdateMarketLeaveEffects();
+            return;
+        }
+
         if (mode != GameMode.Run)
         {
+            return;
+        }
+
+        if (stageFailureTransitionActive)
+        {
+            UpdateStageFailureTransition();
             return;
         }
 
@@ -1051,7 +1920,14 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (rollPhase == RollPhase.ResultDecision)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (!V02CheatEnabled)
+            {
+                if (GameplayPlaybackElapsed(diceVisualRevealStartTime) >= MainGameResultLockDuration())
+                {
+                    BeginSettle();
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.Space))
             {
                 BeginSettle();
             }
@@ -1062,6 +1938,25 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (rollPhase == RollPhase.Scoring)
         {
             UpdateScoreReveal();
+            return;
+        }
+
+        if (rollPhase == RollPhase.StageClear)
+        {
+            if (Input.GetKeyDown(KeyCode.Space) && StageClearPresentationComplete())
+            {
+                ContinueAfterStageClear(CurrentEncounter());
+            }
+
+            return;
+        }
+
+        if (rollPhase == RollPhase.StageFailed)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                BeginStageFailureExit();
+            }
         }
     }
 
@@ -1079,6 +1974,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         float offsetY = (Screen.height - DesignHeight * scale) * 0.5f;
         UpdateUiMousePosition(scale, offsetX, offsetY);
         BeginDiceHoverTooltipFrame();
+        if (diceOrderDragSurface != DiceOrderDragSurface.None
+            && (!DiceOrderDragActive() || !CanReorderDiceOnSurface(diceOrderDragSurface)))
+        {
+            CancelDiceOrderDrag();
+        }
+
         Matrix4x4 oldMatrix = GUI.matrix;
         Matrix4x4 fitMatrix = Matrix4x4.TRS(new Vector3(offsetX, offsetY, 0f), Quaternion.identity, new Vector3(scale, scale, 1f));
         Matrix4x4 prototypeMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(PrototypeToDesignScale, PrototypeToDesignScale, 1f));
@@ -1116,18 +2017,30 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         UpdateDiceHoverTooltipState();
         DrawDiceHoverTooltip();
+        DrawActionTip();
 
         GUI.matrix = oldMatrix;
     }
 
     private void DrawMainMenu()
     {
+        if (mainMenuLampOnTexture != null)
+        {
+            DrawArcadeMainMenu();
+            return;
+        }
+
+        DrawLegacyMainMenu();
+    }
+
+    private void DrawLegacyMainMenu()
+    {
         DrawHudBar("骰子王", string.Empty, string.Empty);
 
         Rect menu = new Rect(382f, 148f, 516f, 430f);
         DrawUiPanel(menu);
-        GUI.Label(new Rect(menu.x + 58f, menu.y + 62f, 330f, 34f), "主菜单", headerStyle);
-        GUI.Label(new Rect(menu.x + 58f, menu.y + 98f, 390f, 44f), "六颗骰子，一份会越写越离谱的王室账本。", smallStyle);
+        DrawStandardLabel(new Rect(menu.x + 58f, menu.y + 62f, 330f, 34f), "主菜单", headerStyle);
+        DrawStandardLabel(new Rect(menu.x + 58f, menu.y + 98f, 390f, 44f), "六颗骰子，一份会越写越离谱的王室账本。", smallStyle);
 
         if (DrawUiButton(new Rect(menu.x + 58f, menu.y + 158f, 388f, 56f), confirmNewGame && hasSave ? "确认覆盖并开始" : "开始新游戏", UiButtonKind.Primary))
         {
@@ -1150,8 +2063,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (DrawUiButton(new Rect(menu.x + 58f, menu.y + 286f, 388f, 52f), "设置", UiButtonKind.Secondary))
         {
-            settingsReturnMode = GameMode.MainMenu;
-            mode = GameMode.Settings;
+            EnterSettings(GameMode.MainMenu);
         }
 
         if (DrawUiButton(new Rect(menu.x + 58f, menu.y + 348f, 388f, 52f), "退出游戏", UiButtonKind.Danger))
@@ -1161,8 +2073,1703 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (confirmNewGame && hasSave)
         {
-            GUI.Label(new Rect(menu.x + 58f, menu.y + 402f, 388f, 24f), "再次点击开始会覆盖当前存档。", tinyStyle);
+            DrawStandardLabel(new Rect(menu.x + 58f, menu.y + 402f, 388f, 24f), "再次点击开始会覆盖当前存档。", tinyStyle);
         }
+    }
+
+    private void DrawArcadeMainMenu()
+    {
+        DrawArcadeCabinet(false);
+
+        Rect newGameRect = new Rect(422f, 212f, 436f, 136f);
+        Rect continueRect = new Rect(422f, 358f, 436f, 87f);
+        Rect settingsRect = new Rect(367f, 468f, 102f, 50f);
+        Rect quitRect = new Rect(818f, 468f, 94f, 50f);
+        Rect confirmKeyRect = new Rect(397f, 552f, 466f, 58f);
+
+        bool newGameClicked = DrawArcadeMainMenuHotspot(newGameRect, MainMenuSelection.NewGame, true);
+        bool continueClicked = DrawArcadeMainMenuHotspot(continueRect, MainMenuSelection.Continue, hasSave);
+        bool settingsClicked = DrawArcadeMainMenuHotspot(settingsRect, MainMenuSelection.Settings, true);
+        bool quitClicked = DrawArcadeMainMenuHotspot(quitRect, MainMenuSelection.Quit, true);
+        bool confirmKeyClicked = GUI.Button(confirmKeyRect, GUIContent.none, GUIStyle.none);
+
+        DrawArcadeMainMenuDynamicCopy(newGameRect, continueRect, settingsRect, quitRect, confirmKeyRect);
+
+        DrawArcadeMainMenuFocus(newGameRect, MainMenuSelection.NewGame, true);
+        DrawArcadeMainMenuFocus(continueRect, MainMenuSelection.Continue, hasSave);
+        DrawArcadeMainMenuFocus(settingsRect, MainMenuSelection.Settings, true);
+        DrawArcadeMainMenuFocus(quitRect, MainMenuSelection.Quit, true);
+
+        if (newGameClicked)
+        {
+            ActivateMainMenuSelection(MainMenuSelection.NewGame);
+        }
+        else if (continueClicked)
+        {
+            ActivateMainMenuSelection(MainMenuSelection.Continue);
+        }
+        else if (settingsClicked)
+        {
+            ActivateMainMenuSelection(MainMenuSelection.Settings);
+        }
+        else if (quitClicked)
+        {
+            ActivateMainMenuSelection(MainMenuSelection.Quit);
+        }
+        else if (confirmKeyClicked)
+        {
+            ActivateMainMenuSelection(mainMenuSelection);
+        }
+    }
+
+    private void DrawArcadeMainMenuDynamicCopy(Rect newGameRect, Rect continueRect, Rect settingsRect, Rect quitRect, Rect confirmKeyRect)
+    {
+        Color teal = new Color(0.35f, 0.72f, 0.68f, 0.92f);
+        Color panel = new Color(0.005f, 0.02f, 0.024f, 1f);
+        MainGameLedFont.TextRole newGameRole = mainMenuSelection == MainMenuSelection.NewGame
+            ? MainGameLedFont.TextRole.FocusAmber
+            : MainGameLedFont.TextRole.PrimaryAmber;
+
+        Rect newCopyRect = new Rect(newGameRect.x + 132f, newGameRect.y + 13f, newGameRect.width - 146f, newGameRect.height - 26f);
+        DrawRect(newCopyRect, panel);
+        if (confirmNewGame && hasSave)
+        {
+            DrawLedRoleText(new Rect(newCopyRect.x + 10f, newCopyRect.y + 4f, newCopyRect.width - 20f, 47f), "确认覆盖并开始", newGameRole, TextAnchor.MiddleLeft);
+            DrawLedRoleText(new Rect(newCopyRect.x + 10f, newCopyRect.y + 58f, newCopyRect.width - 20f, 31f), "再次确认将清除当前运行记录", MainGameLedFont.TextRole.SecondaryWarm, TextAnchor.MiddleLeft);
+        }
+        else
+        {
+            DrawLedRoleText(new Rect(newCopyRect.x + 10f, newCopyRect.y + 4f, newCopyRect.width - 20f, 47f), "开始新游戏", newGameRole, TextAnchor.MiddleLeft);
+            DrawLedRoleText(new Rect(newCopyRect.x + 10f, newCopyRect.y + 58f, newCopyRect.width - 20f, 31f), "开启新的六骰挑战", MainGameLedFont.TextRole.SecondaryWarm, TextAnchor.MiddleLeft);
+        }
+
+        if (hasSave)
+        {
+            DrawSavedContinueCard(continueRect);
+        }
+        else
+        {
+            DrawRect(new Rect(continueRect.x + 3f, continueRect.y + 3f, continueRect.width - 6f, continueRect.height - 6f), new Color(0.008f, 0.025f, 0.029f, 1f));
+            DrawBorder(new Rect(continueRect.x + 49f, continueRect.y + 18f, 54f, 54f), new Color(teal.r, teal.g, teal.b, 0.42f), 2f);
+            DrawLedRoleText(new Rect(continueRect.x + 142f, continueRect.y + 4f, 250f, 47f), "继续游戏", MainGameLedFont.TextRole.Disabled, TextAnchor.MiddleLeft);
+            DrawLedRoleText(new Rect(continueRect.x + 142f, continueRect.y + 51f, 250f, 31f), "暂无运行记录", MainGameLedFont.TextRole.Disabled, TextAnchor.MiddleLeft);
+        }
+
+        DrawArcadeMainMenuFooterCopy(settingsRect, "设置", mainMenuSelection == MainMenuSelection.Settings);
+        DrawArcadeMainMenuFooterCopy(quitRect, "退出", mainMenuSelection == MainMenuSelection.Quit);
+        Rect screenFooterRect = new Rect(505f, 470f, 270f, 42f);
+        DrawRect(screenFooterRect, new Color(0.006f, 0.021f, 0.024f, 1f));
+        DrawBorder(screenFooterRect, new Color(0.30f, 0.43f, 0.38f, 0.44f), 1f);
+        DrawLedRoleText(screenFooterRect, "↑↓ 选择 · SPACE 确认", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleCenter);
+        DrawRect(new Rect(confirmKeyRect.x + 8f, confirmKeyRect.y + 6f, confirmKeyRect.width - 16f, confirmKeyRect.height - 12f), new Color(0.01f, 0.025f, 0.026f, 1f));
+        DrawBorder(new Rect(confirmKeyRect.x + 8f, confirmKeyRect.y + 6f, confirmKeyRect.width - 16f, confirmKeyRect.height - 12f), new Color(0.72f, 0.43f, 0.15f, 0.72f), 1f);
+        DrawLedRoleText(new Rect(confirmKeyRect.x + 18f, confirmKeyRect.y + 4f, confirmKeyRect.width - 36f, confirmKeyRect.height - 8f), "SPACE", MainGameLedFont.TextRole.FocusAmber, TextAnchor.MiddleCenter);
+    }
+
+    private void DrawArcadeMainMenuFooterCopy(Rect rect, string label, bool focused)
+    {
+        Rect copyRect = new Rect(rect.x + 2f, rect.y + 2f, Mathf.Max(1f, rect.width - 4f), rect.height - 4f);
+        DrawRect(copyRect, new Color(0.006f, 0.021f, 0.024f, 1f));
+        DrawLedRoleText(
+            copyRect,
+            label,
+            focused ? MainGameLedFont.TextRole.FocusAmber : MainGameLedFont.TextRole.SecondaryAmber,
+            TextAnchor.MiddleCenter);
+    }
+
+    private void DrawArcadeCabinet(bool dimWindowAtmosphere)
+    {
+        Rect full = new Rect(0f, 0f, VirtualWidth, VirtualHeight);
+        DrawMainMenuTexture(full, mainMenuLampOnTexture, 1f);
+        DrawMainMenuTexture(full, mainMenuLampOffTexture, mainMenuLampOffAlpha);
+        DrawMainMenuTexture(full, mainMenuLampGlowTexture, mainMenuLampGlowAlpha);
+        DrawMainMenuTexture(full, mainMenuLampCoreTexture, mainMenuLampCoreAlpha);
+        DrawMainMenuMarquee();
+
+        Rect windowPatchRect = MainMenuWindowPatchRect();
+        DrawMainMenuTexture(windowPatchRect, mainMenuWindowCleanPatchTexture, 1f);
+        DrawMainMenuRainAtmosphere(windowPatchRect);
+        if (dimWindowAtmosphere)
+        {
+            DrawRect(windowPatchRect, new Color(0.005f, 0.025f, 0.045f, 0.24f));
+        }
+    }
+
+    private void DrawMainMenuTexture(Rect rect, Texture2D texture, float alpha)
+    {
+        if (texture == null || alpha <= 0f)
+        {
+            return;
+        }
+
+        Color old = GUI.color;
+        GUI.color = new Color(1f, 1f, 1f, Mathf.Clamp01(alpha));
+        GUI.DrawTexture(rect, texture, ScaleMode.StretchToFill, true);
+        GUI.color = old;
+    }
+
+    private void DrawMainMenuMarquee()
+    {
+        Rect diceRect = new Rect(
+            MainMenuMarqueeDiceDesignX / PrototypeToDesignScale,
+            MainMenuMarqueeDesignY / PrototypeToDesignScale,
+            MainMenuMarqueeDiceDesignWidth / PrototypeToDesignScale,
+            MainMenuMarqueeDesignHeight / PrototypeToDesignScale);
+        Rect kingRect = new Rect(
+            MainMenuMarqueeKingDesignX / PrototypeToDesignScale,
+            MainMenuMarqueeDesignY / PrototypeToDesignScale,
+            MainMenuMarqueeKingDesignWidth / PrototypeToDesignScale,
+            MainMenuMarqueeDesignHeight / PrototypeToDesignScale);
+        Rect diceUv = new Rect(0f, 0f, MainMenuMarqueeDiceDesignWidth / MainMenuMarqueePatchDesignWidth, 1f);
+        Rect kingUv = new Rect(
+            (MainMenuMarqueeKingDesignX - MainMenuMarqueeDiceDesignX) / MainMenuMarqueePatchDesignWidth,
+            0f,
+            MainMenuMarqueeKingDesignWidth / MainMenuMarqueePatchDesignWidth,
+            1f);
+
+        DrawMainMenuTextureSegment(diceRect, mainMenuMarqueeOffTexture, diceUv, 1f - mainMenuMarqueeDiceBrightness);
+        DrawMainMenuTextureSegment(kingRect, mainMenuMarqueeOffTexture, kingUv, 1f - mainMenuMarqueeKingBrightness);
+        DrawMainMenuTextureSegment(diceRect, mainMenuMarqueeGlowTexture, diceUv, mainMenuMarqueeDiceGlowAlpha);
+        DrawMainMenuTextureSegment(kingRect, mainMenuMarqueeGlowTexture, kingUv, mainMenuMarqueeKingGlowAlpha);
+    }
+
+    private static void DrawMainMenuTextureSegment(Rect rect, Texture2D texture, Rect uv, float alpha)
+    {
+        if (texture == null || alpha <= 0f)
+        {
+            return;
+        }
+
+        Color old = GUI.color;
+        GUI.color = new Color(1f, 1f, 1f, Mathf.Clamp01(alpha));
+        GUI.DrawTextureWithTexCoords(rect, texture, uv, true);
+        GUI.color = old;
+    }
+
+    private static Rect MainMenuWindowPatchRect()
+    {
+        return new Rect(MainMenuWindowPatchX, MainMenuWindowPatchY, MainMenuWindowPatchWidth, MainMenuWindowPatchHeight);
+    }
+
+    private void DrawMainMenuRainAtmosphere(Rect windowRect)
+    {
+        if (mainMenuWindowCleanPatchTexture == null || mainMenuRainProfile == null || !mainMenuRainInitialized)
+        {
+            return;
+        }
+
+        if (mainMenuRainProfile.OutsideRainEnabled && mainMenuRainProfile.OutsideRainDensity > 0f)
+        {
+            int farCount = Mathf.Clamp(Mathf.RoundToInt(mainMenuRainProfile.FarLayerCount * mainMenuRainProfile.OutsideRainDensity), 0, MainMenuRainLayerCapacity);
+            int nearCount = Mathf.Clamp(Mathf.RoundToInt(mainMenuRainProfile.NearLayerCount * mainMenuRainProfile.OutsideRainDensity), 0, MainMenuRainLayerCapacity);
+            DrawMainMenuRainLayer(windowRect, mainMenuFarRainStreaks, farCount, false);
+            DrawMainMenuRainLayer(windowRect, mainMenuNearRainStreaks, nearCount, true);
+        }
+
+        if (!mainMenuRainProfile.GlassWaterEnabled)
+        {
+            return;
+        }
+
+        for (int i = 0; i < mainMenuGlassFlows.Length; i++)
+        {
+            if (mainMenuGlassFlows[i] != null && mainMenuGlassFlows[i].Active)
+            {
+                DrawMainMenuGlassFlow(windowRect, mainMenuGlassFlows[i]);
+            }
+        }
+
+        for (int i = 0; i < mainMenuGlassDrops.Length; i++)
+        {
+            if (mainMenuGlassDrops[i] != null && mainMenuGlassDrops[i].Active)
+            {
+                DrawMainMenuGlassDrop(windowRect, mainMenuGlassDrops[i]);
+            }
+        }
+    }
+
+    private void DrawMainMenuRainLayer(Rect windowRect, MainMenuRainStreak[] streaks, int count, bool nearLayer)
+    {
+        Color baseColor = nearLayer
+            ? new Color(0.66f, 0.82f, 0.86f, mainMenuRainProfile.NearOpacity)
+            : new Color(0.43f, 0.64f, 0.70f, mainMenuRainProfile.FarOpacity);
+
+        for (int i = 0; i < count; i++)
+        {
+            MainMenuRainStreak streak = streaks[i];
+            if (streak == null || !streak.Initialized)
+            {
+                continue;
+            }
+
+            float drift = mainMenuRainProfile.WindDrift;
+            Vector2 tail = new Vector2(streak.X - drift * streak.Length, streak.Y - streak.Length);
+            Vector2 head = new Vector2(streak.X, streak.Y);
+            float shimmer = 0.86f + Mathf.Sin(Time.unscaledTime * 1.7f + streak.Phase) * 0.14f;
+            Color color = new Color(baseColor.r, baseColor.g, baseColor.b, baseColor.a * shimmer);
+
+            const int clipSegments = 4;
+            for (int segment = 0; segment < clipSegments; segment++)
+            {
+                Vector2 start = Vector2.Lerp(tail, head, segment / (float)clipSegments);
+                Vector2 end = Vector2.Lerp(tail, head, (segment + 1) / (float)clipSegments);
+                if (!IsInsideMainMenuPane(start, 1f) || !IsInsideMainMenuPane(end, 1f))
+                {
+                    continue;
+                }
+
+                DrawMainMenuLine(windowRect.position + start, windowRect.position + end, streak.Width, color);
+            }
+        }
+    }
+
+    private void DrawMainMenuGlassDrop(Rect windowRect, MainMenuGlassDrop drop)
+    {
+        float fade = Mathf.Clamp01((drop.Lifetime - drop.Age) / 1.4f);
+        float massScale = Mathf.Clamp(Mathf.Sqrt(Mathf.Max(0.35f, drop.Mass)), 0.8f, 2.15f);
+        float width = drop.Size * massScale;
+        float height = width * 1.22f;
+        Vector2 center = windowRect.position + drop.Position;
+        float alpha = mainMenuRainProfile.GlassOpacity * fade;
+
+        if (drop.Age < 0.28f)
+        {
+            float impact = Mathf.Clamp01(drop.Age / 0.28f);
+            float rippleSize = width * Mathf.Lerp(1.35f, 2.35f, impact);
+            Rect ripple = new Rect(center.x - rippleSize * 0.5f, center.y - rippleSize * 0.5f, rippleSize, rippleSize);
+            DrawTintedCircle(ripple, new Color(0.66f, 0.84f, 0.88f, alpha * (1f - impact) * 0.34f));
+        }
+
+        Rect shadow = new Rect(center.x - width * 0.58f, center.y - height * 0.46f, width * 1.16f, height * 1.10f);
+        DrawTintedCircle(shadow, new Color(0.015f, 0.08f, 0.11f, alpha * 0.48f));
+        Rect body = new Rect(center.x - width * 0.5f, center.y - height * 0.5f, width, height);
+        DrawTintedCircle(body, new Color(0.46f, 0.65f, 0.69f, alpha * 0.62f));
+
+        float highlightSize = Mathf.Max(0.8f, width * 0.24f);
+        Rect highlight = new Rect(center.x - width * 0.20f, center.y - height * 0.30f, highlightSize, highlightSize * 0.72f);
+        DrawTintedCircle(highlight, new Color(0.88f, 0.96f, 0.98f, alpha * 0.76f));
+    }
+
+    private void DrawMainMenuGlassFlow(Rect windowRect, MainMenuGlassFlow flow)
+    {
+        float alpha = mainMenuRainProfile.GlassOpacity * Mathf.Clamp01(flow.Fade);
+        DrawMainMenuGlassFlowPath(windowRect, flow, false, flow.CurrentLength, flow.Width + 1.4f, new Color(0.01f, 0.07f, 0.10f, alpha * 0.46f));
+        DrawMainMenuGlassFlowPath(windowRect, flow, false, flow.CurrentLength, flow.Width, new Color(0.43f, 0.64f, 0.68f, alpha * 0.68f));
+        DrawMainMenuGlassFlowPath(windowRect, flow, false, flow.CurrentLength, Mathf.Max(0.7f, flow.Width * 0.22f), new Color(0.86f, 0.95f, 0.97f, alpha * 0.60f));
+
+        if (flow.HasBranch && flow.CurrentLength > flow.TargetLength * flow.BranchStartFraction)
+        {
+            float available = flow.CurrentLength - flow.TargetLength * flow.BranchStartFraction;
+            float branchLength = Mathf.Min(flow.TargetLength * 0.24f, available * 0.58f);
+            DrawMainMenuGlassFlowPath(windowRect, flow, true, branchLength, Mathf.Max(0.8f, flow.Width * 0.48f), new Color(0.40f, 0.62f, 0.66f, alpha * 0.52f));
+        }
+
+        Vector2 head = windowRect.position + MainMenuGlassFlowPoint(flow, flow.CurrentLength, false);
+        float beadSize = Mathf.Max(2f, flow.Width * 1.45f);
+        DrawTintedCircle(new Rect(head.x - beadSize * 0.5f, head.y - beadSize * 0.55f, beadSize, beadSize * 1.18f), new Color(0.48f, 0.68f, 0.72f, alpha * 0.70f));
+        DrawTintedCircle(new Rect(head.x - beadSize * 0.18f, head.y - beadSize * 0.30f, beadSize * 0.25f, beadSize * 0.20f), new Color(0.9f, 0.97f, 1f, alpha * 0.66f));
+    }
+
+    private void DrawMainMenuGlassFlowPath(Rect windowRect, MainMenuGlassFlow flow, bool branch, float length, float width, Color color)
+    {
+        if (length <= 0.1f || color.a <= 0f)
+        {
+            return;
+        }
+
+        int segments = Mathf.Clamp(Mathf.CeilToInt(length / 5f), 1, 96);
+        Vector2 previous = MainMenuGlassFlowPoint(flow, 0f, branch);
+        for (int i = 1; i <= segments; i++)
+        {
+            float distance = length * i / segments;
+            Vector2 current = MainMenuGlassFlowPoint(flow, distance, branch);
+            if (IsInsideMainMenuPane(previous, 0.5f) && IsInsideMainMenuPane(current, 0.5f))
+            {
+                DrawMainMenuLine(windowRect.position + previous, windowRect.position + current, width, color);
+            }
+
+            previous = current;
+        }
+    }
+
+    private static Vector2 MainMenuGlassFlowPoint(MainMenuGlassFlow flow, float distance, bool branch)
+    {
+        if (!branch)
+        {
+            float normalized = flow.TargetLength > 0f ? Mathf.Clamp01(distance / flow.TargetLength) : 0f;
+            float wave = Mathf.Sin(flow.CurvePhase + normalized * 5.4f) - Mathf.Sin(flow.CurvePhase);
+            float x = flow.Origin.x + flow.CurveDirection * normalized * 3.2f + wave * flow.CurveAmplitude * normalized;
+            return new Vector2(x, flow.Origin.y + distance);
+        }
+
+        float branchStartDistance = flow.TargetLength * flow.BranchStartFraction;
+        Vector2 branchOrigin = MainMenuGlassFlowPoint(flow, branchStartDistance, false);
+        float side = flow.BranchDirection * distance * 0.34f;
+        float wobble = Mathf.Sin(flow.CurvePhase * 1.4f + distance * 0.11f) * Mathf.Min(2.2f, distance * 0.08f);
+        return new Vector2(branchOrigin.x + side + wobble, branchOrigin.y + distance * 0.80f);
+    }
+
+    private void DrawMainMenuLine(Vector2 start, Vector2 end, float width, Color color)
+    {
+        Vector2 delta = end - start;
+        float length = delta.magnitude;
+        if (length <= 0.05f || width <= 0f || color.a <= 0f)
+        {
+            return;
+        }
+
+        Matrix4x4 oldMatrix = GUI.matrix;
+        float angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+        // GUIUtility.RotateAroundPivot premultiplies its pivot against the already scaled
+        // OnGUI canvas. At the 1.5x prototype transform this displaced rain lines hundreds
+        // of pixels onto the cabinet. Compose the line transform in local prototype space.
+        Matrix4x4 lineMatrix = Matrix4x4.TRS(
+            new Vector3(start.x, start.y, 0f),
+            Quaternion.Euler(0f, 0f, angle),
+            Vector3.one);
+        GUI.matrix = oldMatrix * lineMatrix;
+        DrawRect(new Rect(0f, -width * 0.5f, length, width), color);
+        GUI.matrix = oldMatrix;
+    }
+
+    private static bool IsInsideMainMenuPane(Vector2 localPosition, float extraDesignMargin)
+    {
+        float designX = localPosition.x * PrototypeToDesignScale;
+        float designY = localPosition.y * PrototypeToDesignScale;
+        float margin = MainMenuPaneEdgeMargin + Mathf.Max(0f, extraDesignMargin);
+        if (designX < MainMenuPaneMinDesignX + margin || designX > MainMenuPaneMaxDesignX - margin)
+        {
+            return false;
+        }
+
+        float top = 210f - 0.53f * designX + margin;
+        float bottom = 615f + 0.25f * designX - margin;
+        return designY >= top && designY <= bottom;
+    }
+
+    private static float MainMenuPaneTop(float localX, float extraDesignMargin)
+    {
+        float designX = localX * PrototypeToDesignScale;
+        return (210f - 0.53f * designX + MainMenuPaneEdgeMargin + Mathf.Max(0f, extraDesignMargin)) / PrototypeToDesignScale;
+    }
+
+    private static float MainMenuPaneBottom(float localX, float extraDesignMargin)
+    {
+        float designX = localX * PrototypeToDesignScale;
+        return (615f + 0.25f * designX - MainMenuPaneEdgeMargin - Mathf.Max(0f, extraDesignMargin)) / PrototypeToDesignScale;
+    }
+
+    private bool DrawArcadeMainMenuHotspot(Rect rect, MainMenuSelection selection, bool enabled)
+    {
+        if (!enabled)
+        {
+            return false;
+        }
+
+        Event current = Event.current;
+        if (current != null && rect.Contains(current.mousePosition))
+        {
+            SetMainMenuSelection(selection);
+        }
+
+        return GUI.Button(rect, GUIContent.none, GUIStyle.none);
+    }
+
+    private void DrawArcadeMainMenuFocus(Rect rect, MainMenuSelection selection, bool enabled)
+    {
+        if (!enabled || mainMenuSelection != selection)
+        {
+            return;
+        }
+
+        float pulse = 0.82f + Mathf.Sin(Time.unscaledTime * 3.2f) * 0.08f;
+        Color edge = selection == MainMenuSelection.Continue
+            ? new Color(0.28f, 0.85f, 0.78f, pulse)
+            : new Color(1f, 0.68f, 0.2f, pulse);
+        DrawBorder(rect, edge, selection == MainMenuSelection.Settings || selection == MainMenuSelection.Quit ? 2f : 3f);
+    }
+
+    private void DrawSavedContinueCard(Rect rect)
+    {
+        bool selected = mainMenuSelection == MainMenuSelection.Continue;
+        DrawRect(new Rect(rect.x + 3f, rect.y + 3f, rect.width - 6f, rect.height - 6f), new Color(0.015f, 0.035f, 0.04f, 1f));
+
+        int savedStage = Mathf.Clamp(PlayerPrefs.GetInt(SavePrefix + "StageIndex", 0), 0, Mathf.Max(0, encounters.Count - 1));
+        string summary = "继续未完成的六骰挑战";
+        if (encounters.Count > 0)
+        {
+            Encounter encounter = encounters[savedStage];
+            summary = "第 " + encounter.ChapterIndex + " 章 · 第 " + encounter.StageIndexInChapter + " 关";
+        }
+
+        MainGameLedFont.TextRole titleRole = selected
+            ? MainGameLedFont.TextRole.FocusTeal
+            : MainGameLedFont.TextRole.PrimaryAmber;
+        DrawLedRoleText(new Rect(rect.x + 142f, rect.y + 4f, 250f, 47f), "继续游戏", titleRole, TextAnchor.MiddleLeft);
+        DrawLedRoleText(new Rect(rect.x + 142f, rect.y + 51f, 250f, 31f), summary, MainGameLedFont.TextRole.SecondaryWarm, TextAnchor.MiddleLeft);
+        DrawBorder(new Rect(rect.x + 49f, rect.y + 18f, 54f, 54f), selected ? new Color(0.47f, 0.95f, 0.89f, 0.78f) : new Color(1f, 0.75f, 0.29f, 0.62f), 2f);
+        DrawLedRoleText(new Rect(rect.x + 49f, rect.y + 18f, 54f, 54f), "▶", titleRole, TextAnchor.MiddleCenter);
+    }
+
+    private void SetMainMenuSelection(MainMenuSelection selection)
+    {
+        if (selection == MainMenuSelection.Continue && !hasSave)
+        {
+            return;
+        }
+
+        if (mainMenuSelection == selection)
+        {
+            return;
+        }
+
+        mainMenuSelection = selection;
+        if (selection != MainMenuSelection.NewGame)
+        {
+            confirmNewGame = false;
+        }
+
+        ProtectMainMenuAtmosphere();
+    }
+
+    private bool HandleMainMenuKeyboardInput()
+    {
+        MainMenuSelection next = mainMenuSelection;
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            next = mainMenuSelection == MainMenuSelection.NewGame
+                ? MainMenuSelection.NewGame
+                : (mainMenuSelection == MainMenuSelection.Continue ? MainMenuSelection.NewGame : (hasSave ? MainMenuSelection.Continue : MainMenuSelection.NewGame));
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            if (mainMenuSelection == MainMenuSelection.NewGame)
+            {
+                next = hasSave ? MainMenuSelection.Continue : MainMenuSelection.Settings;
+            }
+            else if (mainMenuSelection == MainMenuSelection.Continue)
+            {
+                next = MainMenuSelection.Settings;
+            }
+            else
+            {
+                next = MainMenuSelection.NewGame;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow) && mainMenuSelection == MainMenuSelection.Quit)
+        {
+            next = MainMenuSelection.Settings;
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow) && mainMenuSelection == MainMenuSelection.Settings)
+        {
+            next = MainMenuSelection.Quit;
+        }
+
+        if (next != mainMenuSelection)
+        {
+            SetMainMenuSelection(next);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            ActivateMainMenuSelection(mainMenuSelection);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void ActivateMainMenuSelection(MainMenuSelection selection)
+    {
+        SetMainMenuSelection(selection);
+        ProtectMainMenuAtmosphere();
+
+        switch (selection)
+        {
+            case MainMenuSelection.NewGame:
+                if (hasSave && !confirmNewGame)
+                {
+                    confirmNewGame = true;
+                    return;
+                }
+
+                StartNewGameFlow();
+                return;
+            case MainMenuSelection.Continue:
+                if (hasSave)
+                {
+                    ContinueGameFlow();
+                }
+                return;
+            case MainMenuSelection.Settings:
+                confirmNewGame = false;
+                EnterSettings(GameMode.MainMenu);
+                return;
+            case MainMenuSelection.Quit:
+                Application.Quit();
+                return;
+        }
+    }
+
+    private void UpdateMainMenuPresentation()
+    {
+        if (mainMenuObservedMode != mode)
+        {
+            GameMode previousMode = mainMenuObservedMode;
+            bool previousUsedArcadeCabinet = IsArcadeCabinetMode(previousMode);
+            mainMenuObservedMode = mode;
+            ClearMainMenuLampEvent();
+            ClearMainMenuMarqueeEvent();
+            if (mode == GameMode.MainMenu)
+            {
+                confirmNewGame = false;
+                if (previousMode != GameMode.Settings)
+                {
+                    mainMenuSelection = hasSave ? MainMenuSelection.Continue : MainMenuSelection.NewGame;
+                }
+
+                mainMenuLampProtectionUntil = Time.unscaledTime;
+                mainMenuLampNextEventAt = Time.unscaledTime + mainMenuVisualConfig.FirstEventDelay;
+                if (!previousUsedArcadeCabinet || !mainMenuRainInitialized)
+                {
+                    ResetMainMenuRainPresentation();
+                }
+
+                ResetMainMenuMarqueePresentation();
+            }
+            else if (mode == GameMode.Settings)
+            {
+                mainMenuLampNextEventAt = float.PositiveInfinity;
+                mainMenuMarqueeNextEventAt = float.PositiveInfinity;
+                if (!previousUsedArcadeCabinet || !mainMenuRainInitialized)
+                {
+                    ResetMainMenuRainPresentation();
+                }
+            }
+            else
+            {
+                mainMenuLampNextEventAt = float.PositiveInfinity;
+                mainMenuMarqueeNextEventAt = float.PositiveInfinity;
+                mainMenuRainInitialized = false;
+            }
+        }
+
+        if (!IsArcadeCabinetMode(mode))
+        {
+            return;
+        }
+
+        UpdateMainMenuRainPresentation(Time.unscaledDeltaTime);
+
+        if (mode == GameMode.Settings)
+        {
+            ClearMainMenuLampEvent();
+            ClearMainMenuMarqueeEvent();
+            return;
+        }
+
+        if (confirmNewGame)
+        {
+            ClearMainMenuLampEvent();
+            ClearMainMenuMarqueeEvent();
+            return;
+        }
+
+        UpdateMainMenuMarqueePresentation();
+
+        if (!CanPlayMainMenuLampFlicker())
+        {
+            ClearMainMenuLampEvent();
+            return;
+        }
+
+        float now = Time.unscaledTime;
+        if (mainMenuLampEventStartedAt < 0f)
+        {
+            if (now < mainMenuLampProtectionUntil || now < mainMenuLampNextEventAt)
+            {
+                return;
+            }
+
+            mainMenuLampEventStartedAt = now;
+            ProtectMainMenuMarqueeForLamp(now + MainMenuLampEventDuration());
+        }
+
+        float cutDuration = Mathf.Max(0.01f, mainMenuVisualConfig.PowerCutDuration);
+        float holdDuration = Mathf.Max(0f, mainMenuVisualConfig.BlackoutHoldDuration);
+        float recoveryStart = cutDuration + holdDuration;
+        float elapsed = Mathf.Max(0f, now - mainMenuLampEventStartedAt);
+        float strength = Mathf.Clamp01(mainMenuVisualConfig.OffStrength);
+
+        if (elapsed < cutDuration)
+        {
+            mainMenuLampOffAlpha = strength * Mathf.SmoothStep(0f, 1f, elapsed / cutDuration);
+            mainMenuLampGlowAlpha = 0f;
+            mainMenuLampCoreAlpha = 0f;
+            return;
+        }
+
+        if (elapsed < recoveryStart)
+        {
+            mainMenuLampOffAlpha = strength;
+            mainMenuLampGlowAlpha = 0f;
+            mainMenuLampCoreAlpha = 0f;
+            return;
+        }
+
+        float recoveryElapsed = elapsed - recoveryStart;
+        float environmentDuration = Mathf.Max(0.01f, mainMenuVisualConfig.EnvironmentRelightDuration);
+        float glowDuration = Mathf.Max(0.01f, mainMenuVisualConfig.GlowRelightDuration);
+        float coreDuration = Mathf.Max(0.01f, mainMenuVisualConfig.CoreRelightDuration);
+        mainMenuLampOffAlpha = strength * (1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(recoveryElapsed / environmentDuration)));
+        mainMenuLampGlowAlpha = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(recoveryElapsed / glowDuration));
+        mainMenuLampCoreAlpha = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(recoveryElapsed / coreDuration));
+
+        if (recoveryElapsed >= Mathf.Max(environmentDuration, Mathf.Max(glowDuration, coreDuration)))
+        {
+            ClearMainMenuLampEvent();
+            mainMenuLampNextEventAt = mainMenuVisualConfig.LoopEnabled
+                ? now + NextMainMenuLampIdleInterval()
+                : float.PositiveInfinity;
+        }
+    }
+
+    private static bool IsArcadeCabinetMode(GameMode value)
+    {
+        return value == GameMode.MainMenu || value == GameMode.Settings;
+    }
+
+    private bool CanPlayMainMenuLampFlicker()
+    {
+        return mainMenuVisualConfig != null
+            && mainMenuVisualConfig.LampFlickerEnabled
+            && menuLampFlickerUserEnabled
+            && mainMenuLampOnTexture != null
+            && mainMenuLampOffTexture != null;
+    }
+
+    private void ProtectMainMenuAtmosphere()
+    {
+        float now = Time.unscaledTime;
+        bool interrupted = mainMenuLampEventStartedAt >= 0f;
+        ClearMainMenuLampEvent();
+        mainMenuLampProtectionUntil = Mathf.Max(mainMenuLampProtectionUntil, now + mainMenuVisualConfig.InputProtectionDuration);
+        if (interrupted)
+        {
+            mainMenuLampNextEventAt = mainMenuVisualConfig.LoopEnabled
+                ? mainMenuLampProtectionUntil + NextMainMenuLampIdleInterval()
+                : float.PositiveInfinity;
+        }
+        else
+        {
+            mainMenuLampNextEventAt = Mathf.Max(mainMenuLampNextEventAt, mainMenuLampProtectionUntil);
+        }
+
+        ProtectMainMenuMarqueeForInput(now);
+    }
+
+    private void ClearMainMenuLampEvent()
+    {
+        mainMenuLampEventStartedAt = -1f;
+        mainMenuLampOffAlpha = 0f;
+        mainMenuLampGlowAlpha = 0f;
+        mainMenuLampCoreAlpha = 0f;
+    }
+
+    private float NextMainMenuLampIdleInterval()
+    {
+        float min = Mathf.Max(0.1f, mainMenuVisualConfig.IdleIntervalMin);
+        float max = Mathf.Max(min, mainMenuVisualConfig.IdleIntervalMax);
+        return Mathf.Lerp(min, max, (float)mainMenuVisualRandom.NextDouble());
+    }
+
+    private float MainMenuLampEventDuration()
+    {
+        float cutDuration = Mathf.Max(0.01f, mainMenuVisualConfig.PowerCutDuration);
+        float holdDuration = Mathf.Max(0f, mainMenuVisualConfig.BlackoutHoldDuration);
+        float recoveryDuration = Mathf.Max(
+            Mathf.Max(0.01f, mainMenuVisualConfig.EnvironmentRelightDuration),
+            Mathf.Max(Mathf.Max(0.01f, mainMenuVisualConfig.GlowRelightDuration), Mathf.Max(0.01f, mainMenuVisualConfig.CoreRelightDuration)));
+        return cutDuration + holdDuration + recoveryDuration;
+    }
+
+    private void ResetMainMenuMarqueePresentation()
+    {
+        if (mainMenuMarqueeProfile == null)
+        {
+            LoadMainMenuMarqueeProfile();
+        }
+
+        mainMenuMarqueeProfile.Normalize();
+        int seed = mainMenuMarqueeProfile.RandomSeed;
+        if (!mainMenuMarqueeProfile.LockPreviewSeed)
+        {
+            seed = unchecked(Environment.TickCount ^ GetInstanceID() ^ Mathf.RoundToInt(Time.realtimeSinceStartup * 1000f) ^ 0x4D415251);
+        }
+
+        mainMenuMarqueeRandom = new System.Random(seed);
+        ClearMainMenuMarqueeEvent();
+        mainMenuMarqueeProtectionUntil = Time.unscaledTime;
+        if (!menuLampFlickerUserEnabled || !mainMenuMarqueeProfile.Enabled || mainMenuMarqueeProfile.ReducedFlashingScale <= 0f)
+        {
+            mainMenuMarqueeNextEventAt = float.PositiveInfinity;
+        }
+        else if (mainMenuMarqueeProfile.PlayOnEnter)
+        {
+            mainMenuMarqueeNextEventAt = Time.unscaledTime + mainMenuMarqueeProfile.InitialDelay;
+        }
+        else
+        {
+            mainMenuMarqueeNextEventAt = mainMenuMarqueeProfile.LoopEnabled
+                ? Time.unscaledTime + NextMainMenuMarqueeIdleInterval()
+                : float.PositiveInfinity;
+        }
+    }
+
+    private void UpdateMainMenuMarqueePresentation()
+    {
+        if (!CanPlayMainMenuMarquee())
+        {
+            ClearMainMenuMarqueeEvent();
+            return;
+        }
+
+        float now = Time.unscaledTime;
+        if (mainMenuMarqueeEventStartedAt < 0f)
+        {
+            if (mainMenuLampEventStartedAt >= 0f || now < mainMenuMarqueeProtectionUntil || now < mainMenuMarqueeNextEventAt)
+            {
+                return;
+            }
+
+            BeginMainMenuMarqueeEvent(now);
+        }
+
+        float elapsed = Mathf.Max(0f, now - mainMenuMarqueeEventStartedAt);
+        EvaluateMainMenuMarqueeEvent(elapsed);
+        if (elapsed < mainMenuMarqueeEventDuration)
+        {
+            return;
+        }
+
+        ClearMainMenuMarqueeEvent();
+        float cooldown = Mathf.Max(0f, mainMenuMarqueeProfile.MutualExclusionCooldown);
+        mainMenuLampProtectionUntil = Mathf.Max(mainMenuLampProtectionUntil, now + cooldown);
+        mainMenuMarqueeNextEventAt = mainMenuMarqueeProfile.LoopEnabled
+            ? now + NextMainMenuMarqueeIdleInterval()
+            : float.PositiveInfinity;
+    }
+
+    private bool CanPlayMainMenuMarquee()
+    {
+        return mainMenuMarqueeProfile != null
+            && mainMenuMarqueeProfile.Enabled
+            && mainMenuMarqueeProfile.ReducedFlashingScale > 0f
+            && menuLampFlickerUserEnabled
+            && mainMenuLampOnTexture != null
+            && mainMenuMarqueeOffTexture != null;
+    }
+
+    private void BeginMainMenuMarqueeEvent(float now)
+    {
+        if (mainMenuMarqueeRandom == null)
+        {
+            mainMenuMarqueeRandom = new System.Random(mainMenuMarqueeProfile.RandomSeed);
+        }
+
+        mainMenuMarqueeProfile.Normalize();
+        mainMenuMarqueeActiveFailedPulseCount = Mathf.Clamp(
+            mainMenuMarqueeProfile.FailedPulseCount,
+            0,
+            MainMenuMarqueeMaxFailedPulses);
+        float pulseDuration = 0f;
+        for (int i = 0; i < mainMenuMarqueeActiveFailedPulseCount; i++)
+        {
+            mainMenuMarqueeFailedPulseDurations[i] = NextMainMenuMarqueeRange(mainMenuMarqueeProfile.FailedPulseDurationRange);
+            mainMenuMarqueeFailedPulseBrightness[i] = NextMainMenuMarqueeRange(mainMenuMarqueeProfile.FailedPulseBrightnessRange);
+            pulseDuration += mainMenuMarqueeFailedPulseDurations[i];
+        }
+
+        switch (mainMenuMarqueeProfile.RelightOrder)
+        {
+            case MainMenuMarqueeRelightOrder.KingThenDice:
+                mainMenuMarqueeRelightDiceFirst = false;
+                break;
+            case MainMenuMarqueeRelightOrder.Random:
+                mainMenuMarqueeRelightDiceFirst = mainMenuMarqueeRandom.NextDouble() >= 0.5;
+                break;
+            default:
+                mainMenuMarqueeRelightDiceFirst = true;
+                break;
+        }
+
+        mainMenuMarqueeEventDuration = mainMenuMarqueeProfile.BrownoutDuration
+            + mainMenuMarqueeProfile.NearOffHoldDuration
+            + pulseDuration
+            + mainMenuMarqueeProfile.SectionStagger
+            + mainMenuMarqueeProfile.RelightDuration
+            + mainMenuMarqueeProfile.SettleDuration;
+        mainMenuMarqueeEventStartedAt = now;
+        mainMenuMarqueeNextEventAt = float.PositiveInfinity;
+
+        float stableAt = now + mainMenuMarqueeEventDuration + mainMenuMarqueeProfile.MutualExclusionCooldown;
+        mainMenuLampProtectionUntil = Mathf.Max(mainMenuLampProtectionUntil, stableAt);
+        mainMenuLampNextEventAt = Mathf.Max(mainMenuLampNextEventAt, stableAt);
+    }
+
+    private void EvaluateMainMenuMarqueeEvent(float elapsed)
+    {
+        float minimum = Mathf.Clamp(mainMenuMarqueeProfile.MinimumBrightness, 0.02f, 0.8f);
+        float brownoutDuration = Mathf.Max(0.01f, mainMenuMarqueeProfile.BrownoutDuration);
+        if (elapsed < brownoutDuration)
+        {
+            float t = Mathf.Clamp01(elapsed / brownoutDuration);
+            float firstDip = Mathf.Lerp(minimum, 1f, 0.35f);
+            float rebound = Mathf.Lerp(minimum, 1f, 0.56f);
+            float brightness;
+            if (t < 0.42f)
+            {
+                brightness = Mathf.Lerp(1f, firstDip, Mathf.SmoothStep(0f, 1f, t / 0.42f));
+            }
+            else if (t < 0.70f)
+            {
+                brightness = Mathf.Lerp(firstDip, rebound, Mathf.SmoothStep(0f, 1f, (t - 0.42f) / 0.28f));
+            }
+            else
+            {
+                brightness = Mathf.Lerp(rebound, minimum, Mathf.SmoothStep(0f, 1f, (t - 0.70f) / 0.30f));
+            }
+
+            SetMainMenuMarqueeLevels(brightness, brightness, 0f, 0f);
+            return;
+        }
+
+        elapsed -= brownoutDuration;
+        float holdDuration = Mathf.Max(0f, mainMenuMarqueeProfile.NearOffHoldDuration);
+        if (elapsed < holdDuration)
+        {
+            SetMainMenuMarqueeLevels(minimum, minimum, 0f, 0f);
+            return;
+        }
+
+        elapsed -= holdDuration;
+        for (int i = 0; i < mainMenuMarqueeActiveFailedPulseCount; i++)
+        {
+            float duration = Mathf.Max(0.01f, mainMenuMarqueeFailedPulseDurations[i]);
+            if (elapsed < duration)
+            {
+                float pulse = Mathf.Sin(Mathf.PI * Mathf.Clamp01(elapsed / duration));
+                float dicePeak = mainMenuMarqueeFailedPulseBrightness[i];
+                float kingPeak = Mathf.Clamp(
+                    dicePeak * (i % 2 == 0 ? 0.90f : 1.04f),
+                    minimum,
+                    1f);
+                SetMainMenuMarqueeLevels(
+                    Mathf.Lerp(minimum, dicePeak, pulse),
+                    Mathf.Lerp(minimum, kingPeak, pulse),
+                    pulse * 0.28f,
+                    pulse * 0.22f);
+                return;
+            }
+
+            elapsed -= duration;
+        }
+
+        float firstBrightness;
+        float firstGlow;
+        float secondBrightness;
+        float secondGlow;
+        EvaluateMainMenuMarqueeRelightSection(elapsed, minimum, out firstBrightness, out firstGlow);
+        EvaluateMainMenuMarqueeRelightSection(elapsed - mainMenuMarqueeProfile.SectionStagger, minimum, out secondBrightness, out secondGlow);
+
+        float relightSpan = mainMenuMarqueeProfile.SectionStagger + mainMenuMarqueeProfile.RelightDuration;
+        if (elapsed < relightSpan)
+        {
+            if (mainMenuMarqueeRelightDiceFirst)
+            {
+                SetMainMenuMarqueeLevels(firstBrightness, secondBrightness, firstGlow, secondGlow);
+            }
+            else
+            {
+                SetMainMenuMarqueeLevels(secondBrightness, firstBrightness, secondGlow, firstGlow);
+            }
+
+            return;
+        }
+
+        float settleDuration = Mathf.Max(0.001f, mainMenuMarqueeProfile.SettleDuration);
+        float settle = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((elapsed - relightSpan) / settleDuration));
+        float settleGlow = mainMenuMarqueeProfile.RelightOvershoot * 0.35f * settle;
+        SetMainMenuMarqueeLevels(1f, 1f, settleGlow, settleGlow);
+    }
+
+    private void EvaluateMainMenuMarqueeRelightSection(float elapsed, float minimum, out float brightness, out float glow)
+    {
+        if (elapsed <= 0f)
+        {
+            brightness = minimum;
+            glow = 0f;
+            return;
+        }
+
+        float duration = Mathf.Max(0.01f, mainMenuMarqueeProfile.RelightDuration);
+        float t = Mathf.Clamp01(elapsed / duration);
+        brightness = Mathf.Lerp(minimum, 1f, Mathf.SmoothStep(0f, 1f, t));
+        glow = Mathf.Sin(Mathf.PI * t) * mainMenuMarqueeProfile.RelightOvershoot;
+    }
+
+    private void SetMainMenuMarqueeLevels(float diceBrightness, float kingBrightness, float diceGlow, float kingGlow)
+    {
+        float scale = Mathf.Clamp01(mainMenuMarqueeProfile.ReducedFlashingScale);
+        mainMenuMarqueeDiceBrightness = Mathf.Lerp(1f, Mathf.Clamp01(diceBrightness), scale);
+        mainMenuMarqueeKingBrightness = Mathf.Lerp(1f, Mathf.Clamp01(kingBrightness), scale);
+        float glowScale = scale * Mathf.Max(0f, mainMenuMarqueeProfile.GlowIntensity);
+        mainMenuMarqueeDiceGlowAlpha = Mathf.Clamp01(diceGlow * glowScale);
+        mainMenuMarqueeKingGlowAlpha = Mathf.Clamp01(kingGlow * glowScale);
+    }
+
+    private void ProtectMainMenuMarqueeForInput(float now)
+    {
+        if (mainMenuMarqueeProfile == null || !mainMenuMarqueeProfile.PauseOnInput)
+        {
+            return;
+        }
+
+        bool interrupted = mainMenuMarqueeEventStartedAt >= 0f;
+        ClearMainMenuMarqueeEvent();
+        mainMenuMarqueeProtectionUntil = Mathf.Max(
+            mainMenuMarqueeProtectionUntil,
+            now + mainMenuMarqueeProfile.InputProtectionDuration);
+        if (interrupted)
+        {
+            mainMenuMarqueeNextEventAt = mainMenuMarqueeProfile.LoopEnabled
+                ? mainMenuMarqueeProtectionUntil + NextMainMenuMarqueeIdleInterval()
+                : float.PositiveInfinity;
+        }
+        else
+        {
+            mainMenuMarqueeNextEventAt = Mathf.Max(mainMenuMarqueeNextEventAt, mainMenuMarqueeProtectionUntil);
+        }
+    }
+
+    private void ProtectMainMenuMarqueeForLamp(float lampEventEndsAt)
+    {
+        if (mainMenuMarqueeProfile == null)
+        {
+            return;
+        }
+
+        float protectedUntil = lampEventEndsAt + Mathf.Max(0f, mainMenuMarqueeProfile.MutualExclusionCooldown);
+        mainMenuMarqueeProtectionUntil = Mathf.Max(mainMenuMarqueeProtectionUntil, protectedUntil);
+        mainMenuMarqueeNextEventAt = Mathf.Max(mainMenuMarqueeNextEventAt, protectedUntil);
+    }
+
+    private void ClearMainMenuMarqueeEvent()
+    {
+        mainMenuMarqueeEventStartedAt = -1f;
+        mainMenuMarqueeEventDuration = 0f;
+        mainMenuMarqueeDiceBrightness = 1f;
+        mainMenuMarqueeKingBrightness = 1f;
+        mainMenuMarqueeDiceGlowAlpha = 0f;
+        mainMenuMarqueeKingGlowAlpha = 0f;
+    }
+
+    private float NextMainMenuMarqueeIdleInterval()
+    {
+        return NextMainMenuMarqueeRange(mainMenuMarqueeProfile.EventIntervalRange);
+    }
+
+    private float NextMainMenuMarqueeRange(Vector2 range)
+    {
+        float min = Mathf.Min(range.x, range.y);
+        float max = Mathf.Max(range.x, range.y);
+        if (mainMenuMarqueeRandom == null)
+        {
+            mainMenuMarqueeRandom = new System.Random(mainMenuMarqueeProfile != null ? mainMenuMarqueeProfile.RandomSeed : 777);
+        }
+
+        return Mathf.Lerp(min, max, (float)mainMenuMarqueeRandom.NextDouble());
+    }
+
+    private void ResetMainMenuRainPresentation()
+    {
+        if (mainMenuRainProfile == null)
+        {
+            LoadMainMenuRainProfile();
+        }
+
+        mainMenuRainProfile.Normalize();
+        EnsureMainMenuRainState();
+
+        int seed = mainMenuRainProfile.RandomSeed;
+        if (!mainMenuRainProfile.LockPreviewSeed)
+        {
+            seed = unchecked(Environment.TickCount ^ GetInstanceID() ^ Mathf.RoundToInt(Time.realtimeSinceStartup * 1000f));
+        }
+
+        mainMenuRainRandom = new System.Random(seed);
+        for (int i = 0; i < mainMenuFarRainStreaks.Length; i++)
+        {
+            ResetMainMenuRainStreak(mainMenuFarRainStreaks[i], false, true);
+            ResetMainMenuRainStreak(mainMenuNearRainStreaks[i], true, true);
+        }
+
+        for (int i = 0; i < mainMenuGlassDrops.Length; i++)
+        {
+            mainMenuGlassDrops[i].Active = false;
+        }
+
+        for (int i = 0; i < mainMenuGlassFlows.Length; i++)
+        {
+            mainMenuGlassFlows[i].Active = false;
+        }
+
+        mainMenuGlassClusterCount = NextMainMenuRainInt(mainMenuRainProfile.ClusterCountRange.x, mainMenuRainProfile.ClusterCountRange.y);
+        mainMenuGlassClusterCount = Mathf.Clamp(mainMenuGlassClusterCount, 1, MainMenuGlassClusterCapacity);
+        for (int i = 0; i < MainMenuGlassClusterCapacity; i++)
+        {
+            mainMenuGlassClusterUses[i] = 0;
+        }
+
+        for (int i = 0; i < mainMenuGlassClusterCount; i++)
+        {
+            RefreshMainMenuGlassCluster(i);
+        }
+
+        mainMenuGlassSpawnCounter = 0;
+        int prewarmCount = Mathf.Clamp(mainMenuRainProfile.ActiveDropletRange.x, 0, MainMenuGlassDropCapacity);
+        for (int i = 0; i < prewarmCount; i++)
+        {
+            SpawnMainMenuGlassDrop(true);
+        }
+
+        mainMenuGlassSpawnTimer = NextMainMenuGlassImpactInterval(false);
+        mainMenuRainInitialized = true;
+    }
+
+    private void EnsureMainMenuRainState()
+    {
+        for (int i = 0; i < MainMenuRainLayerCapacity; i++)
+        {
+            if (mainMenuFarRainStreaks[i] == null)
+            {
+                mainMenuFarRainStreaks[i] = new MainMenuRainStreak();
+            }
+
+            if (mainMenuNearRainStreaks[i] == null)
+            {
+                mainMenuNearRainStreaks[i] = new MainMenuRainStreak();
+            }
+        }
+
+        for (int i = 0; i < MainMenuGlassDropCapacity; i++)
+        {
+            if (mainMenuGlassDrops[i] == null)
+            {
+                mainMenuGlassDrops[i] = new MainMenuGlassDrop();
+            }
+        }
+
+        for (int i = 0; i < MainMenuGlassFlowCapacity; i++)
+        {
+            if (mainMenuGlassFlows[i] == null)
+            {
+                mainMenuGlassFlows[i] = new MainMenuGlassFlow();
+            }
+        }
+    }
+
+    private void UpdateMainMenuRainPresentation(float deltaTime)
+    {
+        if (mainMenuRainProfile == null)
+        {
+            return;
+        }
+
+        if (!mainMenuRainInitialized)
+        {
+            ResetMainMenuRainPresentation();
+        }
+
+        float dt = Mathf.Clamp(deltaTime, 0f, 0.1f);
+        if (mainMenuRainProfile.OutsideRainEnabled && mainMenuRainProfile.OutsideRainDensity > 0f)
+        {
+            int farCount = Mathf.Clamp(Mathf.RoundToInt(mainMenuRainProfile.FarLayerCount * mainMenuRainProfile.OutsideRainDensity), 0, MainMenuRainLayerCapacity);
+            int nearCount = Mathf.Clamp(Mathf.RoundToInt(mainMenuRainProfile.NearLayerCount * mainMenuRainProfile.OutsideRainDensity), 0, MainMenuRainLayerCapacity);
+            UpdateMainMenuRainLayer(mainMenuFarRainStreaks, farCount, false, dt);
+            UpdateMainMenuRainLayer(mainMenuNearRainStreaks, nearCount, true, dt);
+        }
+
+        if (mainMenuRainProfile.GlassWaterEnabled)
+        {
+            UpdateMainMenuGlassWater(dt);
+        }
+        else
+        {
+            ClearMainMenuGlassWater();
+        }
+    }
+
+    private void UpdateMainMenuRainLayer(MainMenuRainStreak[] streaks, int count, bool nearLayer, float deltaTime)
+    {
+        float speedMultiplier = mainMenuRainProfile.OutsideRainSpeed;
+        for (int i = 0; i < count; i++)
+        {
+            MainMenuRainStreak streak = streaks[i];
+            if (!streak.Initialized)
+            {
+                ResetMainMenuRainStreak(streak, nearLayer, true);
+            }
+
+            float movement = streak.Speed * speedMultiplier * deltaTime;
+            streak.Y += movement;
+            streak.X += movement * mainMenuRainProfile.WindDrift;
+            float bottom = MainMenuPaneBottom(streak.X, 1f);
+            float minX = (MainMenuPaneMinDesignX + MainMenuPaneEdgeMargin) / PrototypeToDesignScale;
+            float maxX = (MainMenuPaneMaxDesignX - MainMenuPaneEdgeMargin) / PrototypeToDesignScale;
+            if (streak.Y - streak.Length > bottom + 3f || streak.X < minX || streak.X > maxX)
+            {
+                ResetMainMenuRainStreak(streak, nearLayer, false);
+            }
+        }
+    }
+
+    private void ResetMainMenuRainStreak(MainMenuRainStreak streak, bool nearLayer, bool randomizeY)
+    {
+        Vector2 speedRange = nearLayer ? mainMenuRainProfile.NearSpeedRange : mainMenuRainProfile.FarSpeedRange;
+        Vector2 lengthRange = nearLayer ? mainMenuRainProfile.NearLengthRange : mainMenuRainProfile.FarLengthRange;
+        Vector2 widthRange = nearLayer ? mainMenuRainProfile.NearWidthRange : mainMenuRainProfile.FarWidthRange;
+        float minX = (MainMenuPaneMinDesignX + MainMenuPaneEdgeMargin + 2f) / PrototypeToDesignScale;
+        float maxX = (MainMenuPaneMaxDesignX - MainMenuPaneEdgeMargin - 2f) / PrototypeToDesignScale;
+        streak.X = NextMainMenuRainRange(minX, maxX);
+        streak.Speed = NextMainMenuRainRange(speedRange.x, speedRange.y) / PrototypeToDesignScale;
+        streak.Length = NextMainMenuRainRange(lengthRange.x, lengthRange.y) / PrototypeToDesignScale;
+        streak.Width = Mathf.Max(0.48f, NextMainMenuRainRange(widthRange.x, widthRange.y) / PrototypeToDesignScale);
+        streak.Phase = NextMainMenuRainRange(0f, Mathf.PI * 2f);
+        float top = MainMenuPaneTop(streak.X, 1f);
+        float bottom = MainMenuPaneBottom(streak.X, 1f);
+        streak.Y = randomizeY
+            ? NextMainMenuRainRange(top, bottom)
+            : top - NextMainMenuRainRange(0f, streak.Length * 1.4f);
+        streak.Initialized = true;
+    }
+
+    private void UpdateMainMenuGlassWater(float deltaTime)
+    {
+        float mergedSlideSpeed = mainMenuRainProfile.MergeSpeed / PrototypeToDesignScale;
+        float flowThreshold = Mathf.Max(1.01f, mainMenuRainProfile.FlowThreshold);
+        for (int i = 0; i < mainMenuGlassDrops.Length; i++)
+        {
+            MainMenuGlassDrop drop = mainMenuGlassDrops[i];
+            if (!drop.Active)
+            {
+                continue;
+            }
+
+            drop.Age += deltaTime;
+            if (drop.Age > Mathf.Max(0.28f, drop.SurfaceHoldTime))
+            {
+                float massProgress = Mathf.InverseLerp(1f, flowThreshold, drop.Mass);
+                float gravityResponse = massProgress * massProgress;
+                float downwardSpeed = Mathf.Lerp(drop.CreepSpeed, mergedSlideSpeed, gravityResponse);
+                drop.Position.y += downwardSpeed * deltaTime;
+            }
+
+            if (drop.Age >= drop.Lifetime || !IsInsideMainMenuPane(drop.Position, 0f))
+            {
+                drop.Active = false;
+            }
+        }
+
+        ResolveMainMenuGlassContactMerges();
+        StartEligibleMainMenuGlassFlows();
+        UpdateMainMenuGlassFlows(deltaTime);
+
+        mainMenuGlassSpawnTimer -= deltaTime;
+        if (mainMenuGlassSpawnTimer > 0f)
+        {
+            return;
+        }
+
+        int activeDrops = CountActiveMainMenuGlassDrops();
+        int maximum = Mathf.Clamp(mainMenuRainProfile.ActiveDropletRange.y, 1, MainMenuGlassDropCapacity);
+        bool belowMinimum = activeDrops < mainMenuRainProfile.ActiveDropletRange.x;
+        if (activeDrops < maximum)
+        {
+            SpawnMainMenuGlassDrop(false);
+        }
+
+        mainMenuGlassSpawnTimer = NextMainMenuGlassImpactInterval(belowMinimum);
+    }
+
+    private void ResolveMainMenuGlassContactMerges()
+    {
+        for (int i = 0; i < mainMenuGlassDrops.Length; i++)
+        {
+            MainMenuGlassDrop first = mainMenuGlassDrops[i];
+            if (!first.Active || first.Age < 0.28f)
+            {
+                continue;
+            }
+
+            for (int j = i + 1; j < mainMenuGlassDrops.Length; j++)
+            {
+                MainMenuGlassDrop second = mainMenuGlassDrops[j];
+                if (!second.Active || second.Age < 0.28f || !MainMenuGlassDropsTouch(first, second))
+                {
+                    continue;
+                }
+
+                MergeTouchingMainMenuGlassDrops(first, second);
+                if (!first.Active)
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    private bool MainMenuGlassDropsTouch(MainMenuGlassDrop first, MainMenuGlassDrop second)
+    {
+        float firstWidth = MainMenuGlassDropVisualWidth(first);
+        float secondWidth = MainMenuGlassDropVisualWidth(second);
+        float tolerance = mainMenuRainProfile.MergeRadius / PrototypeToDesignScale;
+        float horizontalContact = Mathf.Max(0.1f, (firstWidth + secondWidth) * 0.5f + tolerance);
+        float verticalContact = Mathf.Max(0.1f, (firstWidth + secondWidth) * 0.61f + tolerance);
+        Vector2 delta = second.Position - first.Position;
+        float normalizedX = delta.x / horizontalContact;
+        float normalizedY = delta.y / verticalContact;
+        return normalizedX * normalizedX + normalizedY * normalizedY <= 1f;
+    }
+
+    private static float MainMenuGlassDropVisualWidth(MainMenuGlassDrop drop)
+    {
+        float massScale = Mathf.Clamp(Mathf.Sqrt(Mathf.Max(0.35f, drop.Mass)), 0.8f, 2.15f);
+        return drop.Size * massScale;
+    }
+
+    private static void MergeTouchingMainMenuGlassDrops(MainMenuGlassDrop first, MainMenuGlassDrop second)
+    {
+        bool secondIsLower = second.Position.y > first.Position.y + 0.05f;
+        bool sameHeight = Mathf.Abs(second.Position.y - first.Position.y) <= 0.05f;
+        bool secondIsHeavier = second.Mass > first.Mass;
+        MainMenuGlassDrop target = secondIsLower || (sameHeight && secondIsHeavier) ? second : first;
+        MainMenuGlassDrop source = target == first ? second : first;
+        float combinedMass = Mathf.Max(0.01f, target.Mass + source.Mass);
+        float weightedX = (target.Position.x * target.Mass + source.Position.x * source.Mass) / combinedMass;
+        float lowerY = Mathf.Max(target.Position.y, source.Position.y);
+        float combinedSize = (target.Size * target.Mass + source.Size * source.Mass) / combinedMass;
+
+        target.Position = new Vector2(weightedX, lowerY);
+        target.Size = combinedSize;
+        target.Mass = combinedMass;
+        target.CreepSpeed = Mathf.Max(target.CreepSpeed, source.CreepSpeed);
+        target.SurfaceHoldTime = Mathf.Min(target.SurfaceHoldTime, target.Age);
+        target.Lifetime = Mathf.Max(Mathf.Max(target.Lifetime, source.Lifetime), target.Age + 3f);
+        source.Active = false;
+    }
+
+    private void StartEligibleMainMenuGlassFlows()
+    {
+        int activeFlows = CountActiveMainMenuGlassFlows();
+        int maximumFlows = Mathf.Clamp(mainMenuRainProfile.MaxConcurrentFlows, 1, MainMenuGlassFlowCapacity);
+        if (activeFlows >= maximumFlows)
+        {
+            return;
+        }
+
+        for (int i = 0; i < mainMenuGlassDrops.Length && activeFlows < maximumFlows; i++)
+        {
+            MainMenuGlassDrop drop = mainMenuGlassDrops[i];
+            if (!drop.Active || drop.Mass < mainMenuRainProfile.FlowThreshold)
+            {
+                continue;
+            }
+
+            if (TryStartMainMenuGlassFlow(drop))
+            {
+                activeFlows++;
+            }
+        }
+    }
+
+    private bool TryStartMainMenuGlassFlow(MainMenuGlassDrop source)
+    {
+        MainMenuGlassFlow flow = null;
+        for (int i = 0; i < mainMenuGlassFlows.Length; i++)
+        {
+            if (!mainMenuGlassFlows[i].Active)
+            {
+                flow = mainMenuGlassFlows[i];
+                break;
+            }
+        }
+
+        if (flow == null)
+        {
+            return false;
+        }
+
+        float top = MainMenuPaneTop(source.Position.x, 1f);
+        float bottom = MainMenuPaneBottom(source.Position.x, 1f);
+        float paneHeight = Mathf.Max(1f, bottom - top);
+        float available = bottom - source.Position.y;
+        if (available < Mathf.Max(18f, paneHeight * 0.15f))
+        {
+            return false;
+        }
+
+        float targetFraction = NextMainMenuRainRange(mainMenuRainProfile.FlowLengthRange.x, mainMenuRainProfile.FlowLengthRange.y);
+        float targetLength = Mathf.Min(paneHeight * targetFraction, available - 2f);
+        if (targetLength < 12f)
+        {
+            return false;
+        }
+
+        flow.Active = true;
+        flow.Origin = source.Position;
+        flow.CurrentLength = 0f;
+        flow.TargetLength = targetLength;
+        flow.Speed = NextMainMenuRainRange(mainMenuRainProfile.FlowSpeedRange.x, mainMenuRainProfile.FlowSpeedRange.y) / PrototypeToDesignScale;
+        flow.Width = NextMainMenuRainRange(mainMenuRainProfile.FlowWidthRange.x, mainMenuRainProfile.FlowWidthRange.y) / PrototypeToDesignScale;
+        flow.Width *= Mathf.Lerp(0.92f, 1.20f, Mathf.Clamp01(source.Mass / (mainMenuRainProfile.FlowThreshold * 1.8f)));
+        flow.CurveAmplitude = NextMainMenuRainRange(1.4f, 4.2f);
+        flow.CurvePhase = NextMainMenuRainRange(0f, Mathf.PI * 2f);
+        flow.CurveDirection = NextMainMenuRainFloat() < 0.5f ? -1f : 1f;
+        flow.HasBranch = NextMainMenuRainFloat() < mainMenuRainProfile.BranchChance;
+        flow.BranchStartFraction = NextMainMenuRainRange(0.34f, 0.62f);
+        flow.BranchDirection = NextMainMenuRainFloat() < 0.5f ? -1f : 1f;
+        flow.HasPause = NextMainMenuRainFloat() < mainMenuRainProfile.PauseChance;
+        flow.PauseAtFraction = NextMainMenuRainRange(0.28f, 0.64f);
+        flow.PauseTriggered = false;
+        flow.PauseRemaining = NextMainMenuRainRange(mainMenuRainProfile.FlowPauseRange.x, mainMenuRainProfile.FlowPauseRange.y);
+        flow.HoldTimer = 0f;
+        flow.Fade = 1f;
+        source.Active = false;
+        return true;
+    }
+
+    private void UpdateMainMenuGlassFlows(float deltaTime)
+    {
+        for (int i = 0; i < mainMenuGlassFlows.Length; i++)
+        {
+            MainMenuGlassFlow flow = mainMenuGlassFlows[i];
+            if (!flow.Active)
+            {
+                continue;
+            }
+
+            if (flow.CurrentLength < flow.TargetLength)
+            {
+                if (flow.HasPause && !flow.PauseTriggered && flow.CurrentLength >= flow.TargetLength * flow.PauseAtFraction)
+                {
+                    flow.PauseTriggered = true;
+                }
+
+                if (flow.PauseTriggered && flow.PauseRemaining > 0f)
+                {
+                    flow.PauseRemaining -= deltaTime;
+                }
+                else
+                {
+                    flow.CurrentLength = Mathf.Min(flow.TargetLength, flow.CurrentLength + flow.Speed * deltaTime);
+                }
+
+                AbsorbMainMenuGlassDrops(flow);
+                continue;
+            }
+
+            flow.HoldTimer += deltaTime;
+            if (flow.HoldTimer <= mainMenuRainProfile.FlowHoldDuration)
+            {
+                flow.Fade = 1f;
+                continue;
+            }
+
+            flow.Fade = 1f - (flow.HoldTimer - mainMenuRainProfile.FlowHoldDuration) / 1.2f;
+            if (flow.Fade <= 0f)
+            {
+                flow.Active = false;
+                flow.Fade = 0f;
+            }
+        }
+    }
+
+    private void AbsorbMainMenuGlassDrops(MainMenuGlassFlow flow)
+    {
+        float contactTolerance = mainMenuRainProfile.MergeRadius / PrototypeToDesignScale;
+        for (int i = 0; i < mainMenuGlassDrops.Length; i++)
+        {
+            MainMenuGlassDrop drop = mainMenuGlassDrops[i];
+            if (!drop.Active || drop.Age < 0.28f)
+            {
+                continue;
+            }
+
+            float distanceDown = drop.Position.y - flow.Origin.y;
+            if (distanceDown < 0f || distanceDown > flow.CurrentLength)
+            {
+                continue;
+            }
+
+            Vector2 pathPoint = MainMenuGlassFlowPoint(flow, distanceDown, false);
+            float contactRadius = MainMenuGlassDropVisualWidth(drop) * 0.5f + flow.Width * 0.5f + contactTolerance;
+            if (Vector2.Distance(drop.Position, pathPoint) > contactRadius)
+            {
+                continue;
+            }
+
+            float bottom = MainMenuPaneBottom(flow.Origin.x, 1f);
+            flow.Width = Mathf.Min(flow.Width + drop.Mass * 0.18f, mainMenuRainProfile.FlowWidthRange.y * 1.35f / PrototypeToDesignScale);
+            flow.TargetLength = Mathf.Min(bottom - flow.Origin.y, flow.TargetLength + drop.Mass * 1.8f);
+            drop.Active = false;
+        }
+    }
+
+    private bool SpawnMainMenuGlassDrop(bool prewarm)
+    {
+        MainMenuGlassDrop drop = null;
+        for (int i = 0; i < mainMenuGlassDrops.Length; i++)
+        {
+            if (!mainMenuGlassDrops[i].Active)
+            {
+                drop = mainMenuGlassDrops[i];
+                break;
+            }
+        }
+
+        if (drop == null || mainMenuGlassClusterCount <= 0)
+        {
+            return false;
+        }
+
+        int clusterIndex;
+        if (mainMenuGlassSpawnCounter < mainMenuGlassClusterCount * 2)
+        {
+            clusterIndex = mainMenuGlassSpawnCounter % mainMenuGlassClusterCount;
+        }
+        else
+        {
+            clusterIndex = NextMainMenuRainInt(0, mainMenuGlassClusterCount - 1);
+        }
+
+        mainMenuGlassSpawnCounter++;
+        if (mainMenuGlassClusterUses[clusterIndex] <= 0)
+        {
+            RefreshMainMenuGlassCluster(clusterIndex);
+        }
+
+        Vector2 anchor = mainMenuGlassClusterAnchors[clusterIndex];
+        float spread = mainMenuRainProfile.ClusterSpread / PrototypeToDesignScale;
+        float size = NextMainMenuRainRange(mainMenuRainProfile.DropletSizeRange.x, mainMenuRainProfile.DropletSizeRange.y) / PrototypeToDesignScale;
+        Vector2 position = anchor;
+        MainMenuGlassDrop contactTarget = null;
+        if (NextMainMenuRainFloat() < mainMenuRainProfile.ContactImpactChance)
+        {
+            contactTarget = FindMainMenuGlassContactImpactTarget(clusterIndex);
+        }
+
+        if (contactTarget != null)
+        {
+            float tolerance = mainMenuRainProfile.MergeRadius / PrototypeToDesignScale;
+            float contactDistance = MainMenuGlassDropVisualWidth(contactTarget) * 0.5f + size * 0.5f + tolerance;
+            float xOffset = NextMainMenuRainRange(-0.45f, 0.45f) * contactDistance;
+            float verticalOffset = Mathf.Sqrt(Mathf.Max(0f, contactDistance * contactDistance - xOffset * xOffset));
+            Vector2 candidate = contactTarget.Position + new Vector2(xOffset, -verticalOffset - NextMainMenuRainRange(0f, 1.2f) / PrototypeToDesignScale);
+            if (IsInsideMainMenuPane(candidate, 2f))
+            {
+                position = candidate;
+            }
+            else
+            {
+                contactTarget = null;
+            }
+        }
+
+        if (contactTarget == null)
+        {
+            for (int attempt = 0; attempt < 8; attempt++)
+            {
+                float angle = NextMainMenuRainRange(0f, Mathf.PI * 2f);
+                float radius = Mathf.Sqrt(NextMainMenuRainFloat()) * spread;
+                Vector2 candidate = anchor + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle) * 0.72f) * radius;
+                if (IsInsideMainMenuPane(candidate, 2f))
+                {
+                    position = candidate;
+                    break;
+                }
+            }
+        }
+
+        mainMenuGlassClusterUses[clusterIndex]--;
+        drop.Active = true;
+        drop.ClusterIndex = clusterIndex;
+        drop.Position = position;
+        drop.Lifetime = NextMainMenuRainRange(mainMenuRainProfile.DropletLifetimeRange.x, mainMenuRainProfile.DropletLifetimeRange.y);
+        drop.Age = prewarm ? NextMainMenuRainRange(0.35f, Mathf.Min(3f, drop.Lifetime * 0.30f)) : 0f;
+        drop.SurfaceHoldTime = contactTarget != null
+            ? Mathf.Max(0.28f, mainMenuRainProfile.SurfaceHoldRange.x)
+            : NextMainMenuRainRange(mainMenuRainProfile.SurfaceHoldRange.x, mainMenuRainProfile.SurfaceHoldRange.y);
+        drop.Size = size;
+        drop.Mass = NextMainMenuRainRange(0.86f, 1.18f);
+        drop.CreepSpeed = NextMainMenuRainRange(mainMenuRainProfile.SurfaceCreepSpeedRange.x, mainMenuRainProfile.SurfaceCreepSpeedRange.y) / PrototypeToDesignScale;
+        drop.Phase = NextMainMenuRainRange(0f, Mathf.PI * 2f);
+        return true;
+    }
+
+    private MainMenuGlassDrop FindMainMenuGlassContactImpactTarget(int clusterIndex)
+    {
+        MainMenuGlassDrop selected = null;
+        int candidateCount = 0;
+        for (int i = 0; i < mainMenuGlassDrops.Length; i++)
+        {
+            MainMenuGlassDrop candidate = mainMenuGlassDrops[i];
+            if (!candidate.Active
+                || candidate.ClusterIndex != clusterIndex
+                || candidate.Age < 0.28f
+                || candidate.Mass >= mainMenuRainProfile.FlowThreshold)
+            {
+                continue;
+            }
+
+            float top = MainMenuPaneTop(candidate.Position.x, 2f);
+            if (candidate.Position.y - MainMenuGlassDropVisualWidth(candidate) <= top + 2f)
+            {
+                continue;
+            }
+
+            candidateCount++;
+            if (NextMainMenuRainFloat() <= 1f / candidateCount)
+            {
+                selected = candidate;
+            }
+        }
+
+        return selected;
+    }
+
+    private void RefreshMainMenuGlassCluster(int clusterIndex)
+    {
+        Vector2 selected = RandomMainMenuGlassPoint();
+        float minimumDistance = mainMenuRainProfile.ClusterSpread * 0.80f / PrototypeToDesignScale;
+        for (int attempt = 0; attempt < 8; attempt++)
+        {
+            Vector2 candidate = RandomMainMenuGlassPoint();
+            bool separated = true;
+            for (int i = 0; i < mainMenuGlassClusterCount; i++)
+            {
+                if (i == clusterIndex || mainMenuGlassClusterUses[i] <= 0)
+                {
+                    continue;
+                }
+
+                if (Vector2.Distance(candidate, mainMenuGlassClusterAnchors[i]) < minimumDistance)
+                {
+                    separated = false;
+                    break;
+                }
+            }
+
+            selected = candidate;
+            if (separated)
+            {
+                break;
+            }
+        }
+
+        mainMenuGlassClusterAnchors[clusterIndex] = selected;
+        mainMenuGlassClusterUses[clusterIndex] = NextMainMenuRainInt(4, 8);
+    }
+
+    private Vector2 RandomMainMenuGlassPoint()
+    {
+        Vector4 region = mainMenuRainProfile.SpawnRegionNormalized;
+        float minX = (MainMenuPaneMinDesignX + MainMenuPaneEdgeMargin + 6f) / PrototypeToDesignScale;
+        float maxX = (MainMenuPaneMaxDesignX - MainMenuPaneEdgeMargin - 6f) / PrototypeToDesignScale;
+        float normalizedX = NextMainMenuRainRange(region.x, region.z);
+        float x = Mathf.Lerp(minX, maxX, normalizedX);
+        float top = MainMenuPaneTop(x, 4f);
+        float bottom = MainMenuPaneBottom(x, 4f);
+        float normalizedY = NextMainMenuRainRange(region.y, region.w);
+        return new Vector2(x, Mathf.Lerp(top, bottom, normalizedY));
+    }
+
+    private int CountActiveMainMenuGlassDrops()
+    {
+        int count = 0;
+        for (int i = 0; i < mainMenuGlassDrops.Length; i++)
+        {
+            if (mainMenuGlassDrops[i].Active)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int CountActiveMainMenuGlassFlows()
+    {
+        int count = 0;
+        for (int i = 0; i < mainMenuGlassFlows.Length; i++)
+        {
+            if (mainMenuGlassFlows[i].Active)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private void ClearMainMenuGlassWater()
+    {
+        for (int i = 0; i < mainMenuGlassDrops.Length; i++)
+        {
+            if (mainMenuGlassDrops[i] != null)
+            {
+                mainMenuGlassDrops[i].Active = false;
+            }
+        }
+
+        for (int i = 0; i < mainMenuGlassFlows.Length; i++)
+        {
+            if (mainMenuGlassFlows[i] != null)
+            {
+                mainMenuGlassFlows[i].Active = false;
+            }
+        }
+    }
+
+    private float NextMainMenuGlassImpactInterval(bool belowMinimum)
+    {
+        float rate = Mathf.Max(0.05f, mainMenuRainProfile.ImpactRate);
+        float interval = NextMainMenuRainRange(0.68f, 1.32f) / rate;
+        return belowMinimum ? interval * 0.36f : interval;
+    }
+
+    private float NextMainMenuRainFloat()
+    {
+        if (mainMenuRainRandom == null)
+        {
+            mainMenuRainRandom = new System.Random(mainMenuRainProfile != null ? mainMenuRainProfile.RandomSeed : 777);
+        }
+
+        return (float)mainMenuRainRandom.NextDouble();
+    }
+
+    private float NextMainMenuRainRange(float minimum, float maximum)
+    {
+        float min = Mathf.Min(minimum, maximum);
+        float max = Mathf.Max(minimum, maximum);
+        return Mathf.Lerp(min, max, NextMainMenuRainFloat());
+    }
+
+    private int NextMainMenuRainInt(int minimum, int maximum)
+    {
+        int min = Mathf.Min(minimum, maximum);
+        int max = Mathf.Max(minimum, maximum);
+        return mainMenuRainRandom.Next(min, max + 1);
     }
 
     private void DrawOpening()
@@ -1177,29 +3784,919 @@ public sealed class DiceKingDemo : MonoBehaviour
         DrawRect(new Rect(0f, y + slitHeight * 0.46f, VirtualWidth, 8f), new Color(0.73f, 0.56f, 0.28f));
 
         GUI.color = new Color(0.9f, 0.84f, 0.68f, Mathf.Clamp01((t - 0.45f) * 2f));
-        GUI.Label(new Rect(0f, 320f, VirtualWidth, 46f), "有人把六颗骰子推到了你面前。", centerStyle);
+        DrawStandardLabel(new Rect(0f, 320f, VirtualWidth, 46f), "有人把六颗骰子推到了你面前。", centerStyle);
         GUI.color = Color.white;
     }
 
     private void DrawSettings()
     {
-        DrawHudBar("设置", string.Empty, string.Empty);
-        DrawUiPanel(new Rect(320f, 150f, 640f, 420f));
-
-        GUI.Label(new Rect(370f, 205f, 160f, 28f), "音量", headerStyle);
-        settingsVolume = GUI.HorizontalSlider(new Rect(530f, 214f, 300f, 24f), settingsVolume, 0f, 1f);
-        GUI.Label(new Rect(850f, 204f, 70f, 28f), Mathf.RoundToInt(settingsVolume * 100f) + "%", smallStyle);
-
-        windowed = GUI.Toggle(new Rect(370f, 270f, 260f, 30f), windowed, "窗口模式");
-        GUI.Label(new Rect(370f, 306f, 520f, 24f), "画面：原型默认布局", smallStyle);
-        GUI.Label(new Rect(370f, 346f, 520f, 76f), "操作说明：按 Space 开始旋骰，加力窗口内连续敲 Space 只增强表现；窗口结束后按 Space 只提示停转显点。结果锁定后按 Space 结算，或出千选择最多 3 颗实体骰点数 +1，最高不超过骰面上限；出千确认前可取消。", smallStyle);
-
-        if (DrawUiButton(new Rect(370f, 448f, 206f, 52f), "保存并返回", UiButtonKind.Primary))
+        if (mainMenuLampOnTexture != null)
         {
-            SaveMenuState();
-            Screen.fullScreen = !windowed;
-            mode = settingsReturnMode;
+            DrawArcadeSettings();
         }
+        else
+        {
+            DrawLegacySettings();
+        }
+
+        if (displaySettingsConfirmationPending)
+        {
+            DrawDisplaySettingsConfirmation();
+        }
+    }
+
+    private void DrawLegacySettings()
+    {
+        DrawHudBar("设置", string.Empty, string.Empty);
+        DrawUiPanel(new Rect(300f, 126f, 680f, 510f));
+
+        bool previousGuiEnabled = GUI.enabled;
+        GUI.enabled = previousGuiEnabled && SettingsInteractionEnabled();
+
+        DrawStandardLabel(new Rect(346f, 166f, 150f, 28f), "音量", headerStyle);
+        settingsVolume = GUI.HorizontalSlider(new Rect(506f, 175f, 300f, 24f), settingsVolume, 0f, 1f);
+        AudioListener.volume = settingsVolume;
+        DrawStandardLabel(new Rect(826f, 165f, 70f, 28f), Mathf.RoundToInt(settingsVolume * 100f) + "%", smallStyle);
+
+        DrawStandardLabel(new Rect(346f, 222f, 150f, 28f), "演出速度", headerStyle);
+        DrawSettlementSpeedButton(new Rect(506f, 216f, 116f, 38f), 1f, "1.0x");
+        DrawSettlementSpeedButton(new Rect(632f, 216f, 116f, 38f), 1.5f, "1.5x");
+        DrawSettlementSpeedButton(new Rect(758f, 216f, 116f, 38f), 2f, "2.0x");
+
+        DrawStandardLabel(new Rect(346f, 282f, 150f, 28f), "显示模式", headerStyle);
+        DrawLegacyDisplayModeButton(new Rect(506f, 276f, 112f, 38f), DisplayModeSetting.Windowed, "窗口");
+        DrawLegacyDisplayModeButton(new Rect(628f, 276f, 124f, 38f), DisplayModeSetting.BorderlessFullscreen, "全屏窗口");
+        DrawLegacyDisplayModeButton(new Rect(762f, 276f, 124f, 38f), DisplayModeSetting.ExclusiveFullscreen, "独占全屏");
+
+        DrawStandardLabel(new Rect(346f, 340f, 150f, 28f), displayMode == DisplayModeSetting.Windowed ? "窗口尺寸" : "分辨率", headerStyle);
+        DrawLegacyResolutionControl(new Rect(506f, 334f, 380f, 38f));
+
+        menuLampFlickerUserEnabled = DrawStandardToggle(new Rect(346f, 394f, 300f, 30f), menuLampFlickerUserEnabled, "动态效果：完整");
+        DrawStandardLabel(new Rect(632f, 394f, 274f, 28f), "关闭后减少灯光与 CRT 闪烁。", tinyStyle);
+
+        DrawStandardLabel(new Rect(346f, 438f, 560f, 46f), "窗口模式保留系统标题栏；双击标题栏或使用最大化按钮可铺满桌面工作区，再次双击可还原。", smallStyle);
+
+        if (DrawUiButton(new Rect(346f, 526f, 220f, 52f), "应用并返回", UiButtonKind.Primary))
+        {
+            BeginSettingsExit(true);
+        }
+
+        if (DrawUiButton(new Rect(582f, 526f, 220f, 52f), "取消", UiButtonKind.Secondary))
+        {
+            BeginSettingsExit(false);
+        }
+
+        GUI.enabled = previousGuiEnabled;
+    }
+
+    private void DrawArcadeSettings()
+    {
+        DrawArcadeCabinet(true);
+
+        Rect crtRect = ArcadeSettingsCrtRect();
+        DrawRect(crtRect, new Color(0.002f, 0.012f, 0.014f, 0.985f));
+        DrawBorder(crtRect, new Color(0.36f, 0.29f, 0.16f, 0.58f), 2f);
+        DrawBorder(new Rect(crtRect.x + 5f, crtRect.y + 5f, crtRect.width - 10f, crtRect.height - 10f), new Color(0.12f, 0.28f, 0.28f, 0.30f), 1f);
+
+        for (float y = crtRect.y + 8f; y < crtRect.yMax - 8f; y += 4f)
+        {
+            DrawRect(new Rect(crtRect.x + 8f, y, crtRect.width - 16f, 1f), new Color(0.08f, 0.19f, 0.19f, 0.11f));
+        }
+
+        Color amber = new Color(1f, 0.66f, 0.19f, 0.96f);
+        DrawRunText(new Rect(crtRect.x, crtRect.y + 10f, crtRect.width, 34f), "系统设置", 24, FontStyle.Bold, amber, TextAnchor.MiddleCenter);
+
+        Rect volumeRow = new Rect(332f, 197f, 586f, 45f);
+        Rect settlementRow = new Rect(332f, 247f, 586f, 45f);
+        Rect displayRow = new Rect(332f, 297f, 586f, 45f);
+        Rect resolutionRow = new Rect(332f, 347f, 586f, 45f);
+        Rect dynamicRow = new Rect(332f, 397f, 586f, 45f);
+        DrawArcadeSettingsRow(volumeRow, SettingsSelection.Volume, "主音量");
+        DrawArcadeSettingsRow(settlementRow, SettingsSelection.SettlementPlayback, "演出速度");
+        DrawArcadeSettingsRow(displayRow, SettingsSelection.DisplayMode, "显示模式");
+        DrawArcadeSettingsRow(resolutionRow, SettingsSelection.Resolution, displayMode == DisplayModeSetting.Windowed ? "窗口尺寸" : "分辨率");
+        DrawArcadeSettingsRow(dynamicRow, SettingsSelection.DynamicEffects, "动态效果");
+
+        DrawArcadeVolumeControl(volumeRow);
+
+        if (DrawArcadeSettingsOption(new Rect(512f, settlementRow.y + 8f, 92f, 29f), SettingsSelection.SettlementPlayback, Mathf.Approximately(NormalizeSettlementPlaybackSpeed(settlementPlaybackSpeed), 1f), "1.0x"))
+        {
+            settlementPlaybackSpeed = 1f;
+        }
+        if (DrawArcadeSettingsOption(new Rect(614f, settlementRow.y + 8f, 92f, 29f), SettingsSelection.SettlementPlayback, Mathf.Approximately(NormalizeSettlementPlaybackSpeed(settlementPlaybackSpeed), 1.5f), "1.5x"))
+        {
+            settlementPlaybackSpeed = 1.5f;
+        }
+        if (DrawArcadeSettingsOption(new Rect(716f, settlementRow.y + 8f, 92f, 29f), SettingsSelection.SettlementPlayback, Mathf.Approximately(NormalizeSettlementPlaybackSpeed(settlementPlaybackSpeed), 2f), "2.0x"))
+        {
+            settlementPlaybackSpeed = 2f;
+        }
+
+        if (DrawArcadeSettingsOption(new Rect(504f, displayRow.y + 8f, 106f, 29f), SettingsSelection.DisplayMode, displayMode == DisplayModeSetting.Windowed, "窗口"))
+        {
+            displayMode = DisplayModeSetting.Windowed;
+        }
+        if (DrawArcadeSettingsOption(new Rect(618f, displayRow.y + 8f, 130f, 29f), SettingsSelection.DisplayMode, displayMode == DisplayModeSetting.BorderlessFullscreen, "全屏窗口"))
+        {
+            displayMode = DisplayModeSetting.BorderlessFullscreen;
+        }
+        if (DrawArcadeSettingsOption(new Rect(756f, displayRow.y + 8f, 146f, 29f), SettingsSelection.DisplayMode, displayMode == DisplayModeSetting.ExclusiveFullscreen, "独占全屏"))
+        {
+            displayMode = DisplayModeSetting.ExclusiveFullscreen;
+        }
+
+        DrawArcadeResolutionControl(resolutionRow);
+
+        if (DrawArcadeSettingsOption(new Rect(512f, dynamicRow.y + 8f, 132f, 29f), SettingsSelection.DynamicEffects, menuLampFlickerUserEnabled, "完整"))
+        {
+            menuLampFlickerUserEnabled = true;
+        }
+        if (DrawArcadeSettingsOption(new Rect(656f, dynamicRow.y + 8f, 174f, 29f), SettingsSelection.DynamicEffects, !menuLampFlickerUserEnabled, "减少闪烁"))
+        {
+            menuLampFlickerUserEnabled = false;
+        }
+
+        Rect footerRect = new Rect(332f, 449f, 586f, 60f);
+        DrawRect(footerRect, new Color(0.01f, 0.025f, 0.026f, 0.92f));
+        DrawBorder(footerRect, new Color(0.74f, 0.43f, 0.14f, 0.62f), 1f);
+        DrawRunText(new Rect(footerRect.x, footerRect.y + 3f, footerRect.width, 26f), "↑↓ 选择   ←→ 调整   Esc 取消   Space 应用", 13, FontStyle.Normal, new Color(0.94f, 0.58f, 0.19f, 0.92f), TextAnchor.MiddleCenter);
+        DrawRunText(new Rect(footerRect.x, footerRect.y + 29f, footerRect.width, 24f), "窗口模式可双击系统标题栏最大化或还原", 12, FontStyle.Normal, new Color(0.52f, 0.72f, 0.67f, 0.90f), TextAnchor.MiddleCenter);
+
+        if (SettingsInteractionEnabled())
+        {
+            if (GUI.Button(new Rect(footerRect.x + 330f, footerRect.y, 94f, footerRect.height), GUIContent.none, GUIStyle.none))
+            {
+                BeginSettingsExit(false);
+            }
+            else if (GUI.Button(new Rect(footerRect.x + 430f, footerRect.y, 150f, footerRect.height), GUIContent.none, GUIStyle.none))
+            {
+                BeginSettingsExit(true);
+            }
+        }
+
+        DrawSettingsTransitionOverlay(crtRect);
+    }
+
+    private void DrawLegacyDisplayModeButton(Rect rect, DisplayModeSetting option, string label)
+    {
+        if (DrawUiButton(rect, label, displayMode == option ? UiButtonKind.Primary : UiButtonKind.Secondary))
+        {
+            displayMode = option;
+            settingsSelection = SettingsSelection.DisplayMode;
+        }
+    }
+
+    private void DrawLegacyResolutionControl(Rect rect)
+    {
+        bool editable = displayMode != DisplayModeSetting.BorderlessFullscreen;
+        Rect leftRect = new Rect(rect.x, rect.y, 48f, rect.height);
+        Rect valueRect = new Rect(rect.x + 58f, rect.y, rect.width - 116f, rect.height);
+        Rect rightRect = new Rect(rect.xMax - 48f, rect.y, 48f, rect.height);
+
+        if (editable && DrawUiButton(leftRect, "<", UiButtonKind.Secondary))
+        {
+            settingsSelection = SettingsSelection.Resolution;
+            AdjustResolutionSetting(-1);
+        }
+
+        DrawUiPanel(valueRect);
+        DrawStandardLabel(valueRect, CurrentResolutionSettingLabel(), centerStyle);
+
+        if (editable && DrawUiButton(rightRect, ">", UiButtonKind.Secondary))
+        {
+            settingsSelection = SettingsSelection.Resolution;
+            AdjustResolutionSetting(1);
+        }
+    }
+
+    private void DrawArcadeResolutionControl(Rect row)
+    {
+        bool editable = displayMode != DisplayModeSetting.BorderlessFullscreen;
+        Rect leftRect = new Rect(512f, row.y + 8f, 40f, 29f);
+        Rect valueRect = new Rect(560f, row.y + 8f, 238f, 29f);
+        Rect rightRect = new Rect(806f, row.y + 8f, 40f, 29f);
+        bool focusedRow = settingsSelection == SettingsSelection.Resolution;
+
+        DrawRect(valueRect, new Color(0.01f, 0.035f, 0.038f, 0.92f));
+        DrawBorder(valueRect, focusedRow ? new Color(0.43f, 0.78f, 0.70f, 0.86f) : new Color(0.20f, 0.34f, 0.33f, 0.52f), focusedRow ? 2f : 1f);
+        DrawRunText(valueRect, CurrentResolutionSettingLabel(), 15, FontStyle.Bold, editable ? new Color(0.66f, 0.88f, 0.80f, 0.98f) : new Color(0.42f, 0.56f, 0.53f, 0.88f), TextAnchor.MiddleCenter);
+
+        DrawRect(leftRect, new Color(0.01f, 0.035f, 0.038f, 0.92f));
+        DrawRect(rightRect, new Color(0.01f, 0.035f, 0.038f, 0.92f));
+        DrawBorder(leftRect, new Color(0.20f, 0.34f, 0.33f, editable ? 0.66f : 0.28f), 1f);
+        DrawBorder(rightRect, new Color(0.20f, 0.34f, 0.33f, editable ? 0.66f : 0.28f), 1f);
+        DrawRunText(leftRect, "<", 14, FontStyle.Bold, new Color(0.66f, 0.88f, 0.80f, editable ? 0.96f : 0.32f), TextAnchor.MiddleCenter);
+        DrawRunText(rightRect, ">", 14, FontStyle.Bold, new Color(0.66f, 0.88f, 0.80f, editable ? 0.96f : 0.32f), TextAnchor.MiddleCenter);
+
+        if (!editable || !SettingsInteractionEnabled())
+        {
+            return;
+        }
+
+        if (GUI.Button(leftRect, GUIContent.none, GUIStyle.none))
+        {
+            settingsSelection = SettingsSelection.Resolution;
+            AdjustResolutionSetting(-1);
+        }
+        else if (GUI.Button(rightRect, GUIContent.none, GUIStyle.none))
+        {
+            settingsSelection = SettingsSelection.Resolution;
+            AdjustResolutionSetting(1);
+        }
+    }
+
+    private void DrawDisplaySettingsConfirmation()
+    {
+        int secondsRemaining = Mathf.Max(0, Mathf.CeilToInt(displaySettingsConfirmationDeadline - Time.unscaledTime));
+        DrawRect(new Rect(0f, 0f, VirtualWidth, VirtualHeight), new Color(0f, 0.008f, 0.01f, 0.82f));
+
+        Rect panelRect = new Rect(350f, 206f, 580f, 306f);
+        DrawUiPanel(panelRect);
+        DrawStandardLabel(new Rect(panelRect.x + 30f, panelRect.y + 28f, panelRect.width - 60f, 38f), "保留新的显示设置？", centerStyle);
+        DrawStandardLabel(new Rect(panelRect.x + 42f, panelRect.y + 82f, panelRect.width - 84f, 34f), DisplayModeLabel(displayMode) + " · " + CurrentResolutionSettingLabel(), centerStyle);
+        DrawStandardLabel(new Rect(panelRect.x + 42f, panelRect.y + 122f, panelRect.width - 84f, 52f), secondsRemaining + " 秒后自动恢复原设置", centerStyle);
+        DrawStandardLabel(new Rect(panelRect.x + 42f, panelRect.y + 166f, panelRect.width - 84f, 28f), "Enter / Space 保留　Esc 恢复", centerStyle);
+
+        if (DrawUiButton(new Rect(panelRect.x + 48f, panelRect.y + 220f, 220f, 52f), "保留设置", UiButtonKind.Primary))
+        {
+            ConfirmDisplaySettings();
+        }
+
+        if (DrawUiButton(new Rect(panelRect.x + 312f, panelRect.y + 220f, 220f, 52f), "恢复原设置", UiButtonKind.Secondary))
+        {
+            RevertDisplaySettings();
+        }
+    }
+
+    private static Rect ArcadeSettingsCrtRect()
+    {
+        return new Rect(309f, 151f, 632f, 384f);
+    }
+
+    private void DrawArcadeSettingsRow(Rect rect, SettingsSelection selection, string label)
+    {
+        bool focused = settingsSelection == selection;
+        if (SettingsInteractionEnabled() && Event.current != null && rect.Contains(Event.current.mousePosition))
+        {
+            settingsSelection = selection;
+            focused = true;
+        }
+
+        DrawRect(rect, focused ? new Color(0.055f, 0.055f, 0.028f, 0.94f) : new Color(0.008f, 0.025f, 0.027f, 0.90f));
+        DrawBorder(rect, focused ? new Color(1f, 0.61f, 0.14f, 0.92f) : new Color(0.19f, 0.32f, 0.31f, 0.54f), focused ? 2f : 1f);
+        if (focused)
+        {
+            DrawRunText(new Rect(rect.x - 26f, rect.y, 22f, rect.height), "▶", 15, FontStyle.Bold, new Color(1f, 0.68f, 0.20f, 0.96f), TextAnchor.MiddleCenter);
+        }
+
+        Color labelColor = focused ? new Color(1f, 0.68f, 0.22f, 0.98f) : new Color(0.84f, 0.49f, 0.16f, 0.88f);
+        DrawRunText(new Rect(rect.x + 18f, rect.y, 152f, rect.height), label, 17, FontStyle.Bold, labelColor, TextAnchor.MiddleLeft);
+    }
+
+    private void DrawArcadeVolumeControl(Rect row)
+    {
+        int litCount = Mathf.Clamp(Mathf.RoundToInt(settingsVolume * 10f), 0, 10);
+        float startX = 512f;
+        const float width = 20f;
+        const float gap = 5f;
+        for (int i = 0; i < 10; i++)
+        {
+            Rect segment = new Rect(startX + i * (width + gap), row.y + 16f, width, 22f);
+            bool lit = i < litCount;
+            DrawRect(segment, lit ? new Color(1f, 0.60f, 0.12f, 0.94f) : new Color(0.035f, 0.08f, 0.08f, 0.92f));
+            DrawBorder(segment, lit ? new Color(1f, 0.79f, 0.30f, 0.84f) : new Color(0.24f, 0.38f, 0.36f, 0.48f), 1f);
+            if (SettingsInteractionEnabled() && GUI.Button(segment, GUIContent.none, GUIStyle.none))
+            {
+                settingsSelection = SettingsSelection.Volume;
+                SetSettingsVolume((i + 1) * SettingsVolumeStep);
+            }
+        }
+
+        DrawRunText(new Rect(782f, row.y, 96f, row.height), Mathf.RoundToInt(settingsVolume * 100f) + "%", 18, FontStyle.Bold, new Color(1f, 0.68f, 0.22f, 0.96f), TextAnchor.MiddleRight);
+    }
+
+    private bool DrawArcadeSettingsOption(Rect rect, SettingsSelection selection, bool selected, string label)
+    {
+        bool focusedRow = settingsSelection == selection;
+        Color fill = selected ? new Color(0.13f, 0.34f, 0.32f, focusedRow ? 0.78f : 0.66f) : new Color(0.01f, 0.035f, 0.038f, 0.92f);
+        Color edge = selected ? new Color(0.43f, 0.78f, 0.70f, 0.86f) : new Color(0.20f, 0.34f, 0.33f, 0.52f);
+        Color text = selected ? new Color(0.66f, 0.88f, 0.80f, 0.98f) : new Color(0.35f, 0.48f, 0.46f, 0.90f);
+        DrawRect(rect, fill);
+        DrawBorder(rect, edge, selected ? 2f : 1f);
+        DrawRunText(rect, label, 15, selected ? FontStyle.Bold : FontStyle.Normal, text, TextAnchor.MiddleCenter);
+
+        if (!SettingsInteractionEnabled())
+        {
+            return false;
+        }
+
+        if (Event.current != null && rect.Contains(Event.current.mousePosition))
+        {
+            settingsSelection = selection;
+        }
+
+        return GUI.Button(rect, GUIContent.none, GUIStyle.none);
+    }
+
+    private void DrawSettingsTransitionOverlay(Rect crtRect)
+    {
+        float elapsed = Mathf.Max(0f, Time.unscaledTime - settingsTransitionStartedAt);
+        float t = Mathf.Clamp01(elapsed / SettingsTransitionDuration);
+        float visible = settingsExitPending ? 1f - t : t;
+        if (visible < 1f)
+        {
+            DrawRect(crtRect, new Color(0f, 0.008f, 0.009f, 1f - visible));
+        }
+
+        if (t < 1f)
+        {
+            float lineY = settingsExitPending
+                ? Mathf.Lerp(crtRect.yMax - 6f, crtRect.y + 6f, t)
+                : Mathf.Lerp(crtRect.y + 6f, crtRect.yMax - 6f, t);
+            float lineAlpha = 0.30f + Mathf.Sin(Mathf.PI * t) * 0.45f;
+            DrawRect(new Rect(crtRect.x + 8f, lineY - 1f, crtRect.width - 16f, 2f), new Color(0.76f, 0.58f, 0.25f, lineAlpha));
+            DrawRect(new Rect(crtRect.x + 18f, lineY + 2f, crtRect.width - 36f, 1f), new Color(0.24f, 0.64f, 0.58f, lineAlpha * 0.45f));
+        }
+    }
+
+    private bool SettingsInteractionEnabled()
+    {
+        return !settingsExitPending
+            && !displaySettingsConfirmationPending
+            && Time.unscaledTime - settingsTransitionStartedAt >= SettingsTransitionDuration * 0.65f;
+    }
+
+    private void DrawSettlementSpeedButton(Rect rect, float speed, string label)
+    {
+        bool selected = Mathf.Approximately(NormalizeSettlementPlaybackSpeed(settlementPlaybackSpeed), speed);
+        if (DrawUiButton(rect, label, selected ? UiButtonKind.Primary : UiButtonKind.Secondary))
+        {
+            settlementPlaybackSpeed = speed;
+        }
+    }
+
+    private float NormalizeSettlementPlaybackSpeed(float speed)
+    {
+        if (speed >= 1.75f)
+        {
+            return 2f;
+        }
+
+        if (speed >= 1.25f)
+        {
+            return 1.5f;
+        }
+
+        return 1f;
+    }
+
+    private float GameplayPlaybackSpeed()
+    {
+        return NormalizeSettlementPlaybackSpeed(settlementPlaybackSpeed);
+    }
+
+    private float GameplayPlaybackDeltaTime()
+    {
+        return Time.deltaTime * GameplayPlaybackSpeed();
+    }
+
+    private float GameplayPlaybackElapsed(float startedAt)
+    {
+        return Mathf.Max(0f, Time.time - startedAt) * GameplayPlaybackSpeed();
+    }
+
+    private float GameplayPlaybackTime()
+    {
+        return Time.time * GameplayPlaybackSpeed();
+    }
+
+    private static string DisplayModeLabel(DisplayModeSetting value)
+    {
+        switch (value)
+        {
+            case DisplayModeSetting.Windowed:
+                return "窗口";
+            case DisplayModeSetting.ExclusiveFullscreen:
+                return "独占全屏";
+            default:
+                return "全屏窗口";
+        }
+    }
+
+    private string CurrentResolutionSettingLabel()
+    {
+        if (displayMode == DisplayModeSetting.BorderlessFullscreen)
+        {
+            return "跟随桌面 " + desktopWidth + "×" + desktopHeight;
+        }
+
+        Vector2Int resolution = CurrentResolutionSetting();
+        if (displayMode == DisplayModeSetting.Windowed && windowMaximized)
+        {
+            return resolution.x + "×" + resolution.y + " 还原尺寸";
+        }
+
+        return resolution.x + "×" + resolution.y;
+    }
+
+    private Vector2Int CurrentResolutionSetting()
+    {
+        return displayMode == DisplayModeSetting.ExclusiveFullscreen
+            ? new Vector2Int(exclusiveFullscreenWidth, exclusiveFullscreenHeight)
+            : new Vector2Int(windowWidth, windowHeight);
+    }
+
+    private void SetCurrentResolutionSetting(Vector2Int resolution)
+    {
+        if (displayMode == DisplayModeSetting.ExclusiveFullscreen)
+        {
+            exclusiveFullscreenWidth = Mathf.Max(1, resolution.x);
+            exclusiveFullscreenHeight = Mathf.Max(1, resolution.y);
+            return;
+        }
+
+        if (displayMode == DisplayModeSetting.Windowed)
+        {
+            windowWidth = Mathf.Max(1, resolution.x);
+            windowHeight = Mathf.Max(1, resolution.y);
+        }
+    }
+
+    private void CaptureDesktopResolution()
+    {
+        int width = Display.main != null ? Display.main.systemWidth : 0;
+        int height = Display.main != null ? Display.main.systemHeight : 0;
+        if (width <= 0 || height <= 0)
+        {
+            Resolution current = Screen.currentResolution;
+            width = current.width;
+            height = current.height;
+        }
+
+        desktopWidth = Mathf.Max(DefaultWindowWidth, width);
+        desktopHeight = Mathf.Max(DefaultWindowHeight, height);
+    }
+
+    private void RefreshDisplayResolutionOptions()
+    {
+        displayResolutionOptions.Clear();
+
+        Resolution[] resolutions = Screen.resolutions;
+        for (int i = 0; i < resolutions.Length; i++)
+        {
+            Resolution resolution = resolutions[i];
+            if (resolution.width >= MinimumDisplayWidth && resolution.height >= MinimumDisplayHeight)
+            {
+                AddDisplayResolutionOption(resolution.width, resolution.height);
+            }
+        }
+
+        AddDisplayResolutionOption(DefaultWindowWidth, DefaultWindowHeight);
+        if (desktopWidth >= 1600 && desktopHeight >= 900)
+        {
+            AddDisplayResolutionOption(1600, 900);
+        }
+
+        if (desktopWidth >= 1920 && desktopHeight >= 1080)
+        {
+            AddDisplayResolutionOption(1920, 1080);
+        }
+
+        AddDisplayResolutionOption(desktopWidth, desktopHeight);
+        AddDisplayResolutionOption(windowWidth, windowHeight);
+        AddDisplayResolutionOption(exclusiveFullscreenWidth, exclusiveFullscreenHeight);
+        displayResolutionOptions.Sort(CompareDisplayResolutions);
+    }
+
+    private void AddDisplayResolutionOption(int width, int height)
+    {
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < displayResolutionOptions.Count; i++)
+        {
+            Vector2Int existing = displayResolutionOptions[i];
+            if (existing.x == width && existing.y == height)
+            {
+                return;
+            }
+        }
+
+        displayResolutionOptions.Add(new Vector2Int(width, height));
+    }
+
+    private static int CompareDisplayResolutions(Vector2Int left, Vector2Int right)
+    {
+        long leftPixels = (long)left.x * left.y;
+        long rightPixels = (long)right.x * right.y;
+        int pixelComparison = leftPixels.CompareTo(rightPixels);
+        if (pixelComparison != 0)
+        {
+            return pixelComparison;
+        }
+
+        int widthComparison = left.x.CompareTo(right.x);
+        return widthComparison != 0 ? widthComparison : left.y.CompareTo(right.y);
+    }
+
+    private int FindDisplayResolutionIndex(Vector2Int resolution)
+    {
+        int nearestIndex = 0;
+        long nearestDistance = long.MaxValue;
+        for (int i = 0; i < displayResolutionOptions.Count; i++)
+        {
+            Vector2Int option = displayResolutionOptions[i];
+            if (option == resolution)
+            {
+                return i;
+            }
+
+            long widthDistance = option.x - resolution.x;
+            long heightDistance = option.y - resolution.y;
+            long distance = widthDistance * widthDistance + heightDistance * heightDistance;
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearestIndex = i;
+            }
+        }
+
+        return nearestIndex;
+    }
+
+    private void AdjustResolutionSetting(int direction)
+    {
+        if (displayMode == DisplayModeSetting.BorderlessFullscreen)
+        {
+            return;
+        }
+
+        if (displayResolutionOptions.Count == 0)
+        {
+            RefreshDisplayResolutionOptions();
+        }
+
+        if (displayResolutionOptions.Count == 0)
+        {
+            return;
+        }
+
+        int index = FindDisplayResolutionIndex(CurrentResolutionSetting());
+        index = Mathf.Clamp(index + (direction < 0 ? -1 : 1), 0, displayResolutionOptions.Count - 1);
+        SetCurrentResolutionSetting(displayResolutionOptions[index]);
+    }
+
+    private bool DisplaySettingsChangedFromSnapshot()
+    {
+        if (!settingsSnapshotValid || displayMode != settingsSnapshotDisplayMode)
+        {
+            return settingsSnapshotValid;
+        }
+
+        if (displayMode == DisplayModeSetting.Windowed)
+        {
+            return windowWidth != settingsSnapshotWindowWidth || windowHeight != settingsSnapshotWindowHeight;
+        }
+
+        if (displayMode == DisplayModeSetting.ExclusiveFullscreen)
+        {
+            return exclusiveFullscreenWidth != settingsSnapshotExclusiveFullscreenWidth
+                || exclusiveFullscreenHeight != settingsSnapshotExclusiveFullscreenHeight;
+        }
+
+        return false;
+    }
+
+    private void ApplyDisplaySettings()
+    {
+        restoreNativeWindowMaximizedPending = false;
+        switch (displayMode)
+        {
+            case DisplayModeSetting.Windowed:
+                Screen.SetResolution(Mathf.Max(1, windowWidth), Mathf.Max(1, windowHeight), FullScreenMode.Windowed);
+                if (windowMaximized)
+                {
+                    restoreNativeWindowMaximizedPending = true;
+                    restoreNativeWindowMaximizedRequestedFrame = Time.frameCount + 1;
+                    restoreNativeWindowMaximizedAttempts = 0;
+                }
+                break;
+            case DisplayModeSetting.ExclusiveFullscreen:
+                Screen.SetResolution(Mathf.Max(1, exclusiveFullscreenWidth), Mathf.Max(1, exclusiveFullscreenHeight), FullScreenMode.ExclusiveFullScreen);
+                break;
+            default:
+                Screen.SetResolution(Mathf.Max(1, desktopWidth), Mathf.Max(1, desktopHeight), FullScreenMode.FullScreenWindow);
+                break;
+        }
+    }
+
+    private void CaptureNativeWindowedState()
+    {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        if (displayMode != DisplayModeSetting.Windowed || Screen.fullScreenMode != FullScreenMode.Windowed)
+        {
+            return;
+        }
+
+        IntPtr windowHandle = GetActiveWindow();
+        if (windowHandle == IntPtr.Zero)
+        {
+            return;
+        }
+
+        windowMaximized = IsZoomed(windowHandle);
+        NativeWindowRect clientRect;
+        if (!windowMaximized && GetClientRect(windowHandle, out clientRect))
+        {
+            int clientWidth = clientRect.Right - clientRect.Left;
+            int clientHeight = clientRect.Bottom - clientRect.Top;
+            if (clientWidth > 0 && clientHeight > 0)
+            {
+                windowWidth = Mathf.Max(640, clientWidth);
+                windowHeight = Mathf.Max(360, clientHeight);
+            }
+        }
+#endif
+    }
+
+    private void UpdatePendingNativeWindowMaximizeRestore()
+    {
+        if (!restoreNativeWindowMaximizedPending || Time.frameCount < restoreNativeWindowMaximizedRequestedFrame)
+        {
+            return;
+        }
+
+        restoreNativeWindowMaximizedAttempts++;
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        IntPtr windowHandle = GetActiveWindow();
+        if (windowHandle != IntPtr.Zero)
+        {
+            ShowWindow(windowHandle, NativeShowMaximized);
+            restoreNativeWindowMaximizedPending = false;
+            return;
+        }
+#else
+        restoreNativeWindowMaximizedPending = false;
+#endif
+
+        if (restoreNativeWindowMaximizedAttempts >= NativeWindowRestoreAttemptLimit)
+        {
+            restoreNativeWindowMaximizedPending = false;
+        }
+    }
+
+    private void SaveWindowPlacementState()
+    {
+        PlayerPrefs.SetInt(SavePrefix + "WindowWidth", Mathf.Max(1, windowWidth));
+        PlayerPrefs.SetInt(SavePrefix + "WindowHeight", Mathf.Max(1, windowHeight));
+        PlayerPrefs.SetInt(SavePrefix + "WindowMaximized", windowMaximized ? 1 : 0);
+        PlayerPrefs.Save();
+    }
+
+    private void UpdateDisplaySettingsConfirmation()
+    {
+        if (displaySettingsConfirmationPending && Time.unscaledTime >= displaySettingsConfirmationDeadline)
+        {
+            RevertDisplaySettings();
+        }
+    }
+
+    private void ConfirmDisplaySettings()
+    {
+        if (!displaySettingsConfirmationPending)
+        {
+            return;
+        }
+
+        displaySettingsConfirmationPending = false;
+        SaveMenuState();
+        CaptureSettingsSnapshot();
+        BeginSettingsExit(true);
+    }
+
+    private void RevertDisplaySettings()
+    {
+        if (!displaySettingsConfirmationPending || !settingsSnapshotValid)
+        {
+            return;
+        }
+
+        displayMode = settingsSnapshotDisplayMode;
+        windowWidth = settingsSnapshotWindowWidth;
+        windowHeight = settingsSnapshotWindowHeight;
+        exclusiveFullscreenWidth = settingsSnapshotExclusiveFullscreenWidth;
+        exclusiveFullscreenHeight = settingsSnapshotExclusiveFullscreenHeight;
+        windowMaximized = settingsSnapshotWindowMaximized;
+        displaySettingsConfirmationPending = false;
+        displaySettingsConfirmationDeadline = -999f;
+        ApplyDisplaySettings();
+        RefreshDisplayResolutionOptions();
+        settingsTransitionStartedAt = Time.unscaledTime;
+    }
+
+    private void CaptureSettingsSnapshot()
+    {
+        settingsSnapshotVolume = settingsVolume;
+        settingsSnapshotSettlementPlaybackSpeed = settlementPlaybackSpeed;
+        settingsSnapshotDisplayMode = displayMode;
+        settingsSnapshotWindowWidth = windowWidth;
+        settingsSnapshotWindowHeight = windowHeight;
+        settingsSnapshotExclusiveFullscreenWidth = exclusiveFullscreenWidth;
+        settingsSnapshotExclusiveFullscreenHeight = exclusiveFullscreenHeight;
+        settingsSnapshotWindowMaximized = windowMaximized;
+        settingsSnapshotDynamicEffectsFull = menuLampFlickerUserEnabled;
+        settingsSnapshotValid = true;
+    }
+
+    private void EnterSettings(GameMode returnMode)
+    {
+        CaptureNativeWindowedState();
+        RefreshDisplayResolutionOptions();
+        settingsReturnMode = returnMode;
+        CaptureSettingsSnapshot();
+        settingsSelection = SettingsSelection.Volume;
+        settingsExitPending = false;
+        settingsApplyOnExit = false;
+        displaySettingsConfirmationPending = false;
+        displaySettingsConfirmationDeadline = -999f;
+        settingsTransitionStartedAt = Time.unscaledTime;
+        ClearMainMenuLampEvent();
+        ClearMainMenuMarqueeEvent();
+        mode = GameMode.Settings;
+    }
+
+    private void HandleSettingsKeyboardInput()
+    {
+        if (displaySettingsConfirmationPending)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                RevertDisplaySettings();
+            }
+            else if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            {
+                ConfirmDisplaySettings();
+            }
+
+            return;
+        }
+
+        if (!SettingsInteractionEnabled())
+        {
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            BeginSettingsExit(false);
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            settingsSelection = (SettingsSelection)Mathf.Max(0, (int)settingsSelection - 1);
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            settingsSelection = (SettingsSelection)Mathf.Min((int)SettingsSelection.DynamicEffects, (int)settingsSelection + 1);
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            AdjustSelectedSetting(-1);
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            AdjustSelectedSetting(1);
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            BeginSettingsExit(true);
+        }
+    }
+
+    private void AdjustSelectedSetting(int direction)
+    {
+        int delta = direction < 0 ? -1 : 1;
+        switch (settingsSelection)
+        {
+            case SettingsSelection.Volume:
+                SetSettingsVolume(settingsVolume + delta * SettingsVolumeStep);
+                return;
+            case SettingsSelection.SettlementPlayback:
+            {
+                float normalized = NormalizeSettlementPlaybackSpeed(settlementPlaybackSpeed);
+                int index = normalized >= 2f ? 2 : (normalized >= 1.5f ? 1 : 0);
+                index = Mathf.Clamp(index + delta, 0, 2);
+                settlementPlaybackSpeed = index == 0 ? 1f : (index == 1 ? 1.5f : 2f);
+                return;
+            }
+            case SettingsSelection.DisplayMode:
+            {
+                int modeIndex = Mathf.Clamp((int)displayMode + delta, (int)DisplayModeSetting.Windowed, (int)DisplayModeSetting.ExclusiveFullscreen);
+                displayMode = (DisplayModeSetting)modeIndex;
+                return;
+            }
+            case SettingsSelection.Resolution:
+                AdjustResolutionSetting(delta);
+                return;
+            case SettingsSelection.DynamicEffects:
+                menuLampFlickerUserEnabled = delta < 0;
+                return;
+        }
+    }
+
+    private void SetSettingsVolume(float value)
+    {
+        settingsVolume = Mathf.Clamp01(Mathf.Round(value / SettingsVolumeStep) * SettingsVolumeStep);
+        AudioListener.volume = settingsVolume;
+    }
+
+    private void BeginSettingsExit(bool apply)
+    {
+        if (settingsExitPending || displaySettingsConfirmationPending)
+        {
+            return;
+        }
+
+        settingsApplyOnExit = apply;
+        settingsExitPending = true;
+        settingsTransitionStartedAt = Time.unscaledTime;
+        ClearMainMenuLampEvent();
+        ClearMainMenuMarqueeEvent();
+    }
+
+    private void UpdateSettingsTransition()
+    {
+        if (!settingsExitPending || Time.unscaledTime - settingsTransitionStartedAt < SettingsTransitionDuration)
+        {
+            return;
+        }
+
+        if (settingsApplyOnExit)
+        {
+            if (DisplaySettingsChangedFromSnapshot())
+            {
+                ApplyDisplaySettings();
+                settingsExitPending = false;
+                settingsApplyOnExit = false;
+                displaySettingsConfirmationPending = true;
+                displaySettingsConfirmationDeadline = Time.unscaledTime + DisplaySettingsConfirmationDuration;
+                settingsTransitionStartedAt = Time.unscaledTime;
+                return;
+            }
+
+            SaveMenuState();
+        }
+        else
+        {
+            RestoreSettingsSnapshot();
+        }
+
+        CompleteSettingsExit();
+    }
+
+    private void CompleteSettingsExit()
+    {
+        GameMode returnMode = settingsReturnMode;
+        settingsExitPending = false;
+        settingsApplyOnExit = false;
+        displaySettingsConfirmationPending = false;
+        displaySettingsConfirmationDeadline = -999f;
+        settingsSnapshotValid = false;
+        mode = returnMode;
+        if (mode == GameMode.MainMenu)
+        {
+            mainMenuSelection = MainMenuSelection.Settings;
+        }
+    }
+
+    private void RestoreSettingsSnapshot()
+    {
+        if (!settingsSnapshotValid)
+        {
+            return;
+        }
+
+        settingsVolume = settingsSnapshotVolume;
+        settlementPlaybackSpeed = NormalizeSettlementPlaybackSpeed(settingsSnapshotSettlementPlaybackSpeed);
+        displayMode = settingsSnapshotDisplayMode;
+        windowWidth = settingsSnapshotWindowWidth;
+        windowHeight = settingsSnapshotWindowHeight;
+        exclusiveFullscreenWidth = settingsSnapshotExclusiveFullscreenWidth;
+        exclusiveFullscreenHeight = settingsSnapshotExclusiveFullscreenHeight;
+        windowMaximized = settingsSnapshotWindowMaximized;
+        menuLampFlickerUserEnabled = settingsSnapshotDynamicEffectsFull;
+        AudioListener.volume = settingsVolume;
     }
 
     private void DrawRun()
@@ -1208,6 +4705,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (encounter == null)
         {
             mode = GameMode.Win;
+            return;
+        }
+
+        if (mainGameCommonBaseTexture != null)
+        {
+            DrawArcadeRun(encounter);
             return;
         }
 
@@ -1220,10 +4723,2433 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         GUI.enabled = true;
 
-        if (showHandReference)
+        if (showHandReference && V02HandScoringEnabled)
         {
             DrawHandReferenceOverlay();
         }
+    }
+
+    private void DrawArcadeRun(Encounter encounter)
+    {
+        Matrix4x4 previousMatrix = GUI.matrix;
+        Vector2 finaleOffset = SettlementFinaleWorldOffset();
+        Vector2 finaleScale = SettlementFinaleWorldScale();
+        if (finaleOffset.sqrMagnitude > 0.0001f || (finaleScale - Vector2.one).sqrMagnitude > 0.000001f)
+        {
+            Vector3 pivot = new Vector3(VirtualWidth * 0.5f, VirtualHeight * 0.5f, 0f);
+            Matrix4x4 finaleTransform = Matrix4x4.TRS(
+                    pivot + new Vector3(finaleOffset.x, finaleOffset.y, 0f),
+                    Quaternion.identity,
+                    new Vector3(finaleScale.x, finaleScale.y, 1f))
+                * Matrix4x4.TRS(-pivot, Quaternion.identity, Vector3.one);
+            GUI.matrix = previousMatrix * finaleTransform;
+        }
+
+        DrawArcadeRunTopHud(encounter);
+        DrawArcadeRunScoreTower(encounter);
+        DrawArcadeRunTerminal(encounter);
+
+        if (ShouldShowRunEntryFeedback())
+        {
+            DrawLedRoleText(
+                new Rect(250f, 158f, 770f, 30f),
+                TooltipTrim(rewardBanner, 62),
+                MainGameLedFont.TextRole.SecondaryWarm,
+                TextAnchor.MiddleCenter);
+        }
+
+        // Six 128 px dice align to the authored docking borders at X 299 + 128n and Y 368.
+        DrawTableDice(new Rect(204f, 301f, 830f, 220f));
+
+        if (rollPhase == RollPhase.Ready)
+        {
+            DrawLedRoleText(
+                new Rect(320f, 492f, 570f, 28f),
+                "拖动骰子调整结算顺序",
+                MainGameLedFont.TextRole.SecondaryAmber,
+                TextAnchor.MiddleCenter);
+        }
+
+        DrawArcadeRunActionKey(new Rect(458f, 574f, 356f, 72f), encounter);
+        GUI.matrix = previousMatrix;
+        DrawMainGameFlowPresentation();
+        GUI.enabled = true;
+    }
+
+    private void DrawArcadeRunTopHud(Encounter encounter)
+    {
+        string stageLabel = encounter != null && encounter.ChapterIndex > 0 && encounter.StageIndexInChapter > 0
+            ? "第 " + encounter.ChapterIndex + " 章 · 第 " + encounter.StageIndexInChapter + " 关"
+            : EncounterTitle(encounter);
+        DrawLedRoleText(new Rect(50f, 23f, 760f, 50f), stageLabel, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
+        DrawLedRoleText(new Rect(854f, 23f, 158f, 50f), "生命 " + remainingLives.ToString(CultureInfo.InvariantCulture), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        DrawLedRoleText(new Rect(1052f, 23f, 174f, 50f), "金币 " + DisplayedChapterGold().ToString(CultureInfo.InvariantCulture), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+    }
+
+    private void DrawArcadeRunScoreTower(Encounter encounter)
+    {
+        RunScoreCounterState counterState = BuildRunScoreCounterState(encounter);
+        Color teal = new Color(0.16f, 0.84f, 0.78f, 0.96f);
+        float targetCross = MainGameTargetCrossPulseAmount();
+        if (targetCross > 0f && !settlementImpactPresentationActive)
+        {
+            float expansion = 4f + 3f * targetCross;
+            Rect pulseRect = new Rect(69f - expansion, 133f - expansion, 54f + expansion * 2f, 54f + expansion * 2f);
+            DrawTintedCircle(pulseRect, new Color(teal.r, teal.g, teal.b, 0.12f + 0.24f * targetCross));
+        }
+
+        DrawArcadeRunTargetIcon(new Rect(69f, 133f, 54f, 54f));
+        MainGameLedFont.TextRole scoreRole = targetCross > 0f
+            ? MainGameLedFont.TextRole.Success
+            : settlementImpactPresentationActive
+                ? MainGameLedFont.TextRole.SecondaryWarm
+            : MainGameLedFont.TextRole.PrimaryAmber;
+        DrawLedRoleText(new Rect(40f, 191f, 104f, 31f), "目标 " + counterState.TargetScore.ToString(CultureInfo.InvariantCulture), scoreRole, TextAnchor.MiddleCenter);
+        DrawLedRoleText(new Rect(40f, 222f, 104f, 31f), "当前 " + counterState.ProgressScore.ToString(CultureInfo.InvariantCulture), scoreRole, TextAnchor.MiddleCenter);
+        Color meterFill = settlementImpactPresentationActive
+            ? new Color(1f, 0.55f, 0.12f, 0.96f)
+            : teal;
+        DrawArcadeRunScoreMeter(new Rect(54f, 292f, 76f, 190f), counterState.ProgressScore, counterState.TargetScore, meterFill);
+
+        if (targetCross > 0f && settlementImpactPresentationActive)
+        {
+            Color latch = new Color(0.52f, 1f, 0.94f, 0.32f + 0.58f * targetCross);
+            DrawRect(new Rect(61f, 157f, 14f + 8f * targetCross, 3f), latch);
+            DrawRect(new Rect(117f - 8f * targetCross, 157f, 14f + 8f * targetCross, 3f), latch);
+            DrawRect(new Rect(90f, 142f, 3f, 30f), new Color(latch.r, latch.g, latch.b, latch.a * 0.55f));
+        }
+    }
+
+    private void DrawArcadeRunTargetIcon(Rect rect)
+    {
+        Color amber = new Color(0.94f, 0.34f, 0.09f, 0.96f);
+        Color dark = new Color(0.035f, 0.055f, 0.06f, 0.98f);
+        DrawTintedCircle(rect, amber);
+        DrawTintedCircle(InsetRect(rect, rect.width * 0.16f, rect.height * 0.16f), dark);
+        DrawTintedCircle(InsetRect(rect, rect.width * 0.3f, rect.height * 0.3f), amber);
+        DrawTintedCircle(InsetRect(rect, rect.width * 0.43f, rect.height * 0.43f), dark);
+    }
+
+    private void DrawArcadeRunScoreMeter(Rect rect, int value, int target, Color fill)
+    {
+        const int segmentCount = 12;
+        const float segmentGap = 4f;
+        float segmentHeight = (rect.height - segmentGap * (segmentCount - 1)) / segmentCount;
+        int litSegments = Mathf.CeilToInt(Mathf.Clamp01(value / Mathf.Max(1f, target)) * segmentCount);
+        for (int index = 0; index < litSegments; index++)
+        {
+            float y = rect.y + rect.height - segmentHeight - index * (segmentHeight + segmentGap);
+            float pulse = rollPhase == RollPhase.Scoring && index == litSegments - 1
+                ? 0.82f + 0.18f * Mathf.Sin(GameplayPlaybackTime() * 13f)
+                : 1f;
+            DrawRect(new Rect(rect.x + 4f, y + 1f, rect.width - 8f, Mathf.Max(2f, segmentHeight - 2f)), new Color(fill.r, fill.g, fill.b, fill.a * pulse * 0.78f));
+        }
+    }
+
+    private void DrawArcadeRunTerminal(Encounter encounter)
+    {
+        string title;
+        string detail;
+        bool finaleActive = settlementImpactPresentationActive
+            && rollPhase == RollPhase.Scoring
+            && activeSettlementEvent != null
+            && activeSettlementEvent.Kind == SettlementEventKind.TargetSettle;
+        if (finaleActive)
+        {
+            float finaleProgress = SettlementEventProgress();
+            if (SettlementFinaleResultVisible(activeSettlementEvent.FeedbackTier, finaleProgress))
+            {
+                title = activeSettlementEvent.Passed ? "本关通过" : "本关未过";
+                detail = "结算完成";
+            }
+            else
+            {
+                title = "终局校验";
+                detail = SettlementFinalePendingLabel(activeSettlementEvent.FeedbackTier, finaleProgress);
+            }
+        }
+        else if (MainGameTargetCrossPulseAmount() > 0f)
+        {
+            title = "目标已达成";
+            detail = "继续结算";
+        }
+        else switch (rollPhase)
+        {
+            case RollPhase.Shaking:
+                title = "旋骰";
+                detail = ShakeInputWindowActive() ? "敲 Space 加速" : "骰面高速滚动";
+                break;
+            case RollPhase.Stopping:
+                title = "停转";
+                detail = "减速并逐槽停靠";
+                break;
+            case RollPhase.ResultDecision:
+                title = "结果已锁定";
+                detail = V02CheatEnabled ? "Space 开始结算" : "自动进入结算";
+                break;
+            case RollPhase.CheatEdit:
+                title = V02CheatEnabled ? "调整结果" : "结果已锁定";
+                detail = V02CheatEnabled ? "选择后确认" : "Space 开始结算";
+                break;
+            case RollPhase.Scoring:
+                title = settlementImpactPresentationActive
+                    && activeSettlementEvent != null
+                    && activeSettlementEvent.LocalChain
+                    ? "局部连锁"
+                    : "结算中";
+                detail = activeSettlementEvent != null && !string.IsNullOrEmpty(activeSettlementEvent.Label)
+                    ? activeSettlementEvent.Label
+                    : settlementImpactPresentationActive
+                        ? "积分写入"
+                        : "从左到右计入得分";
+                break;
+            case RollPhase.StageClear:
+                title = "本关通过";
+                detail = StageClearIncomeDisplayText();
+                break;
+            case RollPhase.StageFailed:
+                title = stageFailureRetryAvailable ? "未达目标" : "本轮结束";
+                detail = StageFailureGapText();
+                break;
+            default:
+                title = "本关规则";
+                detail = encounter != null && !string.IsNullOrEmpty(encounter.RuleText)
+                    ? encounter.RuleText
+                    : "无特殊规则";
+                break;
+        }
+
+        bool finaleResultVisible = finaleActive
+            && SettlementFinaleResultVisible(activeSettlementEvent.FeedbackTier, SettlementEventProgress());
+        MainGameLedFont.TextRole titleRole = rollPhase == RollPhase.StageFailed
+            ? MainGameLedFont.TextRole.Warning
+            : finaleResultVisible
+                ? activeSettlementEvent.Passed
+                    ? MainGameLedFont.TextRole.Success
+                    : MainGameLedFont.TextRole.Warning
+                : MainGameTargetCrossPulseAmount() > 0f || rollPhase == RollPhase.StageClear
+                    ? MainGameLedFont.TextRole.Success
+                    : MainGameLedFont.TextRole.PrimaryAmber;
+        DrawLedRoleText(new Rect(1062f, 174f, 162f, 44f), title, titleRole, TextAnchor.MiddleCenter);
+        DrawLedRoleWrappedText(new Rect(1072f, 230f, 142f, 174f), detail, MainGameLedFont.TextRole.SecondaryWarm, TextAnchor.MiddleCenter);
+    }
+
+    private void DrawRunWrappedText(Rect rect, string text, int size, FontStyle fontStyle, Color color, TextAnchor alignment)
+    {
+        if (UseArcadeRunVisuals() && mainGameLedFont != null && mainGameLedFont.IsReady)
+        {
+            mainGameLedFont.DrawWrapped(rect, text, size, color, alignment, MainGameLedGlowIntensity());
+            return;
+        }
+
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.font = uiFont;
+        style.fontSize = size;
+        style.fontStyle = fontStyle;
+        style.normal.textColor = color;
+        style.alignment = alignment;
+        style.wordWrap = true;
+        style.clipping = TextClipping.Clip;
+        DrawStandardLabel(rect, text, style);
+    }
+
+    private void DrawArcadeRunActionKey(Rect rect, Encounter encounter)
+    {
+        bool interactive = rollPhase == RollPhase.Ready
+            || rollPhase == RollPhase.Shaking && ShakeInputWindowActive()
+            || rollPhase == RollPhase.ResultDecision && V02CheatEnabled
+            || rollPhase == RollPhase.CheatEdit
+            || rollPhase == RollPhase.StageClear && StageClearPresentationComplete()
+            || rollPhase == RollPhase.StageFailed && !stageFailureTransitionActive;
+        bool hovered = interactive && uiMousePositionValid && rect.Contains(uiMousePosition);
+        if (hovered)
+        {
+            DrawRect(new Rect(rect.x + 6f, rect.y + 6f, rect.width - 12f, rect.height - 12f), new Color(1f, 0.48f, 0.05f, 0.12f));
+            DrawBorder(new Rect(rect.x + 4f, rect.y + 4f, rect.width - 8f, rect.height - 8f), new Color(1f, 0.67f, 0.18f, 0.84f), 2f);
+        }
+
+        bool clicked = interactive && GUI.Button(rect, GUIContent.none, GUIStyle.none);
+        MainGameLedFont.TextRole actionRole = !interactive
+            ? MainGameLedFont.TextRole.Disabled
+            : rollPhase == RollPhase.StageFailed
+                ? MainGameLedFont.TextRole.Warning
+                : MainGameLedFont.TextRole.FocusAmber;
+        DrawLedRoleText(rect, ArcadeRunActionKeyText(encounter), actionRole, TextAnchor.MiddleCenter);
+        if (!clicked)
+        {
+            return;
+        }
+
+        if (rollPhase == RollPhase.Ready)
+        {
+            BeginShakeRoll();
+        }
+        else if (rollPhase == RollPhase.Shaking)
+        {
+            TryApplyShakeImpulse(CurrentRollFeedbackConfig());
+        }
+        else if (rollPhase == RollPhase.ResultDecision || rollPhase == RollPhase.CheatEdit && !V02CheatEnabled)
+        {
+            BeginSettle();
+        }
+        else if (rollPhase == RollPhase.StageClear)
+        {
+            ContinueAfterStageClear(encounter);
+        }
+        else if (rollPhase == RollPhase.StageFailed)
+        {
+            BeginStageFailureExit();
+        }
+    }
+
+    private string ArcadeRunActionKeyText(Encounter encounter)
+    {
+        switch (rollPhase)
+        {
+            case RollPhase.Ready:
+                return "SPACE  投掷";
+            case RollPhase.Shaking:
+                return ShakeInputWindowActive() ? "SPACE  加速" : "高速滚动";
+            case RollPhase.Stopping:
+                return "减速停靠";
+            case RollPhase.ResultDecision:
+                return V02CheatEnabled ? "SPACE  结算" : "自动结算";
+            case RollPhase.CheatEdit:
+                return "SPACE  结算";
+            case RollPhase.Scoring:
+                return "结算中";
+            case RollPhase.StageClear:
+                if (!StageClearPresentationComplete())
+                {
+                    return "收入结算中";
+                }
+
+                return HasNextEncounter() ? "SPACE  进入市场" : "SPACE  完成本轮";
+            case RollPhase.StageFailed:
+                return stageFailureRetryAvailable ? "SPACE  再次出手" : "SPACE  返回开始界面";
+        }
+
+        return "SPACE";
+    }
+
+    private bool MainGameFlowPresentationEnabled()
+    {
+        return mainGameFlowPresentationProfile != null && mainGameFlowPresentationProfile.Enabled;
+    }
+
+    private bool ShouldUseSettlementImpactPresentation()
+    {
+        return MainGameFlowPresentationEnabled()
+            && mainGameFlowPresentationProfile.SettlementImpactEnabled
+            && UseArcadeRunVisuals()
+            && diceProcessVisualsEnabled;
+    }
+
+    private float SettlementAbsorbFraction()
+    {
+        return mainGameFlowPresentationProfile != null
+            ? Mathf.Clamp(mainGameFlowPresentationProfile.SettlementAbsorbFraction, 0.55f, 0.9f)
+            : 0.74f;
+    }
+
+    private SettlementFeedbackTier SettlementFeedbackTierForResult(Encounter encounter, int score)
+    {
+        if (encounter == null || encounter.Target <= 0)
+        {
+            return SettlementFeedbackTier.Miss;
+        }
+
+        float ratio = score / Mathf.Max(1f, encounter.Target);
+        float passRatio = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.SettlementPassRatio : 1f;
+        float exceedRatio = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.SettlementExceedRatio : 1.5f;
+        float farRatio = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.SettlementFarExceedRatio : 2f;
+        float criticalRatio = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.SettlementCriticalRatio : 3f;
+        if (ratio >= criticalRatio)
+        {
+            return SettlementFeedbackTier.Critical;
+        }
+
+        if (ratio >= farRatio)
+        {
+            return SettlementFeedbackTier.FarExceed;
+        }
+
+        if (ratio >= exceedRatio)
+        {
+            return SettlementFeedbackTier.Exceed;
+        }
+
+        return ratio >= passRatio ? SettlementFeedbackTier.Pass : SettlementFeedbackTier.Miss;
+    }
+
+    private float MainGameSettlementFinaleDuration(SettlementFeedbackTier tier)
+    {
+        if (!settlementImpactPresentationActive || mainGameFlowPresentationProfile == null)
+        {
+            return MainGameSettlementTargetDuration();
+        }
+
+        switch (tier)
+        {
+            case SettlementFeedbackTier.Pass:
+                return mainGameFlowPresentationProfile.SettlementPassFinaleDuration;
+            case SettlementFeedbackTier.Exceed:
+                return mainGameFlowPresentationProfile.SettlementExceedFinaleDuration;
+            case SettlementFeedbackTier.FarExceed:
+                return mainGameFlowPresentationProfile.SettlementFarExceedFinaleDuration;
+            case SettlementFeedbackTier.Critical:
+                return mainGameFlowPresentationProfile.SettlementCriticalFinaleDuration;
+            default:
+                return mainGameFlowPresentationProfile.SettlementMissFinaleDuration;
+        }
+    }
+
+    private float SettlementCriticalVacuumStart()
+    {
+        return mainGameFlowPresentationProfile != null
+            ? mainGameFlowPresentationProfile.SettlementCriticalVacuumStart
+            : 0.46f;
+    }
+
+    private float SettlementCriticalVacuumFull()
+    {
+        return mainGameFlowPresentationProfile != null
+            ? mainGameFlowPresentationProfile.SettlementCriticalVacuumFull
+            : 0.54f;
+    }
+
+    private float SettlementCriticalBreakthrough()
+    {
+        return mainGameFlowPresentationProfile != null
+            ? mainGameFlowPresentationProfile.SettlementCriticalBreakthrough
+            : 0.66f;
+    }
+
+    private float SettlementCriticalAftershock()
+    {
+        return mainGameFlowPresentationProfile != null
+            ? mainGameFlowPresentationProfile.SettlementCriticalAftershock
+            : 0.82f;
+    }
+
+    private float SettlementDynamicEffectsScale()
+    {
+        if (menuLampFlickerUserEnabled)
+        {
+            return 1f;
+        }
+
+        return mainGameFlowPresentationProfile != null
+            ? mainGameFlowPresentationProfile.SettlementReducedEffectsScale
+            : 0.42f;
+    }
+
+    private bool SettlementFinaleResultVisible(SettlementFeedbackTier tier, float progress)
+    {
+        float revealAt;
+        switch (tier)
+        {
+            case SettlementFeedbackTier.Pass:
+                revealAt = 0.56f;
+                break;
+            case SettlementFeedbackTier.Exceed:
+                revealAt = 0.72f;
+                break;
+            case SettlementFeedbackTier.FarExceed:
+                revealAt = 0.78f;
+                break;
+            case SettlementFeedbackTier.Critical:
+                revealAt = Mathf.Min(0.94f, SettlementCriticalAftershock() + 0.08f);
+                break;
+            default:
+                revealAt = 0.68f;
+                break;
+        }
+
+        return progress >= revealAt;
+    }
+
+    private string SettlementFinalePendingLabel(SettlementFeedbackTier tier, float progress)
+    {
+        switch (tier)
+        {
+            case SettlementFeedbackTier.Pass:
+                return "闭合接点";
+            case SettlementFeedbackTier.Exceed:
+                return progress < 0.52f ? "继电复核" : "二次回坐";
+            case SettlementFeedbackTier.FarExceed:
+                return "负载稳定中";
+            case SettlementFeedbackTier.Critical:
+                if (progress < SettlementCriticalVacuumStart())
+                {
+                    return "负载锁定";
+                }
+                if (progress < SettlementCriticalBreakthrough())
+                {
+                    return "信号收束";
+                }
+                return progress < SettlementCriticalAftershock() ? "回路重启" : "余震回落";
+            default:
+                return "回路正在卸载";
+        }
+    }
+
+    private Vector2 SettlementFinaleWorldOffset()
+    {
+        if (!settlementImpactPresentationActive
+            || rollPhase != RollPhase.Scoring
+            || activeSettlementEvent == null
+            || activeSettlementEvent.Kind != SettlementEventKind.TargetSettle
+            || activeSettlementEvent.FeedbackTier != SettlementFeedbackTier.Critical)
+        {
+            return Vector2.zero;
+        }
+
+        float progress = SettlementEventProgress();
+        float crouch = SettlementCriticalCrouchAmount(progress);
+        float launch = SettlementCriticalLaunchAmount(progress);
+        float rebound = SettlementCriticalReboundAmount(progress);
+        float strike = SettlementCriticalStrikeAmount(progress);
+        float aftershock = SettlementPulse01(progress, SettlementCriticalAftershock(), 0.075f) * 0.58f;
+        float energy = Mathf.Max(Mathf.Max(crouch, launch), Mathf.Max(rebound, Mathf.Max(strike, aftershock)));
+        if (energy <= 0f)
+        {
+            return Vector2.zero;
+        }
+
+        float kick = mainGameFlowPresentationProfile != null
+            ? mainGameFlowPresentationProfile.SettlementCriticalWorldKickPixels
+            : 4.2f;
+        kick *= SettlementDynamicEffectsScale();
+        float time = GameplayPlaybackTime();
+        float x = Mathf.Sin(time * 173f) * kick * (strike * 0.42f + aftershock * 0.48f);
+        float y = kick * (crouch * 1.75f - launch * 3.30f + rebound * 1.10f);
+        y += Mathf.Sin(time * 131f + 0.7f) * kick * aftershock * 0.28f;
+        return new Vector2(x, y);
+    }
+
+    private Vector2 SettlementFinaleWorldScale()
+    {
+        if (!settlementImpactPresentationActive
+            || rollPhase != RollPhase.Scoring
+            || activeSettlementEvent == null
+            || activeSettlementEvent.Kind != SettlementEventKind.TargetSettle
+            || activeSettlementEvent.FeedbackTier != SettlementFeedbackTier.Critical)
+        {
+            return Vector2.one;
+        }
+
+        float progress = SettlementEventProgress();
+        float effectScale = SettlementDynamicEffectsScale();
+        float crouch = SettlementCriticalCrouchAmount(progress);
+        float launch = SettlementCriticalLaunchAmount(progress);
+        float rebound = SettlementCriticalReboundAmount(progress);
+        float scaleX = 1f + crouch * 0.012f * effectScale - launch * 0.004f * effectScale;
+        float scaleY = 1f - crouch * 0.032f * effectScale + launch * 0.022f * effectScale - rebound * 0.006f * effectScale;
+        return new Vector2(scaleX, scaleY);
+    }
+
+    private float SettlementCriticalCrouchAmount(float progress)
+    {
+        float vacuumStart = SettlementCriticalVacuumStart();
+        float vacuumFull = SettlementCriticalVacuumFull();
+        float breakthrough = SettlementCriticalBreakthrough();
+        return SettlementEnvelope01(
+            progress,
+            Mathf.Max(0f, vacuumStart - 0.12f),
+            Mathf.Min(breakthrough - 0.05f, vacuumFull + 0.03f),
+            breakthrough - 0.005f,
+            breakthrough + 0.001f);
+    }
+
+    private float SettlementCriticalLaunchAmount(float progress)
+    {
+        float breakthrough = SettlementCriticalBreakthrough();
+        return SettlementEnvelope01(
+            progress,
+            breakthrough - 0.004f,
+            breakthrough + 0.010f,
+            breakthrough + 0.045f,
+            breakthrough + 0.115f);
+    }
+
+    private float SettlementCriticalReboundAmount(float progress)
+    {
+        return SettlementPulse01(progress, SettlementCriticalBreakthrough() + 0.125f, 0.055f);
+    }
+
+    private float SettlementCriticalStrikeAmount(float progress)
+    {
+        float breakthrough = SettlementCriticalBreakthrough();
+        return SettlementEnvelope01(
+            progress,
+            breakthrough - 0.004f,
+            breakthrough + 0.010f,
+            breakthrough + 0.024f,
+            breakthrough + 0.082f);
+    }
+
+    private static float SettlementPulse01(float progress, float center, float halfWidth)
+    {
+        float distance = Mathf.Abs(progress - center) / Mathf.Max(0.001f, halfWidth);
+        return Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(1f - distance));
+    }
+
+    private static float SettlementEnvelope01(float progress, float start, float attackEnd, float releaseStart, float end)
+    {
+        if (progress <= start || progress >= end)
+        {
+            return 0f;
+        }
+
+        float attack = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(start, attackEnd, progress));
+        float release = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(releaseStart, end, progress));
+        return Mathf.Clamp01(Mathf.Min(attack, release));
+    }
+
+    private float MainGameLedGlowIntensity()
+    {
+        return mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.LedGlowIntensity : 0.72f;
+    }
+
+    private float MainGameResultLockDuration()
+    {
+        return MainGameFlowPresentationEnabled() && UseArcadeRunVisuals()
+            ? mainGameFlowPresentationProfile.ResultLockPulseDuration
+            : DiceVisualRevealDuration;
+    }
+
+    private float MainGameSettlementSlotDuration()
+    {
+        return MainGameFlowPresentationEnabled() ? mainGameFlowPresentationProfile.SettlementSlotDuration : SettlementSlotDuration;
+    }
+
+    private float MainGameSettlementRouteDuration()
+    {
+        return MainGameFlowPresentationEnabled() ? mainGameFlowPresentationProfile.SettlementRouteDuration : SettlementRouteDuration;
+    }
+
+    private float MainGameSettlementMultiplierDuration()
+    {
+        return MainGameFlowPresentationEnabled() ? mainGameFlowPresentationProfile.SettlementMultiplierDuration : SettlementMultiplierDuration;
+    }
+
+    private float MainGameSettlementFinalDuration()
+    {
+        return MainGameFlowPresentationEnabled() ? mainGameFlowPresentationProfile.SettlementFinalDuration : SettlementFinalDuration;
+    }
+
+    private float MainGameSettlementTargetDuration()
+    {
+        return MainGameFlowPresentationEnabled() ? mainGameFlowPresentationProfile.SettlementTargetDuration : SettlementTargetDuration;
+    }
+
+    private float MainGameStopSlotStagger()
+    {
+        return mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.StopSlotStagger : 0.08f;
+    }
+
+    private float MainGameStopSlotSettleDuration()
+    {
+        return mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.StopSlotSettleDuration : 0.26f;
+    }
+
+    private float MainGameStopSequenceDuration(int displayCount)
+    {
+        int count = Mathf.Clamp(displayCount, 1, ArcadeRunPhysicalSlotCount);
+        return Mathf.Max(0.05f, MainGameStopSlotSettleDuration() + Mathf.Max(0, count - 1) * MainGameStopSlotStagger());
+    }
+
+    private float MainGameTargetCrossPulseAmount()
+    {
+        if (!MainGameFlowPresentationEnabled() || rollPhase != RollPhase.Scoring || mainGameTargetCrossStartedAt < -900f)
+        {
+            return 0f;
+        }
+
+        float duration = Mathf.Max(0.05f, mainGameFlowPresentationProfile.TargetCrossPulseDuration);
+        float t = Mathf.Clamp01(GameplayPlaybackElapsed(mainGameTargetCrossStartedAt) / duration);
+        return t >= 1f ? 0f : Mathf.SmoothStep(1f, 0f, t);
+    }
+
+    private int DisplayedChapterGold()
+    {
+        if (rollPhase != RollPhase.StageClear || stageClearPresentationStartedAt < -900f)
+        {
+            return chapterGold;
+        }
+
+        int displayed = stageClearGoldBeforeIncome;
+        if (StageClearBeatHasPosted(0))
+        {
+            displayed += lastStageFlatIncome;
+        }
+
+        if (StageClearBeatHasPosted(1))
+        {
+            displayed += lastStageInterestIncome;
+        }
+
+        if (StageClearBeatHasPosted(2))
+        {
+            displayed += lastStageCompoundInterestIncome;
+        }
+
+        return StageClearPresentationComplete() ? chapterGold : displayed;
+    }
+
+    private string StageClearIncomeDisplayText()
+    {
+        if (stageClearPresentationStartedAt < -900f)
+        {
+            return StageIncomeDetailText();
+        }
+
+        float elapsed = StageClearPresentationElapsed();
+        if (elapsed < MainGameStageClearIntroHold())
+        {
+            return "收入清点中";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        int visibleBeat = Mathf.Clamp(StageClearVisibleBeatCount(), 1, 3);
+        if (visibleBeat >= 1)
+        {
+            builder.Append("固定 +");
+            builder.Append(lastStageFlatIncome);
+        }
+
+        if (visibleBeat >= 2)
+        {
+            builder.Append("\n利息 +");
+            builder.Append(lastStageInterestIncome);
+        }
+
+        if (visibleBeat >= 3)
+        {
+            builder.Append("\n复利 +");
+            builder.Append(lastStageCompoundInterestIncome);
+        }
+
+        return builder.ToString();
+    }
+
+    private string StageFailureGapText()
+    {
+        Encounter encounter = CurrentEncounter();
+        int gap = encounter != null ? Mathf.Max(0, encounter.Target - currentScore) : 0;
+        int target = encounter != null ? Mathf.Max(0, encounter.Target) : 0;
+        string lifeText = stageFailureRetryAvailable
+            ? "剩余生命 " + remainingLives.ToString(CultureInfo.InvariantCulture)
+            : "生命归零";
+        return "累计 " + currentScore.ToString(CultureInfo.InvariantCulture)
+            + " / " + target.ToString(CultureInfo.InvariantCulture)
+            + "\n还差 " + gap.ToString(CultureInfo.InvariantCulture) + " 分"
+            + "\n" + lifeText;
+    }
+
+    private float MainGameStageClearIntroHold()
+    {
+        return mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.StageClearIntroHold : 0.32f;
+    }
+
+    private float MainGameStageClearBeatDuration()
+    {
+        return mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.StageClearIncomeBeatDuration : 0.38f;
+    }
+
+    private float MainGameStageClearBeatGap()
+    {
+        return mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.StageClearIncomeBeatGap : 0.10f;
+    }
+
+    private float StageClearPresentationElapsed()
+    {
+        return GameplayPlaybackElapsed(stageClearPresentationStartedAt);
+    }
+
+    private float StageClearBeatStart(int beatIndex)
+    {
+        return MainGameStageClearIntroHold() + Mathf.Clamp(beatIndex, 0, 2) * (MainGameStageClearBeatDuration() + MainGameStageClearBeatGap());
+    }
+
+    private float StageClearBeatProgress(int beatIndex)
+    {
+        return Mathf.Clamp01((StageClearPresentationElapsed() - StageClearBeatStart(beatIndex)) / Mathf.Max(0.01f, MainGameStageClearBeatDuration()));
+    }
+
+    private bool StageClearBeatHasPosted(int beatIndex)
+    {
+        return StageClearBeatProgress(beatIndex) >= 0.55f;
+    }
+
+    private int StageClearVisibleBeatCount()
+    {
+        int visible = 0;
+        for (int beatIndex = 0; beatIndex < 3; beatIndex++)
+        {
+            if (StageClearPresentationElapsed() >= StageClearBeatStart(beatIndex))
+            {
+                visible = beatIndex + 1;
+            }
+        }
+
+        return visible;
+    }
+
+    private float StageClearPresentationDuration()
+    {
+        float settle = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.StageClearSettleDuration : 0.24f;
+        return StageClearBeatStart(2) + MainGameStageClearBeatDuration() + settle;
+    }
+
+    private bool StageClearPresentationComplete()
+    {
+        if (rollPhase != RollPhase.StageClear)
+        {
+            return false;
+        }
+
+        if (!MainGameFlowPresentationEnabled() || stageClearPresentationStartedAt < -900f)
+        {
+            return true;
+        }
+
+        return StageClearPresentationElapsed() >= StageClearPresentationDuration();
+    }
+
+    private void DrawMainGameFlowPresentation()
+    {
+        if (!MainGameFlowPresentationEnabled())
+        {
+            return;
+        }
+
+        DrawArcadeSettlementFeedback();
+        DrawMainGameRollIgnition();
+        DrawStageClearIncomeFlight();
+        if (rollPhase == RollPhase.StageFailed)
+        {
+            DrawStageFailurePresentation();
+        }
+    }
+
+    private void DrawArcadeSettlementFeedback()
+    {
+        if (settlementImpactPresentationActive
+            && rollPhase == RollPhase.Scoring
+            && activeSettlementEvent != null)
+        {
+            float progress = SettlementEventProgress();
+            if (activeSettlementEvent.Kind == SettlementEventKind.SlotScore)
+            {
+                DrawSettlementCursorRail(activeSettlementEvent, progress);
+                DrawSettlementSourceFocus(activeSettlementEvent, progress);
+                DrawSettlementSemanticContext(activeSettlementEvent, progress);
+                DrawSettlementScoreHalo(activeSettlementEvent, progress);
+                DrawSettlementTowerImpact(activeSettlementEvent, progress);
+            }
+            else if (activeSettlementEvent.Kind == SettlementEventKind.BribeFinal)
+            {
+                DrawSettlementTowerOnlyContribution(activeSettlementEvent, progress);
+            }
+            else if (activeSettlementEvent.Kind == SettlementEventKind.TargetSettle)
+            {
+                DrawSettlementFinale(activeSettlementEvent.FeedbackTier, progress);
+            }
+
+            DrawSettlementTowerAfterglow();
+            return;
+        }
+
+        DrawSettlementFinaleResidue();
+    }
+
+    private Rect ArcadeRunPhysicalDieRect(int slotIndex)
+    {
+        const float tableAreaX = 204f;
+        const float tableAreaWidth = 830f;
+        const float tableAreaY = 301f;
+        float startX = tableAreaX
+            + (tableAreaWidth - ArcadeRunPhysicalSlotCount * ArcadeRunDieSlotSize
+                - (ArcadeRunPhysicalSlotCount - 1) * ArcadeRunDieSlotGap) * 0.5f;
+        return new Rect(
+            startX + Mathf.Clamp(slotIndex, 0, ArcadeRunPhysicalSlotCount - 1) * (ArcadeRunDieSlotSize + ArcadeRunDieSlotGap),
+            tableAreaY + ArcadeRunDieSlotTopInset,
+            ArcadeRunDieSlotSize,
+            ArcadeRunDieSlotSize);
+    }
+
+    private static Rect SettlementTowerMeterRect()
+    {
+        return new Rect(54f, 292f, 76f, 190f);
+    }
+
+    private Vector2 SettlementTowerContactPoint(SettlementDisplayEvent settlementEvent)
+    {
+        Rect meter = SettlementTowerMeterRect();
+        Encounter encounter = CurrentEncounter();
+        float target = encounter != null ? Mathf.Max(1f, encounter.Target) : 1f;
+        float fill = Mathf.Clamp01((settlementEvent != null ? settlementEvent.ProgressScore : currentScore) / target);
+        return new Vector2(meter.xMax - 3f, Mathf.Lerp(meter.yMax - 7f, meter.y + 8f, fill));
+    }
+
+    private void DrawSettlementCursorRail(SettlementDisplayEvent settlementEvent, float progress)
+    {
+        if (settlementEvent == null || settlementEvent.CursorSlotIndex < 0)
+        {
+            return;
+        }
+
+        Rect cursorRect = ArcadeRunPhysicalDieRect(settlementEvent.CursorSlotIndex);
+        float pulse = 0.55f + 0.45f * Mathf.Sin(Mathf.Clamp01(progress) * Mathf.PI);
+        Color rail = settlementEvent.LocalChain
+            ? new Color(0.95f, 0.48f, 0.10f, 0.28f + 0.34f * pulse)
+            : new Color(1f, 0.60f, 0.14f, 0.22f + 0.30f * pulse);
+        DrawRect(new Rect(cursorRect.x + 30f, cursorRect.yMax + 3f, cursorRect.width - 60f, 3f), rail);
+        DrawRect(new Rect(cursorRect.center.x - 2f, cursorRect.yMax + 1f, 4f, 7f), new Color(1f, 0.78f, 0.34f, rail.a * 0.72f));
+    }
+
+    private void DrawSettlementSourceFocus(SettlementDisplayEvent settlementEvent, float progress)
+    {
+        if (settlementEvent == null || settlementEvent.SlotIndex < 0)
+        {
+            return;
+        }
+
+        Rect dieRect = ArcadeRunPhysicalDieRect(settlementEvent.SlotIndex);
+        float condenseFraction = mainGameFlowPresentationProfile != null
+            ? mainGameFlowPresentationProfile.SettlementCondenseFraction
+            : 0.16f;
+        float leave = Mathf.InverseLerp(condenseFraction, Mathf.Min(0.98f, SettlementAbsorbFraction() + 0.12f), progress);
+        float focus = 1f - Mathf.SmoothStep(0f, 1f, leave);
+        float breathe = 0.78f + 0.22f * Mathf.Sin(progress * Mathf.PI * 2f);
+        Color edge = settlementEvent.ValueDelta < 0
+            ? new Color(0.86f, 0.25f, 0.08f, focus * breathe * 0.72f)
+            : settlementEvent.ValueDelta == 0
+                ? new Color(0.50f, 0.27f, 0.09f, focus * breathe * 0.52f)
+                : new Color(1f, 0.57f, 0.12f, focus * breathe * 0.80f);
+        DrawBorder(new Rect(dieRect.x + 4f, dieRect.y + 4f, dieRect.width - 8f, dieRect.height - 8f), edge, 2f);
+
+        Vector2 center = dieRect.center;
+        float gather = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0f, Mathf.Max(0.01f, condenseFraction), progress));
+        float radius = Mathf.Lerp(24f, 7f, gather);
+        for (int i = 0; i < 5; i++)
+        {
+            float angle = (i * 1.256637f) + settlementEvent.SlotIndex * 0.37f;
+            Vector2 position = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
+            float size = 3f + settlementEvent.LocalImpactWeight01 * 2f;
+            DrawTintedCircle(
+                new Rect(position.x - size * 0.5f, position.y - size * 0.5f, size, size),
+                new Color(edge.r, edge.g, edge.b, edge.a * (0.60f + i * 0.06f)));
+        }
+
+        float contactShadow = 0.14f + focus * 0.16f;
+        DrawRect(
+            new Rect(dieRect.x + 28f, dieRect.yMax - 7f, dieRect.width - 56f, 3f),
+            new Color(edge.r, edge.g, edge.b, contactShadow));
+    }
+
+    private void DrawSettlementSemanticContext(SettlementDisplayEvent settlementEvent, float progress)
+    {
+        if (settlementEvent == null
+            || settlementEvent.SlotIndex < 0
+            || string.IsNullOrEmpty(settlementEvent.Label))
+        {
+            return;
+        }
+
+        float enter = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.01f, 0.10f, progress));
+        float leave = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.82f, 0.98f, progress));
+        float opacity = Mathf.Clamp01(enter * leave);
+        if (opacity <= 0f)
+        {
+            return;
+        }
+
+        Rect sourceRect = ArcadeRunPhysicalDieRect(settlementEvent.SlotIndex);
+        float sourceWidth = settlementEvent.Label.Length >= 9 ? 146f : 126f;
+        Rect sourceTag = new Rect(
+            sourceRect.center.x - sourceWidth * 0.5f,
+            sourceRect.y - 25f,
+            sourceWidth,
+            22f);
+        Color sourceColor = settlementEvent.ValueDelta < 0
+            ? new Color(0.90f, 0.27f, 0.08f, 1f)
+            : settlementEvent.LocalChain
+                ? new Color(1f, 0.48f, 0.10f, 1f)
+                : new Color(1f, 0.62f, 0.16f, 1f);
+        DrawSettlementSemanticTag(
+            sourceTag,
+            settlementEvent.Label,
+            sourceColor,
+            settlementEvent.ValueDelta < 0 ? MainGameLedFont.TextRole.SecondaryWarm : MainGameLedFont.TextRole.SecondaryAmber,
+            opacity,
+            true);
+
+        if (!settlementEvent.LocalChain
+            || settlementEvent.CursorSlotIndex < 0
+            || settlementEvent.CursorSlotIndex == settlementEvent.SlotIndex
+            || settlementEvent.CursorSlotIndex >= dice.Count)
+        {
+            return;
+        }
+
+        Die cursorDie = dice[settlementEvent.CursorSlotIndex];
+        string cursorLabel = cursorDie != null
+            ? "主槽·" + TypeName(cursorDie.Type)
+            : "主槽·连锁";
+        Rect cursorRect = ArcadeRunPhysicalDieRect(settlementEvent.CursorSlotIndex);
+        Rect cursorTag = new Rect(cursorRect.center.x - 58f, cursorRect.yMax + 8f, 116f, 19f);
+        DrawSettlementSemanticTag(
+            cursorTag,
+            cursorLabel,
+            new Color(0.75f, 0.42f, 0.13f, 1f),
+            MainGameLedFont.TextRole.SecondaryWarm,
+            opacity * 0.86f,
+            false);
+    }
+
+    private void DrawSettlementSemanticTag(
+        Rect rect,
+        string text,
+        Color accent,
+        MainGameLedFont.TextRole role,
+        float opacity,
+        bool source)
+    {
+        float alpha = Mathf.Clamp01(opacity);
+        DrawRect(new Rect(rect.x + 2f, rect.y + 2f, rect.width, rect.height), new Color(0f, 0f, 0f, alpha * 0.34f));
+        DrawRect(rect, new Color(0.015f, 0.027f, 0.029f, alpha * (source ? 0.92f : 0.84f)));
+        DrawBorder(rect, new Color(accent.r, accent.g, accent.b, alpha * (source ? 0.76f : 0.52f)), 1f);
+        DrawRect(
+            new Rect(rect.x + 4f, rect.y + 3f, rect.width - 8f, 1f),
+            new Color(accent.r, accent.g, accent.b, alpha * (source ? 0.52f : 0.32f)));
+        DrawLedRoleText(
+            new Rect(rect.x + 5f, rect.y + 1f, rect.width - 10f, rect.height - 2f),
+            text,
+            role,
+            TextAnchor.MiddleCenter,
+            alpha * (source ? 0.96f : 0.90f));
+    }
+
+    private void DrawSettlementScoreHalo(SettlementDisplayEvent settlementEvent, float progress)
+    {
+        float condenseFraction = mainGameFlowPresentationProfile != null
+            ? mainGameFlowPresentationProfile.SettlementCondenseFraction
+            : 0.16f;
+        float absorbFraction = SettlementAbsorbFraction();
+        if (progress < condenseFraction || progress > Mathf.Min(0.98f, absorbFraction + 0.08f))
+        {
+            return;
+        }
+
+        float travel = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(condenseFraction, absorbFraction, progress));
+        Rect dieRect = ArcadeRunPhysicalDieRect(settlementEvent.SlotIndex);
+        Vector2 start = dieRect.center + new Vector2(-6f, -3f);
+        Vector2 end = SettlementTowerContactPoint(settlementEvent);
+        Vector2 control = Vector2.Lerp(start, end, 0.50f) + new Vector2(0f, -28f - settlementEvent.LocalImpactWeight01 * 18f);
+        Vector2 position = SettlementQuadraticPoint(start, control, end, travel);
+
+        float minSize = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.SettlementHaloMinSize : 14f;
+        float maxSize = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.SettlementHaloMaxSize : 34f;
+        float size = Mathf.Lerp(minSize, maxSize, settlementEvent.LocalImpactWeight01);
+        float compressionFraction = mainGameFlowPresentationProfile != null
+            ? mainGameFlowPresentationProfile.SettlementGlassCompressionFraction
+            : 0.18f;
+        float compression = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(1f - compressionFraction, 1f, travel));
+        float width = size * Mathf.Lerp(1f, 0.20f, compression);
+        float height = size * Mathf.Lerp(1f, 0.82f, compression);
+        Color packet = SettlementPacketColor(settlementEvent.ValueDelta, 0.88f);
+        Color core = settlementEvent.ValueDelta < 0
+            ? new Color(1f, 0.52f, 0.18f, 0.88f)
+            : settlementEvent.ValueDelta == 0
+                ? new Color(0.70f, 0.37f, 0.13f, 0.64f)
+                : new Color(1f, 0.94f, 0.66f, 0.96f);
+
+        int trailCount = Mathf.Clamp(2 + Mathf.RoundToInt(settlementEvent.LocalImpactWeight01 * 2f), 2, 4);
+        for (int i = trailCount; i >= 1; i--)
+        {
+            float tailTravel = Mathf.Max(0f, travel - i * 0.045f);
+            Vector2 tail = SettlementQuadraticPoint(start, control, end, tailTravel);
+            float tailSize = Mathf.Lerp(2f, 5f, settlementEvent.LocalImpactWeight01) * (1f - i / (trailCount + 1f));
+            DrawTintedCircle(
+                new Rect(tail.x - tailSize * 0.5f, tail.y - tailSize * 0.5f, tailSize, tailSize),
+                new Color(packet.r, packet.g, packet.b, packet.a * (0.30f - i * 0.035f)));
+        }
+
+        DrawTintedCircle(new Rect(position.x - width * 0.64f, position.y - height * 0.64f, width * 1.28f, height * 1.28f), new Color(packet.r, packet.g, packet.b, packet.a * 0.18f));
+        DrawSettlementBrokenHalo(position, width, height, packet, settlementEvent.LocalChain);
+        float coreWidth = Mathf.Max(2f, width * (0.20f + settlementEvent.LocalImpactWeight01 * 0.18f));
+        float coreHeight = Mathf.Max(4f, height * (0.24f + settlementEvent.LocalImpactWeight01 * 0.24f));
+        DrawTintedCircle(new Rect(position.x - coreWidth * 0.5f, position.y - coreHeight * 0.5f, coreWidth, coreHeight), core);
+
+        if (compression > 0.45f)
+        {
+            float contactAlpha = Mathf.InverseLerp(0.45f, 1f, compression);
+            DrawRect(
+                new Rect(end.x - 1f, end.y - Mathf.Lerp(4f, 13f, contactAlpha), 2f, Mathf.Lerp(8f, 26f, contactAlpha)),
+                new Color(core.r, core.g, core.b, contactAlpha * 0.72f));
+        }
+    }
+
+    private void DrawSettlementBrokenHalo(Vector2 center, float width, float height, Color color, bool doubleCore)
+    {
+        const int dotCount = 9;
+        for (int i = 0; i < dotCount; i++)
+        {
+            if (i == 2 || i == 6)
+            {
+                continue;
+            }
+
+            float angle = (i / (float)dotCount) * Mathf.PI * 2f;
+            Vector2 point = center + new Vector2(Mathf.Cos(angle) * width * 0.48f, Mathf.Sin(angle) * height * 0.48f);
+            float dotSize = Mathf.Max(1.6f, Mathf.Min(width, height) * 0.13f);
+            DrawTintedCircle(new Rect(point.x - dotSize * 0.5f, point.y - dotSize * 0.5f, dotSize, dotSize), color);
+        }
+
+        if (doubleCore)
+        {
+            DrawRect(new Rect(center.x - Mathf.Max(1f, width * 0.07f), center.y - height * 0.28f, Mathf.Max(2f, width * 0.14f), height * 0.56f), new Color(1f, 0.82f, 0.40f, color.a * 0.48f));
+        }
+    }
+
+    private static Vector2 SettlementQuadraticPoint(Vector2 start, Vector2 control, Vector2 end, float t)
+    {
+        float inverse = 1f - Mathf.Clamp01(t);
+        return inverse * inverse * start + 2f * inverse * t * control + t * t * end;
+    }
+
+    private static Color SettlementPacketColor(int signedContribution, float alpha)
+    {
+        if (signedContribution < 0)
+        {
+            return new Color(0.88f, 0.24f, 0.07f, alpha);
+        }
+
+        if (signedContribution == 0)
+        {
+            return new Color(0.48f, 0.25f, 0.08f, alpha * 0.72f);
+        }
+
+        return new Color(1f, 0.52f, 0.08f, alpha);
+    }
+
+    private void DrawSettlementTowerSegmentedEnergy(
+        Rect meter,
+        Color color,
+        float fill01,
+        float coreWidth,
+        float flow01,
+        float instability)
+    {
+        float energy = Mathf.Clamp01(color.a);
+        float fill = Mathf.Clamp01(fill01);
+        if (energy <= 0f || fill <= 0f)
+        {
+            return;
+        }
+
+        const int segmentCount = 12;
+        const float segmentGap = 4f;
+        float segmentHeight = (meter.height - segmentGap * (segmentCount - 1)) / segmentCount;
+        float visibleSegments = fill * segmentCount;
+        float relayPosition = Mathf.Lerp(-0.45f, segmentCount - 0.55f, Mathf.Clamp01(flow01));
+        float unstable = Mathf.Clamp01(instability);
+        Color hot = Color.Lerp(
+            new Color(color.r, color.g, color.b, 1f),
+            new Color(1f, 0.98f, 0.80f, 1f),
+            0.68f);
+
+        for (int index = 0; index < segmentCount; index++)
+        {
+            float coverage = Mathf.Clamp01(visibleSegments - index);
+            if (coverage <= 0f)
+            {
+                continue;
+            }
+
+            float y = meter.y + meter.height - segmentHeight - index * (segmentHeight + segmentGap);
+            float relayDistance = Mathf.Abs(index - relayPosition);
+            float relay = Mathf.Pow(Mathf.Clamp01(1f - relayDistance * 0.68f), 2f);
+            float ripple = 0.90f + 0.10f * Mathf.Sin(index * 1.73f + GameplayPlaybackTime() * (7f + unstable * 21f));
+            float jitter = Mathf.Sin(GameplayPlaybackTime() * (31f + unstable * 47f) + index * 2.19f)
+                * unstable
+                * (1.2f + energy * 1.6f);
+            float widthVariation = 0.90f + 0.10f * Mathf.Sin(index * 1.41f + flow01 * Mathf.PI * 2f);
+            float bodyWidth = Mathf.Max(3f, coreWidth * widthVariation + relay * 2f);
+            float outerWidth = bodyWidth + 8f + unstable * 5f;
+            float x = meter.center.x + jitter;
+            float outerHeight = Mathf.Max(2f, segmentHeight - 1f);
+            float bodyHeight = Mathf.Max(2f, segmentHeight - 3f);
+            float hotHeight = Mathf.Max(1.5f, segmentHeight - 5f);
+            float segmentEnergy = energy * coverage * ripple;
+
+            DrawRect(
+                new Rect(x - outerWidth * 0.5f, y + (segmentHeight - outerHeight) * 0.5f, outerWidth, outerHeight),
+                new Color(color.r, color.g, color.b, segmentEnergy * (0.10f + relay * 0.14f)));
+            DrawRect(
+                new Rect(x - bodyWidth * 0.5f, y + (segmentHeight - bodyHeight) * 0.5f, bodyWidth, bodyHeight),
+                new Color(color.r, color.g, color.b, segmentEnergy * (0.46f + relay * 0.20f)));
+
+            float hotWidth = Mathf.Max(2f, bodyWidth * (0.28f + relay * 0.12f));
+            DrawRect(
+                new Rect(x - hotWidth * 0.5f, y + (segmentHeight - hotHeight) * 0.5f, hotWidth, hotHeight),
+                new Color(hot.r, hot.g, hot.b, segmentEnergy * (0.34f + relay * 0.54f)));
+
+            if (relay > 0.10f)
+            {
+                float relayWidth = outerWidth + 6f + relay * 8f;
+                float relayY = y + segmentHeight * (index % 2 == 0 ? 0.30f : 0.68f);
+                DrawRect(
+                    new Rect(x - relayWidth * 0.5f, relayY, relayWidth, Mathf.Lerp(1f, 2f, relay)),
+                    new Color(hot.r, hot.g, hot.b, segmentEnergy * relay * 0.76f));
+            }
+        }
+    }
+
+    private void DrawSettlementTowerSegmentedWash(Rect meter, Color color, float inset)
+    {
+        float energy = Mathf.Clamp01(color.a);
+        if (energy <= 0f)
+        {
+            return;
+        }
+
+        const int segmentCount = 12;
+        const float segmentGap = 4f;
+        float segmentHeight = (meter.height - segmentGap * (segmentCount - 1)) / segmentCount;
+        float x = meter.x + inset;
+        float width = Mathf.Max(2f, meter.width - inset * 2f);
+        for (int index = 0; index < segmentCount; index++)
+        {
+            float y = meter.y + meter.height - segmentHeight - index * (segmentHeight + segmentGap);
+            float variation = 0.88f + 0.12f * Mathf.Sin(index * 1.57f + GameplayPlaybackTime() * 5f);
+            DrawRect(
+                new Rect(x, y + 1f, width, Mathf.Max(2f, segmentHeight - 2f)),
+                new Color(color.r, color.g, color.b, energy * variation));
+        }
+    }
+
+    private void DrawSettlementTowerImpact(SettlementDisplayEvent settlementEvent, float progress)
+    {
+        float absorbFraction = SettlementAbsorbFraction();
+        if (progress < absorbFraction)
+        {
+            return;
+        }
+
+        float impact = Mathf.Clamp01(Mathf.InverseLerp(absorbFraction, Mathf.Min(0.98f, absorbFraction + 0.20f), progress));
+        float strike = Mathf.Sin(impact * Mathf.PI);
+        Vector2 contact = SettlementTowerContactPoint(settlementEvent);
+        Rect meter = SettlementTowerMeterRect();
+        Color color = SettlementPacketColor(settlementEvent.ValueDelta, 1f);
+        float weight = Mathf.Clamp01(settlementEvent.LocalImpactWeight01);
+        float bloomWidth = Mathf.Lerp(16f, 42f, weight) * (0.55f + strike * 0.45f);
+        float bloomHeight = Mathf.Lerp(20f, 54f, weight) * (0.55f + strike * 0.45f);
+        DrawTintedCircle(
+            new Rect(contact.x - bloomWidth * 0.5f, contact.y - bloomHeight * 0.5f, bloomWidth, bloomHeight),
+            new Color(color.r, color.g, color.b, strike * (0.14f + weight * 0.24f)));
+        DrawRect(
+            new Rect(contact.x - 1.5f, contact.y - 9f - weight * 9f, 3f, 18f + weight * 18f),
+            new Color(1f, 0.90f, 0.52f, strike * (0.52f + weight * 0.34f)));
+
+        float bandTravel = Mathf.SmoothStep(0f, 1f, impact);
+        float bandY = Mathf.Lerp(contact.y, meter.y + 8f, bandTravel);
+        float bandHeight = Mathf.Lerp(3f, 8f, weight) * (1f - bandTravel * 0.35f);
+        DrawRect(
+            new Rect(meter.x + 6f, bandY - bandHeight * 0.5f, meter.width - 12f, bandHeight),
+            new Color(color.r, color.g, color.b, (1f - bandTravel) * (0.30f + weight * 0.42f)));
+        DrawRect(
+            new Rect(meter.x + 12f, bandY, meter.width - 24f, 2f),
+            new Color(1f, 0.93f, 0.64f, (1f - bandTravel) * strike * 0.76f));
+
+        if (settlementEvent.ValueDelta < 0)
+        {
+            float rollbackY = Mathf.Lerp(contact.y - 5f, contact.y + 16f, bandTravel);
+            DrawRect(new Rect(meter.x + 15f, rollbackY, meter.width - 30f, 3f), new Color(0.88f, 0.22f, 0.07f, (1f - bandTravel) * 0.62f));
+        }
+    }
+
+    private void DrawSettlementTowerOnlyContribution(SettlementDisplayEvent settlementEvent, float progress)
+    {
+        float absorbFraction = SettlementAbsorbFraction();
+        float pulse = Mathf.Sin(Mathf.Clamp01(Mathf.InverseLerp(absorbFraction * 0.65f, 1f, progress)) * Mathf.PI);
+        if (pulse <= 0f)
+        {
+            return;
+        }
+
+        Rect meter = SettlementTowerMeterRect();
+        float weight = Mathf.Clamp01(settlementEvent.LocalImpactWeight01);
+        Color amber = new Color(1f, 0.56f, 0.10f, pulse * (0.30f + weight * 0.36f));
+        DrawSettlementTowerSegmentedWash(
+            meter,
+            new Color(amber.r, amber.g, amber.b, amber.a * 0.08f),
+            8f);
+        DrawSettlementTowerSegmentedEnergy(
+            meter,
+            amber,
+            1f,
+            Mathf.Lerp(5f, 9f, weight),
+            progress,
+            0.08f + weight * 0.08f);
+    }
+
+    private void DrawSettlementTowerAfterglow()
+    {
+        if (settlementTowerAfterglowStartedAt < -900f || mainGameFlowPresentationProfile == null)
+        {
+            return;
+        }
+
+        float duration = Mathf.Max(0.08f, mainGameFlowPresentationProfile.SettlementTowerAfterglowDuration);
+        float t = Mathf.Clamp01(GameplayPlaybackElapsed(settlementTowerAfterglowStartedAt) / duration);
+        if (t >= 1f)
+        {
+            return;
+        }
+
+        float fade = 1f - Mathf.SmoothStep(0f, 1f, t);
+        Color color = SettlementPacketColor(settlementTowerAfterglowSign, 1f);
+        Rect meter = SettlementTowerMeterRect();
+        float weight = Mathf.Clamp01(settlementTowerAfterglowWeight);
+        float colorStrength = color.a;
+        float borderAlpha = fade * colorStrength * (0.16f + weight * 0.18f);
+        DrawBorder(
+            new Rect(meter.x - 2f, meter.y - 2f, meter.width + 4f, meter.height + 4f),
+            new Color(color.r, color.g, color.b, borderAlpha),
+            2f);
+
+        float leftTravel = Mathf.SmoothStep(0f, 1f, t);
+        float rightTravel = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((t - 0.045f) / 0.955f));
+        DrawSettlementTowerEdgeCurrent(meter, color, fade * colorStrength, weight, leftTravel, true);
+        DrawSettlementTowerEdgeCurrent(meter, color, fade * colorStrength * Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / 0.08f)), weight, rightTravel, false);
+
+        float arrival = SettlementPulse01(t, 0.84f, 0.16f);
+        if (arrival > 0f)
+        {
+            float capY = settlementTowerAfterglowSign < 0 ? meter.yMax - 2f : meter.y;
+            Color hot = Color.Lerp(color, new Color(1f, 0.96f, 0.74f, 1f), 0.72f);
+            DrawRect(
+                new Rect(meter.x - 5f, capY - 1f, meter.width + 10f, 3f),
+                new Color(hot.r, hot.g, hot.b, arrival * fade * colorStrength * (0.30f + weight * 0.22f)));
+        }
+    }
+
+    private void DrawSettlementTowerEdgeCurrent(
+        Rect meter,
+        Color color,
+        float fade,
+        float weight,
+        float travel,
+        bool leftEdge)
+    {
+        if (fade <= 0f)
+        {
+            return;
+        }
+
+        bool travelsDown = settlementTowerAfterglowSign < 0;
+        float trackTop = meter.y + 7f;
+        float trackBottom = meter.yMax - 7f;
+        float headY = travelsDown
+            ? Mathf.Lerp(trackTop, trackBottom, travel)
+            : Mathf.Lerp(trackBottom, trackTop, travel);
+        float edgeX = leftEdge ? meter.x - 1f : meter.xMax + 1f;
+        float currentAlpha = fade * (0.42f + weight * 0.34f);
+        Color hot = Color.Lerp(color, new Color(1f, 0.96f, 0.74f, 1f), 0.72f);
+        float tailLength = Mathf.Lerp(24f, 38f, weight);
+
+        const int tailSegments = 4;
+        for (int i = tailSegments - 1; i >= 0; i--)
+        {
+            float distance = 5f + i * (tailLength / tailSegments);
+            float segmentLength = Mathf.Lerp(7f, 11f, 1f - i / (float)tailSegments);
+            float segmentY = travelsDown
+                ? headY - distance - segmentLength
+                : headY + distance;
+            float clippedY = Mathf.Max(trackTop, segmentY);
+            float clippedBottom = Mathf.Min(trackBottom, segmentY + segmentLength);
+            if (clippedBottom <= clippedY)
+            {
+                continue;
+            }
+
+            float segmentFade = 1f - (i + 1f) / (tailSegments + 1f);
+            float segmentAlpha = currentAlpha * segmentFade;
+            float segmentHeight = clippedBottom - clippedY;
+            DrawRect(
+                new Rect(edgeX - 3f, clippedY, 6f, segmentHeight),
+                new Color(color.r, color.g, color.b, segmentAlpha * 0.20f));
+            DrawRect(
+                new Rect(edgeX - 1.5f, clippedY, 3f, segmentHeight),
+                new Color(color.r, color.g, color.b, segmentAlpha * 0.54f));
+            DrawRect(
+                new Rect(edgeX - 0.75f, clippedY, 1.5f, segmentHeight),
+                new Color(hot.r, hot.g, hot.b, segmentAlpha * 0.86f));
+        }
+
+        DrawRect(
+            new Rect(edgeX - 4f, headY - 5f, 8f, 10f),
+            new Color(color.r, color.g, color.b, currentAlpha * 0.24f));
+        DrawRect(
+            new Rect(edgeX - 1.5f, headY - 5f, 3f, 10f),
+            new Color(hot.r, hot.g, hot.b, currentAlpha));
+        float contactX = leftEdge ? edgeX - 2f : edgeX - 10f;
+        DrawRect(
+            new Rect(contactX, headY - 1.5f, 12f, 3f),
+            new Color(hot.r, hot.g, hot.b, currentAlpha * 0.82f));
+    }
+
+    private void DrawSettlementFinale(SettlementFeedbackTier tier, float progress)
+    {
+        if (mainGameFlowPresentationProfile == null)
+        {
+            DrawSettlementFinaleLegacy(tier, progress);
+            return;
+        }
+
+        float p = Mathf.Clamp01(progress);
+        Rect meter = SettlementTowerMeterRect();
+        Rect tower = new Rect(22f, 112f, 139f, 405f);
+        if (tier == SettlementFeedbackTier.Miss)
+        {
+            float unload = SettlementEnvelope01(p, 0.04f, 0.16f, 0.62f, 0.98f);
+            DrawSettlementCabinetLoad(tier, p, unload);
+            DrawSettlementTraySweeps(tier, p, unload);
+            float rollback = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.18f, 0.82f, p));
+            float rollbackY = Mathf.Lerp(meter.y + 12f, meter.yMax - 20f, rollback);
+            DrawRect(new Rect(meter.x + 8f, meter.y + 8f, meter.width - 16f, meter.height - 16f), new Color(0f, 0f, 0f, unload * 0.18f));
+            DrawRect(new Rect(meter.x + 12f, rollbackY, meter.width - 24f, 4f), new Color(0.86f, 0.22f, 0.07f, unload * 0.66f));
+            DrawBorder(tower, new Color(0.62f, 0.18f, 0.06f, unload * 0.18f), 2f);
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.Pass)
+        {
+            DrawSettlementTargetLatch(p, tier);
+            float closure = SettlementEnvelope01(p, 0.12f, 0.22f, 0.48f, 0.68f);
+            float snap = SettlementPulse01(p, 0.34f, 0.10f);
+            Rect contactBand = new Rect(meter.x - 5f, meter.y + 1f, meter.width + 10f, 24f);
+            DrawBorder(contactBand, new Color(1f, 0.58f, 0.11f, closure * 0.42f + snap * 0.34f), 2f);
+            DrawRect(new Rect(meter.center.x - 2f, meter.y + 5f, 4f, 18f), new Color(1f, 0.92f, 0.60f, snap * 0.78f));
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.Exceed)
+        {
+            DrawSettlementExceedRelay(p, meter);
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.FarExceed)
+        {
+            DrawSettlementFarExceedOverload(p, meter, tower);
+            return;
+        }
+
+        DrawSettlementTargetLatch(p, tier);
+        DrawSettlementCriticalFinale(p, meter, tower);
+    }
+
+    private void DrawSettlementExceedRelay(float progress, Rect meter)
+    {
+        float p = Mathf.Clamp01(progress);
+        float effectScale = SettlementDynamicEffectsScale();
+        float outboundTravel = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.10f, 0.36f, p));
+        float returnTravel = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.43f, 0.69f, p));
+        float outboundPulse = SettlementPulse01(p, 0.27f, 0.15f);
+        float returnPulse = SettlementPulse01(p, 0.57f, 0.17f);
+        float outboundHistory = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.18f, 0.34f, p))
+            * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.72f, 0.92f, p)));
+        float returnHistory = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.50f, 0.66f, p))
+            * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.82f, 1f, p)));
+        float outboundEnergy = Mathf.Max(outboundPulse, outboundHistory * 0.38f);
+        float returnEnergy = Mathf.Max(returnPulse, returnHistory * 0.46f);
+
+        const float leftRailX = 174f;
+        const float rightRailX = 1037f;
+        const float topRailY = 93f;
+        const float bottomRailY = 555f;
+        Color outbound = new Color(1f, 0.67f, 0.18f, 1f);
+        Color returning = new Color(1f, 0.91f, 0.55f, 1f);
+        DrawSettlementRelayRail(leftRailX, rightRailX, topRailY, outboundTravel, outboundEnergy, outbound, 0);
+        DrawSettlementRelayRail(rightRailX, leftRailX, bottomRailY, returnTravel, returnEnergy, returning, 1);
+
+        float terminalContact = SettlementPulse01(p, 0.39f, 0.11f);
+        float towerContact = SettlementPulse01(p, 0.70f, 0.11f);
+        Rect terminal = new Rect(1049f, 154f, 186f, 274f);
+        DrawRect(
+            new Rect(rightRailX - 2f, topRailY, 4f, 61f),
+            new Color(outbound.r, outbound.g, outbound.b, outboundEnergy * 0.48f));
+        DrawRect(
+            new Rect(rightRailX - 2f, terminal.yMax, 4f, bottomRailY - terminal.yMax),
+            new Color(returning.r, returning.g, returning.b, returnEnergy * 0.50f));
+        DrawBorder(
+            terminal,
+            new Color(0.56f, 1f, 0.93f, terminalContact * 0.54f * effectScale + returnEnergy * 0.12f),
+            terminalContact > 0.28f ? 3f : 2f);
+        DrawBorder(
+            new Rect(meter.x - 3f, meter.y - 3f, meter.width + 6f, meter.height + 6f),
+            new Color(1f, 0.72f, 0.24f, towerContact * 0.58f + returnEnergy * 0.18f),
+            towerContact > 0.25f ? 3f : 2f);
+
+        float relayEnergy = Mathf.Max(outboundPulse * 0.42f, returnEnergy * 0.86f);
+        float relayFill = Mathf.Lerp(5f, 9f, Mathf.Clamp01(returnTravel));
+        DrawSettlementTowerSegmentedEnergy(
+            meter,
+            new Color(1f, 0.95f, 0.70f, relayEnergy * 0.76f),
+            1f,
+            relayFill,
+            returnTravel,
+            0.08f * effectScale);
+        DrawSettlementCrtSlices(SettlementFeedbackTier.Exceed, Mathf.Max(terminalContact * 0.74f, returnPulse * 0.48f));
+    }
+
+    private void DrawSettlementRelayRail(
+        float startX,
+        float endX,
+        float y,
+        float travel,
+        float energy,
+        Color color,
+        int phaseOffset)
+    {
+        float e = Mathf.Clamp01(energy);
+        if (e <= 0f)
+        {
+            return;
+        }
+
+        float t = Mathf.Clamp01(travel);
+        float headX = Mathf.Lerp(startX, endX, t);
+        float routeLength = Mathf.Abs(endX - startX);
+        const int routeSegmentCount = 18;
+        const float routeSegmentGap = 6f;
+        float routeSegmentWidth = Mathf.Max(4f, (routeLength - routeSegmentGap * (routeSegmentCount - 1)) / routeSegmentCount);
+        for (int index = 0; index < routeSegmentCount; index++)
+        {
+            float segmentT = (index + 0.5f) / routeSegmentCount;
+            float segmentX = Mathf.Lerp(startX, endX, segmentT);
+            float activated = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(segmentT - 0.08f, segmentT + 0.01f, t));
+            float headHeat = Mathf.Pow(Mathf.Clamp01(1f - Mathf.Abs(segmentT - t) * 7f), 2f);
+            float segmentAlpha = e * (0.10f + activated * 0.36f + headHeat * 0.26f);
+            DrawRect(
+                new Rect(segmentX - routeSegmentWidth * 0.5f, y - 1f, routeSegmentWidth, 4f),
+                new Color(color.r, color.g, color.b, segmentAlpha));
+        }
+
+        float direction = endX >= startX ? 1f : -1f;
+        float tailX = direction > 0f ? headX - 34f : headX;
+        DrawRect(
+            new Rect(tailX, y - 2f, 34f, 6f),
+            new Color(color.r, color.g, color.b, e * 0.28f));
+        DrawRect(
+            new Rect(headX - 4f, y - 4f, 8f, 10f),
+            new Color(1f, 0.97f, 0.76f, e * 0.92f));
+        DrawRect(
+            new Rect(headX - 10f, y - 1f, 20f, 4f),
+            new Color(1f, 0.74f, 0.24f, e * 0.68f));
+
+        const int nodeCount = 9;
+        for (int index = 0; index < nodeCount; index++)
+        {
+            float nodeT = (index + 1f) / (nodeCount + 1f);
+            float nodeX = Mathf.Lerp(startX, endX, nodeT);
+            float wave = SettlementPulse01(t, nodeT, 0.13f);
+            float size = 3f + wave * 4f;
+            DrawTintedCircle(
+                new Rect(nodeX - size * 0.5f, y - size * 0.5f + (phaseOffset == 0 ? -1f : 1f), size, size),
+                new Color(color.r, color.g, color.b, e * (0.28f + wave * 0.62f)));
+        }
+    }
+
+    private void DrawSettlementOverloadBus(float startX, float endX, float y, float energy, Color color, int phaseOffset)
+    {
+        float e = Mathf.Clamp01(energy);
+        if (e <= 0f)
+        {
+            return;
+        }
+
+        float routeLength = Mathf.Abs(endX - startX);
+        const int segmentCount = 22;
+        const float gap = 5f;
+        float segmentWidth = Mathf.Max(4f, (routeLength - gap * (segmentCount - 1)) / segmentCount);
+        for (int index = 0; index < segmentCount; index++)
+        {
+            float segmentT = (index + 0.5f) / segmentCount;
+            float x = Mathf.Lerp(startX, endX, segmentT);
+            float flicker = 0.82f + 0.18f * Mathf.Sin(GameplayPlaybackTime() * 31f + index * 0.73f + phaseOffset);
+            float alpha = e * Mathf.Clamp01(flicker);
+            DrawRect(
+                new Rect(x - segmentWidth * 0.5f, y - 2f, segmentWidth, 5f),
+                new Color(color.r, color.g, color.b, alpha * 0.52f));
+            if ((index + phaseOffset) % 3 == 1)
+            {
+                DrawRect(
+                    new Rect(x - segmentWidth * 0.30f, y - 1f, segmentWidth * 0.60f, 3f),
+                    new Color(1f, 0.96f, 0.72f, alpha * 0.64f));
+            }
+        }
+    }
+
+    private void DrawSettlementFarExceedOverload(float progress, Rect meter, Rect tower)
+    {
+        float p = Mathf.Clamp01(progress);
+        float effectScale = SettlementDynamicEffectsScale();
+        float core = SettlementEnvelope01(p, 0.04f, 0.15f, 0.78f, 0.98f);
+        float hold = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.18f, 0.30f, p))
+            * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.78f, 0.96f, p)));
+        float overload = Mathf.Max(core * 0.72f, hold);
+        float recoil = SettlementPulse01(p, 0.79f, 0.13f) * effectScale;
+        float release = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.76f, 0.98f, p)) * core;
+
+        DrawSettlementCabinetLoad(SettlementFeedbackTier.FarExceed, p, overload);
+        DrawSettlementTraySweeps(SettlementFeedbackTier.FarExceed, p, overload);
+        DrawSettlementCrtSlices(SettlementFeedbackTier.FarExceed, overload);
+        DrawSettlementTowerSegmentedEnergy(
+            meter,
+            new Color(1f, 0.94f, 0.68f, overload * 0.86f),
+            1f,
+            12f,
+            p,
+            0.42f * effectScale);
+
+        Rect tray = new Rect(226f, 292f, 798f, 173f);
+        Rect terminal = new Rect(1049f, 154f, 186f, 274f);
+        Rect outer = new Rect(9f, 9f, VirtualWidth - 18f, VirtualHeight - 18f);
+        float thermalFlicker = 0.90f + 0.10f * Mathf.Sin(GameplayPlaybackTime() * 47f) * Mathf.Sin(GameplayPlaybackTime() * 47f);
+        Color amber = new Color(1f, 0.63f, 0.17f, overload * thermalFlicker);
+        DrawBorder(outer, new Color(amber.r, amber.g, amber.b, amber.a * 0.20f), 3f);
+        DrawBorder(tray, new Color(amber.r, amber.g, amber.b, amber.a * 0.48f), 3f);
+        DrawBorder(terminal, new Color(0.58f, 1f, 0.93f, overload * 0.34f * effectScale), 3f);
+        DrawBorder(tower, new Color(1f, 0.76f, 0.28f, overload * 0.54f), 3f);
+        DrawSettlementOverloadBus(170f, 1039f, 92f, overload, new Color(1f, 0.72f, 0.22f, 1f), 0);
+        DrawSettlementOverloadBus(1039f, 228f, 555f, overload, new Color(1f, 0.90f, 0.54f, 1f), 1);
+
+        float recoilX = -3.6f * recoil;
+        float recoilY = 1.8f * recoil;
+        if (recoil > 0f)
+        {
+            DrawBorder(
+                new Rect(tower.x + recoilX, tower.y + recoilY, tower.width, tower.height),
+                new Color(1f, 0.92f, 0.62f, recoil * 0.72f),
+                3f);
+            DrawBorder(
+                new Rect(tray.x - recoilX * 0.65f, tray.y - recoilY, tray.width, tray.height),
+                new Color(1f, 0.78f, 0.30f, recoil * 0.48f),
+                3f);
+            DrawBorder(
+                new Rect(terminal.x + recoilX * 0.45f, terminal.y + recoilY, terminal.width, terminal.height),
+                new Color(0.62f, 1f, 0.94f, recoil * 0.42f),
+                2f);
+        }
+
+        if (release > 0f)
+        {
+            float ventWidth = 112f * (1f - release * 0.34f);
+            DrawRect(
+                new Rect(tray.center.x - ventWidth, tray.yMax + 8f, ventWidth, 3f),
+                new Color(1f, 0.61f, 0.14f, release * 0.36f));
+            DrawRect(
+                new Rect(tray.center.x, tray.yMax + 8f, ventWidth, 3f),
+                new Color(1f, 0.61f, 0.14f, release * 0.36f));
+        }
+    }
+
+    private void DrawSettlementFinaleLegacy(SettlementFeedbackTier tier, float progress)
+    {
+        float p = Mathf.Clamp01(progress);
+        Rect meter = SettlementTowerMeterRect();
+        Rect tower = new Rect(22f, 112f, 139f, 405f);
+        float reducedFlash = menuLampFlickerUserEnabled ? 1f : 0.56f;
+
+        if (tier == SettlementFeedbackTier.Miss)
+        {
+            float unload = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.46f, 0.96f, p));
+            DrawRect(new Rect(meter.x + 8f, meter.y + 8f, meter.width - 16f, meter.height - 16f), new Color(0f, 0f, 0f, unload * 0.12f));
+            if (p > 0.68f)
+            {
+                float rust = Mathf.Sin(Mathf.InverseLerp(0.68f, 1f, p) * Mathf.PI);
+                DrawRect(new Rect(meter.x + 12f, meter.yMax - 18f, meter.width - 24f, 4f), new Color(0.86f, 0.22f, 0.07f, rust * 0.58f));
+            }
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.Pass)
+        {
+            DrawSettlementTargetLatch(p, tier);
+            float settle = Mathf.Sin(Mathf.Clamp01(Mathf.InverseLerp(0.32f, 0.84f, p)) * Mathf.PI);
+            DrawBorder(new Rect(meter.x - 5f, meter.y + 1f, meter.width + 10f, 24f), new Color(1f, 0.56f, 0.10f, settle * 0.34f), 2f);
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.Exceed)
+        {
+            DrawSettlementExceedRelay(p, meter);
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.FarExceed)
+        {
+            DrawSettlementFarExceedOverload(p, meter, tower);
+            return;
+        }
+
+        DrawSettlementTargetLatch(p, tier);
+        float brownout = Mathf.Sin(Mathf.Clamp01(Mathf.InverseLerp(0.08f, 0.34f, p)) * Mathf.PI);
+        DrawRect(tower, new Color(0f, 0f, 0f, brownout * 0.46f * reducedFlash));
+        float hit = Mathf.Sin(Mathf.Clamp01(Mathf.InverseLerp(0.32f, 0.60f, p)) * Mathf.PI);
+        float kick = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.SettlementCriticalKickPixels : 5f;
+        float kickX = Mathf.Sin(p * Mathf.PI * 31f) * kick * hit;
+        if (hit > 0f)
+        {
+            DrawSettlementTowerSegmentedWash(
+                meter,
+                new Color(1f, 0.84f, 0.40f, hit * 0.44f * reducedFlash),
+                5f);
+            DrawSettlementTowerSegmentedEnergy(
+                meter,
+                new Color(1f, 0.97f, 0.78f, hit * 0.92f * reducedFlash),
+                1f,
+                14f,
+                p,
+                0.82f * reducedFlash);
+            DrawBorder(new Rect(tower.x + kickX, tower.y, tower.width, tower.height), new Color(1f, 0.70f, 0.24f, hit * 0.62f), 3f);
+            for (int i = 0; i < 6; i++)
+            {
+                float angle = i * 1.0472f + 0.3f;
+                float distance = 22f + i * 4f + hit * 18f;
+                Vector2 spark = new Vector2(meter.center.x + Mathf.Cos(angle) * distance, meter.center.y + Mathf.Sin(angle) * distance * 1.4f);
+                float sparkSize = 2f + (i % 2) * 2f;
+                DrawRect(new Rect(spark.x, spark.y, sparkSize, 1.5f), new Color(1f, 0.68f, 0.18f, hit * (0.72f - i * 0.07f) * reducedFlash));
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                float y = 188f + i * 36f + Mathf.Sin(i * 2.1f + p * 19f) * 5f;
+                DrawRect(new Rect(1063f, y, 158f, 2f), new Color(0.65f, 0.96f, 0.84f, hit * (0.20f - i * 0.025f)));
+            }
+        }
+
+        float recovery = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.56f, 1f, p));
+        if (recovery > 0f)
+        {
+            DrawSettlementTowerSegmentedWash(meter, new Color(1f, 0.58f, 0.10f, recovery * 0.18f), 10f);
+        }
+    }
+
+    private void DrawSettlementCabinetLoad(SettlementFeedbackTier tier, float progress, float energy)
+    {
+        float e = Mathf.Clamp01(energy);
+        if (e <= 0f)
+        {
+            return;
+        }
+
+        bool miss = tier == SettlementFeedbackTier.Miss;
+        float tierStrength = tier == SettlementFeedbackTier.Pass
+            ? 0.36f
+            : tier == SettlementFeedbackTier.Exceed
+                ? 0.58f
+                : tier == SettlementFeedbackTier.FarExceed
+                    ? 0.82f
+                    : tier == SettlementFeedbackTier.Critical ? 1f : 0.24f;
+        Color trace = miss
+            ? new Color(0.72f, 0.24f, 0.07f, 1f)
+            : new Color(1f, 0.58f + tierStrength * 0.16f, 0.12f + tierStrength * 0.22f, 1f);
+        float alpha = e * tierStrength;
+        Rect outer = new Rect(9f, 9f, VirtualWidth - 18f, VirtualHeight - 18f);
+        Rect tray = new Rect(226f, 292f, 798f, 173f);
+        Rect terminal = new Rect(1049f, 154f, 186f, 274f);
+        DrawBorder(outer, new Color(trace.r, trace.g, trace.b, alpha * 0.24f), (int)tier >= (int)SettlementFeedbackTier.FarExceed ? 3f : 2f);
+        DrawBorder(tray, new Color(trace.r, trace.g, trace.b, alpha * (tier == SettlementFeedbackTier.Pass ? 0.28f : 0.44f)), 2f);
+        DrawBorder(terminal, new Color(trace.r, trace.g, trace.b, alpha * ((int)tier >= (int)SettlementFeedbackTier.Exceed ? 0.38f : 0.12f)), 2f);
+        DrawRect(new Rect(170f, 91f, 850f * Mathf.Clamp01(0.08f + alpha), 3f), new Color(trace.r, trace.g, trace.b, alpha * 0.38f));
+        DrawRect(new Rect(228f, 554f, 794f * Mathf.Clamp01(0.06f + alpha), 3f), new Color(trace.r, trace.g, trace.b, alpha * 0.32f));
+        DrawRect(new Rect(174f, 104f, 3f, 414f), new Color(trace.r, trace.g, trace.b, alpha * 0.20f));
+        DrawRect(new Rect(1035f, 104f, 3f, 414f), new Color(trace.r, trace.g, trace.b, alpha * 0.22f));
+
+        const int relayCount = 14;
+        for (int index = 0; index < relayCount; index++)
+        {
+            int order = miss ? relayCount - 1 - index : index;
+            float wave = SettlementPulse01(progress, 0.16f + order * 0.018f, 0.055f);
+            if (tier == SettlementFeedbackTier.Exceed)
+            {
+                wave = Mathf.Max(wave, SettlementPulse01(progress, 0.48f + (relayCount - 1 - order) * 0.014f, 0.050f) * 0.76f);
+            }
+            else if (tier == SettlementFeedbackTier.FarExceed)
+            {
+                float flicker = Mathf.Sin(GameplayPlaybackTime() * 19f + index * 0.71f);
+                wave = Mathf.Max(wave, e * (0.18f + 0.18f * flicker * flicker));
+            }
+            else if (tier == SettlementFeedbackTier.Critical)
+            {
+                float criticalRelay = progress >= SettlementCriticalBreakthrough()
+                    ? SettlementPulse01(progress, SettlementCriticalBreakthrough() + order * 0.010f, 0.055f)
+                    : 0f;
+                wave = Mathf.Max(wave, criticalRelay);
+            }
+
+            float intensity = Mathf.Clamp01(e * 0.13f + wave);
+            float x = 194f + index * 59f;
+            float y = index % 2 == 0 ? 101f : 542f;
+            float size = 3f + intensity * 5f;
+            DrawTintedCircle(new Rect(x - size * 0.5f, y - size * 0.5f, size, size), new Color(trace.r, trace.g, trace.b, intensity * 0.82f));
+        }
+    }
+
+    private void DrawSettlementTraySweeps(SettlementFeedbackTier tier, float progress, float energy)
+    {
+        float e = Mathf.Clamp01(energy);
+        if (e <= 0f)
+        {
+            return;
+        }
+
+        Rect tray = new Rect(228f, 300f, 792f, 159f);
+        Color color = tier == SettlementFeedbackTier.Miss
+            ? new Color(0.78f, 0.25f, 0.07f, 1f)
+            : new Color(1f, 0.70f, 0.20f, 1f);
+        float forward = tier == SettlementFeedbackTier.Miss
+            ? 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.10f, 0.76f, progress))
+            : Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.10f, 0.60f, progress));
+        float x = Mathf.Lerp(tray.x, tray.xMax, forward);
+        DrawRect(new Rect(x - 10f, tray.y + 3f, 20f, 3f), new Color(color.r, color.g, color.b, e * 0.76f));
+        DrawRect(new Rect(x - 24f, tray.y + 7f, 48f, 2f), new Color(color.r, color.g, color.b, e * 0.24f));
+
+        if (tier == SettlementFeedbackTier.Exceed || tier == SettlementFeedbackTier.FarExceed || tier == SettlementFeedbackTier.Critical)
+        {
+            float reverse = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.38f, 0.82f, progress));
+            float secondX = Mathf.Lerp(tray.x, tray.xMax, reverse);
+            float secondScale = tier == SettlementFeedbackTier.Exceed ? 0.62f : tier == SettlementFeedbackTier.FarExceed ? 0.78f : 0.90f;
+            DrawRect(new Rect(secondX - 12f, tray.yMax - 7f, 24f, 3f), new Color(color.r, color.g, color.b, e * secondScale));
+            DrawRect(new Rect(secondX - 30f, tray.yMax - 11f, 60f, 2f), new Color(color.r, color.g, color.b, e * secondScale * 0.28f));
+        }
+    }
+
+    private void DrawSettlementCrtSlices(SettlementFeedbackTier tier, float energy)
+    {
+        if (tier != SettlementFeedbackTier.Exceed && tier != SettlementFeedbackTier.FarExceed && tier != SettlementFeedbackTier.Critical)
+        {
+            return;
+        }
+
+        float effectScale = SettlementDynamicEffectsScale();
+        float strength = Mathf.Clamp01(energy) * effectScale;
+        if (strength <= 0f)
+        {
+            return;
+        }
+
+        int sliceCount = tier == SettlementFeedbackTier.Exceed ? 1 : tier == SettlementFeedbackTier.FarExceed ? 2 : 3;
+        bool fullScreen = tier == SettlementFeedbackTier.Critical;
+        float x = fullScreen ? 18f : 1057f;
+        float width = fullScreen ? VirtualWidth - 36f : 169f;
+        for (int index = 0; index < sliceCount; index++)
+        {
+            float y = fullScreen
+                ? 146f + index * 176f + Mathf.Sin(GameplayPlaybackTime() * (107f + index * 13f)) * 12f * effectScale
+                : 190f + index * 84f + Mathf.Sin(GameplayPlaybackTime() * 121f) * 5f * effectScale;
+            float offset = Mathf.Sin(GameplayPlaybackTime() * (101f + index * 17f)) * (5f + index * 3f) * strength;
+            DrawRect(new Rect(x + offset, y, width, 2f + index), new Color(0.48f, 0.98f, 0.90f, strength * (0.22f - index * 0.035f)));
+            DrawRect(new Rect(x - offset * 0.45f, y + 3f, width, 1f), new Color(1f, 0.35f, 0.10f, strength * (0.16f - index * 0.025f)));
+        }
+    }
+
+    private void DrawSettlementBreakthroughShockBand(Vector2 origin, float energy, float effectScale)
+    {
+        float strength = Mathf.Clamp01(energy) * Mathf.Clamp01(effectScale);
+        if (strength <= 0f)
+        {
+            return;
+        }
+
+        for (int index = 0; index < 5; index++)
+        {
+            float offset = index == 0 ? -8f : index == 1 ? -3f : index == 2 ? 0f : index == 3 ? 4f : 9f;
+            float length = index == 0 ? 0.18f : index == 1 ? 0.32f : index == 2 ? 0.48f : index == 3 ? 0.30f : 0.16f;
+            float width = index == 2 ? 3f : index == 1 || index == 3 ? 2f : 1.5f;
+            float flicker = 0.88f + 0.12f * Mathf.Sin(GameplayPlaybackTime() * (141f + index * 13f) + index);
+            float endX = Mathf.Lerp(origin.x + 76f, VirtualWidth - 12f, length);
+            Vector2 start = new Vector2(origin.x + 3f, origin.y + offset);
+            Vector2 end = new Vector2(endX, origin.y + offset * 0.42f);
+            Color outer = new Color(1f, 0.58f, 0.12f, strength * flicker * (index == 2 ? 0.34f : 0.18f));
+            Color core = new Color(1f, 0.94f, 0.68f, strength * flicker * (index == 2 ? 0.78f : 0.42f));
+            DrawMainMenuLine(start, end, width + 4f, outer);
+            DrawMainMenuLine(start, end, width, core);
+        }
+    }
+
+    private void DrawSettlementBreakthroughDischarge(Vector2 origin, float energy, float effectScale)
+    {
+        float strength = Mathf.Clamp01(energy) * Mathf.Clamp01(effectScale);
+        if (strength <= 0f)
+        {
+            return;
+        }
+
+        const int segmentCount = 8;
+        Vector2 previous = origin;
+        for (int segment = 1; segment <= segmentCount; segment++)
+        {
+            float t = segment / (float)segmentCount;
+            float drift = Mathf.Sin(
+                GameplayPlaybackTime() * 173f
+                + segment * 1.91f)
+                * Mathf.Lerp(1.5f, 12f, t)
+                * effectScale;
+            Vector2 next = new Vector2(origin.x + drift, Mathf.Lerp(origin.y, 10f, t));
+            Vector2 brokenStart = Vector2.Lerp(previous, next, segment == 1 ? 0.02f : 0.08f);
+            Vector2 brokenEnd = Vector2.Lerp(previous, next, 0.94f);
+            DrawMainMenuLine(
+                brokenStart,
+                brokenEnd,
+                8f,
+                new Color(1f, 0.57f, 0.10f, strength * (0.22f + t * 0.10f)));
+            DrawMainMenuLine(
+                brokenStart,
+                brokenEnd,
+                2f,
+                new Color(1f, 0.99f, 0.86f, strength * (0.90f - t * 0.18f)));
+
+            if (segment == 3 || segment == 5 || segment == 7)
+            {
+                float branchSide = segment == 5 ? -1f : 1f;
+                Vector2 branchStart = Vector2.Lerp(previous, next, 0.70f);
+                Vector2 branchEnd = branchStart + new Vector2(
+                    branchSide * (24f + segment * 5f) * effectScale,
+                    -(22f + segment * 4f));
+                DrawMainMenuLine(
+                    branchStart,
+                    branchEnd,
+                    3f,
+                    new Color(1f, 0.60f, 0.12f, strength * 0.32f));
+                DrawMainMenuLine(
+                    branchStart,
+                    branchEnd,
+                    1f,
+                    new Color(1f, 0.96f, 0.72f, strength * 0.62f));
+            }
+
+            previous = next;
+        }
+
+        previous = origin;
+        for (int segment = 1; segment <= 3; segment++)
+        {
+            float t = segment / 3f;
+            float drift = Mathf.Sin(GameplayPlaybackTime() * 137f + segment * 2.3f) * 4f * effectScale;
+            Vector2 next = new Vector2(origin.x + drift, Mathf.Lerp(origin.y, origin.y + 82f, t));
+            DrawMainMenuLine(
+                Vector2.Lerp(previous, next, segment == 1 ? 0.05f : 0.12f),
+                Vector2.Lerp(previous, next, 0.90f),
+                3f,
+                new Color(1f, 0.48f, 0.08f, strength * (0.28f - segment * 0.045f)));
+            previous = next;
+        }
+    }
+
+    private void DrawSettlementCriticalCompression(float progress, Rect meter, Rect tower, float vacuum, float effectScale)
+    {
+        float crouch = SettlementCriticalCrouchAmount(progress);
+        float pressure = Mathf.Max(crouch, vacuum);
+        if (pressure <= 0f)
+        {
+            return;
+        }
+
+        float vacuumStart = SettlementCriticalVacuumStart();
+        float vacuumFull = SettlementCriticalVacuumFull();
+        float breakthrough = SettlementCriticalBreakthrough();
+        float travel = Mathf.SmoothStep(
+            0f,
+            1f,
+            Mathf.InverseLerp(Mathf.Max(0f, vacuumStart - 0.12f), vacuumFull + 0.02f, progress));
+        float lockHold = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(vacuumStart, vacuumFull, progress))
+            * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(breakthrough - 0.004f, breakthrough + 0.004f, progress)));
+        float alpha = pressure * Mathf.Lerp(0.56f, 1f, effectScale);
+        float topY = Mathf.Lerp(tower.y + 24f, meter.center.y - 24f, travel);
+        float bottomY = Mathf.Lerp(tower.yMax - 24f, meter.center.y + 24f, travel);
+        float clampX = tower.x - 12f;
+        float clampWidth = tower.width + 24f;
+        Color pressureColor = new Color(1f, 0.45f, 0.07f, alpha);
+        Color hot = new Color(1f, 0.90f, 0.56f, alpha);
+
+        DrawRect(new Rect(clampX, topY - 5f, clampWidth, 10f), new Color(pressureColor.r, pressureColor.g, pressureColor.b, pressureColor.a * 0.16f));
+        DrawRect(new Rect(clampX + 6f, topY - 1.5f, clampWidth - 12f, 3f), new Color(hot.r, hot.g, hot.b, hot.a * 0.72f));
+        DrawRect(new Rect(clampX, bottomY - 5f, clampWidth, 10f), new Color(pressureColor.r, pressureColor.g, pressureColor.b, pressureColor.a * 0.12f));
+        DrawRect(new Rect(clampX + 12f, bottomY - 1f, clampWidth - 24f, 2f), new Color(hot.r, hot.g, hot.b, hot.a * 0.46f));
+        DrawRect(new Rect(clampX + 4f, topY, 3f, 13f), new Color(pressureColor.r, pressureColor.g, pressureColor.b, pressureColor.a * 0.66f));
+        DrawRect(new Rect(clampX + clampWidth - 7f, topY, 3f, 13f), new Color(pressureColor.r, pressureColor.g, pressureColor.b, pressureColor.a * 0.66f));
+        DrawRect(new Rect(clampX + 8f, bottomY - 13f, 3f, 13f), new Color(pressureColor.r, pressureColor.g, pressureColor.b, pressureColor.a * 0.44f));
+        DrawRect(new Rect(clampX + clampWidth - 11f, bottomY - 13f, 3f, 13f), new Color(pressureColor.r, pressureColor.g, pressureColor.b, pressureColor.a * 0.44f));
+
+        if (lockHold > 0f)
+        {
+            Vector2 core = meter.center;
+            float lockAlpha = lockHold * Mathf.Lerp(0.62f, 1f, effectScale);
+            DrawTintedCircle(
+                new Rect(core.x - 11f, core.y - 11f, 22f, 22f),
+                new Color(1f, 0.28f, 0.04f, lockAlpha * 0.18f));
+            DrawRect(
+                new Rect(core.x - 3f, core.y - 3f, 6f, 6f),
+                new Color(1f, 0.98f, 0.78f, lockAlpha));
+            DrawRect(
+                new Rect(core.x - 15f, core.y - 1f, 30f, 2f),
+                new Color(1f, 0.44f, 0.06f, lockAlpha * 0.52f));
+            DrawRect(
+                new Rect(core.x - 1f, core.y - 14f, 2f, 28f),
+                new Color(1f, 0.88f, 0.50f, lockAlpha * 0.76f));
+        }
+    }
+
+    private void DrawSettlementCriticalEruption(Vector2 origin, float progress, float energy, float effectScale)
+    {
+        float strength = Mathf.Clamp01(energy) * Mathf.Clamp01(effectScale);
+        if (strength <= 0f)
+        {
+            return;
+        }
+
+        float breakthrough = SettlementCriticalBreakthrough();
+        float rise = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(breakthrough - 0.006f, breakthrough + 0.085f, progress));
+        float crownWidth = Mathf.Lerp(24f, 360f, rise);
+        float crownY = Mathf.Lerp(origin.y - 18f, 48f, rise);
+        const int crownSegments = 5;
+        float segmentWidth = crownWidth / crownSegments;
+        for (int index = 0; index < crownSegments; index++)
+        {
+            float gap = 4f + index % 2 * 2f;
+            float x = origin.x - crownWidth * 0.5f + index * segmentWidth + gap * 0.5f;
+            float y = crownY + Mathf.Abs(index - 2) * 5f;
+            float width = Mathf.Max(4f, segmentWidth - gap);
+            DrawRect(
+                new Rect(x, y - 4f, width, 8f),
+                new Color(1f, 0.48f, 0.06f, strength * (0.14f + rise * 0.10f)));
+            DrawRect(
+                new Rect(x, y - 1f, width, 2f),
+                new Color(1f, 0.96f, 0.70f, strength * (0.58f - index * 0.045f)));
+        }
+
+        float throatHeight = Mathf.Lerp(18f, origin.y - 16f, rise);
+        float throatY = origin.y - throatHeight;
+        int throatSegments = menuLampFlickerUserEnabled ? 8 : 5;
+        float throatGap = Mathf.Min(4f, throatHeight / (throatSegments * 2.8f));
+        float throatSegmentHeight = Mathf.Max(
+            1f,
+            (throatHeight - throatGap * (throatSegments - 1)) / throatSegments);
+        for (int index = 0; index < throatSegments; index++)
+        {
+            float y = throatY + index * (throatSegmentHeight + throatGap);
+            float widthJitter = index % 3 == 0 ? 2f : 0f;
+            DrawRect(
+                new Rect(origin.x - 8f - widthJitter, y, 16f + widthJitter * 2f, throatSegmentHeight),
+                new Color(1f, 0.38f, 0.04f, strength * 0.18f));
+            DrawRect(
+                new Rect(origin.x - 2f, y, 4f, throatSegmentHeight),
+                new Color(1f, 0.98f, 0.80f, strength * 0.82f));
+        }
+    }
+
+    private void DrawSettlementCriticalFinale(float progress, Rect meter, Rect tower)
+    {
+        float p = Mathf.Clamp01(progress);
+        float vacuumStart = SettlementCriticalVacuumStart();
+        float vacuumFull = SettlementCriticalVacuumFull();
+        float breakthroughAt = SettlementCriticalBreakthrough();
+        float aftershockAt = SettlementCriticalAftershock();
+        float effectScale = SettlementDynamicEffectsScale();
+        float lockPulse = SettlementPulse01(p, 0.055f, 0.040f);
+        float drawIn = SettlementEnvelope01(p, 0.07f, 0.18f, vacuumStart + 0.02f, breakthroughAt);
+        float vacuum = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(vacuumStart, vacuumFull, p))
+            * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(breakthroughAt - 0.004f, breakthroughAt + 0.008f, p)));
+        float strike = SettlementCriticalStrikeAmount(p);
+        float aftershock = SettlementPulse01(p, aftershockAt, 0.075f);
+        float residue = SettlementEnvelope01(p, breakthroughAt - 0.002f, breakthroughAt + 0.045f, 0.90f, 1f);
+
+        DrawSettlementCabinetLoad(SettlementFeedbackTier.Critical, p, drawIn * (1f - vacuum * 0.94f));
+        DrawSettlementTraySweeps(SettlementFeedbackTier.Critical, p, drawIn * (1f - vacuum));
+        DrawBorder(tower, new Color(1f, 0.56f, 0.10f, lockPulse * 0.72f + drawIn * 0.24f), lockPulse > 0.2f ? 3f : 2f);
+        float drawInFill = Mathf.Lerp(0.18f, 1f, drawIn);
+        float drawInFlow = Mathf.Clamp01(Mathf.InverseLerp(0.07f, Mathf.Max(0.08f, vacuumStart), p));
+        DrawSettlementTowerSegmentedEnergy(
+            meter,
+            new Color(1f, 0.91f, 0.56f, drawIn * (1f - vacuum) * 0.76f),
+            drawInFill,
+            6f,
+            drawInFlow,
+            0.22f * effectScale);
+
+        float configuredDim = mainGameFlowPresentationProfile.SettlementCriticalGlobalDim;
+        float reducedDimScale = Mathf.Lerp(0.74f, 1f, effectScale);
+        DrawRect(new Rect(0f, 0f, VirtualWidth, VirtualHeight), new Color(0f, 0f, 0f, vacuum * configuredDim * reducedDimScale));
+        DrawSettlementCriticalCompression(p, meter, tower, vacuum, effectScale);
+        if (vacuum > 0f)
+        {
+            float filamentWave = Mathf.Sin(GameplayPlaybackTime() * 113f);
+            float corePulse = 0.64f + 0.36f * filamentWave * filamentWave;
+            DrawTintedCircle(new Rect(meter.center.x - 10f, meter.center.y - 12f, 20f, 24f), new Color(1f, 0.47f, 0.08f, vacuum * 0.13f));
+            DrawRect(new Rect(meter.center.x - 1f, meter.center.y - 8f, 2f, 16f), new Color(1f, 0.96f, 0.68f, vacuum * corePulse * 0.88f));
+            DrawRect(new Rect(meter.center.x - 7f, meter.center.y - 1f, 14f, 2f), new Color(1f, 0.42f, 0.08f, vacuum * 0.46f));
+        }
+
+        float releaseEnergy = Mathf.Max(strike, aftershock * 0.62f);
+        if (releaseEnergy <= 0f && residue <= 0f)
+        {
+            return;
+        }
+
+        DrawSettlementCabinetLoad(SettlementFeedbackTier.Critical, p, Mathf.Max(aftershock * 0.46f, residue * 0.30f));
+        DrawSettlementTraySweeps(SettlementFeedbackTier.Critical, p, Mathf.Max(aftershock * 0.28f, residue * 0.18f));
+        DrawSettlementCrtSlices(SettlementFeedbackTier.Critical, releaseEnergy + residue * 0.24f);
+        Vector2 origin = new Vector2(meter.center.x, meter.center.y);
+        float expansion = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(breakthroughAt - 0.002f, breakthroughAt + 0.11f, p));
+        Rect wave = new Rect(
+            Mathf.Lerp(origin.x - 5f, -34f, expansion),
+            Mathf.Lerp(origin.y - 7f, -24f, expansion),
+            Mathf.Lerp(10f, VirtualWidth + 68f, expansion),
+            Mathf.Lerp(14f, origin.y + 66f, expansion));
+        DrawBorder(wave, new Color(1f, 0.84f, 0.42f, (1f - expansion) * residue * 0.86f * effectScale), 3f);
+
+        float impactBand = Mathf.Max(strike, aftershock * 0.44f);
+        DrawSettlementBreakthroughShockBand(origin, impactBand * 0.34f, effectScale);
+        DrawSettlementBreakthroughDischarge(origin, strike, effectScale);
+        DrawSettlementCriticalEruption(origin, p, Mathf.Max(strike, residue * 0.52f), effectScale);
+
+        int rayCount = menuLampFlickerUserEnabled ? 16 : 7;
+        for (int index = 0; index < rayCount; index++)
+        {
+            float angle = -2.40f + index * (1.68f / Mathf.Max(1, rayCount - 1));
+            float length = 200f + (index % 4) * 68f + strike * 330f;
+            Vector2 end = origin + new Vector2(Mathf.Cos(angle) * length, Mathf.Sin(angle) * length);
+            float width = index % 3 == 0 ? 3f : 1.5f;
+            DrawMainMenuLine(origin, end, width, new Color(1f, 0.76f, 0.24f, strike * (0.62f - index * 0.018f) * effectScale));
+        }
+
+        float debrisTravel = Mathf.Clamp01(Mathf.InverseLerp(breakthroughAt, breakthroughAt + 0.20f, p));
+        for (int index = 0; index < 12; index++)
+        {
+            float angle = -2.48f + index * (1.82f / 11f);
+            float distance = (26f + index * 8f) * debrisTravel + strike * 22f;
+            Vector2 debris = origin + new Vector2(Mathf.Cos(angle) * distance, Mathf.Sin(angle) * distance * 1.18f);
+            float fade = (1f - debrisTravel) * residue * effectScale;
+            DrawRect(new Rect(debris.x, debris.y, 2f + index % 3, 1.5f + index % 2), new Color(1f, 0.60f, 0.12f, fade * (0.82f - index * 0.035f)));
+        }
+
+        float localKick = mainGameFlowPresentationProfile.SettlementCriticalKickPixels;
+        float launch = SettlementCriticalLaunchAmount(p);
+        float rebound = SettlementCriticalReboundAmount(p);
+        float kickX = Mathf.Sin(GameplayPlaybackTime() * 185f) * localKick * impactBand * 0.34f * effectScale;
+        float kickY = (-launch * 2.1f + rebound * 0.72f) * localKick * effectScale;
+        DrawBorder(new Rect(tower.x + kickX, tower.y + kickY, tower.width, tower.height), new Color(1f, 0.70f, 0.24f, impactBand * 0.78f), 3f);
+        DrawSettlementTowerSegmentedWash(
+            meter,
+            new Color(1f, 0.84f, 0.40f, impactBand * 0.42f),
+            4f);
+        DrawSettlementTowerSegmentedEnergy(
+            meter,
+            new Color(1f, 0.98f, 0.82f, strike * 0.94f * effectScale),
+            1f,
+            14f,
+            Mathf.Clamp01(Mathf.InverseLerp(breakthroughAt - 0.02f, breakthroughAt + 0.08f, p)),
+            0.88f * effectScale);
+        DrawRect(new Rect(0f, 0f, VirtualWidth, VirtualHeight), new Color(1f, 0.94f, 0.76f, strike * 0.26f * effectScale));
+
+        if (aftershock > 0f)
+        {
+            float afterExpansion = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(aftershockAt - 0.02f, aftershockAt + 0.09f, p));
+            Rect afterWave = new Rect(
+                Mathf.Lerp(origin.x - 10f, tower.x - 18f, afterExpansion),
+                Mathf.Lerp(origin.y - 14f, tower.y - 20f, afterExpansion),
+                Mathf.Lerp(20f, tower.width + 36f, afterExpansion),
+                Mathf.Lerp(28f, tower.height + 40f, afterExpansion));
+            DrawBorder(afterWave, new Color(0.62f, 1f, 0.92f, aftershock * (1f - afterExpansion) * 0.48f * effectScale), 2f);
+        }
+    }
+
+    private void DrawSettlementTargetLatch(float progress, SettlementFeedbackTier tier)
+    {
+        float latch = Mathf.Sin(Mathf.Clamp01(Mathf.InverseLerp(0.20f, 0.56f, progress)) * Mathf.PI);
+        if (latch <= 0f)
+        {
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.Pass)
+        {
+            Rect meter = SettlementTowerMeterRect();
+            float contact = SettlementPulse01(progress, 0.34f, 0.10f);
+            float approach = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.20f, 0.34f, progress));
+            float jawOffset = Mathf.Lerp(26f, 6f, approach);
+            float targetY = meter.y + 12f;
+            Color warm = new Color(1f, 0.58f, 0.10f, latch * 0.74f);
+            Color core = new Color(1f, 0.90f, 0.54f, contact * 0.86f);
+            DrawRect(new Rect(meter.center.x - jawOffset - 12f, targetY - 7f, 12f, 14f), warm);
+            DrawRect(new Rect(meter.center.x + jawOffset, targetY - 7f, 12f, 14f), warm);
+            DrawRect(new Rect(meter.center.x - jawOffset - 18f, targetY - 2f, 18f, 4f), new Color(warm.r, warm.g, warm.b, warm.a * 0.64f));
+            DrawRect(new Rect(meter.center.x + jawOffset, targetY - 2f, 18f, 4f), new Color(warm.r, warm.g, warm.b, warm.a * 0.64f));
+            DrawRect(new Rect(meter.center.x - 4f, targetY - 8f, 8f, 16f), core);
+            DrawRect(new Rect(meter.center.x - 12f, targetY - 2f, 24f, 4f), new Color(core.r, core.g, core.b, core.a * 0.76f));
+            return;
+        }
+
+        Rect icon = new Rect(69f, 133f, 54f, 54f);
+        Color cyanWhite = new Color(0.58f, 1f, 0.94f, latch * 0.82f);
+        DrawRect(new Rect(icon.x - 5f + 8f * latch, icon.center.y - 2f, 17f, 4f), cyanWhite);
+        DrawRect(new Rect(icon.xMax - 12f - 8f * latch, icon.center.y - 2f, 17f, 4f), cyanWhite);
+        DrawTintedCircle(new Rect(icon.center.x - 5f, icon.center.y - 5f, 10f, 10f), new Color(0.88f, 1f, 0.92f, latch * 0.46f));
+
+        if (tier == SettlementFeedbackTier.Exceed || tier == SettlementFeedbackTier.FarExceed || tier == SettlementFeedbackTier.Critical)
+        {
+            float echo = Mathf.Sin(Mathf.Clamp01(Mathf.InverseLerp(0.50f, 0.82f, progress)) * Mathf.PI);
+            DrawRect(new Rect(icon.x + 7f, icon.yMax + 5f, icon.width - 14f, 3f), new Color(1f, 0.61f, 0.14f, echo * 0.48f));
+        }
+    }
+
+    private void DrawSettlementFinaleResidue()
+    {
+        if (!settlementFinaleAfterglowActive || settlementFinaleCompletedAt < -900f)
+        {
+            return;
+        }
+
+        float duration = settlementFinaleTier == SettlementFeedbackTier.Pass ? 0.18f : 0.52f;
+        float t = Mathf.Clamp01(GameplayPlaybackElapsed(settlementFinaleCompletedAt) / duration);
+        if (t >= 1f)
+        {
+            return;
+        }
+
+        float fade = (1f - t) * (1f - t);
+        Rect meter = SettlementTowerMeterRect();
+        if (settlementFinaleTier == SettlementFeedbackTier.Pass)
+        {
+            DrawBorder(
+                new Rect(meter.x - 2f, meter.y - 2f, meter.width + 4f, meter.height + 4f),
+                new Color(1f, 0.57f, 0.11f, fade * 0.18f),
+                2f);
+            return;
+        }
+
+        Color color = settlementFinaleTier == SettlementFeedbackTier.Miss
+            ? new Color(0.82f, 0.20f, 0.06f, fade * 0.22f)
+            : settlementFinaleTier == SettlementFeedbackTier.Critical
+                ? new Color(1f, 0.91f, 0.60f, fade * 0.34f)
+                : new Color(1f, 0.57f, 0.11f, fade * 0.24f);
+        DrawSettlementTowerSegmentedWash(meter, color, 8f);
+        DrawBorder(new Rect(meter.x - 2f, meter.y - 2f, meter.width + 4f, meter.height + 4f), new Color(color.r, color.g, color.b, color.a * 0.75f), 2f);
+        if (settlementFinaleTier == SettlementFeedbackTier.FarExceed || settlementFinaleTier == SettlementFeedbackTier.Critical)
+        {
+            float cabinetAlpha = settlementFinaleTier == SettlementFeedbackTier.Critical ? fade * 0.18f : fade * 0.10f;
+            DrawBorder(new Rect(226f, 292f, 798f, 173f), new Color(color.r, color.g, color.b, cabinetAlpha), 2f);
+            DrawBorder(new Rect(1049f, 154f, 186f, 274f), new Color(color.r, color.g, color.b, cabinetAlpha * 0.82f), 2f);
+            if (settlementFinaleTier == SettlementFeedbackTier.Critical)
+            {
+                DrawBorder(new Rect(9f, 9f, VirtualWidth - 18f, VirtualHeight - 18f), new Color(color.r, color.g, color.b, fade * 0.10f), 2f);
+            }
+        }
+    }
+
+    private void DrawMainGameRollIgnition()
+    {
+        if (rollPhase != RollPhase.Shaking || mainGameRollIgnitionStartedAt < -900f)
+        {
+            return;
+        }
+
+        float duration = Mathf.Max(0.02f, mainGameFlowPresentationProfile.RollIgnitionDuration);
+        float t = Mathf.Clamp01(GameplayPlaybackElapsed(mainGameRollIgnitionStartedAt) / duration);
+        if (t >= 1f)
+        {
+            return;
+        }
+
+        Rect tray = new Rect(234f, 303f, ArcadeRunPhysicalSlotCount * ArcadeRunDieSlotSize, ArcadeRunDieSlotSize);
+        float alpha = Mathf.Sin(t * Mathf.PI) * 0.75f;
+        DrawBorder(new Rect(tray.x - 4f, tray.y - 4f, tray.width + 8f, tray.height + 8f), new Color(1f, 0.62f, 0.16f, alpha), 3f);
+        float scanX = Mathf.Lerp(tray.x, tray.xMax, t);
+        DrawRect(new Rect(scanX - 3f, tray.y - 2f, 6f, tray.height + 4f), new Color(1f, 0.82f, 0.38f, alpha * 0.65f));
+    }
+
+    private void DrawStageClearIncomeFlight()
+    {
+        if (rollPhase != RollPhase.StageClear || stageClearPresentationStartedAt < -900f)
+        {
+            return;
+        }
+
+        for (int beatIndex = 0; beatIndex < 3; beatIndex++)
+        {
+            float progress = StageClearBeatProgress(beatIndex);
+            if (progress <= 0f || progress >= 1f)
+            {
+                continue;
+            }
+
+            float eased = Mathf.SmoothStep(0f, 1f, progress);
+            Vector2 start = new Vector2(1143f, 344f + beatIndex * 24f);
+            Vector2 end = new Vector2(1138f, 48f);
+            float arc = Mathf.Sin(progress * Mathf.PI) * (52f + beatIndex * 9f);
+            Vector2 position = Vector2.Lerp(start, end, eased) + new Vector2(-arc, 0f);
+            float size = 9f + Mathf.Sin(progress * Mathf.PI) * 5f;
+            DrawTintedCircle(new Rect(position.x - size * 0.5f, position.y - size * 0.5f, size, size), new Color(1f, 0.68f, 0.18f, 0.42f + 0.5f * Mathf.Sin(progress * Mathf.PI)));
+            DrawTintedCircle(new Rect(position.x - size * 0.2f, position.y - size * 0.2f, size * 0.4f, size * 0.4f), new Color(1f, 0.92f, 0.56f, 0.88f));
+        }
+    }
+
+    private void DrawStageFailurePresentation()
+    {
+        Color rust = new Color(0.94f, 0.28f, 0.10f, 0.82f);
+        if (!stageFailureTransitionActive)
+        {
+            DrawBorder(new Rect(1049f, 132f, 183f, 306f), rust, 2f);
+            DrawBorder(new Rect(462f, 578f, 348f, 64f), new Color(rust.r, rust.g, rust.b, 0.55f), 2f);
+            return;
+        }
+
+        float elapsed = StageFailureTransitionElapsed();
+        if (stageFailureRetryAvailable)
+        {
+            float duration = Mathf.Max(0.1f, mainGameFlowPresentationProfile.RetryScanDuration);
+            float progress = Mathf.Clamp01(elapsed / duration);
+            float y = Mathf.Lerp(64f, VirtualHeight - 48f, Mathf.SmoothStep(0f, 1f, progress));
+            DrawRect(new Rect(0f, 0f, VirtualWidth, y), new Color(0.006f, 0.018f, 0.02f, 0.88f));
+            DrawRect(new Rect(0f, y - 2f, VirtualWidth, 4f), new Color(0.24f, 0.96f, 0.90f, 0.92f));
+            DrawRect(new Rect(0f, y + 2f, VirtualWidth, 14f), new Color(0.12f, 0.68f, 0.64f, 0.16f));
+            return;
+        }
+
+        DrawRunOverPowerdown(elapsed);
+    }
+
+    private void DrawRunOverPowerdown(float elapsed)
+    {
+        float keyDuration = Mathf.Max(0.05f, mainGameFlowPresentationProfile.RunOverKeyTerminalDuration);
+        float diceDuration = Mathf.Max(0.05f, mainGameFlowPresentationProfile.RunOverDiceDuration);
+        float hudDuration = Mathf.Max(0.05f, mainGameFlowPresentationProfile.RunOverHudDuration);
+        float collapseDuration = Mathf.Max(0.08f, mainGameFlowPresentationProfile.RunOverCrtCollapseDuration);
+        float keyProgress = Mathf.Clamp01(elapsed / keyDuration);
+        float diceProgress = Mathf.Clamp01((elapsed - keyDuration) / diceDuration);
+        float hudProgress = Mathf.Clamp01((elapsed - keyDuration - diceDuration) / hudDuration);
+        float collapseProgress = Mathf.Clamp01((elapsed - keyDuration - diceDuration - hudDuration) / collapseDuration);
+
+        if (keyProgress > 0f)
+        {
+            DrawRect(new Rect(1044f, 126f, 193f, 318f), new Color(0f, 0f, 0f, keyProgress * 0.98f));
+            DrawRect(new Rect(450f, 567f, 371f, 87f), new Color(0f, 0f, 0f, keyProgress * 0.98f));
+        }
+
+        if (diceProgress > 0f)
+        {
+            DrawRect(new Rect(219f, 286f, 800f, 166f), new Color(0f, 0f, 0f, diceProgress * 0.98f));
+        }
+
+        if (hudProgress > 0f)
+        {
+            DrawRect(new Rect(23f, 14f, 1214f, 67f), new Color(0f, 0f, 0f, hudProgress * 0.98f));
+            DrawRect(new Rect(30f, 105f, 118f, 420f), new Color(0f, 0f, 0f, hudProgress * 0.98f));
+        }
+
+        if (collapseProgress > 0f)
+        {
+            DrawRect(new Rect(0f, 0f, VirtualWidth, VirtualHeight), new Color(0f, 0f, 0f, Mathf.Lerp(0.82f, 1f, collapseProgress)));
+            float lineWidth = Mathf.Lerp(1050f, 0f, Mathf.SmoothStep(0f, 1f, collapseProgress));
+            float lineHeight = Mathf.Lerp(6f, 1f, collapseProgress);
+            DrawRect(new Rect((VirtualWidth - lineWidth) * 0.5f, VirtualHeight * 0.5f - lineHeight * 0.5f, lineWidth, lineHeight), new Color(0.44f, 0.82f, 0.58f, 1f - collapseProgress * 0.7f));
+        }
+    }
+
+    private void BeginStageFailedPresentation(bool retryAvailable)
+    {
+        rollPhase = RollPhase.StageFailed;
+        stageFailureRetryAvailable = retryAvailable;
+        stageFailureTransitionActive = false;
+        stageFailureTransitionStartedAt = -999f;
+    }
+
+    private void BeginStageFailureExit()
+    {
+        if (rollPhase != RollPhase.StageFailed || stageFailureTransitionActive)
+        {
+            return;
+        }
+
+        stageFailureTransitionActive = true;
+        stageFailureTransitionStartedAt = Time.time;
+        ClearDiceHoverTooltip();
+    }
+
+    private void UpdateStageFailureTransition()
+    {
+        if (!stageFailureTransitionActive || rollPhase != RollPhase.StageFailed)
+        {
+            return;
+        }
+
+        float elapsed = StageFailureTransitionElapsed();
+        if (stageFailureRetryAvailable)
+        {
+            if (elapsed >= Mathf.Max(0.1f, mainGameFlowPresentationProfile.RetryScanDuration))
+            {
+                CompleteStageFailureRetry();
+            }
+
+            return;
+        }
+
+        if (elapsed >= RunOverPresentationDuration())
+        {
+            CompleteRunOverReturnToMenu();
+        }
+    }
+
+    private float StageFailureTransitionElapsed()
+    {
+        return GameplayPlaybackElapsed(stageFailureTransitionStartedAt);
+    }
+
+    private float RunOverPresentationDuration()
+    {
+        if (mainGameFlowPresentationProfile == null)
+        {
+            return 1.27f;
+        }
+
+        return mainGameFlowPresentationProfile.RunOverKeyTerminalDuration
+            + mainGameFlowPresentationProfile.RunOverDiceDuration
+            + mainGameFlowPresentationProfile.RunOverHudDuration
+            + mainGameFlowPresentationProfile.RunOverCrtCollapseDuration
+            + mainGameFlowPresentationProfile.RunOverBlackHoldDuration;
+    }
+
+    private void CompleteRunOverReturnToMenu()
+    {
+        ClearSave();
+        stageFailureTransitionActive = false;
+        stageFailureTransitionStartedAt = -999f;
+        stageFailureRetryAvailable = false;
+        stageContinuationPending = false;
+        rollResultsLocked = false;
+        mainGameTargetCrossStartedAt = -999f;
+        mode = GameMode.MainMenu;
+    }
+
+    private void CompleteStageFailureRetry()
+    {
+        stageFailureTransitionActive = false;
+        stageFailureTransitionStartedAt = -999f;
+        stageFailureRetryAvailable = false;
+        rollsLeft = RollsPerStage;
+        cheatsLeft = CheatsPerStage;
+        rolledThisEncounter = true;
+        PrepareNextRollVisualReadyState();
+        rollPhase = RollPhase.Ready;
+        AddLog("消耗生命后继续本关：累计 " + currentScore + " 分，剩余生命 " + remainingLives + "。");
     }
 
     private void DrawRunLeftRail(Rect rect, Encounter encounter)
@@ -1232,8 +7158,8 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         float resourceY = rect.y + 284f;
         DrawRunResourceCard(new Rect(rect.x, resourceY, 152f, 52f), RunUiIcon.Coin, chapterGold.ToString(CultureInfo.InvariantCulture));
-        DrawRunResourceCard(new Rect(rect.x, resourceY + 64f, 152f, 52f), RunUiIcon.Roll, rollsLeft + " / " + RollsPerStage);
-        DrawRunResourceCard(new Rect(rect.x, resourceY + 128f, 152f, 52f), RunUiIcon.Cheat, cheatsLeft + " / " + CheatsPerStage);
+        DrawRunResourceCard(new Rect(rect.x, resourceY + 64f, 152f, 52f), RunUiIcon.Roll, "生命 " + remainingLives);
+        DrawRunResourceCard(new Rect(rect.x, resourceY + 128f, 152f, 52f), RunUiIcon.TargetScore, "直计");
     }
 
     private void DrawRunResourceCard(Rect rect, RunUiIcon icon, string value)
@@ -1263,7 +7189,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         Rect multiplierRect = new Rect(counter.x + 106f, counter.y + 7f, counter.width - 116f, counter.height - 14f);
         DrawRect(split, new Color(0.38f, 0.24f, 0.13f, 0.72f));
         DrawRunText(baseRect, counterState.BaseScore.ToString(CultureInfo.InvariantCulture), 42 + Mathf.RoundToInt(5f * CounterPulseAmount(counterBasePulseTimer)), FontStyle.Bold, new Color(0.13f, 0.09f, 0.07f), TextAnchor.MiddleCenter);
-        DrawMultiplierBadge(multiplierRect, "×" + MultiplierText(counterState.Multiplier), CounterPulseAmount(counterMultiplierPulseTimer));
+        DrawMultiplierBadge(multiplierRect, V02HandScoringEnabled ? "×" + MultiplierText(counterState.Multiplier) : "直计", CounterPulseAmount(counterMultiplierPulseTimer));
     }
 
     private void DrawScoreLedgerRow(Rect rect, RunUiIcon icon, string value, Color valueColor, float pulse = 0f)
@@ -1292,7 +7218,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (rollPhase == RollPhase.ResultDecision || rollPhase == RollPhase.CheatEdit)
         {
             int bribeScore = Mathf.Max(0, previewBribeScoreBonus);
-            int rollScore = Mathf.Max(0, previewRollScore);
+            int rollScore = previewRollScore;
 
             state.Phase = RunScoreCounterPhase.Preview;
             state.ScoreBeforeRoll = currentScore;
@@ -1362,19 +7288,19 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         int baseScore = CurrentCounterBaseScore();
         float multiplier = Mathf.Max(1f, lastMultiplier);
-        int rollScore = Mathf.Max(0, previewRollScore);
-        state.ScoreBeforeRoll = Mathf.Max(0, resolvedScore - rollScore);
+        int rollScore = previewRollScore;
+        state.ScoreBeforeRoll = resolvedScore - rollScore;
         state.BaseScore = baseScore;
         state.Multiplier = multiplier;
         state.MultipliedScore = Mathf.RoundToInt(baseScore * multiplier);
         state.BribeScore = Mathf.Max(0, lastBribeScoreBonus);
         state.RollScore = rollScore;
-        state.ResolvedScore = resolvedScore > 0 ? resolvedScore : currentScore;
+        state.ResolvedScore = resolvedScore;
     }
 
     private int CurrentCounterBaseScore()
     {
-        return Mathf.Max(0, previewIndividualScore + previewTemporaryScore + previewRuleBonus);
+        return previewIndividualScore + previewTemporaryScore + previewRuleBonus;
     }
 
     private void ClearCommittedRunScoreCounter()
@@ -1387,6 +7313,9 @@ public sealed class DiceKingDemo : MonoBehaviour
         committedCounterBribeScore = 0;
         committedCounterRollScore = 0;
         committedCounterResolvedScore = 0;
+        ClearCommittedSettlementContributions();
+        settlementImpactPresentationActive = false;
+        ResetSettlementImpactPresentationState();
         ClearRunScoreCounterAnimation();
     }
 
@@ -1401,8 +7330,186 @@ public sealed class DiceKingDemo : MonoBehaviour
         committedCounterMultiplier = multiplier;
         committedCounterMultipliedScore = Mathf.RoundToInt(baseScore * multiplier);
         committedCounterBribeScore = Mathf.Max(0, lastBribeScoreBonus);
-        committedCounterRollScore = Mathf.Max(0, rollScore);
-        committedCounterResolvedScore = Mathf.Max(0, resolved);
+        committedCounterRollScore = rollScore;
+        committedCounterResolvedScore = resolved;
+    }
+
+    private void ClearCommittedSettlementContributions()
+    {
+        committedSettlementContributions.Clear();
+        pendingSettlementTemporaryScoreByDieId.Clear();
+        settlementScoringCursorIndex = -1;
+        settlementPhysicalContributionCaptureComplete = false;
+    }
+
+    private void AccumulateSettlementTemporaryScore(Die source, int score)
+    {
+        if (source == null || source.Temporary || score == 0)
+        {
+            return;
+        }
+
+        int accumulated;
+        pendingSettlementTemporaryScoreByDieId.TryGetValue(source.Id, out accumulated);
+        pendingSettlementTemporaryScoreByDieId[source.Id] = accumulated + score;
+    }
+
+    private int TakePendingSettlementTemporaryScore(Die source)
+    {
+        if (source == null || source.Temporary)
+        {
+            return 0;
+        }
+
+        int score;
+        if (!pendingSettlementTemporaryScoreByDieId.TryGetValue(source.Id, out score))
+        {
+            return 0;
+        }
+
+        pendingSettlementTemporaryScoreByDieId.Remove(source.Id);
+        return score;
+    }
+
+    private void RecordSettlementContribution(
+        Die source,
+        int signedBaseDelta,
+        int cursorSlotIndex,
+        bool localChain,
+        bool includesTemporaryScore,
+        string semanticLabel = null)
+    {
+        if (source == null || source.Temporary)
+        {
+            return;
+        }
+
+        int sourceSlotIndex = dice.IndexOf(source);
+        if (sourceSlotIndex < 0)
+        {
+            return;
+        }
+
+        if (cursorSlotIndex < 0)
+        {
+            for (int i = committedSettlementContributions.Count - 1; i >= 0; i--)
+            {
+                SettlementContributionRecord existing = committedSettlementContributions[i];
+                if (existing != null && existing.SourceDieId == source.Id)
+                {
+                    existing.SignedBaseDelta += signedBaseDelta;
+                    existing.IncludesTemporaryScore |= includesTemporaryScore;
+                    existing.SemanticLabel = MergeSettlementSemanticLabels(existing.SemanticLabel, semanticLabel);
+                    return;
+                }
+            }
+
+            cursorSlotIndex = sourceSlotIndex;
+        }
+
+        SettlementContributionRecord record = new SettlementContributionRecord
+        {
+            SourceDieId = source.Id,
+            SourceSlotIndex = sourceSlotIndex,
+            CursorSlotIndex = Mathf.Clamp(cursorSlotIndex, 0, Mathf.Max(0, dice.Count - 1)),
+            SignedBaseDelta = signedBaseDelta,
+            SemanticLabel = semanticLabel,
+            LocalChain = localChain || sourceSlotIndex != cursorSlotIndex,
+            IncludesTemporaryScore = includesTemporaryScore
+        };
+
+        if (!settlementPhysicalContributionCaptureComplete)
+        {
+            committedSettlementContributions.Add(record);
+            return;
+        }
+
+        int insertIndex = committedSettlementContributions.Count;
+        for (int i = 0; i < committedSettlementContributions.Count; i++)
+        {
+            SettlementContributionRecord existing = committedSettlementContributions[i];
+            if (existing != null && existing.CursorSlotIndex > record.CursorSlotIndex)
+            {
+                insertIndex = i;
+                break;
+            }
+        }
+
+        while (insertIndex < committedSettlementContributions.Count
+            && committedSettlementContributions[insertIndex] != null
+            && committedSettlementContributions[insertIndex].CursorSlotIndex == record.CursorSlotIndex)
+        {
+            insertIndex++;
+        }
+
+        committedSettlementContributions.Insert(insertIndex, record);
+    }
+
+    private void ReconcileCommittedSettlementContributions(int committedBaseScore)
+    {
+        if (pendingSettlementTemporaryScoreByDieId.Count > 0)
+        {
+            for (int dieIndex = 0; dieIndex < dice.Count; dieIndex++)
+            {
+                Die die = dice[dieIndex];
+                int pending = TakePendingSettlementTemporaryScore(die);
+                if (pending != 0)
+                {
+                    RecordSettlementContribution(die, pending, dieIndex, false, true, "附属得分");
+                }
+            }
+        }
+
+        if (committedSettlementContributions.Count <= 0)
+        {
+            for (int i = 0; i < dice.Count; i++)
+            {
+                Die die = dice[i];
+                if (die != null && !die.Temporary)
+                {
+                    RecordSettlementContribution(die, die.Score, i, false, false, SettlementSemanticLabelForDie(die, false));
+                }
+            }
+        }
+
+        int capturedBaseScore = 0;
+        int strongestIndex = -1;
+        int strongestMagnitude = -1;
+        for (int i = 0; i < committedSettlementContributions.Count; i++)
+        {
+            SettlementContributionRecord record = committedSettlementContributions[i];
+            if (record == null)
+            {
+                continue;
+            }
+
+            capturedBaseScore += record.SignedBaseDelta;
+            int magnitude = Mathf.Abs(record.SignedBaseDelta);
+            if (magnitude > strongestMagnitude)
+            {
+                strongestMagnitude = magnitude;
+                strongestIndex = i;
+            }
+        }
+
+        int residual = committedBaseScore - capturedBaseScore;
+        if (residual == 0)
+        {
+            return;
+        }
+
+        if (strongestIndex >= 0)
+        {
+            SettlementContributionRecord strongest = committedSettlementContributions[strongestIndex];
+            strongest.SignedBaseDelta += residual;
+            strongest.IncludesTemporaryScore = true;
+            return;
+        }
+
+        if (dice.Count > 0 && dice[0] != null)
+        {
+            RecordSettlementContribution(dice[0], residual, 0, false, true, "附属得分");
+        }
     }
 
     private void ClearRunScoreCounterAnimation()
@@ -1430,7 +7537,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         animatedCounterMultipliedScore = 0;
         animatedCounterBribeScore = 0;
         animatedCounterRollScore = 0;
-        animatedCounterProgressScore = Mathf.Max(0, scoreBeforeRoll);
+        animatedCounterProgressScore = scoreBeforeRoll;
         counterBasePulseTimer = 0f;
         counterMultiplierPulseTimer = 0f;
         counterProgressPulseTimer = 0f;
@@ -1441,7 +7548,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             Die die = scoringDice[i];
             if (die != null)
             {
-                runningBaseScore += Mathf.Max(0, die.Score);
+                runningBaseScore += die.Score;
             }
 
             if (i == scoringDice.Count - 1)
@@ -1458,7 +7565,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 MultipliedScore = multipliedScore,
                 BribeScore = 0,
                 RollScore = multipliedScore,
-                ProgressScore = Mathf.Max(0, scoreBeforeRoll + multipliedScore)
+                ProgressScore = scoreBeforeRoll + multipliedScore
             });
         }
     }
@@ -1473,6 +7580,12 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void PrepareSettlementDisplayEvents(int scoreBeforeRoll)
     {
         ClearSettlementDisplayEvents();
+
+        if (settlementImpactPresentationActive && committedSettlementContributions.Count > 0)
+        {
+            PrepareImpactSettlementDisplayEvents(scoreBeforeRoll);
+            return;
+        }
 
         int shownTemporaryDice = 0;
         int hiddenTemporaryStart = -1;
@@ -1498,11 +7611,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
                 hiddenTemporaryEnd = i;
                 hiddenTemporaryCount++;
-                hiddenTemporaryScore += Mathf.Max(0, die.Score);
+                hiddenTemporaryScore += die.Score;
                 continue;
             }
 
-            AddSettlementSlotEvent(i, i, die, false, Mathf.Max(0, die.Score), SettlementSlotLabelForDie(die));
+            AddSettlementSlotEvent(i, i, die, false, die.Score, SettlementSlotLabelForDie(die));
             AddSettlementRouteEventIfNeeded(die, i);
             AddSettlementMultiplierEventIfNeeded(i, die, ref previousMultiplier);
 
@@ -1527,6 +7640,111 @@ public sealed class DiceKingDemo : MonoBehaviour
         AddSettlementFinalEvents();
     }
 
+    private void PrepareImpactSettlementDisplayEvents(int scoreBeforeRoll)
+    {
+        int maxMagnitude = 0;
+        for (int i = 0; i < committedSettlementContributions.Count; i++)
+        {
+            SettlementContributionRecord record = committedSettlementContributions[i];
+            if (record != null)
+            {
+                maxMagnitude = Mathf.Max(maxMagnitude, Mathf.Abs(record.SignedBaseDelta));
+            }
+        }
+
+        int runningBaseScore = 0;
+        int previousMultipliedScore = 0;
+        float multiplier = committedCounterValid ? committedCounterMultiplier : Mathf.Max(1f, lastMultiplier);
+        for (int i = 0; i < committedSettlementContributions.Count; i++)
+        {
+            SettlementContributionRecord record = committedSettlementContributions[i];
+            if (record == null || record.SourceSlotIndex < 0 || record.SourceSlotIndex >= dice.Count)
+            {
+                continue;
+            }
+
+            runningBaseScore += record.SignedBaseDelta;
+            int multipliedScore = Mathf.RoundToInt(runningBaseScore * multiplier);
+            int signedFinalDelta = multipliedScore - previousMultipliedScore;
+            settlementDisplayEvents.Add(new SettlementDisplayEvent
+            {
+                Kind = SettlementEventKind.SlotScore,
+                SlotIndex = record.SourceSlotIndex,
+                CursorSlotIndex = record.CursorSlotIndex,
+                ScoreIndex = record.SourceSlotIndex,
+                ScoreIndexEnd = record.SourceSlotIndex,
+                DieId = record.SourceDieId,
+                Label = SettlementContributionDisplayLabel(record),
+                ValueDelta = signedFinalDelta,
+                BaseScore = runningBaseScore,
+                Multiplier = multiplier,
+                ProgressScore = scoreBeforeRoll + multipliedScore,
+                Duration = MainGameSettlementSlotDuration(),
+                HighlightLevel = record.LocalChain ? SettlementHighlightLevel.Route : SettlementHighlightLevel.Normal,
+                TargetArea = SettlementTargetArea.Target,
+                UseCommittedSnapshot = true,
+                LocalChain = record.LocalChain,
+                IncludesTemporaryScore = record.IncludesTemporaryScore,
+                LocalImpactWeight01 = SettlementLocalImpactWeight(record.SignedBaseDelta, maxMagnitude)
+            });
+            previousMultipliedScore = multipliedScore;
+        }
+
+        bool hasBribe = lastBribeScoreBonus != 0;
+        if (hasBribe)
+        {
+            settlementDisplayEvents.Add(new SettlementDisplayEvent
+            {
+                Kind = SettlementEventKind.BribeFinal,
+                ScoreIndex = scoringDice.Count,
+                ScoreIndexEnd = scoringDice.Count,
+                Label = "额外入账",
+                ValueDelta = lastBribeScoreBonus,
+                BaseScore = committedCounterBaseScore,
+                Multiplier = committedCounterMultiplier,
+                ProgressScore = committedCounterResolvedScore,
+                Duration = MainGameSettlementFinalDuration(),
+                HighlightLevel = SettlementHighlightLevel.Route,
+                TargetArea = SettlementTargetArea.Target,
+                ApplyFinal = true,
+                UseCommittedSnapshot = true,
+                LocalImpactWeight01 = SettlementLocalImpactWeight(lastBribeScoreBonus, Mathf.Max(1, maxMagnitude))
+            });
+        }
+
+        Encounter encounter = CurrentEncounter();
+        bool willPass = encounter != null && resolvedScore >= encounter.Target;
+        settlementFinaleTier = SettlementFeedbackTierForResult(encounter, resolvedScore);
+        settlementDisplayEvents.Add(new SettlementDisplayEvent
+        {
+            Kind = SettlementEventKind.TargetSettle,
+            ScoreIndex = scoringDice.Count,
+            ScoreIndexEnd = scoringDice.Count,
+            Label = willPass ? "本关通过" : "本关未过",
+            BaseScore = committedCounterBaseScore,
+            Multiplier = committedCounterMultiplier,
+            ProgressScore = committedCounterResolvedScore,
+            Duration = MainGameSettlementFinaleDuration(settlementFinaleTier),
+            HighlightLevel = SettlementHighlightLevel.Target,
+            TargetArea = SettlementTargetArea.Target,
+            ApplyFinal = !hasBribe,
+            Passed = willPass,
+            FeedbackTier = settlementFinaleTier
+        });
+    }
+
+    private static float SettlementLocalImpactWeight(int signedContribution, int maxMagnitude)
+    {
+        int magnitude = Mathf.Abs(signedContribution);
+        if (magnitude <= 0)
+        {
+            return 0.08f;
+        }
+
+        float normalized = Mathf.Clamp01(magnitude / Mathf.Max(1f, maxMagnitude));
+        return Mathf.Lerp(0.24f, 1f, Mathf.Sqrt(normalized));
+    }
+
     private void AddSettlementSlotEvent(int scoreIndexStart, int scoreIndexEnd, Die die, bool summary, int valueDelta, string label)
     {
         RunScoreCounterStep step = SettlementCounterStepAt(scoreIndexEnd);
@@ -1538,8 +7756,8 @@ public sealed class DiceKingDemo : MonoBehaviour
             ScoreIndexEnd = scoreIndexEnd,
             DieId = die != null ? die.Id : 0,
             Label = label,
-            ValueDelta = Mathf.Max(0, valueDelta),
-            Duration = summary ? SettlementRouteDuration : SettlementSlotDuration,
+            ValueDelta = valueDelta,
+            Duration = summary ? MainGameSettlementRouteDuration() : MainGameSettlementSlotDuration(),
             HighlightLevel = SettlementHighlightLevel.Normal,
             TargetArea = SettlementTargetArea.Dice,
             CounterStepIndex = scoreIndexEnd,
@@ -1575,7 +7793,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             DieId = die != null ? die.Id : 0,
             Label = label,
             GoldDelta = goldDelta,
-            Duration = SettlementRouteDuration,
+            Duration = MainGameSettlementRouteDuration(),
             HighlightLevel = SettlementHighlightLevel.Route,
             TargetArea = goldDelta > 0 ? SettlementTargetArea.Coin : SettlementTargetArea.Dice
         };
@@ -1615,7 +7833,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             BaseScore = step.BaseScore,
             Multiplier = step.Multiplier,
             ProgressScore = step.ProgressScore,
-            Duration = SettlementMultiplierDuration,
+            Duration = MainGameSettlementMultiplierDuration(),
             HighlightLevel = SettlementHighlightLevel.Multiplier,
             TargetArea = SettlementTargetArea.Multiplier
         };
@@ -1629,6 +7847,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         Encounter encounter = CurrentEncounter();
         bool willPass = encounter != null && resolvedScore >= encounter.Target;
         bool bribeEventAppliesFinal = lastBribeScoreBonus > 0;
+        SettlementFeedbackTier feedbackTier = SettlementFeedbackTierForResult(encounter, resolvedScore);
+        settlementFinaleTier = feedbackTier;
 
         if (bribeEventAppliesFinal)
         {
@@ -1649,7 +7869,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 BaseScore = committedCounterBaseScore,
                 Multiplier = committedCounterMultiplier,
                 ProgressScore = committedCounterResolvedScore,
-                Duration = SettlementFinalDuration,
+                Duration = MainGameSettlementFinalDuration(),
                 HighlightLevel = SettlementHighlightLevel.Route,
                 TargetArea = SettlementTargetArea.Target,
                 ApplyFinal = true
@@ -1665,11 +7885,12 @@ public sealed class DiceKingDemo : MonoBehaviour
             BaseScore = committedCounterBaseScore,
             Multiplier = committedCounterMultiplier,
             ProgressScore = committedCounterResolvedScore,
-            Duration = SettlementTargetDuration,
+            Duration = MainGameSettlementFinaleDuration(feedbackTier),
             HighlightLevel = SettlementHighlightLevel.Target,
             TargetArea = SettlementTargetArea.Target,
             ApplyFinal = !bribeEventAppliesFinal,
-            Passed = willPass
+            Passed = willPass,
+            FeedbackTier = feedbackTier
         });
     }
 
@@ -1692,11 +7913,190 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (die.Temporary)
         {
-            return "小骰 +" + Mathf.Max(0, die.Score);
+            return "小骰 " + SignedDeltaText(die.Score);
         }
 
         int slotIndex = dice.IndexOf(die);
-        return "槽 " + (slotIndex + 1) + " +" + Mathf.Max(0, die.Score);
+        return "槽 " + (slotIndex + 1) + " " + SignedDeltaText(die.Score);
+    }
+
+    private string SettlementContributionDisplayLabel(SettlementContributionRecord record)
+    {
+        if (record == null)
+        {
+            return "点数入账";
+        }
+
+        string rawLabel = string.IsNullOrEmpty(record.SemanticLabel)
+            ? "点数入账"
+            : record.SemanticLabel.Trim();
+        bool retrigger = rawLabel.StartsWith("二重", StringComparison.Ordinal)
+            || rawLabel.StartsWith("再触发", StringComparison.Ordinal);
+        string semantic = NormalizeSettlementSemanticLabel(rawLabel);
+        if (!record.LocalChain)
+        {
+            return semantic;
+        }
+
+        if (retrigger)
+        {
+            semantic = SettlementRetriggerEffectName(semantic);
+        }
+
+        if (semantic.StartsWith("再触发·", StringComparison.Ordinal)
+            || semantic.StartsWith("响应·", StringComparison.Ordinal)
+            || semantic.StartsWith("连锁·", StringComparison.Ordinal))
+        {
+            return semantic;
+        }
+
+        bool differentSource = record.SourceSlotIndex >= 0
+            && record.CursorSlotIndex >= 0
+            && record.SourceSlotIndex != record.CursorSlotIndex;
+        return (retrigger
+            ? "再触发·"
+            : differentSource
+                ? "响应·"
+                : "连锁·") + semantic;
+    }
+
+    private string SettlementSemanticLabelForDie(Die die, bool includesTemporaryScore)
+    {
+        if (die == null)
+        {
+            return includesTemporaryScore ? "附属得分" : "点数入账";
+        }
+
+        string note = die.RoundNote ?? string.Empty;
+        if (die.Type == DieType.Duet)
+        {
+            string copiedLabel = SettlementCopiedEffectLabel(note);
+            if (!string.IsNullOrEmpty(copiedLabel))
+            {
+                return "二重·" + copiedLabel;
+            }
+        }
+
+        string label = die.TypeTriggeredThisSettle && die.Type != DieType.Basic
+            ? TypeName(die.Type)
+            : string.Empty;
+        if (note.IndexOf("触发器 +", StringComparison.Ordinal) >= 0
+            && !string.Equals(label, "触发器", StringComparison.Ordinal))
+        {
+            label = string.IsNullOrEmpty(label) ? "触发器" : label + "·触发器";
+        }
+        else if (string.IsNullOrEmpty(label) && note.IndexOf("盟约 +", StringComparison.Ordinal) >= 0)
+        {
+            label = "盟约加成";
+        }
+        else if (string.IsNullOrEmpty(label) && note.IndexOf("王冠 +", StringComparison.Ordinal) >= 0)
+        {
+            label = "王冠";
+        }
+
+        if (string.IsNullOrEmpty(label))
+        {
+            label = includesTemporaryScore ? "附属得分" : "点数入账";
+        }
+
+        return NormalizeSettlementSemanticLabel(label);
+    }
+
+    private string SettlementCopiedEffectLabel(string note)
+    {
+        if (string.IsNullOrEmpty(note))
+        {
+            return string.Empty;
+        }
+
+        int marker = note.LastIndexOf("二重 ", StringComparison.Ordinal);
+        if (marker < 0)
+        {
+            return string.Empty;
+        }
+
+        string segment = note.Substring(marker + 3).Trim();
+        int end = segment.IndexOfAny(new char[] { '，', '；', ';', '/', '、' });
+        if (end >= 0)
+        {
+            segment = segment.Substring(0, end).Trim();
+        }
+
+        return NormalizeSettlementSemanticLabel(segment);
+    }
+
+    private string NormalizeSettlementSemanticLabel(string label)
+    {
+        if (string.IsNullOrEmpty(label))
+        {
+            return "点数入账";
+        }
+
+        string normalized = label.Trim();
+        if (normalized.StartsWith("二重三猪", StringComparison.Ordinal))
+        {
+            normalized = "二重·三只小猪";
+        }
+
+        int numericSuffix = normalized.IndexOfAny(new char[] { '+', '-' });
+        if (numericSuffix > 0)
+        {
+            normalized = normalized.Substring(0, numericSuffix).Trim();
+        }
+
+        if (string.Equals(normalized, "三猪", StringComparison.Ordinal))
+        {
+            normalized = "三只小猪";
+        }
+
+        return string.IsNullOrEmpty(normalized) ? "点数入账" : normalized;
+    }
+
+    private string SettlementRetriggerEffectName(string label)
+    {
+        string normalized = NormalizeSettlementSemanticLabel(label);
+        if (normalized.StartsWith("再触发·", StringComparison.Ordinal))
+        {
+            return normalized.Substring(4).Trim();
+        }
+
+        if (normalized.StartsWith("二重·", StringComparison.Ordinal)
+            || normalized.StartsWith("二重 ", StringComparison.Ordinal))
+        {
+            return normalized.Substring(3).Trim();
+        }
+
+        return normalized;
+    }
+
+    private string MergeSettlementSemanticLabels(string current, string incoming)
+    {
+        if (string.IsNullOrEmpty(incoming))
+        {
+            return current;
+        }
+
+        if (string.IsNullOrEmpty(current)
+            || string.Equals(current, "点数入账", StringComparison.Ordinal)
+            || string.Equals(current, "附属得分", StringComparison.Ordinal))
+        {
+            return incoming;
+        }
+
+        string currentNormalized = NormalizeSettlementSemanticLabel(current);
+        string incomingNormalized = NormalizeSettlementSemanticLabel(incoming);
+        if (string.Equals(currentNormalized, incomingNormalized, StringComparison.Ordinal))
+        {
+            return current;
+        }
+
+        if (string.Equals(incomingNormalized, "触发器", StringComparison.Ordinal)
+            && currentNormalized.IndexOf("触发器", StringComparison.Ordinal) < 0)
+        {
+            return currentNormalized + "·触发器";
+        }
+
+        return incoming;
     }
 
     private string SettlementRouteLabelForDie(Die die)
@@ -1727,6 +8127,10 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         string[] priorityMarkers =
         {
+            "三猪",
+            "饲",
+            "肉x2",
+            "贪吃",
             "盖章",
             "轨道",
             "半步",
@@ -2001,6 +8405,41 @@ public sealed class DiceKingDemo : MonoBehaviour
         TriggerRunScoreCounterPulses(previousBaseScore, previousMultiplier, previousProgressScore);
     }
 
+    private void ApplyCommittedSettlementSnapshot(SettlementDisplayEvent settlementEvent)
+    {
+        if (settlementEvent == null)
+        {
+            return;
+        }
+
+        int previousBaseScore = animatedCounterBaseScore;
+        float previousMultiplier = animatedCounterMultiplier;
+        int previousProgressScore = animatedCounterProgressScore;
+
+        animatedCounterBaseScore = settlementEvent.BaseScore;
+        animatedCounterMultiplier = Mathf.Max(1f, settlementEvent.Multiplier);
+        animatedCounterMultipliedScore = settlementEvent.ProgressScore - committedCounterScoreBeforeRoll;
+        animatedCounterBribeScore = settlementEvent.Kind == SettlementEventKind.BribeFinal
+            ? Mathf.Max(0, committedCounterBribeScore)
+            : 0;
+        animatedCounterRollScore = settlementEvent.ProgressScore - committedCounterScoreBeforeRoll;
+        animatedCounterProgressScore = settlementEvent.ProgressScore;
+        currentScore = animatedCounterProgressScore;
+
+        TriggerRunScoreCounterPulses(previousBaseScore, previousMultiplier, previousProgressScore);
+    }
+
+    private void ResetSettlementImpactPresentationState()
+    {
+        settlementTowerAfterglowStartedAt = -999f;
+        settlementTowerAfterglowWeight = 0f;
+        settlementTowerAfterglowSign = 1;
+        settlementPrimaryAudioPlayed = false;
+        settlementFinaleAudioStage = 0;
+        settlementFinaleCompletedAt = -999f;
+        settlementFinaleAfterglowActive = false;
+    }
+
     private void ApplyRunScoreCounterFinal()
     {
         int previousBaseScore = animatedCounterBaseScore;
@@ -2041,6 +8480,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             counterProgressPulseTimer = ScoreCounterPulseDuration;
         }
+
+        Encounter encounter = CurrentEncounter();
+        if (encounter != null
+            && previousProgressScore < encounter.Target
+            && animatedCounterProgressScore >= encounter.Target)
+        {
+            mainGameTargetCrossStartedAt = Time.time;
+        }
     }
 
     private void UpdateRunScoreCounterPulses(float deltaTime)
@@ -2068,22 +8515,56 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void DrawRunPlayPanel(Rect rect, Encounter encounter)
     {
         DrawUiPanel(rect);
-        GUI.Label(new Rect(rect.x + 30f, rect.y + 24f, 260f, 30f), "投掷区", headerStyle);
+        DrawStandardLabel(new Rect(rect.x + 30f, rect.y + 24f, 260f, 30f), "投掷区", headerStyle);
 
-        Rect tableArea = new Rect(rect.x + 34f, rect.y + 78f, rect.width - 68f, rect.height - 112f);
+        bool showEntryFeedback = ShouldShowRunEntryFeedback();
+        if (showEntryFeedback)
+        {
+            DrawRunEntryFeedback(new Rect(rect.x + 34f, rect.y + 64f, rect.width - 68f, 42f));
+        }
+
+        float tableTop = showEntryFeedback ? rect.y + 122f : rect.y + 78f;
+        Rect tableArea = new Rect(rect.x + 34f, tableTop, rect.width - 68f, rect.y + rect.height - tableTop - 34f);
         DrawTableDice(tableArea);
+    }
+
+    private bool ShouldShowRunEntryFeedback()
+    {
+        return rollPhase == RollPhase.Ready && !string.IsNullOrEmpty(rewardBanner);
+    }
+
+    private bool ShouldHighlightRecentDevour(Die die)
+    {
+        return die != null
+            && die.LastDevourGain > 0
+            && rollPhase == RollPhase.Ready
+            && !string.IsNullOrEmpty(rewardBanner)
+            && rewardBanner.Contains("吞噬");
+    }
+
+    private void DrawRunEntryFeedback(Rect rect)
+    {
+        DrawUiSmallPanel(rect);
+        DrawRect(new Rect(rect.x + 6f, rect.y + 6f, 4f, rect.height - 12f), new Color(0.58f, 0.2f, 0.45f, 0.86f));
+        DrawStandardLabel(new Rect(rect.x + 18f, rect.y + 7f, 86f, 28f), "市场反馈", tinyStyle);
+        DrawStandardLabel(new Rect(rect.x + 102f, rect.y + 7f, rect.width - 116f, 28f), TooltipTrim(rewardBanner, 62), smallStyle);
     }
 
     private void DrawRunSupportPanel(Rect rect, Encounter encounter)
     {
         DrawUiSidePanel(rect);
-        GUI.Label(new Rect(rect.x + 24f, rect.y + 24f, rect.width - 48f, 30f), "本关规则", headerStyle);
+        DrawStandardLabel(new Rect(rect.x + 24f, rect.y + 24f, rect.width - 48f, 30f), "本关规则", headerStyle);
 
         Rect ruleRect = new Rect(rect.x + 24f, rect.y + 70f, rect.width - 48f, 64f);
         DrawUiSmallPanel(ruleRect);
         DrawRunText(new Rect(ruleRect.x + 12f, ruleRect.y + 8f, ruleRect.width - 24f, ruleRect.height - 16f), encounter.RuleText, 13, FontStyle.Normal, new Color(0.42f, 0.32f, 0.24f), TextAnchor.MiddleCenter);
 
-        if (DrawUiButton(new Rect(rect.x + 24f, rect.y + 154f, rect.width - 48f, 42f), showHandReference ? "关闭牌型表" : "牌型表", UiButtonKind.Secondary))
+        if (!V02HandScoringEnabled)
+        {
+            DrawRunText(new Rect(rect.x + 24f, rect.y + 154f, rect.width - 48f, 42f), "单次出手直计", 14, FontStyle.Bold, new Color(0.42f, 0.32f, 0.24f), TextAnchor.MiddleCenter);
+            showHandReference = false;
+        }
+        else if (DrawUiButton(new Rect(rect.x + 24f, rect.y + 154f, rect.width - 48f, 42f), showHandReference ? "关闭牌型表" : "牌型表", UiButtonKind.Secondary))
         {
             showHandReference = !showHandReference;
         }
@@ -2097,6 +8578,16 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (rollPhase == RollPhase.ResultDecision)
         {
+            if (!V02CheatEnabled)
+            {
+                bool previousEnabled = GUI.enabled;
+                GUI.enabled = false;
+                DrawUiButton(fullPrimary, SettleButtonText(), UiButtonKind.Primary);
+                GUI.enabled = previousEnabled;
+
+                return;
+            }
+
             if (DrawUiButton(primary, SettleButtonText(), UiButtonKind.Primary))
             {
                 BeginSettle();
@@ -2108,6 +8599,16 @@ public sealed class DiceKingDemo : MonoBehaviour
                 BeginCheatEdit();
             }
             GUI.enabled = true;
+            return;
+        }
+
+        if (rollPhase == RollPhase.CheatEdit && !V02CheatEnabled)
+        {
+            if (DrawUiButton(fullPrimary, SettleButtonText(), UiButtonKind.Primary))
+            {
+                BeginSettle();
+            }
+
             return;
         }
 
@@ -2131,16 +8632,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             if (DrawUiButton(fullPrimary, HasNextEncounter() ? "进入市场" : "完成本轮", UiButtonKind.Primary))
             {
-                if (HasNextEncounter())
-                {
-                    EnterMarket(encounter.Boss);
-                    mode = encounter.Boss ? GameMode.ChapterShop : GameMode.InterStageMarket;
-                }
-                else
-                {
-                    ClearSave();
-                    mode = GameMode.Win;
-                }
+                ContinueAfterStageClear(encounter);
             }
             return;
         }
@@ -2148,9 +8640,34 @@ public sealed class DiceKingDemo : MonoBehaviour
         DrawActionPill(fullPrimary, CompactActionBarText());
     }
 
+    private void ContinueAfterStageClear(Encounter encounter)
+    {
+        if (encounter == null)
+        {
+            return;
+        }
+
+        if (HasNextEncounter())
+        {
+            string impMarketText = ResolveImpStageEndTavernGrowth();
+            EnterMarket(encounter.Boss);
+            if (!string.IsNullOrEmpty(impMarketText))
+            {
+                rewardBanner = impMarketText;
+            }
+
+            mode = encounter.Boss ? GameMode.ChapterShop : GameMode.InterStageMarket;
+            SaveRun();
+            return;
+        }
+
+        ClearSave();
+        mode = GameMode.Win;
+    }
+
     private string SettleButtonText()
     {
-        return "Space";
+        return V02CheatEnabled ? "Space" : "自动结算";
     }
 
     private string CompactActionBarText()
@@ -2160,9 +8677,24 @@ public sealed class DiceKingDemo : MonoBehaviour
             return "结算中";
         }
 
+        if (rollPhase == RollPhase.Shaking)
+        {
+            return ShakeInputWindowActive() ? "Space 加速" : "高速滚动";
+        }
+
+        if (rollPhase == RollPhase.Stopping)
+        {
+            return "减速停靠";
+        }
+
+        if (rollPhase == RollPhase.ResultDecision && !V02CheatEnabled)
+        {
+            return "自动结算";
+        }
+
         if (rollPhase == RollPhase.StageFailed)
         {
-            return "失败";
+            return stageFailureRetryAvailable ? "再次出手" : "返回开始界面";
         }
 
         if (dice.Count == 0)
@@ -2181,7 +8713,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             DrawRect(new Rect(rect.x + 4f, rect.y + 4f, rect.width - 8f, 3f), new Color(0.2f, 0.58f, 0.53f, 0.85f));
         }
 
-        GUI.Label(rect, text, centerStyle);
+        DrawStandardLabel(rect, text, centerStyle);
     }
 
     private void DrawRecentLog(Rect rect, int maxLines)
@@ -2190,7 +8722,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         int drawn = 0;
         if (!string.IsNullOrEmpty(rewardBanner))
         {
-            GUI.Label(new Rect(rect.x, y, rect.width, 20f), rewardBanner, tinyStyle);
+            DrawStandardLabel(new Rect(rect.x, y, rect.width, 20f), rewardBanner, tinyStyle);
             y += 22f;
             drawn++;
         }
@@ -2203,14 +8735,14 @@ public sealed class DiceKingDemo : MonoBehaviour
                 continue;
             }
 
-            GUI.Label(new Rect(rect.x, y, rect.width, 20f), line, tinyStyle);
+            DrawStandardLabel(new Rect(rect.x, y, rect.width, 20f), line, tinyStyle);
             y += 22f;
             drawn++;
         }
 
         if (drawn == 0)
         {
-            GUI.Label(rect, "暂无反馈", tinyStyle);
+            DrawStandardLabel(rect, "暂无反馈", tinyStyle);
         }
     }
 
@@ -2221,17 +8753,25 @@ public sealed class DiceKingDemo : MonoBehaviour
             return string.Empty;
         }
 
-        if (line == "摇骰盅开始，敲空格加力。" || line == "骰子开始旋转，敲空格加速。")
+        if (line == "摇骰盅开始，敲空格加力。"
+            || line == "骰子开始旋转，敲空格加速。"
+            || line == "骰面滚轴启动，可在窗口内敲空格加速。"
+            || line == "骰面滚轴启动，高速滚动后将自动停靠。")
         {
             return string.Empty;
         }
 
-        if (line == "加力窗口结束，骰盅回落。" || line == "加力窗口结束，骰子即将停转。")
+        if (line == "加力窗口结束，骰盅回落。"
+            || line == "加力窗口结束，骰子即将停转。"
+            || line == "骰面滚轴开始减速，六个槽位将从左到右停靠。")
         {
             return string.Empty;
         }
 
-        if (line == "开盅，结果锁定。可直接结算或出千。" || line == "停转显点，结果锁定。可直接结算或出千。")
+        if (line == "开盅，结果锁定。可直接结算或出千。"
+            || line == "停转显点，结果锁定。可直接结算或出千。"
+            || line == "停转显点，结果锁定。可直接结算。"
+            || line == "骰面停靠完成，结果锁定并自动结算。")
         {
             return string.Empty;
         }
@@ -2251,7 +8791,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return "已取消出千";
         }
 
-        if (line == "出千需要至少选择一颗实体骰。")
+        if (line == "出千需要至少选择一颗己方骰。")
         {
             return "需选择至少 1 颗";
         }
@@ -2272,7 +8812,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         DrawPromptPulse(rect);
         DrawBorder(rect, new Color(0.28f, 0.19f, 0.11f, 0.56f), 2f);
         DrawRect(new Rect(rect.x + 5f, rect.y + 5f, 7f, rect.height - 10f), accent);
-        GUI.Label(new Rect(rect.x + 18f, rect.y + 4f, rect.width - 24f, rect.height - 8f), PhaseTitleText() + " | " + PhaseDetailText(encounter), phaseRibbonStyle);
+        DrawStandardLabel(new Rect(rect.x + 18f, rect.y + 4f, rect.width - 24f, rect.height - 8f), PhaseTitleText() + " | " + PhaseDetailText(encounter), phaseRibbonStyle);
     }
 
     private void DrawPromptPulse(Rect rect)
@@ -2342,9 +8882,9 @@ public sealed class DiceKingDemo : MonoBehaviour
             case RollPhase.Stopping:
                 return "停转";
             case RollPhase.ResultDecision:
-                return "决策";
+                return V02CheatEnabled ? "决策" : "锁点";
             case RollPhase.CheatEdit:
-                return "出千";
+                return V02CheatEnabled ? "出千" : "结算";
             case RollPhase.Scoring:
                 return "结算";
             case RollPhase.StageClear:
@@ -2375,16 +8915,21 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (rollPhase == RollPhase.Shaking)
         {
-            return "敲 Space 加速";
+            return ShakeInputWindowActive() ? "敲 Space 加速" : "骰面高速滚动";
         }
 
         if (rollPhase == RollPhase.Stopping)
         {
-            return "停转显点";
+            return "减速并逐槽停靠";
         }
 
         if (rollPhase == RollPhase.ResultDecision)
         {
+            if (!V02CheatEnabled)
+            {
+                return "结果锁定，自动结算";
+            }
+
             int afterScore = currentScore + previewRollScore;
             if (encounter != null && afterScore >= encounter.Target)
             {
@@ -2396,12 +8941,12 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "Space 结算达标";
             }
 
-            return cheatsLeft > 0 ? "Space 结算，或出千改点" : "Space 结算";
+            return "Space 结算";
         }
 
         if (rollPhase == RollPhase.CheatEdit)
         {
-            return "已选 " + cheatRerollIds.Count + "/" + MaxCheatRerollDice + "，确认后直接结算";
+            return V02CheatEnabled ? "已选 " + cheatRerollIds.Count + "/" + MaxCheatRerollDice + "，确认后直接结算" : "Space 结算";
         }
 
         if (rollPhase == RollPhase.Scoring)
@@ -2421,7 +8966,9 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (rollPhase == RollPhase.StageFailed)
         {
-            return "目标未达成，本轮结束";
+            return stageFailureRetryAvailable
+                ? "已扣 1 生命，剩余 " + remainingLives
+                : "生命归零，本轮结束";
         }
 
         return RollPromptText();
@@ -2430,7 +8977,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void DrawActionPill(Rect rect, string text)
     {
         DrawScalableButtonFrame(rect, UiButtonKind.Primary, true);
-        GUI.Label(rect, text, artButtonStyle);
+        DrawStandardLabel(rect, text, artButtonStyle);
     }
 
     private int CountDiceOfType(DieType type)
@@ -2447,120 +8994,127 @@ public sealed class DiceKingDemo : MonoBehaviour
         return count;
     }
 
-    private int TurtleRouteDiceCount()
+    private bool HasDiceOfType(DieType type)
     {
-        return CountDiceOfType(DieType.Turtle)
-            + CountDiceOfType(DieType.Shellsmith)
-            + CountDiceOfType(DieType.Nest)
-            + CountDiceOfType(DieType.SlowTurtle);
+        return CountDiceOfType(type) > 0;
     }
 
-    private int GoldRouteDiceCount()
+    private void MarkAllDiceOfTypeTriggered(DieType type, string note)
     {
-        return CountDiceOfType(DieType.Piggy)
-            + CountDiceOfType(DieType.Treasury)
-            + CountDiceOfType(DieType.Bribe)
-            + CountDiceOfType(DieType.Investment)
-            + CountDiceOfType(DieType.BountyGold)
-            + CountDiceOfType(DieType.TopGold)
-            + CountDiceOfType(DieType.HandTax)
-            + CountDiceOfType(DieType.Collection)
-            + CountDiceOfType(DieType.CompoundInterest)
-            + CountDiceOfType(DieType.LeadTicket)
-            + CountDiceOfType(DieType.ShellTax)
-            + CountDiceOfType(DieType.CounterGold)
-            + CountDiceOfType(DieType.LumberGold);
-    }
-
-    private int TreeInterfaceDiceCount()
-    {
-        return CountDiceOfType(DieType.PointSeedTree)
-            + CountDiceOfType(DieType.PatternTree)
-            + CountDiceOfType(DieType.CanopyTree)
-            + CountDiceOfType(DieType.RingTree)
-            + CountDiceOfType(DieType.FertilizerTree)
-            + CountDiceOfType(DieType.PruningTree)
-            + CountDiceOfType(DieType.RootTree);
-    }
-
-    private int TreeRouteDiceCount()
-    {
-        return CountDiceOfType(DieType.Tree)
-            + CountDiceOfType(DieType.Gardener)
-            + CountDiceOfType(DieType.Irrigation)
-            + TreeInterfaceDiceCount();
-    }
-
-    private bool IsTreeGrowthType(DieType type)
-    {
-        switch (type)
+        for (int i = 0; i < dice.Count; i++)
         {
-            case DieType.Tree:
-            case DieType.PointSeedTree:
-            case DieType.PatternTree:
-            case DieType.CanopyTree:
-            case DieType.RingTree:
-            case DieType.FertilizerTree:
-            case DieType.PruningTree:
-            case DieType.RootTree:
-                return true;
+            Die die = dice[i];
+            if (die == null || die.Temporary || die.Type != type)
+            {
+                continue;
+            }
+
+            MarkTypeTriggered(die);
+            if (!string.IsNullOrEmpty(note))
+            {
+                die.RoundNote = AppendNote(die.RoundNote, note);
+            }
+        }
+    }
+
+    private int MainFamilyDiceCount(MainFamily family)
+    {
+        int count = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (IsEntityMainFamilyDie(die) && HasMainFamily(die.Type, family))
+            {
+                count++;
+            }
         }
 
-        return false;
+        return count;
+    }
+
+    private int NeutralDiceCount()
+    {
+        int count = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die != null && !die.Temporary && IsV02NeutralFamilyMarketType(die.Type))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int DualFamilyDiceCount()
+    {
+        int count = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die != null && !die.Temporary && IsV02DualFamilyMarketType(die.Type))
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     private string RunHudResourceText()
     {
-        string investment = stageInvestmentGold > 0 ? "   投 " + stageInvestmentGold : string.Empty;
-        return "金 " + chapterGold + investment + "   出手 " + rollsLeft + "/" + RollsPerStage + "   出千 " + cheatsLeft + "/" + CheatsPerStage;
+        return "金 " + chapterGold + "   生命 " + remainingLives + "   直计";
     }
 
     private string[] DiceBagTypeLines()
     {
         List<string> lines = new List<string>();
         AddDiceBagTypeLine(lines, DieType.Basic, "基础");
-        AddDiceBagTypeLine(lines, DieType.Odd, "奇数");
-        AddDiceBagTypeLine(lines, DieType.Even, "偶数");
-        AddDiceBagTypeLine(lines, DieType.LoneWitness, "孤证");
-        AddDiceBagTypeLine(lines, DieType.Stamp, "盖章");
-        AddDiceBagTypeLine(lines, DieType.HalfStep, "半步");
-        AddDiceBagTypeLine(lines, DieType.Track, "轨道");
-        AddDiceBagTypeLine(lines, DieType.ParityNeighborDiff, "异邻");
-        AddDiceBagTypeLine(lines, DieType.ParityNeighborSame, "同邻");
-        AddDiceBagTypeLine(lines, DieType.ParityComplete, "补全");
-        AddDiceBagTypeLine(lines, DieType.ParityReview, "复核");
-        AddDiceBagTypeLine(lines, DieType.ParityFlipScore, "翻号");
-        AddDiceBagTypeLine(lines, DieType.ParityHoldScore, "守号");
-        AddDiceBagTypeLine(lines, DieType.ParityTurner, "转号");
-        AddDiceBagTypeLine(lines, DieType.Piggy, "猪猪");
-        AddDiceBagTypeLine(lines, DieType.Treasury, "国库");
-        AddDiceBagTypeLine(lines, DieType.Bribe, "贿赂");
-        AddDiceBagTypeLine(lines, DieType.Investment, "投资");
-        AddDiceBagTypeLine(lines, DieType.BountyGold, "悬赏");
-        AddDiceBagTypeLine(lines, DieType.TopGold, "顶金");
-        AddDiceBagTypeLine(lines, DieType.HandTax, "牌税");
-        AddDiceBagTypeLine(lines, DieType.Collection, "收账");
-        AddDiceBagTypeLine(lines, DieType.CompoundInterest, "复利");
-        AddDiceBagTypeLine(lines, DieType.LeadTicket, "铅票");
-        AddDiceBagTypeLine(lines, DieType.ShellTax, "壳税");
-        AddDiceBagTypeLine(lines, DieType.CounterGold, "柜台");
-        AddDiceBagTypeLine(lines, DieType.LumberGold, "伐木");
-        AddDiceBagTypeLine(lines, DieType.Turtle, "龟龟");
-        AddDiceBagTypeLine(lines, DieType.Shellsmith, "壳匠");
-        AddDiceBagTypeLine(lines, DieType.Nest, "巢穴");
-        AddDiceBagTypeLine(lines, DieType.SlowTurtle, "慢龟");
-        AddDiceBagTypeLine(lines, DieType.Double, "双倍");
-        AddDiceBagTypeLine(lines, DieType.Tree, "大树");
-        AddDiceBagTypeLine(lines, DieType.Gardener, "园丁");
-        AddDiceBagTypeLine(lines, DieType.Irrigation, "灌溉");
-        AddDiceBagTypeLine(lines, DieType.PointSeedTree, "点籽");
-        AddDiceBagTypeLine(lines, DieType.PatternTree, "牌谱");
-        AddDiceBagTypeLine(lines, DieType.CanopyTree, "冠层");
-        AddDiceBagTypeLine(lines, DieType.RingTree, "年轮");
-        AddDiceBagTypeLine(lines, DieType.FertilizerTree, "肥料");
-        AddDiceBagTypeLine(lines, DieType.PruningTree, "修枝");
-        AddDiceBagTypeLine(lines, DieType.RootTree, "根系");
-        AddDiceBagTypeLine(lines, DieType.Gambler, "赌徒");
+        AddDiceBagTypeLine(lines, DieType.PigFarmer, "养猪");
+        AddDiceBagTypeLine(lines, DieType.MeatPig, "肉猪");
+        AddDiceBagTypeLine(lines, DieType.TradePig, "贸易猪");
+        AddDiceBagTypeLine(lines, DieType.SowPig, "母猪");
+        AddDiceBagTypeLine(lines, DieType.ThreeLittlePigs, "三猪");
+        AddDiceBagTypeLine(lines, DieType.GreedyPig, "贪吃");
+        AddDiceBagTypeLine(lines, DieType.FeedWholesaler, "批发");
+        AddDiceBagTypeLine(lines, DieType.Imp, "小鬼");
+        AddDiceBagTypeLine(lines, DieType.Devourer, "吞噬");
+        AddDiceBagTypeLine(lines, DieType.Demon, "恶魔");
+        AddDiceBagTypeLine(lines, DieType.DemonBat, "魔蝠");
+        AddDiceBagTypeLine(lines, DieType.AbyssSummon, "深渊");
+        AddDiceBagTypeLine(lines, DieType.MoneyTurtle, "金钱龟");
+        AddDiceBagTypeLine(lines, DieType.TinyTurtle, "小小龟");
+        AddDiceBagTypeLine(lines, DieType.DoubleTurtle, "双倍龟");
+        AddDiceBagTypeLine(lines, DieType.LuckyTurtle, "幸运龟");
+        AddDiceBagTypeLine(lines, DieType.MagnetTurtle, "磁力龟");
+        AddDiceBagTypeLine(lines, DieType.RallyTurtle, "呼朋龟");
+        AddDiceBagTypeLine(lines, DieType.LeaderTurtle, "首领龟");
+        AddDiceBagTypeLine(lines, DieType.RefreshPirate, "刷新海盗");
+        AddDiceBagTypeLine(lines, DieType.PlunderPirate, "劫掠海盗");
+        AddDiceBagTypeLine(lines, DieType.CrewPirate, "人口海盗");
+        AddDiceBagTypeLine(lines, DieType.PirateCaptain, "海盗头领");
+        AddDiceBagTypeLine(lines, DieType.TrainingPirate, "练腿海盗");
+        AddDiceBagTypeLine(lines, DieType.TreasurePirate, "财宝海盗");
+        AddDiceBagTypeLine(lines, DieType.RobberyPirate, "抢劫海盗");
+        AddDiceBagTypeLine(lines, DieType.PirateKing, "海贼王");
+        AddDiceBagTypeLine(lines, DieType.BlackSailBat, "黑帆魔蝠");
+        AddDiceBagTypeLine(lines, DieType.PackTurtle, "驮粮龟");
+        AddDiceBagTypeLine(lines, DieType.TributePig, "贡猪");
+        AddDiceBagTypeLine(lines, DieType.BlackMarketImp, "黑市小鬼");
+        AddDiceBagTypeLine(lines, DieType.BloodPactCaptain, "血契船长");
+        AddDiceBagTypeLine(lines, DieType.ClearancePig, "清仓猪");
+        AddDiceBagTypeLine(lines, DieType.SupplyPig, "补给猪");
+        AddDiceBagTypeLine(lines, DieType.SharedFeastDemonTurtle, "共食魔龟");
+        AddDiceBagTypeLine(lines, DieType.SafetyNetTurtle, "托底龟");
+        AddDiceBagTypeLine(lines, DieType.Lightfang, "光牙");
+        AddDiceBagTypeLine(lines, DieType.Duet, "二重唱");
+        AddDiceBagTypeLine(lines, DieType.Trigger, "触发器");
+        AddDiceBagTypeLine(lines, DieType.Crown, "王冠");
+        AddDiceBagTypeLine(lines, DieType.Relief, "接济");
+        AddDiceBagTypeLine(lines, DieType.Airstrike, "空袭");
+        AddDiceBagTypeLine(lines, DieType.Pact, "盟约");
+        AddDiceBagTypeLine(lines, DieType.Stitch, "缝合");
 
         if (lines.Count == 0)
         {
@@ -2581,208 +9135,78 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string DiceBagFocusText()
     {
-        int bestTreeGrowth = 0;
-        for (int i = 0; i < dice.Count; i++)
+        if (DualFamilyDiceCount() > 0)
         {
-            if (IsTreeGrowthType(dice[i].Type) && dice[i].Growth > bestTreeGrowth)
-            {
-                bestTreeGrowth = dice[i].Growth;
-            }
+            return "双阵营连接两套家族效果";
         }
 
-        if (bestTreeGrowth > 0)
+        if (MainFamilyDiceCount(MainFamily.Pig) > 0)
         {
-            return "大树最高 +" + bestTreeGrowth;
+            return "猪猪用喂养抬高最低点";
         }
 
-        int interfaceTree = TreeInterfaceDiceCount();
-        if (interfaceTree > 0)
+        if (MainFamilyDiceCount(MainFamily.Devil) > 0)
         {
-            return "接触触发大树成长";
+            return "恶魔经营货架并吞噬成长";
         }
 
-        int tree = CountDiceOfType(DieType.Tree);
-        int gardener = CountDiceOfType(DieType.Gardener);
-        int irrigation = CountDiceOfType(DieType.Irrigation);
-        if (tree > 0 && gardener > 0)
+        if (MainFamilyDiceCount(MainFamily.Turtle) > 0)
         {
-            return "园丁叠大树成长";
+            return "龟龟离场化壳形成壳层";
         }
 
-        if (tree > 0 && irrigation > 0)
+        if (MainFamilyDiceCount(MainFamily.Pirate) > 0)
         {
-            return "灌溉追大树目标";
+            return "海盗用买卖和金币换成长";
         }
 
-        if (gardener > 0)
+        if (NeutralDiceCount() > 0)
         {
-            return "园丁等大树";
+            return "中立骰连接现有家族";
         }
 
-        if (irrigation > 0)
-        {
-            return "灌溉等大树";
-        }
-
-        if (stageInvestmentGold > 0)
-        {
-            return "投资锁 " + stageInvestmentGold + " 金";
-        }
-
-        int treasury = CountDiceOfType(DieType.Treasury);
-        if (treasury > 0)
-        {
-            return "国库本金 +" + TreasuryScoreBonus();
-        }
-
-        int bribe = CountDiceOfType(DieType.Bribe);
-        if (bribe > 0)
-        {
-            int reserve = Mathf.Min(Mathf.Max(0, chapterGold), bribe * Mathf.Max(0, bribeGoldCapPerDie));
-            return reserve > 0 ? "贿赂可用 " + reserve + " 金" : "贿赂暂无现金";
-        }
-
-        int piggy = CountDiceOfType(DieType.Piggy);
-        if (CountDiceOfType(DieType.LoneWitness) > 0)
-        {
-            return "孤证会重找同点";
-        }
-
-        if (CountDiceOfType(DieType.Stamp) > 0)
-        {
-            return "盖章吃同点伙伴";
-        }
-
-        if (CountDiceOfType(DieType.HalfStep) > 0)
-        {
-            return "半步可补顺子";
-        }
-
-        if (CountDiceOfType(DieType.Track) > 0)
-        {
-            return "轨道看 2/4/6";
-        }
-
-        if (CountDiceOfType(DieType.ParityNeighborDiff) > 0 || CountDiceOfType(DieType.ParityNeighborSame) > 0)
-        {
-            return "邻位看奇偶";
-        }
-
-        if (CountDiceOfType(DieType.ParityComplete) > 0)
-        {
-            return "补全全奇全偶";
-        }
-
-        if (CountDiceOfType(DieType.ParityReview) > 0)
-        {
-            return "复核会重摇";
-        }
-
-        if (CountDiceOfType(DieType.ParityFlipScore) > 0 || CountDiceOfType(DieType.ParityHoldScore) > 0 || CountDiceOfType(DieType.ParityTurner) > 0)
-        {
-            return "出千看奇偶";
-        }
-
-        if (piggy > 0)
-        {
-            return "猪猪看目标";
-        }
-
-        int turtle = TurtleRouteDiceCount();
-        if (turtle > 0)
-        {
-            if (CountDiceOfType(DieType.Shellsmith) > 0)
-            {
-                return "壳匠吃小骰数量";
-            }
-
-            if (CountDiceOfType(DieType.Nest) > 0)
-            {
-                return "巢穴等龟链";
-            }
-
-            return "龟龟会追加小骰";
-        }
-
-        int gambler = CountDiceOfType(DieType.Gambler);
-        if (gambler > 0)
-        {
-            return "赌徒看阈值";
-        }
-
-        return "看点数和牌型";
+        return "基础骰过渡，优先构筑当前阵容";
     }
 
     private string DiceBagRouteText()
     {
-        int odd = CountDiceOfType(DieType.Odd) + CountDiceOfType(DieType.LoneWitness) + CountDiceOfType(DieType.Stamp);
-        int even = CountDiceOfType(DieType.Even) + CountDiceOfType(DieType.HalfStep) + CountDiceOfType(DieType.Track);
-        int parityShort = CountDiceOfType(DieType.ParityNeighborDiff)
-            + CountDiceOfType(DieType.ParityNeighborSame)
-            + CountDiceOfType(DieType.ParityComplete)
-            + CountDiceOfType(DieType.ParityReview)
-            + CountDiceOfType(DieType.ParityFlipScore)
-            + CountDiceOfType(DieType.ParityHoldScore)
-            + CountDiceOfType(DieType.ParityTurner);
-        int piggy = CountDiceOfType(DieType.Piggy);
-        int goldDice = GoldRouteDiceCount();
-        int turtle = TurtleRouteDiceCount();
-        int tree = TreeRouteDiceCount();
-        int burst = CountDiceOfType(DieType.Double) + CountDiceOfType(DieType.Gambler);
-
-        if (goldDice > piggy)
+        if (DualFamilyDiceCount() >= 2)
         {
-            return "金币路线";
+            return "双阵营桥接";
         }
 
-        if (parityShort >= 2)
+        int pig = MainFamilyDiceCount(MainFamily.Pig);
+        int devil = MainFamilyDiceCount(MainFamily.Devil);
+        int turtle = MainFamilyDiceCount(MainFamily.Turtle);
+        int pirate = MainFamilyDiceCount(MainFamily.Pirate);
+        int presentFamilies = (pig > 0 ? 1 : 0) + (devil > 0 ? 1 : 0) + (turtle > 0 ? 1 : 0) + (pirate > 0 ? 1 : 0);
+        if (presentFamilies >= 3)
         {
-            return "奇偶短规则";
+            return "多家族议会";
         }
 
-        if (even >= 3)
+        int best = Mathf.Max(Mathf.Max(pig, devil), Mathf.Max(turtle, pirate));
+        if (best >= 2)
         {
-            return "偶数路线";
+            if (best == pig) return "猪猪喂养";
+            if (best == devil) return "恶魔吞噬";
+            if (best == turtle) return "龟龟化壳";
+            return "海盗市场";
         }
 
-        if (odd >= 3)
-        {
-            return "奇数路线";
-        }
-
-        if (piggy >= 2)
-        {
-            return "经济路线";
-        }
-
-        if (tree > 0)
-        {
-            return "成长路线";
-        }
-
-        if (turtle > 0)
-        {
-            return "迭代路线";
-        }
-
-        if (burst >= 2)
-        {
-            return "爆发路线";
-        }
-
-        return "基础过渡";
+        return NeutralDiceCount() > 0 ? "中立过渡" : "基础过渡";
     }
 
     private string StagePrepFocusText(Encounter encounter)
     {
         if (rollPhase == RollPhase.Shaking)
         {
-            return "敲 Space 加速";
+            return ShakeInputWindowActive() ? "敲 Space 加速" : "骰面高速滚动";
         }
 
         if (rollPhase == RollPhase.Stopping)
         {
-            return "停转显点";
+            return "减速逐槽停靠";
         }
 
         if (rollPhase == RollPhase.Scoring)
@@ -2792,7 +9216,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (rollPhase == RollPhase.StageFailed)
         {
-            return "本轮失败";
+            return stageFailureRetryAvailable ? "保留累计分，再次出手" : "生命归零，本轮结束";
         }
 
         if (encounter != null && encounter.Rule != RuleKind.None)
@@ -2800,7 +9224,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return RuleFocusText(encounter);
         }
 
-        return rolledThisEncounter ? "继续追分" : "看点数和牌型";
+        return rolledThisEncounter ? "等待结算" : "调整槽位后投骰";
     }
 
     private string RuleFocusText(Encounter encounter)
@@ -2810,11 +9234,11 @@ public sealed class DiceKingDemo : MonoBehaviour
             case RuleKind.OddLedger:
                 return "奇数骰本关更值钱";
             case RuleKind.HandAudit:
-                return "有牌型会额外加分";
+                return V02HandScoringEnabled ? "有牌型会额外加分" : "牌型规则已关闭";
             case RuleKind.LowFog:
                 return "低点数本关会吃亏";
             case RuleKind.DoubleJudge:
-                return "偶数优先，顺子加分";
+                return V02HandScoringEnabled ? "偶数优先，顺子加分" : "偶数优先";
         }
 
         return "无额外规则";
@@ -2915,6 +9339,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string CheatAdviceText(Encounter encounter)
     {
+        if (!V02CheatEnabled)
+        {
+            return "单次直计";
+        }
+
         if (rollPhase == RollPhase.StageClear)
         {
             return "进入市场";
@@ -2963,12 +9392,12 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (rollPhase == RollPhase.Shaking)
         {
-            return "敲 Space 加速";
+            return ShakeInputWindowActive() ? "敲 Space 加速" : "骰面高速滚动";
         }
 
         if (rollPhase == RollPhase.Stopping)
         {
-            return "停转显点";
+            return "减速逐槽停靠";
         }
 
         if (rollPhase == RollPhase.Scoring)
@@ -2978,7 +9407,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (rollPhase == RollPhase.StageFailed)
         {
-            return "本轮失败";
+            return stageFailureRetryAvailable ? "Space 再次出手" : "Space 返回开始界面";
         }
 
         return RollPromptText();
@@ -3030,6 +9459,740 @@ public sealed class DiceKingDemo : MonoBehaviour
         return false;
     }
 
+    private bool UseArcadeMarketVisuals()
+    {
+        // The current arcade clean plate intentionally has no crafting inventory area.
+        // Keep the complete legacy market available if that soft-disabled feature is restored.
+        return (mode == GameMode.InterStageMarket || mode == GameMode.ChapterShop)
+            && marketCommonBaseTexture != null
+            && !affixFeatureEnabled;
+    }
+
+    private void DrawArcadeMarket(bool chapterMarket)
+    {
+        Encounter encounter = CurrentEncounter();
+        string title = chapterMarket && encounter != null ? "章节市场" : "关间市场";
+        int refreshCost = CurrentMarketRefreshNetCost(chapterMarket);
+        bool marketLeaveLocked = marketLeaveEffectSequenceActive;
+
+        if (selectedMarketDieIndex >= dice.Count)
+        {
+            selectedMarketDieIndex = dice.Count - 1;
+        }
+        if (selectedMarketDieIndex < 0 && dice.Count > 0 && !marketLeaveLocked)
+        {
+            selectedMarketDieIndex = 0;
+        }
+
+        DrawLedRoleText(new Rect(66f, 17f, 220f, 48f), title, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        DrawLedRoleText(new Rect(322f, 17f, 246f, 48f), "金币 " + chapterGold, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+
+        List<int> marketVisualIndices = DiceOrderVisualIndices(DiceOrderDragSurface.MarketBag);
+        Rect[] marketSlotRects = new Rect[marketVisualIndices.Count];
+        for (int i = 0; i < marketVisualIndices.Count; i++)
+        {
+            int dieIndex = marketVisualIndices[i];
+            if (dieIndex < 0 || dieIndex >= dice.Count)
+            {
+                continue;
+            }
+
+            Die die = dice[dieIndex];
+            Rect rect = MarketBagSlotRect(i);
+            marketSlotRects[i] = rect;
+            bool draggedGhost = IsDiceOrderDraggedDie(DiceOrderDragSurface.MarketBag, die);
+            if (draggedGhost)
+            {
+                DrawDiceOrderInsertMarker(rect, false);
+                DrawDiceOrderGhost(rect);
+            }
+            else
+            {
+                DrawArcadeMarketBagDie(rect, die, dieIndex == selectedMarketDieIndex, "market-bag-" + die.Id, true);
+            }
+
+            if (marketLeaveEffectSequenceActive && die != null && die.Id == marketLeaveEffectVisualHostId)
+            {
+                DrawMarketLeaveAttachmentTarget(rect);
+            }
+
+            DrawArcadeMarketLeaveScan(rect, dieIndex);
+            if (!marketLeaveLocked)
+            {
+                HandleDiceOrderDragMouseDown(DiceOrderDragSurface.MarketBag, dieIndex, rect);
+            }
+        }
+
+        if (!marketLeaveLocked)
+        {
+            UpdateDiceOrderDragFromSlots(DiceOrderDragSurface.MarketBag, marketSlotRects, false);
+        }
+        DrawDiceOrderFloatingDie(DiceOrderDragSurface.MarketBag);
+        DrawMarketLeaveAttachmentFlyVisual();
+
+        Rect sellKey = new Rect(59f, 496f, 172f, 72f);
+        bool hasSelectedDie = selectedMarketDieIndex >= 0 && selectedMarketDieIndex < dice.Count;
+        ArcadeMarketButtonResult sellResult = DrawArcadeMarketButton(
+            sellKey,
+            "卖出",
+            hasSelectedDie && !marketLeaveLocked,
+            true,
+            "market-sell");
+        if (sellResult == ArcadeMarketButtonResult.Activated)
+        {
+            SellSelectedMarketDie();
+            ShowActionTip("已卖出", ActionTipSemantic.Success, "market-action");
+        }
+        else if (sellResult == ArcadeMarketButtonResult.Blocked)
+        {
+            ShowActionTip(MarketSellBlockedReason(hasSelectedDie), ActionTipSemantic.Warning, "market-action");
+        }
+
+        float[] offerXs = { 292f, 586f, 879f };
+        for (int i = 0; i < offerXs.Length; i++)
+        {
+            MarketOffer offer = i < marketOffers.Count ? marketOffers[i] : null;
+            Rect offerRect = new Rect(offerXs[i], 118f, 277f, 430f);
+            DrawArcadeMarketOffer(offerRect, offer, "market-offer-" + i);
+
+            if (!HasArcadeMarketPurchaseAction(offer))
+            {
+                continue;
+            }
+
+            bool canBuy = !marketLeaveLocked && CanBuyMarketOffer(offer);
+            Rect buyKey = new Rect(offerRect.x + 31f, offerRect.y + 354f, 215f, 57f);
+            ArcadeMarketButtonResult buyResult = DrawArcadeMarketButton(
+                buyKey,
+                "购买",
+                canBuy,
+                true,
+                "market-buy-" + i);
+            if (buyResult == ArcadeMarketButtonResult.Activated)
+            {
+                BuyOffer(i);
+                ShowActionTip("已购买", ActionTipSemantic.Success, "market-action");
+                break;
+            }
+            if (buyResult == ArcadeMarketButtonResult.Blocked)
+            {
+                ShowActionTip(MarketBuyBlockedReason(offer, marketLeaveLocked), ActionTipSemantic.Warning, "market-action");
+            }
+        }
+
+        bool canRefresh = !marketLeaveLocked && (refreshCost <= 0 || chapterGold >= refreshCost);
+        ArcadeMarketButtonResult refreshResult = DrawArcadeMarketButton(
+            new Rect(58f, 601f, 244f, 82f),
+            "刷新",
+            canRefresh,
+            false,
+            "market-refresh");
+        if (refreshResult == ArcadeMarketButtonResult.Activated)
+        {
+            RefreshMarketOffers(chapterMarket);
+            ShowActionTip("已刷新", ActionTipSemantic.Success, "market-action");
+        }
+        else if (refreshResult == ArcadeMarketButtonResult.Blocked)
+        {
+            ShowActionTip(MarketRefreshBlockedReason(refreshCost, marketLeaveLocked), ActionTipSemantic.Warning, "market-action");
+        }
+
+        string feedback = ArcadeMarketFeedbackText(chapterMarket);
+        DrawLedRoleText(
+            new Rect(334f, 609f, 550f, 64f),
+            TooltipTrim(feedback, 48),
+            marketLeaveLocked ? MainGameLedFont.TextRole.FocusTeal : MainGameLedFont.TextRole.SecondaryAmber,
+            TextAnchor.MiddleCenter);
+
+        bool canLeave = dice.Count > 0 && !marketLeaveLocked;
+        ArcadeMarketButtonResult leaveResult = DrawArcadeMarketButton(
+            new Rect(912f, 601f, 301f, 82f),
+            "离开市场",
+            canLeave,
+            true,
+            "market-leave");
+        if (leaveResult == ArcadeMarketButtonResult.Activated)
+        {
+            ActivateMarketLeave();
+        }
+        else if (leaveResult == ArcadeMarketButtonResult.Blocked)
+        {
+            ShowActionTip(MarketLeaveBlockedReason(marketLeaveLocked), ActionTipSemantic.Warning, "market-action");
+        }
+
+        GUI.enabled = true;
+    }
+
+    private void DrawArcadeMarketBagDie(Rect rect, Die die, bool selected, string hoverKey, bool acceptHover)
+    {
+        if (die == null)
+        {
+            return;
+        }
+
+        if (selected)
+        {
+            Color edge = marketLeaveEffectSequenceActive
+                ? new Color(0.24f, 0.88f, 0.8f, 0.96f)
+                : new Color(1f, 0.63f, 0.18f, 0.94f);
+            DrawBorder(new Rect(rect.x - 2f, rect.y - 2f, rect.width + 4f, rect.height + 4f), edge, 3f);
+        }
+
+        float tokenSize = Mathf.Min(52f, rect.height + 2f);
+        Rect tokenRect = new Rect(rect.x + (rect.width - tokenSize) * 0.5f, rect.y + (rect.height - tokenSize) * 0.5f, tokenSize, tokenSize);
+        DrawArcadeRunDieToken(tokenRect, die, die.Type, 0, false, 0, 1f);
+        if (acceptHover)
+        {
+            TrySetHoveredTooltip(rect, die, DiceTooltipContext.MarketBag, -1, hoverKey);
+        }
+    }
+
+    private void DrawArcadeMarketOffer(Rect rect, MarketOffer offer, string hoverKey)
+    {
+        bool hovered = uiMousePositionValid && rect.Contains(uiMousePosition) && !marketLeaveEffectSequenceActive;
+        if (hovered)
+        {
+            float pulse = 0.78f + Mathf.Sin(Time.unscaledTime * 4.2f) * 0.12f;
+            DrawBorder(new Rect(rect.x + 6f, rect.y + 4f, rect.width - 12f, 278f), new Color(0.2f, 0.84f, 0.78f, pulse), 3f);
+        }
+
+        if (offer == null || offer.Kind == MarketOfferKind.Empty)
+        {
+            Rect emptyRing = new Rect(rect.x + 86f, rect.y + 82f, 105f, 105f);
+            DrawBorder(emptyRing, new Color(0.72f, 0.43f, 0.12f, 0.32f), 3f);
+            DrawBorder(InsetRect(emptyRing, 18f, 18f), new Color(0.72f, 0.43f, 0.12f, 0.2f), 2f);
+            DrawLedRoleText(new Rect(rect.x + 28f, rect.y + 201f, rect.width - 56f, 34f), "已售出", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleCenter);
+            DrawLedRoleText(new Rect(rect.x + 28f, rect.y + 286f, rect.width - 56f, 48f), "付费刷新补货", MainGameLedFont.TextRole.SecondaryWarm, TextAnchor.MiddleCenter);
+            return;
+        }
+
+        if (offer.Kind != MarketOfferKind.Die || offer.Die == null)
+        {
+            DrawLedRoleText(new Rect(rect.x + 28f, rect.y + 198f, rect.width - 56f, 38f), "货架整理中", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleCenter);
+            return;
+        }
+
+        Die die = offer.Die;
+        DrawArcadeRunDieToken(new Rect(rect.x + 67f, rect.y + 53f, 143f, 143f), die, die.Type, 0, false, 0, 1f);
+        DrawLedRoleText(new Rect(rect.x + 18f, rect.y + 289f, rect.width - 36f, 56f), TooltipTrim(DieDisplayName(die), 12), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        TrySetHoveredTooltip(rect, die, DiceTooltipContext.MarketOffer, CurrentOfferPrice(offer), hoverKey + "-" + die.Id);
+    }
+
+    private void DrawArcadeMarketLeaveScan(Rect rect, int dieIndex)
+    {
+        if (!marketLeaveEffectSequenceActive || dieIndex != selectedMarketDieIndex)
+        {
+            return;
+        }
+
+        float scanProgress = MarketLeaveEffectDuration > 0f
+            ? 1f - Mathf.Clamp01(marketLeaveEffectTimer / MarketLeaveEffectDuration)
+            : 1f;
+        float scanY = Mathf.Lerp(rect.y + 4f, rect.y + rect.height - 6f, scanProgress);
+        DrawRect(new Rect(rect.x + 5f, scanY, rect.width - 10f, 3f), new Color(0.22f, 0.92f, 0.84f, 0.8f));
+    }
+
+    private ArcadeMarketButtonResult DrawArcadeMarketButton(
+        Rect rect,
+        string label,
+        bool enabled,
+        bool lightKey,
+        string interactionKey)
+    {
+        bool pointerHovered = uiMousePositionValid && rect.Contains(uiMousePosition);
+        bool hovered = enabled && pointerHovered;
+        bool pressed = hovered && Input.GetMouseButton(0);
+        bool blockedPressed = !enabled && pointerHovered && Input.GetMouseButton(0);
+        float blockedFeedback = ArcadeMarketBlockedFeedback(interactionKey);
+        Color focus = lightKey
+            ? new Color(1f, 0.67f, 0.2f, 0.94f)
+            : new Color(0.2f, 0.88f, 0.8f, 0.94f);
+        if (!enabled)
+        {
+            Color disabledTint = lightKey
+                ? new Color(0.035f, 0.04f, 0.04f, blockedPressed ? 0.72f : 0.62f)
+                : new Color(0.006f, 0.012f, 0.014f, blockedPressed ? 0.76f : 0.64f);
+            Rect blockedFace = new Rect(rect.x + 3f, rect.y + 3f, rect.width - 6f, rect.height - 6f);
+            DrawRect(blockedFace, disabledTint);
+            DrawBorder(blockedFace, new Color(0.05f, 0.055f, 0.052f, 0.9f), 3f);
+            DrawRect(
+                new Rect(blockedFace.x + 4f, blockedFace.y + blockedFace.height - 7f, blockedFace.width - 8f, 3f),
+                new Color(0.34f, 0.30f, 0.24f, 0.28f));
+        }
+        else if (pressed)
+        {
+            Color pressedTint = lightKey
+                ? new Color(0.05f, 0.035f, 0.025f, 0.12f)
+                : new Color(0.005f, 0.012f, 0.014f, 0.34f);
+            DrawRect(new Rect(rect.x + 4f, rect.y + 4f, rect.width - 8f, rect.height - 8f), pressedTint);
+        }
+        else if (hovered)
+        {
+            float pulse = 0.82f + Mathf.Sin(Time.unscaledTime * 5f) * 0.1f;
+            DrawBorder(new Rect(rect.x - 1f, rect.y - 1f, rect.width + 2f, rect.height + 2f), new Color(focus.r, focus.g, focus.b, pulse), 3f);
+        }
+
+        if (blockedFeedback > 0f)
+        {
+            float expand = Mathf.Lerp(5f, 1f, blockedFeedback);
+            Color reject = new Color(0.92f, 0.36f, 0.16f, blockedFeedback * 0.92f);
+            DrawBorder(
+                new Rect(rect.x - expand, rect.y - expand, rect.width + expand * 2f, rect.height + expand * 2f),
+                reject,
+                2f);
+        }
+
+        if (lightKey)
+        {
+            // Approved material exception: light physical keycaps use native-rasterized
+            // solid ink directly on the original texture. Dark display surfaces stay V4 LED.
+            DrawArcadePhysicalKeyLabel(rect, label, enabled, pressed || blockedPressed);
+        }
+        else
+        {
+            Rect labelRect = rect;
+            if (pressed || blockedPressed)
+            {
+                labelRect.y += 2f;
+                labelRect.height = Mathf.Max(1f, labelRect.height - 2f);
+            }
+            DrawLedRoleText(
+                labelRect,
+                label,
+                enabled ? MainGameLedFont.TextRole.FocusTeal : MainGameLedFont.TextRole.Disabled,
+                TextAnchor.MiddleCenter);
+        }
+
+        bool previousEnabled = GUI.enabled;
+        GUI.enabled = true;
+        bool clicked = GUI.Button(rect, GUIContent.none, GUIStyle.none);
+        GUI.enabled = previousEnabled;
+        if (!clicked)
+        {
+            return ArcadeMarketButtonResult.None;
+        }
+        if (enabled)
+        {
+            return ArcadeMarketButtonResult.Activated;
+        }
+
+        arcadeMarketBlockedFeedbackKey = interactionKey ?? string.Empty;
+        arcadeMarketBlockedFeedbackStartedAt = Time.unscaledTime;
+        return ArcadeMarketButtonResult.Blocked;
+    }
+
+    private void DrawArcadePhysicalKeyLabel(Rect keyRect, string label, bool enabled, bool pressed)
+    {
+        if (string.IsNullOrEmpty(label) || Event.current == null || Event.current.type != EventType.Repaint)
+        {
+            return;
+        }
+
+        Rect labelRect = ArcadePhysicalKeyLabelRect(keyRect);
+        if (pressed)
+        {
+            labelRect.y += 2f;
+            labelRect.height = Mathf.Max(1f, labelRect.height - 2f);
+        }
+
+        Matrix4x4 drawingMatrix = GUI.matrix;
+        Vector3 topLeft = drawingMatrix.MultiplyPoint3x4(new Vector3(labelRect.xMin, labelRect.yMin, 0f));
+        Vector3 bottomRight = drawingMatrix.MultiplyPoint3x4(new Vector3(labelRect.xMax, labelRect.yMax, 0f));
+        Rect screenRect = Rect.MinMaxRect(
+            Mathf.Round(Mathf.Min(topLeft.x, bottomRight.x)),
+            Mathf.Round(Mathf.Min(topLeft.y, bottomRight.y)),
+            Mathf.Round(Mathf.Max(topLeft.x, bottomRight.x)),
+            Mathf.Round(Mathf.Max(topLeft.y, bottomRight.y)));
+        float physicalScale = drawingMatrix.MultiplyVector(Vector3.up).magnitude;
+        if (physicalScale <= 0.0001f || screenRect.width <= 0f || screenRect.height <= 0f)
+        {
+            return;
+        }
+
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.font = physicalKeyLabelFont != null ? physicalKeyLabelFont : uiFont;
+        style.fontSize = Mathf.Max(1, Mathf.RoundToInt(ArcadePhysicalKeyLabelSize(keyRect) * physicalScale));
+        style.fontStyle = FontStyle.Normal;
+        style.normal.textColor = enabled
+            ? new Color32(24, 14, 8, 255)
+            : new Color32(122, 111, 90, 255);
+        style.alignment = TextAnchor.MiddleCenter;
+        style.wordWrap = false;
+        style.clipping = TextClipping.Clip;
+        style.padding = new RectOffset(0, 0, 0, 0);
+        style.margin = new RectOffset(0, 0, 0, 0);
+
+        GUIContent content = new GUIContent(label);
+        int minimumSize = Mathf.Max(8, Mathf.RoundToInt(14f * physicalScale));
+        float horizontalPadding = Mathf.Max(4f, 5f * physicalScale) * 2f;
+        while (style.fontSize > minimumSize && style.CalcSize(content).x > screenRect.width - horizontalPadding)
+        {
+            style.fontSize--;
+        }
+
+        Matrix4x4 previousMatrix = GUI.matrix;
+        Color previousColor = GUI.color;
+        GUI.matrix = Matrix4x4.identity;
+        GUI.color = Color.white;
+        GUI.Label(screenRect, content, style);
+        GUI.color = previousColor;
+        GUI.matrix = previousMatrix;
+    }
+
+    private Rect ArcadePhysicalKeyLabelRect(Rect keyRect)
+    {
+        if (keyRect.width < 190f)
+        {
+            return new Rect(keyRect.x + 12f, keyRect.y + 14f, keyRect.width - 24f, keyRect.height - 28f);
+        }
+        if (keyRect.width > 260f)
+        {
+            return new Rect(keyRect.x + 16f, keyRect.y + 14f, keyRect.width - 32f, keyRect.height - 28f);
+        }
+
+        return new Rect(keyRect.x + 12f, keyRect.y + 10f, keyRect.width - 24f, keyRect.height - 20f);
+    }
+
+    private float ArcadePhysicalKeyLabelSize(Rect keyRect)
+    {
+        return keyRect.width > 260f ? 24f : 22f;
+    }
+
+    private float ArcadeMarketBlockedFeedback(string interactionKey)
+    {
+        if (string.IsNullOrEmpty(interactionKey)
+            || !string.Equals(arcadeMarketBlockedFeedbackKey, interactionKey, StringComparison.Ordinal))
+        {
+            return 0f;
+        }
+
+        float elapsed = Time.unscaledTime - arcadeMarketBlockedFeedbackStartedAt;
+        if (elapsed < 0f || elapsed >= ArcadeMarketBlockedFeedbackDuration)
+        {
+            arcadeMarketBlockedFeedbackKey = string.Empty;
+            arcadeMarketBlockedFeedbackStartedAt = -999f;
+            return 0f;
+        }
+
+        return 1f - Mathf.SmoothStep(0f, 1f, elapsed / ArcadeMarketBlockedFeedbackDuration);
+    }
+
+    private bool HasArcadeMarketPurchaseAction(MarketOffer offer)
+    {
+        if (offer == null || offer.Kind == MarketOfferKind.Empty)
+        {
+            return false;
+        }
+
+        if (offer.Kind == MarketOfferKind.Die)
+        {
+            return offer.Die != null;
+        }
+
+        return offer.Kind == MarketOfferKind.CraftingItem && offer.CraftingItem != null;
+    }
+
+    private string MarketSellBlockedReason(bool hasSelectedDie)
+    {
+        if (marketLeaveEffectSequenceActive)
+        {
+            return "交互已锁定";
+        }
+
+        return hasSelectedDie ? "暂不可卖出" : "请先选择骰子";
+    }
+
+    private string MarketBuyBlockedReason(MarketOffer offer, bool marketLeaveLocked)
+    {
+        if (marketLeaveLocked)
+        {
+            return "交互已锁定";
+        }
+        if (offer == null || offer.Kind == MarketOfferKind.Empty)
+        {
+            return "商品已售出";
+        }
+        if (offer.Kind == MarketOfferKind.CraftingItem)
+        {
+            if (!affixFeatureEnabled || offer.CraftingItem == null)
+            {
+                return "暂不可购买";
+            }
+        }
+        else if (offer.Kind != MarketOfferKind.Die || offer.Die == null)
+        {
+            return "暂不可购买";
+        }
+        else if (offer.Die.Type == DieType.Tribute && dice.Count <= 0)
+        {
+            return "请先选择骰子";
+        }
+
+        if (chapterGold < CurrentOfferPrice(offer))
+        {
+            return "金币不足";
+        }
+        if (offer.Kind == MarketOfferKind.Die
+            && offer.Die.Type != DieType.Tribute
+            && dice.Count >= DiceCapacity
+            && !HasDiceOfType(DieType.BloodPactCaptain))
+        {
+            return "骰袋已满";
+        }
+
+        return "暂不可购买";
+    }
+
+    private string MarketRefreshBlockedReason(int refreshCost, bool marketLeaveLocked)
+    {
+        if (marketLeaveLocked)
+        {
+            return "交互已锁定";
+        }
+        if (refreshCost > 0 && chapterGold < refreshCost)
+        {
+            return "金币不足";
+        }
+
+        return "暂不可刷新";
+    }
+
+    private string MarketLeaveBlockedReason(bool marketLeaveLocked)
+    {
+        if (marketLeaveLocked)
+        {
+            return "交互已锁定";
+        }
+
+        return dice.Count <= 0 ? "骰袋为空" : "暂不可离开";
+    }
+
+    private void ShowActionTip(
+        string text,
+        ActionTipSemantic semantic,
+        string replaceKey,
+        float holdDuration = ActionTipHoldDuration)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        string normalizedReplaceKey = string.IsNullOrEmpty(replaceKey) ? "global-action-tip" : replaceKey;
+        if (!string.Equals(actionTipReplaceKey, normalizedReplaceKey, StringComparison.Ordinal))
+        {
+            // Different channels replace the single visible slot instead of stacking.
+            actionTipReplaceKey = normalizedReplaceKey;
+        }
+
+        actionTipText = text;
+        actionTipSemantic = semantic;
+        actionTipHoldDuration = Mathf.Max(0f, holdDuration);
+        actionTipStartedAt = Time.unscaledTime;
+    }
+
+    private void ClearActionTip()
+    {
+        actionTipText = string.Empty;
+        actionTipReplaceKey = string.Empty;
+        actionTipStartedAt = -999f;
+        actionTipHoldDuration = ActionTipHoldDuration;
+    }
+
+    private void DrawActionTip()
+    {
+        if (string.IsNullOrEmpty(actionTipText))
+        {
+            return;
+        }
+
+        float elapsed = Mathf.Max(0f, Time.unscaledTime - actionTipStartedAt);
+        float fadeStart = ActionTipFlyInDuration + actionTipHoldDuration;
+        float totalDuration = fadeStart + ActionTipFadeOutDuration;
+        if (elapsed >= totalDuration)
+        {
+            ClearActionTip();
+            return;
+        }
+
+        float opacity = 1f;
+        float yOffset = 0f;
+        float panelScale = 1f;
+        if (elapsed < ActionTipFlyInDuration)
+        {
+            float t = Mathf.Clamp01(elapsed / ActionTipFlyInDuration);
+            float eased = 1f - Mathf.Pow(1f - t, 3f);
+            opacity = Mathf.SmoothStep(0f, 1f, t);
+            yOffset = Mathf.Lerp(ActionTipFlyDistance, 0f, eased);
+            if (t < 0.72f)
+            {
+                panelScale = Mathf.Lerp(0.94f, 1.03f, Mathf.SmoothStep(0f, 1f, t / 0.72f));
+            }
+            else
+            {
+                panelScale = Mathf.Lerp(1.03f, 1f, Mathf.SmoothStep(0f, 1f, (t - 0.72f) / 0.28f));
+            }
+        }
+        else if (elapsed >= fadeStart)
+        {
+            float t = Mathf.Clamp01((elapsed - fadeStart) / ActionTipFadeOutDuration);
+            float eased = Mathf.SmoothStep(0f, 1f, t);
+            opacity = 1f - eased;
+            yOffset = Mathf.Lerp(0f, -ActionTipFadeDistance, eased);
+        }
+
+        Rect targetRect = new Rect(
+            ActionTipUpperCenterX - ActionTipPanelWidth * 0.5f,
+            ActionTipUpperCenterY - ActionTipPanelHeight * 0.5f + yOffset,
+            ActionTipPanelWidth,
+            ActionTipPanelHeight);
+        Rect panelRect = ScaleRect(targetRect, panelScale);
+        Color accent = actionTipSemantic == ActionTipSemantic.Warning
+            ? new Color(0.94f, 0.36f, 0.16f, opacity * 0.96f)
+            : new Color(0.28f, 0.9f, 0.82f, opacity * 0.96f);
+        MainGameLedFont.TextRole textRole = actionTipSemantic == ActionTipSemantic.Warning
+            ? MainGameLedFont.TextRole.Warning
+            : MainGameLedFont.TextRole.Success;
+
+        DrawRect(
+            new Rect(panelRect.x + 5f, panelRect.y + 6f, panelRect.width, panelRect.height),
+            new Color(0f, 0f, 0f, opacity * 0.46f));
+        DrawRect(panelRect, new Color(0.008f, 0.018f, 0.022f, opacity * 0.94f));
+        DrawBorder(panelRect, new Color(accent.r, accent.g, accent.b, opacity * 0.88f), 2f);
+        DrawRect(
+            new Rect(panelRect.x + 8f, panelRect.y + 7f, 4f, panelRect.height - 14f),
+            new Color(accent.r, accent.g, accent.b, opacity * 0.72f));
+        DrawLedRoleText(
+            new Rect(targetRect.x + 24f, targetRect.y + 7f, targetRect.width - 48f, targetRect.height - 14f),
+            actionTipText,
+            textRole,
+            TextAnchor.MiddleCenter,
+            opacity);
+    }
+
+    private string ArcadeMarketRefreshLabel(int refreshCost)
+    {
+        if (refreshCost > 0)
+        {
+            return "刷新 " + refreshCost + " 金";
+        }
+        if (refreshCost < 0)
+        {
+            return "刷新返 " + (-refreshCost) + " 金";
+        }
+        return "免费刷新";
+    }
+
+    private string ArcadeMarketRefreshCostText(int refreshCost)
+    {
+        if (refreshCost > 0)
+        {
+            return "刷新费用 " + refreshCost + " 金";
+        }
+        if (refreshCost < 0)
+        {
+            return "刷新可返 " + (-refreshCost) + " 金";
+        }
+
+        return "本次刷新免费";
+    }
+
+    private string ArcadeMarketFeedbackText(bool chapterMarket)
+    {
+        if (marketLeaveEffectSequenceActive)
+        {
+            string detail = string.IsNullOrEmpty(marketLeaveEffectFeedback) ? string.Empty : " · " + marketLeaveEffectFeedback;
+            return MarketLeaveEffectProgressText() + detail;
+        }
+        if (!string.IsNullOrEmpty(rewardBanner))
+        {
+            return rewardBanner;
+        }
+        if (dice.Count <= 0)
+        {
+            return "骰袋为空，不能离开市场";
+        }
+
+        string leavePreview = MarketLeavePreviewText();
+        if (!string.IsNullOrEmpty(leavePreview))
+        {
+            return "离场预览 · " + leavePreview;
+        }
+
+        return ArcadeMarketRefreshCostText(CurrentMarketRefreshNetCost(chapterMarket));
+    }
+
+    private void SellSelectedMarketDie()
+    {
+        if (selectedMarketDieIndex < 0 || selectedMarketDieIndex >= dice.Count || marketLeaveEffectSequenceActive)
+        {
+            return;
+        }
+
+        int soldIndex = selectedMarketDieIndex;
+        Die selectedDie = dice[soldIndex];
+        int sell = SellPrice(selectedDie);
+        string soldName = DieDisplayName(selectedDie);
+        bool hadCrewPirate = HasCrewPirateSellSource(selectedDie);
+        dice.RemoveAt(soldIndex);
+        string marketEffectText = ResolvePigMarketActionEffects(MarketActionKind.SellDie, selectedDie, soldIndex);
+        marketEffectText += ResolveCrewPirateSellEffect(hadCrewPirate);
+        string treasureText = AddGoldIncome(sell, "卖出" + soldName, true);
+        marketEffectText += treasureText;
+        if (selectedDie.Type == DieType.TributePig)
+        {
+            marketEffectText += ResolveDevour(selectedDie, "贡猪奉献", false);
+        }
+        AddLog("卖出 " + soldName + "，+" + sell + " 金币。" + marketEffectText);
+        selectedMarketDieIndex = dice.Count > 0 ? Mathf.Clamp(soldIndex, 0, dice.Count - 1) : -1;
+        rewardBanner = "卖出骰子，骰袋 " + dice.Count + " / " + DiceCapacity + "。" + marketEffectText;
+        SaveRun();
+    }
+
+    private void RefreshMarketOffers(bool chapterMarket)
+    {
+        int refreshCost = CurrentMarketRefreshNetCost(chapterMarket);
+        if (marketLeaveEffectSequenceActive || refreshCost > 0 && chapterGold < refreshCost)
+        {
+            return;
+        }
+
+        string refreshGoldText = string.Empty;
+        if (refreshCost > 0)
+        {
+            chapterGold -= refreshCost;
+        }
+        else if (refreshCost < 0)
+        {
+            refreshGoldText = AddGoldIncome(-refreshCost, "刷新返利", true);
+        }
+
+        currentMarketBlackMarketRefreshDiscount = 0;
+        string blackSailText = ResolveBlackSailRefreshDevours();
+        currentMarketPaidRefreshCount++;
+        BuildMarketOffers(true);
+        string refreshDeltaText = refreshCost > 0 ? "-" + refreshCost + " 金币" : refreshCost < 0 ? "+" + (-refreshCost) + " 金币" : "免费";
+        rewardBanner = "刷新货架，" + refreshDeltaText + "。下次刷新 " + CurrentMarketRefreshNetCost(chapterMarket) + " 金。" + blackSailText + refreshGoldText;
+        SaveRun();
+    }
+
+    private void ActivateMarketLeave()
+    {
+        if (dice.Count <= 0 || marketLeaveEffectSequenceActive)
+        {
+            return;
+        }
+
+        if (ShouldStageMarketLeaveEffects())
+        {
+            BeginMarketLeaveEffects();
+        }
+        else
+        {
+            CompleteMarketLeave();
+        }
+    }
+
     private void DrawMarket(bool chapterMarket)
     {
         if (!affixFeatureEnabled && !string.IsNullOrEmpty(activeCraftingItemKey))
@@ -3037,10 +10200,55 @@ public sealed class DiceKingDemo : MonoBehaviour
             activeCraftingItemKey = string.Empty;
         }
 
+        if (UseArcadeMarketVisuals())
+        {
+            DrawArcadeMarket(chapterMarket);
+            return;
+        }
+
         Encounter encounter = CurrentEncounter();
         string title = chapterMarket && encounter != null ? "章节市场" : "关间市场";
-        DrawHudBar(title, "金币 " + chapterGold, "骰袋 " + dice.Count + " / " + DiceCapacity + "   刷新 " + RefreshCost(chapterMarket) + " 金");
+        string feedHud = "骰袋 " + dice.Count + " / " + DiceCapacity + "   刷新 " + CurrentMarketRefreshNetCost(chapterMarket) + " 金";
+        if (UsesV02CoreFamiliesMarketPool())
+        {
+            feedHud += "   四族 + 中立 + 双阵营正式池";
+        }
+        if (v02PigFamilyMarketOnly)
+        {
+            feedHud += "   喂养质量 " + feedQuality + "   猪猪测试池";
+        }
+        if (v02TurtleAttachmentMarketOnly)
+        {
+            feedHud += "   龟龟化壳测试池";
+        }
+        if (v02PirateFamilyMarketOnly)
+        {
+            feedHud += "   海盗测试池";
+        }
+        if (v02NeutralFamilyMarketOnly)
+        {
+            feedHud += "   中立测试池";
+        }
+        if (v02DualFamilyMarketOnly)
+        {
+            feedHud += "   双阵营测试池";
+        }
+        if (currentMarketBlackMarketRefreshDiscount > 0)
+        {
+            feedHud += "   黑市折扣 -" + currentMarketBlackMarketRefreshDiscount;
+        }
+        if (v02DevilFamilyMarketOnly || TavernMinimumValue() > 1)
+        {
+            feedHud += "   市场最低点 " + TavernMinimumValue() + " 本轮+" + Mathf.Max(0, tavernBaseMinimumBonus) + "/本市场+" + Mathf.Max(0, marketTemporaryMinimumBonus);
+            if (v02DevilFamilyMarketOnly)
+            {
+                feedHud += "   恶魔测试池";
+            }
+        }
 
+        DrawHudBar(title, "金币 " + chapterGold, feedHud);
+
+        bool marketLeaveLocked = marketLeaveEffectSequenceActive;
         if (selectedMarketDieIndex >= dice.Count)
         {
             selectedMarketDieIndex = dice.Count - 1;
@@ -3052,15 +10260,48 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         DrawUiPanel(new Rect(36f, 128f, 430f, 556f));
         DrawIconLabel(new Rect(64f, 158f, 260f, 30f), uiIconBagTexture, string.IsNullOrEmpty(activeCraftingItemKey) ? "当前骰袋" : "选择改造目标", headerStyle);
-        GUI.Label(new Rect(320f, 162f, 110f, 24f), dice.Count + " / " + DiceCapacity, smallStyle);
-        for (int i = 0; i < dice.Count; i++)
+        DrawStandardLabel(new Rect(320f, 162f, 110f, 24f), dice.Count + " / " + DiceCapacity, smallStyle);
+        List<int> marketVisualIndices = DiceOrderVisualIndices(DiceOrderDragSurface.MarketBag);
+        Rect[] marketSlotRects = new Rect[marketVisualIndices.Count];
+        for (int i = 0; i < marketVisualIndices.Count; i++)
         {
-            Rect rect = new Rect(64f, 204f + i * 58f, 350f, 52f);
-            if (DrawCompactDie(rect, dice[i], i == selectedMarketDieIndex, "market-bag-" + dice[i].Id))
+            int dieIndex = marketVisualIndices[i];
+            if (dieIndex < 0 || dieIndex >= dice.Count)
             {
-                selectedMarketDieIndex = i;
+                continue;
+            }
+
+            Die die = dice[dieIndex];
+            Rect rect = MarketBagSlotRect(i);
+            marketSlotRects[i] = rect;
+            bool draggedGhost = IsDiceOrderDraggedDie(DiceOrderDragSurface.MarketBag, die);
+            if (draggedGhost)
+            {
+                DrawDiceOrderInsertMarker(rect, false);
+                DrawDiceOrderGhost(rect);
+            }
+            else
+            {
+                DrawCompactDieVisual(rect, die, dieIndex == selectedMarketDieIndex, "market-bag-" + die.Id, true);
+            }
+
+            if (marketLeaveEffectSequenceActive && die != null && die.Id == marketLeaveEffectVisualHostId)
+            {
+                DrawMarketLeaveAttachmentTarget(rect);
+            }
+
+            if (!marketLeaveLocked)
+            {
+                HandleDiceOrderDragMouseDown(DiceOrderDragSurface.MarketBag, dieIndex, rect);
             }
         }
+
+        if (!marketLeaveLocked)
+        {
+            UpdateDiceOrderDragFromSlots(DiceOrderDragSurface.MarketBag, marketSlotRects, false);
+        }
+        DrawDiceOrderFloatingDie(DiceOrderDragSurface.MarketBag);
+        DrawMarketLeaveAttachmentFlyVisual();
 
         Rect sellPanel = new Rect(64f, 562f, 350f, 86f);
         DrawUiSmallPanel(sellPanel);
@@ -3071,38 +10312,38 @@ public sealed class DiceKingDemo : MonoBehaviour
         else if (selectedMarketDieIndex >= 0 && selectedMarketDieIndex < dice.Count)
         {
             Die selectedDie = dice[selectedMarketDieIndex];
-            int sell = SellPrice(selectedDie.Type);
-            GUI.Label(new Rect(sellPanel.x + 20f, sellPanel.y + 10f, 168f, 22f), DieDisplayName(selectedDie), smallStyle);
-            GUI.Label(new Rect(sellPanel.x + 20f, sellPanel.y + 34f, 168f, 20f), TypeName(selectedDie.Type) + " | " + FaceText(selectedDie.Faces), tinyStyle);
-            GUI.Label(new Rect(sellPanel.x + 20f, sellPanel.y + 56f, 168f, 18f), "按类型回收", tinyStyle);
+            int sell = SellPrice(selectedDie);
+            DrawStandardLabel(new Rect(sellPanel.x + 20f, sellPanel.y + 10f, 168f, 22f), DieDisplayName(selectedDie), smallStyle);
+            DrawStandardLabel(new Rect(sellPanel.x + 20f, sellPanel.y + 34f, 168f, 20f), TypeName(selectedDie.Type) + " | " + FaceText(selectedDie.Faces), tinyStyle);
+            DrawStandardLabel(new Rect(sellPanel.x + 20f, sellPanel.y + 56f, 168f, 18f), FeedSellDetailText(selectedDie), tinyStyle);
+            GUI.enabled = !marketLeaveLocked;
             if (DrawUiButton(new Rect(sellPanel.x + 204f, sellPanel.y + 23f, 122f, 42f), "卖 " + sell + " 金", UiButtonKind.Danger))
             {
-                chapterGold += sell;
-                AddLog("卖出 " + DieDisplayName(selectedDie) + "，+" + sell + " 金币。");
-                dice.RemoveAt(selectedMarketDieIndex);
-                selectedMarketDieIndex = dice.Count > 0 ? Mathf.Clamp(selectedMarketDieIndex, 0, dice.Count - 1) : -1;
-                rewardBanner = "卖出骰子，骰袋 " + dice.Count + " / " + DiceCapacity + "。";
-                SaveRun();
+                SellSelectedMarketDie();
             }
+            GUI.enabled = true;
         }
         else
         {
             string sellHint = dice.Count >= DiceCapacity ? "袋满：卖一颗再买。" : "选择骰子查看卖价。";
-            GUI.Label(new Rect(sellPanel.x + 20f, sellPanel.y + 26f, sellPanel.width - 40f, 34f), sellHint, smallStyle);
+            DrawStandardLabel(new Rect(sellPanel.x + 20f, sellPanel.y + 26f, sellPanel.width - 40f, 34f), sellHint, smallStyle);
         }
 
         DrawUiPanel(new Rect(496f, 128f, 748f, 556f));
-        GUI.Label(new Rect(528f, 158f, 300f, 30f), "本次货架", headerStyle);
+        DrawStandardLabel(new Rect(528f, 158f, 300f, 30f), "本次货架", headerStyle);
         if (dice.Count >= DiceCapacity)
         {
-            GUI.Label(new Rect(832f, 162f, 360f, 24f), affixFeatureEnabled ? "骰袋已满：仍可买改造道具" : "骰袋已满：卖一颗再买", smallStyle);
+            string fullBagHint = HasDiceOfType(DieType.BloodPactCaptain)
+                ? "骰袋已满：血契可买骰吞噬"
+                : v02DevilFamilyMarketOnly ? "骰袋已满：贡品仍可奉献" : affixFeatureEnabled ? "骰袋已满：仍可买改造道具" : "骰袋已满：卖一颗再买";
+            DrawStandardLabel(new Rect(832f, 162f, 360f, 24f), fullBagHint, smallStyle);
         }
 
         for (int i = 0; i < marketOffers.Count; i++)
         {
             Rect rect = new Rect(528f + i * 226f, 214f, 204f, 300f);
             DrawMarketOffer(rect, marketOffers[i], "market-offer-" + i);
-            bool canBuy = CanBuyMarketOffer(marketOffers[i]);
+            bool canBuy = !marketLeaveLocked && CanBuyMarketOffer(marketOffers[i]);
             GUI.enabled = canBuy;
             if (DrawUiButton(new Rect(rect.x + 26f, rect.y + 242f, 152f, 44f), MarketBuyButtonText(marketOffers[i]), UiButtonKind.Primary))
             {
@@ -3118,64 +10359,376 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         MarketRuleConfig marketRule = CurrentMarketRule();
-        int refreshCost = RefreshCost(chapterMarket);
-        GUI.enabled = chapterGold >= refreshCost;
-        if (DrawUiButton(new Rect(528f, 594f, 172f, 46f), refreshCost > 0 ? "刷新 " + refreshCost + " 金" : "刷新货架", UiButtonKind.Secondary))
+        int refreshCost = CurrentMarketRefreshNetCost(chapterMarket);
+        GUI.enabled = !marketLeaveLocked && (refreshCost <= 0 || chapterGold >= refreshCost);
+        string refreshButtonText = refreshCost > 0 ? "刷新 " + refreshCost + " 金" : refreshCost < 0 ? "刷新返 " + (-refreshCost) + " 金" : "免费刷新";
+        if (DrawUiButton(new Rect(528f, 594f, 172f, 46f), refreshButtonText, UiButtonKind.Secondary))
         {
-            chapterGold -= refreshCost;
-            BuildMarketOffers(true);
-            rewardBanner = "刷新货架，-" + refreshCost + " 金币。";
-            SaveRun();
+            RefreshMarketOffers(chapterMarket);
         }
         GUI.enabled = true;
-        string refreshHint = marketTestRandomRefresh
+        string refreshHint = UsesV02CoreFamiliesMarketPool()
+            ? "正式池：四族核心 + 中立 + 双阵营；贡品仅由深渊生成"
+            : v02TurtleAttachmentMarketOnly
+            ? "龟龟测试：只刷化壳龟和首领龟"
+            : v02DualFamilyMarketOnly
+            ? "双阵营测试：九颗融合骰"
+            : v02PigFamilyMarketOnly
+            ? "猪猪测试：刷新递增 +" + marketRefreshCostStep
+            : v02DevilFamilyMarketOnly
+            ? (HasDiceOfType(DieType.AbyssSummon) ? "恶魔测试：深渊固定 1 贡品，购买留空" : "恶魔测试：五骰池，购买留空")
+            : v02PirateFamilyMarketOnly
+            ? "海盗测试：刷新海盗每颗 -1，可返利"
+            : marketTestRandomRefresh
             ? "测试随机：全池骰子"
             : (marketRule.HighTierPityRefreshes > 0 ? "高阶保底 " + marketRefreshesWithoutHighTier + " / " + marketRule.HighTierPityRefreshes : "刷新后替换全部货架");
         DrawIconLabel(new Rect(714f, 600f, 240f, 34f), uiIconRefreshTexture, refreshHint, smallStyle);
 
-        GUI.enabled = dice.Count > 0;
-        if (DrawUiButton(new Rect(1010f, 594f, 184f, 50f), HasNextEncounter() ? "离开市场" : "完成本轮", UiButtonKind.Primary))
+        GUI.enabled = dice.Count > 0 && !marketLeaveLocked;
+        if (DrawUiButton(new Rect(1010f, 594f, 184f, 50f), MarketLeaveButtonText(), UiButtonKind.Primary))
         {
-            if (HasNextEncounter())
-            {
-                stageIndex++;
-                rewardBanner = string.Empty;
-                activeCraftingItemKey = string.Empty;
-                selectedMarketDieIndex = -1;
-                SaveRun();
-                StartEncounter();
-                mode = GameMode.Run;
-            }
-            else
-            {
-                activeCraftingItemKey = string.Empty;
-                ClearSave();
-                mode = GameMode.Win;
-            }
+            ActivateMarketLeave();
         }
         GUI.enabled = true;
 
         if (dice.Count <= 0)
         {
-            GUI.Label(new Rect(966f, 648f, 260f, 26f), "骰袋为空，不能离开市场。", smallStyle);
+            DrawStandardLabel(new Rect(966f, 648f, 260f, 26f), "骰袋为空，不能离开市场。", smallStyle);
+        }
+        else
+        {
+            string leavePreview = marketLeaveEffectSequenceActive ? MarketLeaveEffectProgressText() : MarketLeavePreviewText();
+            if (!string.IsNullOrEmpty(leavePreview))
+            {
+                DrawStandardLabel(new Rect(966f, 648f, 260f, 26f), leavePreview, smallStyle);
+            }
         }
 
         if (!string.IsNullOrEmpty(rewardBanner))
         {
-            GUI.Label(new Rect(528f, 654f, 420f, 24f), rewardBanner, smallStyle);
+            DrawStandardLabel(new Rect(528f, 654f, 420f, 24f), rewardBanner, smallStyle);
         }
+    }
+
+    private void DrawMarketLeaveAttachmentTarget(Rect rect)
+    {
+        float pulse = 0.72f + Mathf.Sin(GameplayPlaybackTime() * 16f) * 0.18f;
+        Color edge = new Color(0.18f, 0.78f, 0.58f, Mathf.Clamp01(pulse));
+        DrawBorder(new Rect(rect.x - 5f, rect.y - 5f, rect.width + 10f, rect.height + 10f), edge, 3f);
+    }
+
+    private void DrawMarketLeaveAttachmentFlyVisual()
+    {
+        if (!marketLeaveEffectSequenceActive || marketLeaveEffectVisualHostId < 0 || marketLeaveEffectVisualSourceIndex < 0 || marketLeaveEffectVisualTargetIndex < 0)
+        {
+            return;
+        }
+
+        float progress = MarketLeaveEffectDuration > 0f ? 1f - Mathf.Clamp01(marketLeaveEffectTimer / MarketLeaveEffectDuration) : 1f;
+        progress = Mathf.SmoothStep(0f, 1f, progress);
+        Rect sourceRect = MarketBagSlotRect(Mathf.Clamp(marketLeaveEffectVisualSourceIndex, 0, DiceCapacity - 1));
+        Rect targetRect = MarketBagSlotRect(Mathf.Clamp(marketLeaveEffectVisualTargetIndex, 0, DiceCapacity - 1));
+        Vector2 source = new Vector2(sourceRect.x + 30f, sourceRect.y + sourceRect.height * 0.5f);
+        Vector2 target = new Vector2(targetRect.x + 30f, targetRect.y + targetRect.height * 0.5f);
+        Vector2 pos = Vector2.Lerp(source, target, progress);
+        float size = Mathf.Lerp(42f, 24f, progress);
+        float alpha = Mathf.Lerp(1f, 0.32f, progress);
+        Rect token = new Rect(pos.x - size * 0.5f, pos.y - size * 0.5f, size, size);
+
+        DrawMarketLeaveAttachmentTrail(source, target, progress);
+        DrawRect(new Rect(token.x + 4f, token.y + token.height - 4f, token.width - 8f, 5f), new Color(0f, 0f, 0f, 0.16f * alpha));
+        DrawTurtleAttachmentFlyToken(token, marketLeaveEffectVisualType, alpha);
+
+        if (progress > 0.68f)
+        {
+            float burst = Mathf.InverseLerp(0.68f, 1f, progress);
+            Rect burstRect = new Rect(target.x - 24f - burst * 10f, target.y - 24f - burst * 10f, 48f + burst * 20f, 48f + burst * 20f);
+            DrawBorder(burstRect, new Color(0.18f, 0.78f, 0.58f, 0.5f * (1f - burst)), 2f);
+        }
+    }
+
+    private void DrawMarketLeaveAttachmentTrail(Vector2 source, Vector2 target, float progress)
+    {
+        float y = Mathf.Lerp(source.y, target.y, Mathf.Clamp01(progress));
+        float top = Mathf.Min(source.y, y);
+        float height = Mathf.Max(4f, Mathf.Abs(y - source.y));
+        DrawRect(new Rect(source.x - 2f, top, 4f, height), new Color(0.18f, 0.78f, 0.58f, 0.34f));
+    }
+
+    private void DrawTurtleAttachmentFlyToken(Rect rect, DieType type, float alpha)
+    {
+        Texture2D icon = DieTypeIcon(type);
+        Color old = GUI.color;
+        GUI.color = new Color(1f, 1f, 1f, alpha);
+        if (icon != null)
+        {
+            GUI.DrawTexture(rect, icon, ScaleMode.ScaleToFit, true);
+        }
+        else
+        {
+            Color typeColor = TypeColor(type);
+            GUI.color = new Color(typeColor.r, typeColor.g, typeColor.b, alpha);
+            GUI.DrawTexture(rect, whiteTexture);
+        }
+
+        GUI.color = old;
+    }
+
+    private Rect MarketBagSlotRect(int visualIndex)
+    {
+        if (UseArcadeMarketVisuals())
+        {
+            return new Rect(86f, 95f + visualIndex * 61f, 126f, 52f);
+        }
+
+        return new Rect(64f, 204f + visualIndex * 58f, 350f, 52f);
+    }
+
+    private string MarketLeaveButtonText()
+    {
+        if (marketLeaveEffectSequenceActive)
+        {
+            return "离场结算中";
+        }
+
+        return HasNextEncounter() ? "离开市场" : "完成本轮";
+    }
+
+    private bool ShouldStageMarketLeaveEffects()
+    {
+        return CountMarketLeaveEffectDice() > 0;
+    }
+
+    private int CountMarketLeaveEffectDice()
+    {
+        int count = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            if (HasMarketLeaveEffect(dice[i]))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private bool HasMarketLeaveEffect(Die die)
+    {
+        if (die == null || die.Temporary)
+        {
+            return false;
+        }
+
+        if (die.Type == DieType.DemonBat)
+        {
+            return true;
+        }
+
+        if (die.Type == DieType.RobberyPirate)
+        {
+            return true;
+        }
+
+        if (die.Type == DieType.ClearancePig)
+        {
+            return true;
+        }
+
+        return IsF018AbsorbableTurtleType(die.Type) && NextPositionTurtleAttachmentHost(DiceIndexById(die.Id)) != null;
+    }
+
+    private string ResolveMarketLeaveEffectForDie(Die die, int dieIndex)
+    {
+        if (!HasMarketLeaveEffect(die))
+        {
+            return string.Empty;
+        }
+
+        switch (die.Type)
+        {
+            case DieType.DemonBat:
+                return "第 " + (dieIndex + 1) + " 位 " + ResolveDemonBatLeaveDevour(die);
+            case DieType.RobberyPirate:
+                return "第 " + (dieIndex + 1) + " 位 " + ResolveRobberyPirateLeaveSteal(die);
+            case DieType.ClearancePig:
+                return "第 " + (dieIndex + 1) + " 位 " + ResolveClearancePigLeaveFeed(die);
+        }
+
+        if (IsF018AbsorbableTurtleType(die.Type))
+        {
+            return "第 " + (dieIndex + 1) + " 位 " + ResolveF018TurtleAbsorption(die);
+        }
+
+        return string.Empty;
+    }
+
+    private void BeginMarketLeaveEffects()
+    {
+        CancelDiceOrderDrag();
+        activeCraftingItemKey = string.Empty;
+        selectedMarketDieIndex = -1;
+        marketLeaveEffectSequenceActive = true;
+        marketLeaveEffectIndex = 0;
+        marketLeaveEffectResolvedCount = 0;
+        marketLeaveEffectTotalCount = CountMarketLeaveEffectDice();
+        marketLeaveEffectTimer = 0f;
+        marketLeaveEffectFeedback = string.Empty;
+        ClearMarketLeaveEffectVisual();
+        rewardBanner = "离开市场：按骰袋顺序触发离场效果。";
+        AddLog(rewardBanner);
+
+        if (ProcessNextMarketLeaveEffect())
+        {
+            marketLeaveEffectTimer = MarketLeaveEffectDuration;
+        }
+        else
+        {
+            CompleteMarketLeave();
+        }
+    }
+
+    private void UpdateMarketLeaveEffects()
+    {
+        if (!marketLeaveEffectSequenceActive)
+        {
+            return;
+        }
+
+        marketLeaveEffectTimer -= GameplayPlaybackDeltaTime();
+        if (marketLeaveEffectTimer > 0f)
+        {
+            return;
+        }
+
+        if (ProcessNextMarketLeaveEffect())
+        {
+            marketLeaveEffectTimer = MarketLeaveEffectDuration;
+            return;
+        }
+
+        CompleteMarketLeave();
+    }
+
+    private bool ProcessNextMarketLeaveEffect()
+    {
+        while (marketLeaveEffectIndex < dice.Count)
+        {
+            int dieIndex = marketLeaveEffectIndex;
+            marketLeaveEffectIndex++;
+            Die die = dice[dieIndex];
+            int dieId = die != null ? die.Id : -1;
+            int diceCountBefore = dice.Count;
+            ClearMarketLeaveEffectVisual();
+            string effectText = ResolveMarketLeaveEffectForDie(die, dieIndex);
+            if (string.IsNullOrEmpty(effectText))
+            {
+                continue;
+            }
+
+            marketLeaveEffectResolvedCount++;
+            if (dieId >= 0 && DiceIndexById(dieId) < 0 && dice.Count < diceCountBefore)
+            {
+                marketLeaveEffectIndex = Mathf.Clamp(dieIndex, 0, dice.Count);
+            }
+
+            marketLeaveEffectTotalCount = Mathf.Max(marketLeaveEffectTotalCount, marketLeaveEffectResolvedCount + CountPendingMarketLeaveEffectDice(marketLeaveEffectIndex));
+
+            int visualHostIndex = DiceIndexById(marketLeaveEffectVisualHostId);
+            selectedMarketDieIndex = visualHostIndex >= 0
+                ? visualHostIndex
+                : Mathf.Clamp(Mathf.Min(dieIndex, dice.Count - 1), -1, dice.Count - 1);
+            bool hasAttachmentVisual = marketLeaveEffectVisualHostId >= 0;
+            marketLeaveEffectFeedback = hasAttachmentVisual
+                ? "离场化壳已结算"
+                : AppendMarketLeaveEffectFeedback(marketLeaveEffectFeedback, effectText);
+            rewardBanner = hasAttachmentVisual
+                ? MarketLeaveEffectProgressText()
+                : "离场 " + marketLeaveEffectResolvedCount + " / " + Mathf.Max(1, marketLeaveEffectTotalCount) + "：" + effectText;
+            AddLog("离场 " + marketLeaveEffectResolvedCount + " / " + Mathf.Max(1, marketLeaveEffectTotalCount) + "：" + effectText);
+            return true;
+        }
+
+        return false;
+    }
+
+    private int CountPendingMarketLeaveEffectDice(int startIndex)
+    {
+        int count = 0;
+        for (int i = Mathf.Max(0, startIndex); i < dice.Count; i++)
+        {
+            if (HasMarketLeaveEffect(dice[i]))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private string MarketLeaveEffectProgressText()
+    {
+        if (!marketLeaveEffectSequenceActive)
+        {
+            return string.Empty;
+        }
+
+        return "离场效果 " + marketLeaveEffectResolvedCount + " / " + Mathf.Max(1, marketLeaveEffectTotalCount);
+    }
+
+    private string AppendMarketLeaveEffectFeedback(string existing, string effectText)
+    {
+        if (string.IsNullOrEmpty(existing))
+        {
+            return effectText;
+        }
+
+        return existing + " " + effectText;
+    }
+
+    private void CompleteMarketLeave()
+    {
+        string leaveFeedback = marketLeaveEffectFeedback;
+        marketLeaveEffectSequenceActive = false;
+        marketLeaveEffectIndex = 0;
+        marketLeaveEffectTotalCount = 0;
+        marketLeaveEffectResolvedCount = 0;
+        marketLeaveEffectTimer = 0f;
+        marketLeaveEffectFeedback = string.Empty;
+        ClearMarketLeaveEffectVisual();
+        marketTemporaryMinimumBonus = 0;
+        activeCraftingItemKey = string.Empty;
+        selectedMarketDieIndex = -1;
+
+        if (HasNextEncounter())
+        {
+            stageIndex++;
+            rewardBanner = string.Empty;
+            SaveRun();
+            StartEncounter();
+            if (!string.IsNullOrEmpty(leaveFeedback))
+            {
+                rewardBanner = leaveFeedback;
+            }
+            mode = GameMode.Run;
+            return;
+        }
+
+        ClearSave();
+        rewardBanner = leaveFeedback;
+        mode = GameMode.Win;
     }
 
     private void DrawEnd(bool won)
     {
         DrawHudBar("骰子王", won ? "本轮通关" : "本轮失败", string.Empty);
         DrawUiPanel(new Rect(216f, 136f, 848f, 430f));
-        GUI.Label(new Rect(264f, 184f, 680f, 52f), won ? "本轮通关" : "本轮失败", headerStyle);
+        DrawStandardLabel(new Rect(264f, 184f, 680f, 52f), won ? "本轮通关" : "本轮失败", headerStyle);
         string result = won
             ? "本轮已经完成。目标分来自 Resources/Data/chapter_score_table.csv，市场和骰子类型已按当前设计运行。"
-            : "任意小关失败会直接结束本轮，并清除本轮存档；需要从主菜单重新开始。";
-        GUI.Label(new Rect(266f, 252f, 720f, 90f), result, bodyStyle);
-        GUI.Label(new Rect(266f, 360f, 720f, 36f), "最终金币 " + chapterGold + " | 骰子数量 " + dice.Count, headerStyle);
+            : "生命归零后本轮结束并清除本轮存档；需要从主菜单重新开始。";
+        DrawStandardLabel(new Rect(266f, 252f, 720f, 90f), result, bodyStyle);
+        DrawStandardLabel(new Rect(266f, 360f, 720f, 36f), "最终金币 " + chapterGold + " | 骰子数量 " + dice.Count, headerStyle);
 
         if (DrawUiButton(new Rect(266f, 438f, 206f, 52f), "回主菜单", UiButtonKind.Primary))
         {
@@ -3189,7 +10742,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         DrawRect(new Rect(0f, 0f, VirtualWidth, VirtualHeight), new Color(0f, 0f, 0f, 0.42f));
         Rect panel = new Rect(190f, 78f, 900f, 572f);
         DrawUiPanel(panel);
-        GUI.Label(new Rect(panel.x + 36f, panel.y + 26f, 360f, 46f), "牌型表", headerStyle);
+        DrawStandardLabel(new Rect(panel.x + 36f, panel.y + 26f, 360f, 46f), "牌型表", headerStyle);
         if (DrawUiButton(new Rect(panel.x + panel.width - 150f, panel.y + 30f, 112f, 42f), "关闭", UiButtonKind.Secondary))
         {
             showHandReference = false;
@@ -3218,16 +10771,16 @@ public sealed class DiceKingDemo : MonoBehaviour
             DrawHandReferenceRow(new Rect(x, y, 374f, 70f), names[i], multipliers[i], examples[i]);
         }
 
-        GUI.Label(new Rect(panel.x + 40f, panel.y + panel.height - 76f, panel.width - 80f, 54f), "只认上表牌型。主牌型按优先级只取一个；全奇和全偶是副牌型，最终倍率取更高的那个。", smallStyle);
+        DrawStandardLabel(new Rect(panel.x + 40f, panel.y + panel.height - 76f, panel.width - 80f, 54f), "只认上表牌型。主牌型按优先级只取一个；全奇和全偶是副牌型，最终倍率取更高的那个。", smallStyle);
     }
 
     private void DrawHandReferenceRow(Rect rect, string handName, string multiplier, string example)
     {
         DrawUiSmallPanel(rect);
         DrawRect(new Rect(rect.x + 6f, rect.y + 8f, 4f, rect.height - 16f), new Color(0.78f, 0.58f, 0.28f, 0.72f));
-        GUI.Label(new Rect(rect.x + 16f, rect.y + 8f, 126f, 34f), handName, cardTitleStyle);
-        GUI.Label(new Rect(rect.x + 150f, rect.y + 8f, 70f, 34f), multiplier, headerStyle);
-        GUI.Label(new Rect(rect.x + 16f, rect.y + 42f, rect.width - 32f, 24f), "例：" + example, smallStyle);
+        DrawStandardLabel(new Rect(rect.x + 16f, rect.y + 8f, 126f, 34f), handName, cardTitleStyle);
+        DrawStandardLabel(new Rect(rect.x + 150f, rect.y + 8f, 70f, 34f), multiplier, headerStyle);
+        DrawStandardLabel(new Rect(rect.x + 16f, rect.y + 42f, rect.width - 32f, 24f), "例：" + example, smallStyle);
     }
 
     private void DrawDiceBag()
@@ -3241,11 +10794,21 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
     }
 
+    private bool UseArcadeRunVisuals()
+    {
+        return mode == GameMode.Run && mainGameCommonBaseTexture != null;
+    }
+
+    private bool UseArcadeRunDieVisuals()
+    {
+        return UseArcadeRunVisuals() && mainGameNeutralShellTexture != null;
+    }
+
     private void DrawTableDice(Rect area)
     {
         if (dice.Count == 0)
         {
-            GUI.Label(new Rect(area.x + 20f, area.y + 92f, area.width - 40f, 36f), "骰袋为空。", centerStyle);
+            DrawStandardLabel(new Rect(area.x + 20f, area.y + 92f, area.width - 40f, 36f), "骰袋为空。", centerStyle);
             return;
         }
 
@@ -3256,9 +10819,36 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
-        List<TableDieView> displayDice = BuildTableDieViews();
+        List<TableDieView> displayDice = rollPhase == RollPhase.Ready
+            && DiceOrderDragActive()
+            && diceOrderDragSurface == DiceOrderDragSurface.RunTable
+            && diceOrderDragMoving
+            ? BuildDiceOrderDragTableViews()
+            : BuildTableDieViews();
         int displayCount = displayDice.Count;
-        int rows = displayCount > 8 ? 2 : 1;
+        bool arcadeLayout = UseArcadeRunVisuals();
+        int temporaryViewCount = 0;
+        if (arcadeLayout)
+        {
+            for (int i = 0; i < displayDice.Count; i++)
+            {
+                TableDieView candidate = displayDice[i];
+                if (candidate == null || candidate.Die == null || candidate.Die.Temporary || candidate.Summary)
+                {
+                    temporaryViewCount++;
+                }
+            }
+
+            if (temporaryViewCount > 0)
+            {
+                float trayWidth = Mathf.Min(area.width - 80f, temporaryViewCount * 56f + Mathf.Max(0, temporaryViewCount - 1) * 8f + 24f);
+                Rect temporaryTray = new Rect(area.x + (area.width - trayWidth) * 0.5f, area.y + 143f, trayWidth, 64f);
+                DrawRect(temporaryTray, new Color(0.008f, 0.024f, 0.026f, 0.90f));
+                DrawBorder(temporaryTray, new Color(0.12f, 0.64f, 0.60f, 0.48f), 1f);
+            }
+        }
+
+        int rows = !arcadeLayout && displayCount > 8 ? 2 : 1;
         int columns = rows == 1 ? displayCount : Mathf.CeilToInt(displayCount / 2f);
         float gap = rows == 1 ? 14f : 8f;
         float maxCardWidth = rows == 1 ? 86f : 54f;
@@ -3267,20 +10857,56 @@ public sealed class DiceKingDemo : MonoBehaviour
         float rowGap = rows == 1 ? 0f : 48f;
         float rowHeight = cardWidth + rowGap;
         float firstY = rows == 1 ? area.y + 18f : area.y + 6f;
+        Rect[] slotRects = new Rect[displayCount];
+        int physicalViewIndex = 0;
+        int temporaryViewIndex = 0;
 
         for (int i = 0; i < displayCount; i++)
         {
             TableDieView view = displayDice[i];
             Die die = view.Die;
-            int row = rows == 1 ? 0 : i / columns;
-            int column = rows == 1 ? i : i % columns;
-            int rowCount = rows == 1 || row == 0 ? Mathf.Min(columns, displayCount) : displayCount - columns;
-            float rowStartX = area.x + (area.width - rowCount * cardWidth - Mathf.Max(0, rowCount - 1) * gap) * 0.5f;
-            float scale = ScoreScaleForView(view);
-            float scaledWidth = cardWidth * scale;
-            Rect dieRect = new Rect(rowStartX + column * (cardWidth + gap) - (scaledWidth - cardWidth) * 0.5f, firstY + row * rowHeight - (scaledWidth - cardWidth) * 0.5f, scaledWidth, scaledWidth);
+            Rect dieRect;
+            if (arcadeLayout)
+            {
+                bool temporaryView = die == null || die.Temporary || view.Summary;
+                float lift = IsScoreViewActive(view) && !settlementImpactPresentationActive
+                    ? Mathf.Sin(SettlementEventProgress() * Mathf.PI) * 7f
+                    : 0f;
+                if (temporaryView)
+                {
+                    const float temporarySize = 56f;
+                    const float temporaryGap = 8f;
+                    float temporaryRowWidth = temporaryViewCount * temporarySize + Mathf.Max(0, temporaryViewCount - 1) * temporaryGap;
+                    float temporaryStartX = area.x + (area.width - temporaryRowWidth) * 0.5f;
+                    dieRect = new Rect(temporaryStartX + temporaryViewIndex * (temporarySize + temporaryGap), area.y + 147f - lift, temporarySize, temporarySize);
+                    temporaryViewIndex++;
+                }
+                else
+                {
+                    float physicalStartX = area.x + (area.width - ArcadeRunPhysicalSlotCount * ArcadeRunDieSlotSize - (ArcadeRunPhysicalSlotCount - 1) * ArcadeRunDieSlotGap) * 0.5f;
+                    dieRect = new Rect(physicalStartX + physicalViewIndex * (ArcadeRunDieSlotSize + ArcadeRunDieSlotGap), area.y + ArcadeRunDieSlotTopInset - lift, ArcadeRunDieSlotSize, ArcadeRunDieSlotSize);
+                    physicalViewIndex++;
+                }
+            }
+            else
+            {
+                int row = rows == 1 ? 0 : i / columns;
+                int column = rows == 1 ? i : i % columns;
+                int rowCount = rows == 1 || row == 0 ? Mathf.Min(columns, displayCount) : displayCount - columns;
+                float rowStartX = area.x + (area.width - rowCount * cardWidth - Mathf.Max(0, rowCount - 1) * gap) * 0.5f;
+                float scale = ScoreScaleForView(view);
+                float scaledWidth = cardWidth * scale;
+                dieRect = new Rect(rowStartX + column * (cardWidth + gap) - (scaledWidth - cardWidth) * 0.5f, firstY + row * rowHeight - (scaledWidth - cardWidth) * 0.5f, scaledWidth, scaledWidth);
+            }
             int value = view.Value;
-            if (useProcessVisuals)
+            slotRects[i] = dieRect;
+            bool draggedGhost = IsDiceOrderDraggedDie(DiceOrderDragSurface.RunTable, die);
+            if (draggedGhost)
+            {
+                DrawDiceOrderInsertMarker(dieRect, true);
+                DrawDiceOrderGhost(dieRect);
+            }
+            else if (useProcessVisuals)
             {
                 DrawDiceProcessToken(area, dieRect, view, i, displayCount);
             }
@@ -3289,25 +10915,37 @@ public sealed class DiceKingDemo : MonoBehaviour
                 DrawDieToken(dieRect, die, value);
             }
 
-            if (IsScoreViewActive(view))
+            if (!draggedGhost && IsScoreViewActive(view) && !settlementImpactPresentationActive)
             {
-                Rect highlight = new Rect(dieRect.x - 8f, dieRect.y - 8f, dieRect.width + 16f, dieRect.height + 16f);
-                DrawBorder(highlight, new Color(1f, 0.79f, 0.22f, 0.98f), 4f);
-                DrawBorder(new Rect(highlight.x - 4f, highlight.y - 4f, highlight.width + 8f, highlight.height + 8f), new Color(0.45f, 0.28f, 0.08f, 0.65f), 2f);
+                Rect highlight = UseArcadeRunVisuals()
+                    ? new Rect(dieRect.x + 1f, dieRect.y + 1f, dieRect.width - 2f, dieRect.height - 2f)
+                    : new Rect(dieRect.x - 8f, dieRect.y - 8f, dieRect.width + 16f, dieRect.height + 16f);
+                if (UseArcadeRunVisuals())
+                {
+                    float pulse = 0.72f + Mathf.Sin(SettlementEventProgress() * Mathf.PI) * 0.22f;
+                    Color amber = new Color(1f, 0.62f, 0.16f, pulse);
+                    DrawBorder(highlight, amber, 2f);
+                    DrawBorder(new Rect(highlight.x + 4f, highlight.y + 4f, highlight.width - 8f, highlight.height - 8f), new Color(0.09f, 0.72f, 0.66f, 0.34f), 1f);
+                }
+                else
+                {
+                    DrawBorder(highlight, new Color(1f, 0.79f, 0.22f, 0.98f), 4f);
+                    DrawBorder(new Rect(highlight.x - 4f, highlight.y - 4f, highlight.width + 8f, highlight.height + 8f), new Color(0.45f, 0.28f, 0.08f, 0.65f), 2f);
+                }
             }
 
-            if (!die.Temporary && rollPhase == RollPhase.CheatEdit && IsCheatRerollSelected(die.Id))
+            if (V02CheatEnabled && !die.Temporary && rollPhase == RollPhase.CheatEdit && IsCheatRerollSelected(die.Id))
             {
                 DrawRect(new Rect(dieRect.x - 5f, dieRect.y - 5f, dieRect.width + 10f, 4f), new Color(1f, 0.82f, 0.28f));
                 DrawRect(new Rect(dieRect.x - 5f, dieRect.y + dieRect.height + 1f, dieRect.width + 10f, 4f), new Color(1f, 0.82f, 0.28f));
             }
 
-            if (!die.Temporary && rollPhase == RollPhase.CheatEdit && GUI.Button(dieRect, GUIContent.none, GUIStyle.none))
+            if (V02CheatEnabled && !die.Temporary && rollPhase == RollPhase.CheatEdit && GUI.Button(dieRect, GUIContent.none, GUIStyle.none))
             {
                 ToggleCheatReroll(die);
             }
 
-            if (IsScoreViewActive(view))
+            if (!draggedGhost && IsScoreViewActive(view) && !settlementImpactPresentationActive)
             {
                 SettlementDisplayEvent viewEvent = ActiveSettlementEventForView(view);
                 float progress = SettlementEventProgress();
@@ -3323,21 +10961,29 @@ public sealed class DiceKingDemo : MonoBehaviour
             int dieIndex = die != null && !die.Temporary ? dice.IndexOf(die) : -1;
             if (dieIndex >= 0)
             {
-                TrySetHoveredTooltip(dieRect, die, true, "table-die-" + die.Id);
+                if (!draggedGhost)
+                {
+                    TrySetHoveredTooltip(dieRect, die, DiceTooltipContext.Run, -1, "table-die-" + die.Id);
+                }
 
                 if (rollPhase == RollPhase.Ready && selectedReadySlotIndex == dieIndex)
                 {
-                    DrawBorder(new Rect(dieRect.x - 7f, dieRect.y - 7f, dieRect.width + 14f, dieRect.height + 14f), new Color(0.2f, 0.62f, 0.56f, 0.96f), 3f);
+                    Rect selection = UseArcadeRunVisuals()
+                        ? new Rect(dieRect.x + 2f, dieRect.y + 2f, dieRect.width - 4f, dieRect.height - 4f)
+                        : new Rect(dieRect.x - 7f, dieRect.y - 7f, dieRect.width + 14f, dieRect.height + 14f);
+                    DrawBorder(selection, new Color(0.2f, 0.62f, 0.56f, 0.96f), 3f);
                 }
             }
 
-            if (rollPhase == RollPhase.Ready && dieIndex >= 0 && GUI.Button(dieRect, GUIContent.none, GUIStyle.none))
+            if (rollPhase == RollPhase.Ready && dieIndex >= 0)
             {
-                ToggleReadySlotSelection(dieIndex);
+                HandleDiceOrderDragMouseDown(DiceOrderDragSurface.RunTable, dieIndex, dieRect);
             }
         }
 
-        if (rollPhase == RollPhase.Scoring && scoreRevealIndex >= scoringDice.Count)
+        UpdateDiceOrderDragFromSlots(DiceOrderDragSurface.RunTable, slotRects, true);
+
+        if (rollPhase == RollPhase.Scoring && !settlementImpactPresentationActive && scoreRevealIndex >= scoringDice.Count)
         {
             int bonus = Mathf.Max(0, resolvedScore - currentScore);
             if (bonus > 0)
@@ -3347,6 +10993,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         DrawSettlementStageFeedback(area);
+        DrawDiceOrderFloatingDie(DiceOrderDragSurface.RunTable);
     }
 
     private void DrawCheatRerollControls(Rect area)
@@ -3356,14 +11003,14 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
-        GUI.Label(new Rect(area.x + 50f, area.y + 190f, area.width - 100f, 24f), "出千：点击选择 1-3 颗实体骰点数 +1。", centerStyle);
-        GUI.Label(new Rect(area.x + 80f, area.y + 224f, area.width - 160f, 24f), "已选 " + cheatRerollIds.Count + " / " + MaxCheatRerollDice + "，确认后按骰面上限封顶并直接结算。", centerStyle);
+        DrawStandardLabel(new Rect(area.x + 50f, area.y + 190f, area.width - 100f, 24f), "出千：点击选择 1-3 颗己方骰点数 +1。", centerStyle);
+        DrawStandardLabel(new Rect(area.x + 80f, area.y + 224f, area.width - 160f, 24f), "已选 " + cheatRerollIds.Count + " / " + MaxCheatRerollDice + "，确认后按骰面上限封顶并直接结算。", centerStyle);
     }
 
     private void DrawDiceCup(Rect area)
     {
         RollFeedbackConfig config = CurrentRollFeedbackConfig();
-        float time = Time.time;
+        float time = GameplayPlaybackTime();
         float frequency = Mathf.Max(1f, config.CupFrequency);
         float reveal = DiceStopRevealProgress();
         float cupPower = Mathf.Lerp(shakePower, Mathf.Min(shakePower, config.StopMinPower), reveal);
@@ -3389,7 +11036,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         else
         {
             DrawPanel(cup, new Color(0.42f, 0.2f, 0.12f));
-            GUI.Label(new Rect(cup.x, cup.y + 82f, cup.width, 34f), "骰盅", centerStyle);
+            DrawStandardLabel(new Rect(cup.x, cup.y + 82f, cup.width, 34f), "骰盅", centerStyle);
         }
         GUI.color = oldColor;
         GUI.matrix = oldMatrix;
@@ -3398,7 +11045,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             float stopDuration = Mathf.Max(0.05f, config.StopDuration);
             float t = Mathf.Clamp01(stopTimer / stopDuration);
-            GUI.Label(new Rect(area.x + 120f, area.y + 228f, area.width - 240f, 24f), "回落 " + Mathf.RoundToInt(t * 100f) + "%", centerStyle);
+            DrawStandardLabel(new Rect(area.x + 120f, area.y + 228f, area.width - 240f, 24f), "回落 " + Mathf.RoundToInt(t * 100f) + "%", centerStyle);
         }
     }
 
@@ -3420,6 +11067,189 @@ public sealed class DiceKingDemo : MonoBehaviour
         return diceProcessVisualsEnabled;
     }
 
+    private void UpdateTypeCoreIdlePresentation()
+    {
+        float now = Time.unscaledTime;
+        bool receivedInput = TypeCoreIdleReceivedInput();
+        if (!TypeCoreIdlePresentationEligible())
+        {
+            typeCoreIdlePulses.Clear();
+            typeCoreIdleNextEventAt = -1f;
+            return;
+        }
+
+        if (receivedInput)
+        {
+            typeCoreIdlePulses.Clear();
+            typeCoreIdleNextEventAt = now + NextTypeCoreIdleInterval();
+            return;
+        }
+
+        for (int i = typeCoreIdlePulses.Count - 1; i >= 0; i--)
+        {
+            TypeCoreIdlePulse pulse = typeCoreIdlePulses[i];
+            if (pulse == null || now >= pulse.StartedAt + pulse.Duration)
+            {
+                typeCoreIdlePulses.RemoveAt(i);
+            }
+        }
+
+        if (typeCoreIdleNextEventAt < 0f)
+        {
+            typeCoreIdleNextEventAt = now + NextTypeCoreIdleInterval();
+            return;
+        }
+
+        if (now < typeCoreIdleNextEventAt || typeCoreIdlePulses.Count > 0)
+        {
+            return;
+        }
+
+        List<Die> candidates = VisibleTypeCoreIdleCandidates();
+        if (candidates.Count <= 0)
+        {
+            typeCoreIdleNextEventAt = now + NextTypeCoreIdleInterval();
+            return;
+        }
+
+        int pulseCount = candidates.Count > 1 && typeCoreVisualRandom.NextDouble() < 0.35
+            ? TypeCoreIdleMaxConcurrent
+            : 1;
+        pulseCount = Mathf.Min(pulseCount, candidates.Count);
+        for (int i = 0; i < pulseCount; i++)
+        {
+            int candidateIndex = typeCoreVisualRandom.Next(candidates.Count);
+            Die die = candidates[candidateIndex];
+            candidates.RemoveAt(candidateIndex);
+            typeCoreIdlePulses.Add(new TypeCoreIdlePulse
+            {
+                DieId = die.Id,
+                StartedAt = now,
+                Duration = TypeCoreIdleDuration(die.Type)
+            });
+        }
+
+        typeCoreIdleNextEventAt = now + NextTypeCoreIdleInterval();
+    }
+
+    private bool TypeCoreIdlePresentationEligible()
+    {
+        if (!menuLampFlickerUserEnabled || DiceOrderDragActive())
+        {
+            return false;
+        }
+
+        if (mode == GameMode.Run)
+        {
+            return rollPhase == RollPhase.Ready;
+        }
+
+        return (mode == GameMode.InterStageMarket || mode == GameMode.ChapterShop)
+            && !marketLeaveEffectSequenceActive;
+    }
+
+    private bool TypeCoreIdleReceivedInput()
+    {
+        Vector3 mousePosition = Input.mousePosition;
+        bool mouseMoved = typeCoreMousePositionInitialized
+            && (mousePosition - typeCoreLastMousePosition).sqrMagnitude > 0.01f;
+        typeCoreLastMousePosition = mousePosition;
+        typeCoreMousePositionInitialized = true;
+        return Input.anyKey
+            || Input.mouseScrollDelta.sqrMagnitude > 0.001f
+            || mouseMoved
+            || DiceOrderDragActive();
+    }
+
+    private List<Die> VisibleTypeCoreIdleCandidates()
+    {
+        List<Die> candidates = new List<Die>();
+        HashSet<int> ids = new HashSet<int>();
+        if (mode == GameMode.Run && rollPhase == RollPhase.Ready)
+        {
+            int count = Mathf.Min(dice.Count, ArcadeRunPhysicalSlotCount);
+            for (int i = 0; i < count; i++)
+            {
+                AddTypeCoreIdleCandidate(candidates, ids, dice[i]);
+            }
+            return candidates;
+        }
+
+        if (mode == GameMode.InterStageMarket || mode == GameMode.ChapterShop)
+        {
+            for (int i = 0; i < dice.Count; i++)
+            {
+                AddTypeCoreIdleCandidate(candidates, ids, dice[i]);
+            }
+            for (int i = 0; i < marketOffers.Count; i++)
+            {
+                MarketOffer offer = marketOffers[i];
+                if (offer != null && offer.Kind == MarketOfferKind.Die)
+                {
+                    AddTypeCoreIdleCandidate(candidates, ids, offer.Die);
+                }
+            }
+        }
+
+        return candidates;
+    }
+
+    private static void AddTypeCoreIdleCandidate(List<Die> candidates, HashSet<int> ids, Die die)
+    {
+        if (die == null || die.Temporary || die.Id <= 0 || !HasDedicatedTypeCore(die.Type) || !ids.Add(die.Id))
+        {
+            return;
+        }
+
+        candidates.Add(die);
+    }
+
+    private float NextTypeCoreIdleInterval()
+    {
+        return Mathf.Lerp(TypeCoreIdleMinInterval, TypeCoreIdleMaxInterval, (float)typeCoreVisualRandom.NextDouble());
+    }
+
+    private static float TypeCoreIdleDuration(DieType type)
+    {
+        switch (TypeCoreIdleMotionForType(type))
+        {
+            case TypeCoreIdleMotion.Click:
+                return 0.32f;
+            case TypeCoreIdleMotion.DualPulse:
+                return 0.40f;
+            case TypeCoreIdleMotion.Intake:
+            case TypeCoreIdleMotion.Output:
+                return 0.42f;
+            case TypeCoreIdleMotion.Transmission:
+            case TypeCoreIdleMotion.Stable:
+                return 0.45f;
+            case TypeCoreIdleMotion.Echo:
+                return 0.48f;
+        }
+
+        return 0.42f;
+    }
+
+    private float TypeCoreIdleProgress(Die die)
+    {
+        if (die == null || !TypeCoreIdlePresentationEligible())
+        {
+            return -1f;
+        }
+
+        float now = Time.unscaledTime;
+        for (int i = 0; i < typeCoreIdlePulses.Count; i++)
+        {
+            TypeCoreIdlePulse pulse = typeCoreIdlePulses[i];
+            if (pulse != null && pulse.DieId == die.Id && pulse.Duration > 0f)
+            {
+                return Mathf.Clamp01((now - pulse.StartedAt) / pulse.Duration);
+            }
+        }
+
+        return -1f;
+    }
+
     private void ClearDiceVisualStates()
     {
         diceVisualStates.Clear();
@@ -3427,6 +11257,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         diceVisualRollStartTime = -999f;
         diceVisualRevealStartTime = -999f;
         diceVisualImpulseTimer = 0f;
+        diceFaceReelStopTravel = 0f;
     }
 
     private void BeginDiceVisualEnter()
@@ -3444,6 +11275,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         diceVisualRollStartTime = Time.time;
         diceVisualRevealStartTime = -999f;
         diceVisualImpulseTimer = 0f;
+        diceFaceReelStopTravel = 0f;
     }
 
     private void BeginDiceVisualReveal()
@@ -3515,9 +11347,9 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             TableDieView view = displayDice[i];
             Die die = view != null ? view.Die : null;
-            DieType visualType = die != null && !die.Temporary ? die.Type : DieType.Turtle;
+            DieType visualType = die != null && !die.Temporary ? die.Type : DieType.MoneyTurtle;
             float seed = DiceVisualSeed(die, i);
-            float time = Time.time * (8.5f + power * 5.5f) + seed * 6.283f;
+            float time = GameplayPlaybackTime() * (8.5f + power * 5.5f) + seed * 6.283f;
             float angle = (i / Mathf.Max(1f, count)) * Mathf.PI * 2f + Mathf.Sin(time * 0.6f) * 0.18f;
             float radiusX = 40f + seed * 42f;
             float radiusY = 14f + seed * 18f;
@@ -3545,6 +11377,25 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         Die die = view.Die;
+        if (UseArcadeRunDieVisuals())
+        {
+            DieType arcadeType = die.Temporary ? DieType.MoneyTurtle : die.Type;
+            if (rollPhase == RollPhase.Ready)
+            {
+                DrawReadyDieToken(baseRect, die, arcadeType);
+            }
+            else if (rollPhase == RollPhase.Shaking || rollPhase == RollPhase.Stopping)
+            {
+                DrawArcadeRunFaceReelDie(baseRect, die, arcadeType, view.Value, viewIndex);
+            }
+            else
+            {
+                DrawArcadeRunDieToken(baseRect, die, arcadeType, view.Value, false, 0, 1f);
+            }
+
+            return;
+        }
+
         float seed = DiceVisualSeed(die, viewIndex);
         DiceVisualMotion motion = CurrentDiceVisualMotion(viewIndex, displayCount);
         DiceVisualProfile profile = DiceVisualProfileForDie(die);
@@ -3552,7 +11403,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         Rect visualRect = DiceVisualAnimatedRect(area, baseRect, seed, viewIndex, displayCount, motion, view, profile);
         if (rollPhase == RollPhase.Ready)
         {
-            DrawReadyDieToken(visualRect, die, die.Temporary ? DieType.Turtle : die.Type);
+            DrawReadyDieToken(visualRect, die, die.Temporary ? DieType.MoneyTurtle : die.Type);
             return;
         }
 
@@ -3569,13 +11420,13 @@ public sealed class DiceKingDemo : MonoBehaviour
             return DiceVisualMotion.Rolling;
         }
 
-        if (rollPhase == RollPhase.ResultDecision && Time.time - diceVisualRevealStartTime < DiceVisualRevealDuration)
+        if (rollPhase == RollPhase.ResultDecision && GameplayPlaybackElapsed(diceVisualRevealStartTime) < MainGameResultLockDuration())
         {
             return DiceVisualMotion.Reveal;
         }
 
         float entrySpan = DiceVisualEnterDuration + Mathf.Max(0, displayCount - 1) * DiceVisualEnterStagger;
-        if (rollPhase == RollPhase.Ready && Time.time - diceVisualEnterStartTime < entrySpan + 0.12f)
+        if (rollPhase == RollPhase.Ready && GameplayPlaybackElapsed(diceVisualEnterStartTime) < entrySpan + 0.12f)
         {
             return DiceVisualMotion.Entry;
         }
@@ -3619,7 +11470,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return 0;
         }
 
-        float elapsed = diceVisualRollStartTime > -900f ? Mathf.Max(0f, Time.time - diceVisualRollStartTime) : Time.time;
+        float elapsed = diceVisualRollStartTime > -900f ? GameplayPlaybackElapsed(diceVisualRollStartTime) : GameplayPlaybackTime();
         RollFeedbackConfig config = CurrentRollFeedbackConfig();
         float maxPower = config != null ? Mathf.Max(config.MaxPower, config.BasePower, 0.01f) : 1f;
         float power = Mathf.Clamp01(shakePower / maxPower);
@@ -3643,6 +11494,13 @@ public sealed class DiceKingDemo : MonoBehaviour
             return rollPhase == RollPhase.ResultDecision || rollPhase == RollPhase.CheatEdit || rollPhase == RollPhase.Scoring || rollPhase == RollPhase.StageClear ? 1f : 0f;
         }
 
+        if (MainGameFlowPresentationEnabled() && UseArcadeRunVisuals())
+        {
+            float startAt = Mathf.Max(0, viewIndex) * MainGameStopSlotStagger();
+            float progress = Mathf.Clamp01((stopTimer - startAt) / Mathf.Max(0.05f, MainGameStopSlotSettleDuration()));
+            return Mathf.SmoothStep(0f, 1f, progress);
+        }
+
         RollFeedbackConfig config = CurrentRollFeedbackConfig();
         float stopDuration = config != null ? Mathf.Max(0.05f, config.StopDuration) : 0.9f;
         float t = Mathf.Clamp01(stopTimer / stopDuration);
@@ -3664,7 +11522,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return 0f;
         }
 
-        float t = Mathf.Clamp01((Time.time - diceVisualRevealStartTime) / DiceVisualRevealDuration);
+        float t = Mathf.Clamp01(GameplayPlaybackElapsed(diceVisualRevealStartTime) / MainGameResultLockDuration());
         float slot = displayCount <= 1 ? 0f : Mathf.Clamp01(viewIndex / Mathf.Max(1f, displayCount - 1f));
         float start = slot * 0.34f;
         float end = Mathf.Min(1f, start + 0.34f);
@@ -3674,8 +11532,41 @@ public sealed class DiceKingDemo : MonoBehaviour
     private int RollingVisualValue(float seed, int viewIndex, float speedScale)
     {
         float speed = DiceVisualRollSpeed * Mathf.Max(0.35f, speedScale);
-        int step = Mathf.FloorToInt((Time.time * speed + seed * 19.7f + viewIndex * 1.31f) * 1.37f);
+        int step = Mathf.FloorToInt((GameplayPlaybackTime() * speed + seed * 19.7f + viewIndex * 1.31f) * 1.37f);
         return 1 + Mathf.Abs(step) % 6;
+    }
+
+    private float DiceFaceReelTravelAtElapsed(float elapsed)
+    {
+        float safeElapsed = Mathf.Max(0f, elapsed);
+        float accelerationDuration = mainGameFlowPresentationProfile != null
+            ? Mathf.Max(0.02f, mainGameFlowPresentationProfile.FaceReelAccelerationDuration)
+            : 0.08f;
+        float fastSpeed = DiceFaceReelFastSpeed();
+        float startSpeed = Mathf.Min(fastSpeed, Mathf.Max(4f, fastSpeed * 0.4f));
+        if (safeElapsed <= accelerationDuration)
+        {
+            float t = safeElapsed / accelerationDuration;
+            return safeElapsed * (startSpeed + (fastSpeed - startSpeed) * t * 0.5f);
+        }
+
+        float accelerationTravel = accelerationDuration * (startSpeed + fastSpeed) * 0.5f;
+        return accelerationTravel + (safeElapsed - accelerationDuration) * fastSpeed;
+    }
+
+    private float DiceFaceReelFastSpeed()
+    {
+        return mainGameFlowPresentationProfile != null
+            ? Mathf.Max(4f, mainGameFlowPresentationProfile.FaceReelFastCellsPerSecond)
+            : 20f;
+    }
+
+    private float DiceFaceReelSlowSpeed()
+    {
+        float fastSpeed = DiceFaceReelFastSpeed();
+        return mainGameFlowPresentationProfile != null
+            ? Mathf.Clamp(mainGameFlowPresentationProfile.FaceReelSlowCellsPerSecond, 1f, fastSpeed)
+            : 5f;
     }
 
     private Rect DiceVisualAnimatedRect(Rect area, Rect baseRect, float seed, int viewIndex, int displayCount, DiceVisualMotion motion, TableDieView view, DiceVisualProfile profile)
@@ -3686,7 +11577,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (motion == DiceVisualMotion.Entry)
         {
             float delay = viewIndex * DiceVisualEnterStagger;
-            float t = Mathf.Clamp01((Time.time - diceVisualEnterStartTime - delay) / DiceVisualEnterDuration);
+            float t = Mathf.Clamp01((GameplayPlaybackElapsed(diceVisualEnterStartTime) - delay) / DiceVisualEnterDuration);
             float ease = EaseOutBack(t);
             float startX = (seed - 0.5f) * 16f;
             float startY = -20f - viewIndex * 1.4f;
@@ -3706,7 +11597,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
         else if (motion == DiceVisualMotion.Reveal)
         {
-            float t = Mathf.Clamp01((Time.time - diceVisualRevealStartTime) / DiceVisualRevealDuration);
+            float t = Mathf.Clamp01(GameplayPlaybackElapsed(diceVisualRevealStartTime) / MainGameResultLockDuration());
             rect.y -= Mathf.Sin(t * Mathf.PI) * 5f;
             scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.04f;
         }
@@ -3725,7 +11616,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (motion == DiceVisualMotion.Entry)
         {
             float delay = viewIndex * DiceVisualEnterStagger;
-            float t = Mathf.Clamp01((Time.time - diceVisualEnterStartTime - delay) / DiceVisualEnterDuration);
+            float t = Mathf.Clamp01((GameplayPlaybackElapsed(diceVisualEnterStartTime) - delay) / DiceVisualEnterDuration);
             return Mathf.Lerp(-18f + seed * 36f, 0f, Mathf.SmoothStep(0f, 1f, t));
         }
 
@@ -3737,7 +11628,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             float speed = DiceVisualProfileSpeed(profile);
             float amplitude = DiceVisualProfileRotationAmplitude(profile);
             float reveal = DiceStopRevealProgress();
-            float time = Time.time * ((64f + power * 36f) * speed) + seed * 360f + viewIndex * 19f;
+            float time = GameplayPlaybackTime() * ((64f + power * 36f) * speed) + seed * 360f + viewIndex * 19f;
             float wave = Mathf.Sin(time * Mathf.Deg2Rad);
             if (profile == DiceVisualProfile.Parity)
             {
@@ -3753,7 +11644,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (motion == DiceVisualMotion.Reveal)
         {
-            float t = Mathf.Clamp01((Time.time - diceVisualRevealStartTime) / DiceVisualRevealDuration);
+            float t = Mathf.Clamp01(GameplayPlaybackElapsed(diceVisualRevealStartTime) / MainGameResultLockDuration());
             float amplitude = DiceVisualProfileRotationAmplitude(profile);
             return Mathf.Sin(t * Mathf.PI * DiceVisualProfileRevealTurns(profile) + seed * 3f) * (1f - t) * amplitude * 0.7f;
         }
@@ -3771,21 +11662,21 @@ public sealed class DiceKingDemo : MonoBehaviour
             float power = Mathf.Clamp01(shakePower / maxPower);
             float impulse = Mathf.Clamp01(diceVisualImpulseTimer / DiceVisualImpulseDuration);
             float speed = DiceVisualProfileSpeed(profile);
-            float amount = 0.5f + 0.5f * Mathf.Sin(Time.time * ((DiceVisualRollSpeed + power * 4.4f) * speed) + seed * 6.283f + viewIndex * 0.72f);
+            float amount = 0.5f + 0.5f * Mathf.Sin(GameplayPlaybackTime() * ((DiceVisualRollSpeed + power * 4.4f) * speed) + seed * 6.283f + viewIndex * 0.72f);
             amount = Mathf.Clamp01(amount * DiceVisualProfileRollWeight(profile) + impulse * 0.2f);
             return amount * Mathf.Lerp(1f, 0.04f, reveal);
         }
 
         if (motion == DiceVisualMotion.Reveal)
         {
-            float t = Mathf.Clamp01((Time.time - diceVisualRevealStartTime) / DiceVisualRevealDuration);
+            float t = Mathf.Clamp01(GameplayPlaybackElapsed(diceVisualRevealStartTime) / MainGameResultLockDuration());
             return Mathf.Abs(Mathf.Sin(t * Mathf.PI * DiceVisualProfileRevealTurns(profile))) * (1f - t) * 0.78f * DiceVisualProfileRollWeight(profile);
         }
 
         if (motion == DiceVisualMotion.Entry)
         {
             float delay = viewIndex * DiceVisualEnterStagger;
-            float t = Mathf.Clamp01((Time.time - diceVisualEnterStartTime - delay) / DiceVisualEnterDuration);
+            float t = Mathf.Clamp01((GameplayPlaybackElapsed(diceVisualEnterStartTime) - delay) / DiceVisualEnterDuration);
             return (1f - t) * 0.18f;
         }
 
@@ -3794,8 +11685,14 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawDiceSequenceFrame(Rect rect, Die die, int value, int frameIndex, float stopProgress, float revealProgress, float seed, DiceVisualProfile profile)
     {
-        DieType visualType = die.Temporary ? DieType.Turtle : die.Type;
-        DiceMaterial material = die.Temporary ? DiceMaterial.None : die.Material;
+        DieType visualType = die.Temporary ? DieType.MoneyTurtle : die.Type;
+        if (UseArcadeRunDieVisuals())
+        {
+            DrawArcadeRunDieToken(rect, die, visualType, value, value <= 0, frameIndex, stopProgress);
+            return;
+        }
+
+        DiceMaterial material = ActiveDiceMaterial(die);
         Color typeColor = TypeColor(visualType);
         bool resultVisible = value > 0;
         if (resultVisible && DrawUnifiedResultDieFace(rect, value, material))
@@ -4141,8 +12038,8 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawDiceProcessCube(Rect rect, Die die, int value, float rotation, float rollAmount, float seed, DiceVisualProfile profile)
     {
-        DieType visualType = die.Temporary ? DieType.Turtle : die.Type;
-        DiceMaterial material = die.Temporary ? DiceMaterial.None : die.Material;
+        DieType visualType = die.Temporary ? DieType.MoneyTurtle : die.Type;
+        DiceMaterial material = ActiveDiceMaterial(die);
         Color typeColor = TypeColor(visualType);
         float turn = Mathf.Clamp01(rollAmount);
         bool verticalAxis = profile == DiceVisualProfile.Parity || profile == DiceVisualProfile.Gold || (seed > 0.68f && profile != DiceVisualProfile.Turtle);
@@ -4221,55 +12118,47 @@ public sealed class DiceKingDemo : MonoBehaviour
             return DiceVisualProfile.Balanced;
         }
 
-        DieType type = die.Temporary ? DieType.Turtle : die.Type;
+        DieType type = die.Temporary ? DieType.MoneyTurtle : die.Type;
         switch (type)
         {
-            case DieType.Turtle:
-            case DieType.Shellsmith:
-            case DieType.Nest:
-            case DieType.SlowTurtle:
-            case DieType.ShellTax:
+            case DieType.MoneyTurtle:
+            case DieType.TinyTurtle:
+            case DieType.DoubleTurtle:
+            case DieType.LuckyTurtle:
+            case DieType.MagnetTurtle:
+            case DieType.RallyTurtle:
+            case DieType.LeaderTurtle:
+            case DieType.PackTurtle:
+            case DieType.SharedFeastDemonTurtle:
+            case DieType.SafetyNetTurtle:
                 return DiceVisualProfile.Turtle;
-            case DieType.Odd:
-            case DieType.Even:
-            case DieType.LoneWitness:
-            case DieType.Stamp:
-            case DieType.HalfStep:
-            case DieType.Track:
-            case DieType.ParityNeighborDiff:
-            case DieType.ParityNeighborSame:
-            case DieType.ParityComplete:
-            case DieType.ParityReview:
-            case DieType.ParityFlipScore:
-            case DieType.ParityHoldScore:
-            case DieType.ParityTurner:
-                return DiceVisualProfile.Parity;
-            case DieType.Tree:
-            case DieType.Gardener:
-            case DieType.Irrigation:
-            case DieType.PointSeedTree:
-            case DieType.PatternTree:
-            case DieType.CanopyTree:
-            case DieType.RingTree:
-            case DieType.FertilizerTree:
-            case DieType.PruningTree:
-            case DieType.RootTree:
-                return DiceVisualProfile.Tree;
-            case DieType.Piggy:
-            case DieType.Treasury:
-            case DieType.Bribe:
-            case DieType.Investment:
-            case DieType.BountyGold:
-            case DieType.TopGold:
-            case DieType.HandTax:
-            case DieType.Collection:
-            case DieType.CompoundInterest:
-            case DieType.LeadTicket:
-            case DieType.CounterGold:
-            case DieType.LumberGold:
+            case DieType.PigFarmer:
+            case DieType.MeatPig:
+            case DieType.TradePig:
+            case DieType.SowPig:
+            case DieType.ThreeLittlePigs:
+            case DieType.GreedyPig:
+            case DieType.FeedWholesaler:
+            case DieType.RefreshPirate:
+            case DieType.PlunderPirate:
+            case DieType.CrewPirate:
+            case DieType.PirateCaptain:
+            case DieType.TrainingPirate:
+            case DieType.TreasurePirate:
+            case DieType.RobberyPirate:
+            case DieType.PirateKing:
+            case DieType.ClearancePig:
+            case DieType.SupplyPig:
                 return DiceVisualProfile.Gold;
-            case DieType.Double:
-            case DieType.Gambler:
+            case DieType.Imp:
+            case DieType.Devourer:
+            case DieType.Demon:
+            case DieType.DemonBat:
+            case DieType.AbyssSummon:
+            case DieType.BlackSailBat:
+            case DieType.TributePig:
+            case DieType.BlackMarketImp:
+            case DieType.BloodPactCaptain:
                 return DiceVisualProfile.Burst;
         }
 
@@ -4471,10 +12360,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         hoverCandidateKey = string.Empty;
         hoverCandidateDie = null;
         hoverCandidateRect = default(Rect);
-        hoverCandidateAllowCurrentStateText = false;
+        hoverCandidateContext = DiceTooltipContext.Run;
+        hoverCandidateBuyPrice = -1;
     }
 
-    private void TrySetHoveredTooltip(Rect rect, Die die, bool allowCurrentStateText, string sourceKey)
+    private void TrySetHoveredTooltip(Rect rect, Die die, DiceTooltipContext context, int buyPrice, string sourceKey)
     {
         if (die == null || die.Temporary || string.IsNullOrEmpty(sourceKey))
         {
@@ -4494,11 +12384,17 @@ public sealed class DiceKingDemo : MonoBehaviour
         hoverCandidateKey = sourceKey;
         hoverCandidateDie = die;
         hoverCandidateRect = rect;
-        hoverCandidateAllowCurrentStateText = allowCurrentStateText;
+        hoverCandidateContext = context;
+        hoverCandidateBuyPrice = buyPrice;
     }
 
     private bool CanAcceptDiceHoverTooltipCandidate()
     {
+        if (DiceOrderDragActive())
+        {
+            return false;
+        }
+
         if (mode == GameMode.InterStageMarket || mode == GameMode.ChapterShop)
         {
             return true;
@@ -4678,7 +12574,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         activeTooltipKey = hoverCandidateKey;
         activeTooltipDie = hoverCandidateDie;
         activeTooltipRect = hoverCandidateRect;
-        activeTooltipAllowCurrentStateText = hoverCandidateAllowCurrentStateText;
+        activeTooltipContext = hoverCandidateContext;
+        activeTooltipBuyPrice = hoverCandidateBuyPrice;
     }
 
     private void SwitchActiveTooltip(float now)
@@ -4708,7 +12605,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         activeTooltipKey = string.Empty;
         activeTooltipDie = null;
         activeTooltipRect = default(Rect);
-        activeTooltipAllowCurrentStateText = false;
+        activeTooltipContext = DiceTooltipContext.Run;
+        activeTooltipBuyPrice = -1;
         hoverCandidateStartedAt = -999f;
         tooltipVisibleStartedAt = -999f;
         tooltipHideStartedAt = -999f;
@@ -4724,7 +12622,8 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
-        Rect totalRect = DiceHoverTooltipRect(activeTooltipRect);
+        DiceTooltipViewModel model = BuildDiceTooltipViewModel(activeTooltipDie, activeTooltipContext, activeTooltipBuyPrice);
+        Rect totalRect = DiceHoverTooltipRect(activeTooltipRect, model.PanelHeight, model.Context);
         float enterProgress = tooltipState == DiceTooltipState.FadingIn ? Mathf.Clamp01(tooltipAlpha) : 1f;
         totalRect.y += (1f - enterProgress) * TooltipEnterOffsetY;
 
@@ -4736,16 +12635,33 @@ public sealed class DiceKingDemo : MonoBehaviour
             contentAlpha *= Mathf.Lerp(0.62f, 1f, swap);
         }
 
-        Rect panelRect = new Rect(totalRect.x, totalRect.y, TooltipPanelWidth, TooltipPanelHeight);
-        DrawDiceHoverTooltipFrame(panelRect, totalAlpha);
-        DrawDiceHoverTooltipContent(panelRect, activeTooltipDie, activeTooltipAllowCurrentStateText, contentAlpha);
+        Rect panelRect = new Rect(totalRect.x, totalRect.y, TooltipPanelWidth, model.PanelHeight);
+        DrawDiceHoverTooltipFrame(panelRect, model, totalAlpha);
+        DrawDiceHoverTooltipContent(panelRect, model, contentAlpha);
     }
 
-    private Rect DiceHoverTooltipRect(Rect target)
+    private Rect DiceHoverTooltipRect(Rect target, float panelHeight, DiceTooltipContext context)
     {
         float safe = 16f;
         float totalWidth = TooltipPanelWidth;
-        float x = target.x + target.width + 12f;
+        float x;
+        if (context == DiceTooltipContext.Run)
+        {
+            x = target.x + (target.width - totalWidth) * 0.5f;
+        }
+        else if (context == DiceTooltipContext.MarketBag)
+        {
+            x = target.x + target.width + 12f;
+        }
+        else
+        {
+            x = target.x - totalWidth - 12f;
+            if (x < safe)
+            {
+                x = target.x + target.width + 12f;
+            }
+        }
+
         if (x + totalWidth > VirtualWidth - safe)
         {
             x = target.x - totalWidth - 12f;
@@ -4761,115 +12677,565 @@ public sealed class DiceKingDemo : MonoBehaviour
             bottomLimit = 584f;
         }
 
-        float y = target.y - 24f;
-        if (y + TooltipPanelHeight > bottomLimit)
+        float y = context == DiceTooltipContext.Run
+            ? target.y - panelHeight - 10f
+            : target.y - 24f;
+        if (y + panelHeight > bottomLimit)
         {
-            float above = target.y - TooltipPanelHeight - 10f;
-            y = above >= safe ? above : bottomLimit - TooltipPanelHeight;
+            float above = target.y - panelHeight - 10f;
+            y = above >= safe ? above : bottomLimit - panelHeight;
         }
         if (y < safe)
         {
-            y = Mathf.Min(bottomLimit - TooltipPanelHeight, target.y + target.height + 10f);
+            y = Mathf.Min(bottomLimit - panelHeight, target.y + target.height + 10f);
         }
 
         x = Mathf.Clamp(x, safe, VirtualWidth - totalWidth - safe);
-        y = Mathf.Clamp(y, safe, bottomLimit - TooltipPanelHeight);
-        return new Rect(x, y, totalWidth, TooltipPanelHeight);
+        y = Mathf.Clamp(y, safe, bottomLimit - panelHeight);
+        return new Rect(x, y, totalWidth, panelHeight);
     }
 
-    private void DrawDiceHoverTooltipFrame(Rect panelRect, float alpha)
+    private void DrawDiceHoverTooltipFrame(Rect panelRect, DiceTooltipViewModel model, float alpha)
     {
-        DrawTooltipTexture(panelRect, tooltipPanelTexture, alpha, new Color(1f, 0.94f, 0.78f, 0.96f));
-        DrawBorder(new Rect(panelRect.x + 10f, panelRect.y + 10f, panelRect.width - 20f, panelRect.height - 20f), new Color(0.62f, 0.38f, 0.16f, alpha * 0.48f), 1f);
-    }
-
-    private void DrawDiceHoverTooltipContent(Rect panelRect, Die die, bool allowCurrentStateText, float alpha)
-    {
-        float left = panelRect.x + 24f;
-        float right = panelRect.x + panelRect.width - 24f;
-        float contentWidth = right - left;
-        Rect iconRect = new Rect(left, panelRect.y + 24f, 68f, 68f);
-        DrawTooltipDieIcon(iconRect, die, alpha);
-
-        Rect priceRect = new Rect(right - 76f, panelRect.y + 40f, 76f, 30f);
-        float titleX = left + 82f;
-        float titleWidth = Mathf.Max(104f, priceRect.x - titleX - 8f);
-        string displayName = TooltipDisplayName(die);
-        DrawTooltipLabel(new Rect(titleX, panelRect.y + 28f, titleWidth, 26f), displayName, tooltipTitleStyle, alpha);
-        DrawTooltipLabel(new Rect(titleX, panelRect.y + 58f, titleWidth, 22f), die != null ? TooltipTypeName(die.Type) : string.Empty, tooltipTinyStyle, alpha);
-
-        DrawTooltipTexture(priceRect, tooltipPriceChipTexture, alpha, new Color(0.96f, 0.72f, 0.28f, 0.94f));
-        DrawTooltipLabel(priceRect, die != null ? "卖 " + SellPrice(die.Type) : string.Empty, tooltipLabelStyle, alpha);
-
-        DrawTooltipDivider(new Rect(left, panelRect.y + 102f, contentWidth, 1f), alpha);
-        DrawTooltipLabel(new Rect(left, panelRect.y + 124f, 62f, 20f), "点面", tooltipTinyStyle, alpha);
-        DrawTooltipFaces(new Rect(left + 2f, panelRect.y + 154f, contentWidth - 4f, 40f), die, alpha);
-        DrawTooltipDivider(new Rect(left, panelRect.y + 212f, contentWidth, 1f), alpha);
-
-        DrawTooltipSection(
-            new Rect(left, panelRect.y + 232f, contentWidth, 70f),
-            tooltipLabelChipBlueTexture,
-            "骰效",
-            TooltipEffectText(die, allowCurrentStateText),
-            alpha,
-            76);
-
-        DrawTooltipDivider(new Rect(left + 20f, panelRect.y + 318f, contentWidth - 40f, 1f), alpha * 0.72f);
-
-        DrawTooltipSection(
-            new Rect(left, panelRect.y + 334f, contentWidth, 42f),
-            tooltipLabelChipGreenTexture,
-            "质效",
-            TooltipMaterialText(die),
-            alpha,
-            42);
-    }
-
-    private void DrawTooltipSection(Rect rect, Texture2D labelTexture, string label, string text, float alpha, int maxCharacters)
-    {
-        Rect labelRect = new Rect(rect.x, rect.y + 2f, 58f, 28f);
-        DrawTooltipTexture(labelRect, labelTexture, alpha, new Color(0.64f, 0.7f, 0.62f, 0.9f));
-        DrawTooltipLabel(labelRect, label, tooltipLabelStyle, alpha);
-        DrawTooltipLabel(new Rect(rect.x + 74f, rect.y - 1f, rect.width - 74f, rect.height + 2f), TooltipTrim(text, maxCharacters), tooltipBodyStyle, alpha);
-    }
-
-    private void DrawTooltipFaces(Rect rect, Die die, float alpha)
-    {
-        int[] faces = die != null && die.Faces != null ? die.Faces : new int[0];
-        float cellSize = 38f;
-        float gap = Mathf.Max(6f, (rect.width - cellSize * 6f) / 5f);
-        for (int i = 0; i < 6; i++)
+        Texture2D panelTexture = TooltipArcadePanelTexture(model.PanelHeight);
+        if (panelTexture != null)
         {
-            Rect cell = new Rect(rect.x + i * (cellSize + gap), rect.y, cellSize, cellSize);
-            DrawTooltipTexture(cell, tooltipFaceCellTexture, alpha, new Color(1f, 0.94f, 0.76f, 0.9f));
-            int value = i < faces.Length ? faces[i] : 0;
-            if (value > 0 && value <= 12)
+            DrawTooltipTexture(panelRect, panelTexture, alpha, Color.white);
+            return;
+        }
+
+        DrawRect(panelRect, new Color(0.025f, 0.047f, 0.065f, alpha * 0.98f));
+        DrawBorder(panelRect, new Color(0.12f, 0.74f, 0.76f, alpha * 0.82f), 2f);
+        DrawBorder(new Rect(panelRect.x + 5f, panelRect.y + 5f, panelRect.width - 10f, panelRect.height - 10f), new Color(0.88f, 0.55f, 0.18f, alpha * 0.78f), 2f);
+    }
+
+    private void DrawDiceHoverTooltipContent(Rect panelRect, DiceTooltipViewModel model, float alpha)
+    {
+        if (model == null || model.Die == null)
+        {
+            return;
+        }
+
+        Color dimAmber = new Color(0.9f, 0.61f, 0.28f, alpha * 0.86f);
+        Color cyan = new Color(0.34f, 0.82f, 0.8f, alpha);
+
+        Rect typeCoreRect = new Rect(panelRect.x + 18f, panelRect.y + 13f, 58f, 58f);
+        DrawTooltipTypeCore(typeCoreRect, model.Die, alpha);
+
+        DrawLedRoleText(
+            new Rect(panelRect.x + 84f, panelRect.y + 4f, panelRect.width - 104f, 44f),
+            model.DisplayName,
+            MainGameLedFont.TextRole.PrimaryAmber,
+            TextAnchor.MiddleLeft,
+            alpha);
+
+        Rect triggerRect = new Rect(panelRect.x + panelRect.width - 88f, panelRect.y + 51f, 66f, 21f);
+        bool showTrigger = !string.IsNullOrEmpty(model.TriggerLabel);
+        if (showTrigger)
+        {
+            DrawTooltipChip(triggerRect, model.TriggerLabel, new Color(0.76f, 0.34f, 0.22f), alpha);
+        }
+
+        float familyX = panelRect.x + 84f;
+        float familyLimit = showTrigger ? triggerRect.x - 6f : panelRect.xMax - 22f;
+        for (int i = 0; i < model.FamilyLabels.Count; i++)
+        {
+            string family = model.FamilyLabels[i];
+            float width = Mathf.Clamp(20f + family.Length * 12f, 46f, 68f);
+            if (familyX + width > familyLimit)
             {
-                DrawDiePips(InsetRect(cell, 8f, 8f), value, new Color(0.08f, 0.08f, 0.07f, alpha * 0.95f));
+                break;
             }
-            else if (value > 0)
+
+            DrawTooltipChip(
+                new Rect(familyX, panelRect.y + 51f, width, 21f),
+                family,
+                TooltipFamilyColor(family),
+                alpha);
+            familyX += width + 6f;
+        }
+
+        float faceTitleY = panelRect.y + 76f;
+        DrawLedRoleText(
+            new Rect(panelRect.x + 24f, faceTitleY, 120f, 18f),
+            "实际六面",
+            MainGameLedFont.TextRole.SecondaryAmber,
+            TextAnchor.MiddleLeft,
+            alpha);
+        Rect faceGridRect = new Rect(panelRect.x + 24f, faceTitleY + 20f, panelRect.width - 48f, model.FaceGridHeight);
+        DrawTooltipNumericFaces(faceGridRect, model, alpha);
+        float faceDividerY = faceGridRect.yMax + 4f;
+        DrawTooltipDivider(new Rect(panelRect.x + 22f, faceDividerY, panelRect.width - 44f, 1f), alpha);
+
+        float ruleY = faceDividerY + 6f;
+        float ruleHeight = Mathf.Max(40f, model.RuleHeight);
+        DrawTooltipChip(new Rect(panelRect.x + 22f, ruleY + 1f, 48f, 21f), "规则", new Color(0.76f, 0.48f, 0.16f), alpha);
+        DrawTooltipHighlightedRule(
+            new Rect(panelRect.x + 78f, ruleY - 1f, panelRect.width - 102f, ruleHeight + 2f),
+            model,
+            alpha);
+
+        int optionalRowCount = model.StateRows.Count + (model.ShowEconomy ? 1 : 0);
+        float rowY = ruleY + ruleHeight + 6f;
+        if (optionalRowCount > 0)
+        {
+            DrawTooltipDivider(new Rect(panelRect.x + 22f, rowY - 2f, panelRect.width - 44f, 1f), alpha * 0.82f);
+            for (int i = 0; i < model.StateRows.Count; i++)
             {
-                DrawTooltipLabel(cell, value.ToString(CultureInfo.InvariantCulture), tooltipLabelStyle, alpha);
+                DrawTooltipStateRow(
+                    new Rect(panelRect.x + 24f, rowY, panelRect.width - 48f, 18f),
+                    model.StateRows[i],
+                    i % 2 == 0 ? cyan : dimAmber,
+                    alpha);
+                rowY += 18f;
+            }
+
+            if (model.ShowEconomy)
+            {
+                DrawTooltipEconomyRow(
+                    new Rect(panelRect.x + 24f, rowY, panelRect.width - 48f, 22f),
+                    model,
+                    alpha);
+                rowY += 22f;
+            }
+        }
+
+        if (model.Keywords.Count > 0)
+        {
+            DrawTooltipDivider(new Rect(panelRect.x + 22f, rowY + 1f, panelRect.width - 44f, 1f), alpha * 0.82f);
+            rowY += 7f;
+            for (int i = 0; i < model.Keywords.Count; i++)
+            {
+                TooltipKeywordViewModel keyword = model.Keywords[i];
+                Color keywordColor = TooltipKeywordAccentColor(keyword.AccentFamily);
+                float chipWidth = Mathf.Clamp(20f + keyword.DisplayName.Length * 12f, 48f, 92f);
+                DrawTooltipKeywordChip(
+                    new Rect(panelRect.x + 22f, rowY, chipWidth, 21f),
+                    keyword.DisplayName,
+                    keywordColor,
+                    alpha);
+                rowY += 24f;
+
+                float explanationHeight = Mathf.Max(18f, keyword.LineCount * 18f);
+                DrawLedRoleWrappedText(
+                    new Rect(panelRect.x + 24f, rowY, panelRect.width - 48f, explanationHeight),
+                    keyword.Explanation,
+                    MainGameLedFont.TextRole.SecondaryWarm,
+                    TextAnchor.UpperLeft,
+                    alpha);
+                rowY += explanationHeight;
+                if (i < model.Keywords.Count - 1)
+                {
+                    rowY += 4f;
+                }
             }
         }
     }
 
-    private void DrawTooltipDieIcon(Rect rect, Die die, float alpha)
+    private Texture2D TooltipArcadePanelTexture(float panelHeight)
+    {
+        if (panelHeight <= TooltipPanelShortHeight)
+        {
+            return tooltipArcadePanelShortTexture;
+        }
+
+        if (panelHeight <= TooltipPanelMediumHeight)
+        {
+            return tooltipArcadePanelMediumTexture;
+        }
+
+        return tooltipArcadePanelTallTexture;
+    }
+
+    private void DrawTooltipTypeCore(Rect rect, Die die, float alpha)
     {
         Color accent = TypeColor(die.Type);
-        DrawTooltipTexture(rect, null, alpha, new Color(accent.r, accent.g, accent.b, 0.22f));
-        DrawBorder(rect, new Color(0.32f, 0.22f, 0.13f, alpha * 0.42f), 1f);
+        Rect inner = InsetRect(rect, 8f, 8f);
+        DrawRect(inner, new Color(accent.r * 0.2f, accent.g * 0.24f, accent.b * 0.28f, alpha * 0.78f));
 
         Texture2D icon = DieTypeIcon(die.Type);
         if (icon != null)
         {
-            DrawTooltipTexture(InsetRect(rect, 7f, 7f), icon, alpha, Color.white);
+            Color previousColor = GUI.color;
+            GUI.color = new Color(1f, 1f, 1f, alpha);
+            GUI.DrawTexture(InsetRect(rect, 10f, 10f), icon, ScaleMode.ScaleToFit, true);
+            GUI.color = previousColor;
+        }
+        else
+        {
+            DrawTooltipArcadeText(
+                InsetRect(rect, 10f, 10f),
+                ShortTypeName(die.Type),
+                12f,
+                new Color(1f, 0.68f, 0.22f, alpha),
+                TextAnchor.MiddleCenter,
+                false);
+        }
+
+        if (tooltipArcadeTypeCoreFrameTexture != null)
+        {
+            DrawTooltipTexture(rect, tooltipArcadeTypeCoreFrameTexture, alpha, Color.white);
+        }
+        else
+        {
+            DrawBorder(rect, new Color(0.18f, 0.78f, 0.78f, alpha * 0.9f), 2f);
+            DrawBorder(InsetRect(rect, 3f, 3f), new Color(0.9f, 0.56f, 0.18f, alpha * 0.82f), 1f);
+        }
+    }
+
+    private void DrawTooltipNumericFaces(Rect rect, DiceTooltipViewModel model, float alpha)
+    {
+        if (model == null)
+        {
             return;
         }
 
-        DrawTooltipTexture(InsetRect(rect, 10f, 10f), runtimeDieFaceBaseTexture, alpha, new Color(1f, 0.94f, 0.76f, 0.94f));
-        int value = die.Faces != null && die.Faces.Length > 0 ? die.Faces[0] : 1;
-        DrawDiePips(InsetRect(rect, 22f, 22f), value, new Color(0.08f, 0.08f, 0.07f, alpha * 0.95f));
+        bool singleRow = model.FaceDisplayMode == TooltipFaceDisplayMode.SingleRowExact;
+        int columns = singleRow ? 6 : 3;
+        const float horizontalGap = 8f;
+        const float verticalGap = 6f;
+        float cellWidth = singleRow
+            ? 60f
+            : (rect.width - horizontalGap * (columns - 1)) / columns;
+        float cellHeight = singleRow
+            ? rect.height
+            : (rect.height - verticalGap) * 0.5f;
+        float contentWidth = cellWidth * columns + horizontalGap * (columns - 1);
+        float startX = rect.x + Mathf.Max(0f, (rect.width - contentWidth) * 0.5f);
+        for (int i = 0; i < 6; i++)
+        {
+            int column = i % columns;
+            int row = i / columns;
+            Rect cell = new Rect(
+                startX + column * (cellWidth + horizontalGap),
+                rect.y + row * (cellHeight + verticalGap),
+                cellWidth,
+                cellHeight);
+            if (tooltipArcadeFaceCellTexture != null)
+            {
+                DrawTooltipTexture(cell, tooltipArcadeFaceCellTexture, alpha, Color.white);
+            }
+            else
+            {
+                DrawRect(cell, new Color(0.025f, 0.055f, 0.072f, alpha * 0.96f));
+                DrawBorder(cell, new Color(0.88f, 0.55f, 0.18f, alpha * 0.8f), 1f);
+            }
+
+            bool isUniqueHighest = i == model.UniqueHighestFaceIndex;
+            if (isUniqueHighest)
+            {
+                DrawBorder(cell, new Color(1f, 0.62f, 0.08f, alpha), 2f);
+            }
+
+            if (!singleRow)
+            {
+                DrawTooltipArcadeText(
+                    new Rect(cell.x + 5f, cell.y + 1f, 34f, 13f),
+                    "面" + (i + 1).ToString(CultureInfo.InvariantCulture),
+                    9f,
+                    new Color(0.9f, 0.62f, 0.28f, alpha * 0.9f),
+                    TextAnchor.MiddleLeft,
+                    false);
+                if (isUniqueHighest)
+                {
+                    DrawTooltipHighestMarker(new Rect(cell.xMax - 31f, cell.y + 2f, 27f, 13f), alpha);
+                }
+            }
+
+            int value = model.EffectiveFaces[i];
+            string valueText = model.FaceDisplayMode == TooltipFaceDisplayMode.GridScientific
+                ? FormatTooltipScientific(value)
+                : value.ToString("N0", CultureInfo.InvariantCulture);
+            Rect mainValueRect;
+            if (singleRow)
+            {
+                mainValueRect = InsetRect(cell, 4f, 2f);
+            }
+            else if (model.FaceDisplayMode == TooltipFaceDisplayMode.GridScientific)
+            {
+                mainValueRect = new Rect(cell.x + 4f, cell.y + 13f, cell.width - 8f, 19f);
+            }
+            else
+            {
+                mainValueRect = new Rect(cell.x + 4f, cell.y + 12f, cell.width - 8f, cell.height - 14f);
+            }
+            DrawLedRoleText(
+                mainValueRect,
+                valueText,
+                value < 0 ? MainGameLedFont.TextRole.Warning : MainGameLedFont.TextRole.PrimaryAmber,
+                TextAnchor.MiddleCenter,
+                alpha);
+
+            if (model.FaceDisplayMode == TooltipFaceDisplayMode.GridScientific)
+            {
+                DrawTooltipArcadeText(
+                    new Rect(cell.x + 4f, cell.yMax - 15f, cell.width - 8f, 13f),
+                    FormatTooltipQuickRead(value),
+                    10f,
+                    new Color(0.92f, 0.64f, 0.3f, alpha * 0.9f),
+                    TextAnchor.MiddleCenter,
+                    false);
+            }
+        }
+    }
+
+    private void DrawTooltipHighlightedRule(Rect rect, DiceTooltipViewModel model, float alpha)
+    {
+        if (model == null || string.IsNullOrEmpty(model.RuleText))
+        {
+            return;
+        }
+
+        if (mainGameLedFont != null && mainGameLedFont.IsReady)
+        {
+            mainGameLedFont.DrawRoleWrappedHighlights(
+                rect,
+                model.RuleText,
+                MainGameLedFont.TextRole.SecondaryWarm,
+                model.RuleHighlights,
+                TextAnchor.UpperLeft,
+                alpha);
+            return;
+        }
+
+        DrawLedRoleWrappedText(
+            rect,
+            model.RuleText,
+            MainGameLedFont.TextRole.SecondaryWarm,
+            TextAnchor.UpperLeft,
+            alpha);
+    }
+
+    private void DrawTooltipHighestMarker(Rect rect, float alpha)
+    {
+        DrawRect(rect, new Color(0.045f, 0.06f, 0.07f, alpha * 0.92f));
+        DrawBorder(rect, new Color(1f, 0.62f, 0.08f, alpha), 1f);
+        DrawTooltipArcadeText(
+            InsetRect(rect, 2f, 0f),
+            "最高",
+            8f,
+            new Color(1f, 0.7f, 0.2f, alpha),
+            TextAnchor.MiddleCenter,
+            false);
+    }
+
+    private static string FormatTooltipScientific(int value)
+    {
+        if (value == 0)
+        {
+            return "0";
+        }
+
+        double absolute = Math.Abs((double)value);
+        int exponent = (int)Math.Floor(Math.Log10(absolute));
+        double mantissa = absolute / Math.Pow(10d, exponent);
+        mantissa = Math.Round(mantissa, 2, MidpointRounding.AwayFromZero);
+        if (mantissa >= 10d)
+        {
+            mantissa /= 10d;
+            exponent++;
+        }
+
+        string sign = value < 0 ? "-" : string.Empty;
+        return sign
+            + mantissa.ToString("0.00", CultureInfo.InvariantCulture)
+            + "×10"
+            + TooltipSuperscriptInteger(exponent);
+    }
+
+    private static string FormatTooltipQuickRead(int value)
+    {
+        double absolute = Math.Abs((double)value);
+        if (absolute < 10000d)
+        {
+            return value.ToString("N0", CultureInfo.InvariantCulture);
+        }
+
+        double divisor = absolute >= 100000000d ? 100000000d : 10000d;
+        string unit = absolute >= 100000000d ? "亿" : "万";
+        string sign = value < 0 ? "-" : string.Empty;
+        return "约"
+            + sign
+            + (absolute / divisor).ToString("0.##", CultureInfo.InvariantCulture)
+            + unit;
+    }
+
+    private static string TooltipSuperscriptInteger(int value)
+    {
+        const string digits = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+        string source = Math.Abs(value).ToString(CultureInfo.InvariantCulture);
+        StringBuilder result = new StringBuilder(source.Length + 1);
+        if (value < 0)
+        {
+            result.Append('⁻');
+        }
+        for (int i = 0; i < source.Length; i++)
+        {
+            result.Append(digits[source[i] - '0']);
+        }
+        return result.ToString();
+    }
+
+    private void DrawTooltipArcadeText(Rect rect, string text, float size, Color color, TextAnchor alignment, bool wrapped)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        if (mainGameLedFont != null && mainGameLedFont.IsReady)
+        {
+            if (wrapped)
+            {
+                mainGameLedFont.DrawWrapped(rect, text, size, color, alignment, 0f);
+            }
+            else
+            {
+                mainGameLedFont.Draw(rect, text, size, color, alignment, 0f);
+            }
+            return;
+        }
+
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.font = uiFont;
+        style.fontSize = Mathf.RoundToInt(size);
+        style.fontStyle = FontStyle.Bold;
+        style.normal.textColor = color;
+        style.alignment = alignment;
+        style.wordWrap = wrapped;
+        style.clipping = TextClipping.Clip;
+        DrawStandardLabel(rect, text, style);
+    }
+
+    private void DrawTooltipBodyWrapped(Rect rect, string text, Color color)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.font = uiFont;
+        style.fontSize = 14;
+        style.fontStyle = FontStyle.Normal;
+        style.normal.textColor = color;
+        style.alignment = TextAnchor.UpperLeft;
+        style.wordWrap = true;
+        style.clipping = TextClipping.Clip;
+        DrawStandardLabel(rect, text, style);
+    }
+
+    private void DrawTooltipChip(Rect rect, string text, Color accent, float alpha)
+    {
+        DrawRect(rect, new Color(0.025f, 0.055f, 0.072f, alpha * 0.9f));
+        DrawBorder(rect, new Color(accent.r, accent.g, accent.b, alpha * 0.84f), 1f);
+
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.font = uiFont;
+        style.fontSize = 11;
+        style.fontStyle = FontStyle.Bold;
+        style.normal.textColor = new Color(0.9f, 0.84f, 0.68f, alpha);
+        style.alignment = TextAnchor.MiddleCenter;
+        style.clipping = TextClipping.Clip;
+        DrawStandardLabel(InsetRect(rect, 3f, 1f), text, style);
+    }
+
+    private void DrawTooltipKeywordChip(Rect rect, string text, Color accent, float alpha)
+    {
+        DrawRect(rect, new Color(0.025f, 0.055f, 0.072f, alpha * 0.92f));
+        DrawBorder(rect, new Color(accent.r, accent.g, accent.b, alpha), 1f);
+        DrawTooltipArcadeText(
+            InsetRect(rect, 4f, 1f),
+            text,
+            11f,
+            new Color(accent.r, accent.g, accent.b, alpha),
+            TextAnchor.MiddleCenter,
+            false);
+    }
+
+    private void DrawTooltipStateRow(Rect rect, string text, Color accent, float alpha)
+    {
+        DrawRect(new Rect(rect.x, rect.y + 2f, 4f, Mathf.Max(4f, rect.height - 4f)), new Color(accent.r, accent.g, accent.b, alpha * 0.82f));
+
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.font = uiFont;
+        style.fontSize = 12;
+        style.fontStyle = FontStyle.Normal;
+        style.normal.textColor = new Color(0.82f, 0.82f, 0.72f, alpha);
+        style.alignment = TextAnchor.MiddleLeft;
+        style.clipping = TextClipping.Clip;
+        DrawStandardLabel(new Rect(rect.x + 10f, rect.y, rect.width - 10f, rect.height), text, style);
+    }
+
+    private void DrawTooltipKeywordRow(Rect rect, string text, Color accent, float alpha)
+    {
+        DrawRect(new Rect(rect.x, rect.y + 2f, 4f, Mathf.Max(4f, rect.height - 4f)), new Color(accent.r, accent.g, accent.b, alpha * 0.9f));
+        DrawLedRoleWrappedText(
+            new Rect(rect.x + 10f, rect.y, rect.width - 10f, rect.height),
+            text,
+            MainGameLedFont.TextRole.SecondaryWarm,
+            TextAnchor.UpperLeft,
+            alpha);
+    }
+
+    private void DrawTooltipEconomyRow(Rect rect, DiceTooltipViewModel model, float alpha)
+    {
+        string text = model.ShowBuyPrice
+            ? "买 " + model.BuyPrice.ToString(CultureInfo.InvariantCulture) + "    预计卖 " + model.SellPrice.ToString(CultureInfo.InvariantCulture)
+            : "当前卖出 " + model.SellPrice.ToString(CultureInfo.InvariantCulture);
+        DrawRect(rect, new Color(0.07f, 0.105f, 0.115f, alpha * 0.92f));
+        DrawBorder(rect, new Color(0.88f, 0.56f, 0.18f, alpha * 0.88f), 1f);
+        DrawTooltipArcadeText(
+            InsetRect(rect, 6f, 1f),
+            text,
+            12f,
+            new Color(1f, 0.68f, 0.22f, alpha),
+            TextAnchor.MiddleCenter,
+            false);
+    }
+
+    private Color TooltipFamilyColor(string family)
+    {
+        if (string.Equals(family, "猪猪", StringComparison.Ordinal))
+        {
+            return new Color(0.92f, 0.42f, 0.36f);
+        }
+        if (string.Equals(family, "恶魔", StringComparison.Ordinal))
+        {
+            return new Color(0.72f, 0.27f, 0.25f);
+        }
+        if (string.Equals(family, "龟龟", StringComparison.Ordinal))
+        {
+            return new Color(0.28f, 0.72f, 0.64f);
+        }
+        if (string.Equals(family, "海盗", StringComparison.Ordinal))
+        {
+            return new Color(0.3f, 0.52f, 0.76f);
+        }
+
+        return new Color(0.76f, 0.58f, 0.3f);
+    }
+
+    private Color TooltipKeywordAccentColor(string family)
+    {
+        if (string.Equals(family, "pig", StringComparison.OrdinalIgnoreCase))
+        {
+            return TooltipFamilyColor("猪猪");
+        }
+        if (string.Equals(family, "devil", StringComparison.OrdinalIgnoreCase))
+        {
+            return TooltipFamilyColor("恶魔");
+        }
+        if (string.Equals(family, "turtle", StringComparison.OrdinalIgnoreCase))
+        {
+            return TooltipFamilyColor("龟龟");
+        }
+        if (string.Equals(family, "pirate", StringComparison.OrdinalIgnoreCase))
+        {
+            return TooltipFamilyColor("海盗");
+        }
+
+        return TooltipFamilyColor("中立");
     }
 
     private void DrawTooltipDivider(Rect rect, float alpha)
@@ -4903,7 +13269,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         Color old = GUI.color;
         GUI.color = new Color(1f, 1f, 1f, alpha);
-        GUI.Label(rect, text, style);
+        DrawStandardLabel(rect, text, style);
         GUI.color = old;
     }
 
@@ -4915,28 +13281,559 @@ public sealed class DiceKingDemo : MonoBehaviour
             name = TypeName(die.Type);
         }
 
-        return TooltipTrim(name, 16);
+        return name;
     }
 
-    private string TooltipEffectText(Die die, bool allowCurrentStateText)
+    private DiceTooltipViewModel BuildDiceTooltipViewModel(Die die, DiceTooltipContext context, int buyPrice)
     {
+        string rawRuleText = die != null ? DiceTypeTooltipEffect(die) : string.Empty;
+        DiceTooltipViewModel model = new DiceTooltipViewModel
+        {
+            Die = die,
+            Context = context,
+            BuyPrice = Mathf.Max(0, buyPrice),
+            SellPrice = die != null ? SellPrice(die) : 0,
+            DisplayName = TooltipDisplayName(die),
+            TriggerLabel = die != null ? TooltipTriggerLabel(die.Type) : string.Empty
+        };
+        model.RuleText = ResolveKeywordTokens(rawRuleText, model.RuleHighlights);
+
         if (die == null)
+        {
+            model.RuleLineCount = 1;
+            model.RuleHeight = 40f;
+            model.PanelHeight = TooltipPanelShortHeight;
+            return model;
+        }
+
+        for (MainFamily family = MainFamily.Pig; family <= MainFamily.Pirate; family++)
+        {
+            if (HasMainFamily(die.Type, family))
+            {
+                model.FamilyLabels.Add(TooltipFamilyShortName(family));
+            }
+        }
+
+        if (model.FamilyLabels.Count == 0)
+        {
+            model.FamilyLabels.Add("中立");
+        }
+
+        PopulateTooltipEffectiveFaces(model, die);
+
+        if (die.Growth > 0)
+        {
+            model.StateRows.Add("成长 " + die.Growth.ToString(CultureInfo.InvariantCulture) + " 层");
+        }
+
+        string feedText = FeedStateText(die);
+        bool hasFeedState = !string.IsNullOrEmpty(feedText);
+        if (hasFeedState)
+        {
+            model.StateRows.Add(feedText);
+        }
+
+        string devourText = DevourStateText(die);
+        bool hasDevourState = !string.IsNullOrEmpty(devourText);
+        if (hasDevourState)
+        {
+            model.StateRows.Add(devourText);
+        }
+
+        string turtleAttachmentText = TurtleAttachmentStateText(die);
+        bool hasShellState = !string.IsNullOrEmpty(turtleAttachmentText);
+        if (hasShellState)
+        {
+            model.StateRows.Add(TooltipFirstLine(turtleAttachmentText));
+        }
+
+        PopulateTooltipKeywords(model, die.Type, hasFeedState, hasDevourState, hasShellState);
+        model.RuleLineCount = EstimateTooltipRuleLineCount(model.RuleText);
+        model.RuleHeight = Mathf.Max(40f, model.RuleLineCount * 18f);
+        model.KeywordSectionHeight = TooltipKeywordSectionHeight(model.Keywords);
+        float optionalHeight = model.StateRows.Count * 18f + (model.ShowEconomy ? 22f : 0f);
+        float requiredHeight = 106f
+            + model.FaceGridHeight
+            + model.RuleHeight
+            + 6f
+            + optionalHeight
+            + model.KeywordSectionHeight
+            + 10f;
+        model.PanelHeight = TooltipPanelHeightForRequired(requiredHeight);
+
+        return model;
+    }
+
+    private void PopulateTooltipEffectiveFaces(DiceTooltipViewModel model, Die die)
+    {
+        if (model == null || die == null)
+        {
+            return;
+        }
+
+        int[] sourceFaces = die.Faces ?? new int[0];
+        int feedMinimum = die.FeedValue > 0
+            ? MinimumFaceValue(die) + Mathf.Max(0, die.FeedValue)
+            : int.MinValue;
+        bool hasLuckyTurtle = CountTurtleAttachmentsOfType(die, DieType.LuckyTurtle) > 0;
+        int highestFace = HighestFaceValue(die);
+        long maximumMagnitude = 0L;
+        int highestValue = int.MinValue;
+        int highestCount = 0;
+        for (int i = 0; i < model.EffectiveFaces.Length; i++)
+        {
+            int value = i < sourceFaces.Length ? sourceFaces[i] : 0;
+            if (die.FeedValue > 0)
+            {
+                value = Mathf.Max(value, feedMinimum);
+            }
+            if (hasLuckyTurtle)
+            {
+                value = Mathf.Max(value, highestFace);
+            }
+
+            model.EffectiveFaces[i] = value;
+            maximumMagnitude = Math.Max(maximumMagnitude, Math.Abs((long)value));
+            if (value > highestValue)
+            {
+                highestValue = value;
+                highestCount = 1;
+                model.UniqueHighestFaceIndex = i;
+            }
+            else if (value == highestValue)
+            {
+                highestCount++;
+            }
+        }
+
+        if (highestCount != 1)
+        {
+            model.UniqueHighestFaceIndex = -1;
+        }
+
+        if (maximumMagnitude < TooltipSingleRowExactThreshold)
+        {
+            model.FaceDisplayMode = TooltipFaceDisplayMode.SingleRowExact;
+            model.FaceGridHeight = 44f;
+        }
+        else if (maximumMagnitude < TooltipScientificThreshold)
+        {
+            model.FaceDisplayMode = TooltipFaceDisplayMode.GridExact;
+            model.FaceGridHeight = 94f;
+        }
+        else
+        {
+            model.FaceDisplayMode = TooltipFaceDisplayMode.GridScientific;
+            model.FaceGridHeight = 102f;
+        }
+    }
+
+    private void PopulateTooltipKeywords(
+        DiceTooltipViewModel model,
+        DieType type,
+        bool hasFeedState,
+        bool hasDevourState,
+        bool hasShellState)
+    {
+        Dictionary<string, TooltipKeywordViewModel> selected = new Dictionary<string, TooltipKeywordViewModel>(StringComparer.OrdinalIgnoreCase);
+        List<KeywordBindingConfig> bindings;
+        if (dieKeywordBindings.TryGetValue(type, out bindings))
+        {
+            AddTooltipKeywordBindings(selected, bindings);
+        }
+
+        if (hasFeedState && stateKeywordBindings.TryGetValue(KeywordStateFeedStatus, out bindings))
+        {
+            AddTooltipKeywordBindings(selected, bindings);
+        }
+        if (hasDevourState && stateKeywordBindings.TryGetValue(KeywordStateDevourHistory, out bindings))
+        {
+            AddTooltipKeywordBindings(selected, bindings);
+        }
+        if (hasShellState && stateKeywordBindings.TryGetValue(KeywordStateShellAttachment, out bindings))
+        {
+            AddTooltipKeywordBindings(selected, bindings);
+        }
+
+        foreach (KeyValuePair<string, TooltipKeywordViewModel> pair in selected)
+        {
+            pair.Value.LineCount = EstimateTooltipWrappedLineCount(pair.Value.Explanation, 36f, 4);
+            model.Keywords.Add(pair.Value);
+        }
+
+        model.Keywords.Sort(delegate (TooltipKeywordViewModel left, TooltipKeywordViewModel right)
+        {
+            int order = left.DisplayOrder.CompareTo(right.DisplayOrder);
+            if (order != 0)
+            {
+                return order;
+            }
+
+            order = left.DefaultOrder.CompareTo(right.DefaultOrder);
+            return order != 0 ? order : string.Compare(left.Key, right.Key, StringComparison.OrdinalIgnoreCase);
+        });
+    }
+
+    private void AddTooltipKeywordBindings(
+        Dictionary<string, TooltipKeywordViewModel> selected,
+        List<KeywordBindingConfig> bindings)
+    {
+        for (int i = 0; i < bindings.Count; i++)
+        {
+            KeywordBindingConfig binding = bindings[i];
+            KeywordGlossaryConfig glossary;
+            if (!keywordGlossaryConfigs.TryGetValue(binding.KeywordKey, out glossary))
+            {
+                continue;
+            }
+
+            if (!glossary.ShowExplanation)
+            {
+                continue;
+            }
+
+            TooltipKeywordViewModel existing;
+            if (selected.TryGetValue(binding.KeywordKey, out existing))
+            {
+                existing.DisplayOrder = Mathf.Min(existing.DisplayOrder, binding.DisplayOrder);
+                continue;
+            }
+
+            selected[binding.KeywordKey] = new TooltipKeywordViewModel
+            {
+                Key = glossary.Key,
+                DisplayName = glossary.DisplayName,
+                Explanation = glossary.Explanation,
+                AccentFamily = glossary.AccentFamily,
+                DisplayOrder = binding.DisplayOrder,
+                DefaultOrder = glossary.DefaultOrder
+            };
+        }
+    }
+
+    private static float TooltipKeywordSectionHeight(List<TooltipKeywordViewModel> keywords)
+    {
+        if (keywords == null || keywords.Count == 0)
+        {
+            return 0f;
+        }
+
+        float height = 8f;
+        for (int i = 0; i < keywords.Count; i++)
+        {
+            height += 24f + Mathf.Max(18f, keywords[i].LineCount * 18f);
+            if (i < keywords.Count - 1)
+            {
+                height += 4f;
+            }
+        }
+        return height;
+    }
+
+    private static float TooltipPanelHeightForRequired(float requiredHeight)
+    {
+        if (requiredHeight <= TooltipPanelShortHeight)
+        {
+            return TooltipPanelShortHeight;
+        }
+        if (requiredHeight <= TooltipPanelMediumHeight)
+        {
+            return TooltipPanelMediumHeight;
+        }
+        if (requiredHeight <= TooltipPanelTallHeight)
+        {
+            return TooltipPanelTallHeight;
+        }
+        if (requiredHeight <= TooltipPanelExtendedSmallHeight)
+        {
+            return TooltipPanelExtendedSmallHeight;
+        }
+        if (requiredHeight <= TooltipPanelExtendedMediumHeight)
+        {
+            return TooltipPanelExtendedMediumHeight;
+        }
+        if (requiredHeight <= TooltipPanelExtendedTallHeight)
+        {
+            return TooltipPanelExtendedTallHeight;
+        }
+
+        return TooltipPanelExtendedMaxHeight;
+    }
+
+    private string TooltipFamilyShortName(MainFamily family)
+    {
+        switch (family)
+        {
+            case MainFamily.Pig:
+                return "猪猪";
+            case MainFamily.Devil:
+                return "恶魔";
+            case MainFamily.Turtle:
+                return "龟龟";
+            case MainFamily.Pirate:
+                return "海盗";
+        }
+
+        return "中立";
+    }
+
+    private string TooltipTriggerLabel(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.Basic:
+            case DieType.Odd:
+            case DieType.Even:
+                return "常驻";
+
+            case DieType.Piggy:
+            case DieType.Tree:
+            case DieType.Gambler:
+            case DieType.BountyGold:
+            case DieType.TopGold:
+            case DieType.LoneWitness:
+            case DieType.ParityReview:
+            case DieType.Irrigation:
+            case DieType.PointSeedTree:
+            case DieType.PatternTree:
+            case DieType.CanopyTree:
+                return "投掷时";
+
+            case DieType.MeatPig:
+            case DieType.GreedyPig:
+                return "喂养时";
+
+            case DieType.TradePig:
+            case DieType.CrewPirate:
+            case DieType.TributePig:
+                return "卖出时";
+
+            case DieType.FeedWholesaler:
+            case DieType.Demon:
+            case DieType.Tribute:
+            case DieType.PirateCaptain:
+            case DieType.TrainingPirate:
+            case DieType.BloodPactCaptain:
+                return "买入时";
+
+            case DieType.Imp:
+                return "进市场";
+
+            case DieType.Devourer:
+            case DieType.BlackMarketImp:
+                return "吞噬时";
+
+            case DieType.DemonBat:
+            case DieType.RobberyPirate:
+            case DieType.ClearancePig:
+                return "离场时";
+
+            case DieType.AbyssSummon:
+            case DieType.SupplyPig:
+                return "货架生成";
+
+            case DieType.RefreshPirate:
+            case DieType.BlackSailBat:
+                return "刷新时";
+
+            case DieType.MoneyTurtle:
+            case DieType.TinyTurtle:
+            case DieType.DoubleTurtle:
+            case DieType.LuckyTurtle:
+            case DieType.MagnetTurtle:
+            case DieType.RallyTurtle:
+            case DieType.LeaderTurtle:
+            case DieType.PackTurtle:
+            case DieType.SharedFeastDemonTurtle:
+            case DieType.SafetyNetTurtle:
+                return string.Empty;
+
+            case DieType.TreasurePirate:
+            case DieType.CounterGold:
+                return "金币时";
+
+            case DieType.ParityFlipScore:
+            case DieType.ParityHoldScore:
+            case DieType.ParityTurner:
+            case DieType.PruningTree:
+            case DieType.LeadTicket:
+                return "出千时";
+
+            case DieType.Treasury:
+            case DieType.Investment:
+                return "小关始";
+
+            case DieType.CompoundInterest:
+                return "通关时";
+
+            case DieType.Crown:
+                return "回合末";
+
+            case DieType.Trigger:
+            case DieType.RootTree:
+                return "触发时";
+
+            case DieType.HandTax:
+            case DieType.HalfStep:
+            case DieType.ParityComplete:
+                return "牌型时";
+
+            case DieType.Gardener:
+                return "命中时";
+
+            case DieType.Bribe:
+            case DieType.RingTree:
+                return "结算后";
+
+            case DieType.Nest:
+                return "壳链时";
+        }
+
+        return "结算时";
+    }
+
+    private int EstimateTooltipRuleLineCount(string text)
+    {
+        return EstimateTooltipWrappedLineCount(text, 22f, 5);
+    }
+
+    private static int EstimateTooltipWrappedLineCount(string text, float maxLineUnits, int maxLines)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return 1;
+        }
+
+        float currentLineUnits = 0f;
+        int lineCount = 1;
+        for (int i = 0; i < text.Length; i++)
+        {
+            char character = text[i];
+            if (character == '\n')
+            {
+                lineCount++;
+                currentLineUnits = 0f;
+                continue;
+            }
+
+            float units = character <= 0x7f ? 0.58f : 1f;
+            if (currentLineUnits > 0f && currentLineUnits + units > maxLineUnits)
+            {
+                lineCount++;
+                currentLineUnits = units;
+            }
+            else
+            {
+                currentLineUnits += units;
+            }
+        }
+
+        return Mathf.Clamp(lineCount, 1, Mathf.Max(1, maxLines));
+    }
+
+    private string ResolveKeywordTokens(string text, List<MainGameLedFont.HighlightSpan> highlights)
+    {
+        if (highlights != null)
+        {
+            highlights.Clear();
+        }
+
+        if (string.IsNullOrEmpty(text) || text.IndexOf(KeywordTokenPrefix, StringComparison.Ordinal) < 0)
+        {
+            return text;
+        }
+
+        StringBuilder resolved = new StringBuilder();
+        int cursor = 0;
+        while (cursor < text.Length)
+        {
+            int tokenStart = text.IndexOf(KeywordTokenPrefix, cursor, StringComparison.Ordinal);
+            if (tokenStart < 0)
+            {
+                resolved.Append(text, cursor, text.Length - cursor);
+                break;
+            }
+
+            resolved.Append(text, cursor, tokenStart - cursor);
+            int keyStart = tokenStart + KeywordTokenPrefix.Length;
+            int tokenEnd = text.IndexOf(KeywordTokenSuffix, keyStart, StringComparison.Ordinal);
+            if (tokenEnd < 0)
+            {
+                resolved.Append("术语配置格式错误");
+                break;
+            }
+
+            string key = text.Substring(keyStart, tokenEnd - keyStart).Trim();
+            KeywordGlossaryConfig glossary;
+            if (keywordGlossaryConfigs.TryGetValue(key, out glossary))
+            {
+                int resolvedStart = resolved.Length;
+                resolved.Append(glossary.DisplayName);
+                if (highlights != null
+                    && glossary.ShowExplanation
+                    && IsValidTooltipAccentFamily(glossary.AccentFamily))
+                {
+                    highlights.Add(new MainGameLedFont.HighlightSpan(
+                        resolvedStart,
+                        glossary.DisplayName.Length,
+                        TooltipKeywordAccentColor(glossary.AccentFamily),
+                        true));
+                }
+            }
+            else
+            {
+                resolved.Append("术语配置缺失");
+            }
+            cursor = tokenEnd + KeywordTokenSuffix.Length;
+        }
+
+        return resolved.ToString();
+    }
+
+    private static List<string> ExtractKeywordTokenKeys(string text)
+    {
+        List<string> keys = new List<string>();
+        if (string.IsNullOrEmpty(text))
+        {
+            return keys;
+        }
+
+        int cursor = 0;
+        while (cursor < text.Length)
+        {
+            int tokenStart = text.IndexOf(KeywordTokenPrefix, cursor, StringComparison.Ordinal);
+            if (tokenStart < 0)
+            {
+                break;
+            }
+
+            int keyStart = tokenStart + KeywordTokenPrefix.Length;
+            int tokenEnd = text.IndexOf(KeywordTokenSuffix, keyStart, StringComparison.Ordinal);
+            if (tokenEnd < 0)
+            {
+                break;
+            }
+
+            string key = text.Substring(keyStart, tokenEnd - keyStart).Trim();
+            if (!string.IsNullOrEmpty(key))
+            {
+                keys.Add(key);
+            }
+            cursor = tokenEnd + KeywordTokenSuffix.Length;
+        }
+
+        return keys;
+    }
+
+    private string TooltipFirstLine(string text)
+    {
+        if (string.IsNullOrEmpty(text))
         {
             return string.Empty;
         }
 
-        string text = DiceTypeTooltipEffect(die);
-        if (string.IsNullOrEmpty(text))
-        {
-            text = allowCurrentStateText ? RoundTag(die) : MarketOfferHint(die);
-        }
-
-        if (string.IsNullOrEmpty(text))
-        {
-            text = TypeName(die.Type);
-        }
-
-        return text;
+        int lineBreak = text.IndexOf('\n');
+        return lineBreak >= 0 ? text.Substring(0, lineBreak) : text;
     }
 
     private string TooltipTypeName(DieType type)
@@ -4963,18 +13860,12 @@ public sealed class DiceKingDemo : MonoBehaviour
             return config.TooltipEffect;
         }
 
-        string fallback = MarketOfferHint(die);
-        if (string.IsNullOrEmpty(fallback))
-        {
-            fallback = RoundTag(die);
-        }
-
-        return string.IsNullOrEmpty(fallback) ? TypeName(die.Type) : fallback;
+        return TypeName(die.Type);
     }
 
     private string TooltipMaterialText(Die die)
     {
-        if (die == null)
+        if (!DiceMaterialFeatureEnabled || die == null)
         {
             return string.Empty;
         }
@@ -4995,6 +13886,12 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private bool DrawCompactDie(Rect rect, Die die, bool selected, string hoverKey = null)
     {
+        DrawCompactDieVisual(rect, die, selected, hoverKey, true);
+        return GUI.Button(rect, GUIContent.none, GUIStyle.none);
+    }
+
+    private void DrawCompactDieVisual(Rect rect, Die die, bool selected, string hoverKey, bool acceptHover)
+    {
         DrawUiSmallPanel(rect);
         if (selected)
         {
@@ -5003,24 +13900,28 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         DrawDieToken(new Rect(rect.x + 8f, rect.y + 8f, 38f, 38f), die, die.EffectiveValue > 0 ? die.EffectiveValue : die.Faces[0]);
-        GUI.Label(new Rect(rect.x + 56f, rect.y + 7f, rect.width - 62f, 22f), DieDisplayName(die), smallStyle);
-        string detail = affixFeatureEnabled ? AffixSlotSummary(die) : MaterialDisplayName(die.Material);
-        GUI.Label(new Rect(rect.x + 56f, rect.y + 28f, rect.width - 62f, 20f), FaceText(die.Faces) + " | " + detail, tinyStyle);
-        TrySetHoveredTooltip(rect, die, false, hoverKey);
-        return GUI.Button(rect, GUIContent.none, GUIStyle.none);
+        DrawStandardLabel(new Rect(rect.x + 56f, rect.y + 7f, rect.width - 62f, 22f), DieDisplayName(die), smallStyle);
+        string attachmentDetail = TurtleAttachmentShortText(die);
+        string detail = !string.IsNullOrEmpty(attachmentDetail) ? attachmentDetail : affixFeatureEnabled ? AffixSlotSummary(die) : TypeName(die.Type);
+        string faceSummary = FaceText(die.Faces);
+        DrawStandardLabel(new Rect(rect.x + 56f, rect.y + 28f, rect.width - 62f, 20f), string.IsNullOrEmpty(detail) ? faceSummary : faceSummary + " | " + detail, tinyStyle);
+        if (acceptHover)
+        {
+            TrySetHoveredTooltip(rect, die, DiceTooltipContext.MarketBag, -1, hoverKey);
+        }
     }
 
     private void DrawCraftingTargetPanel(Rect rect)
     {
         CraftingItemDefinition item = CraftingItemDefinitionForKey(activeCraftingItemKey);
         string itemName = item != null ? item.DisplayName : "改造道具";
-        GUI.Label(new Rect(rect.x + 18f, rect.y + 8f, 190f, 22f), "使用 " + itemName, smallStyle);
+        DrawStandardLabel(new Rect(rect.x + 18f, rect.y + 8f, 190f, 22f), "使用 " + itemName, smallStyle);
 
         Die selectedDie = selectedMarketDieIndex >= 0 && selectedMarketDieIndex < dice.Count ? dice[selectedMarketDieIndex] : null;
         string reason;
         bool canUse = CanUseCraftingItemOnDie(activeCraftingItemKey, selectedDie, out reason);
-        GUI.Label(new Rect(rect.x + 18f, rect.y + 34f, 190f, 20f), selectedDie != null ? DieDisplayName(selectedDie) : "请选择目标骰", tinyStyle);
-        GUI.Label(new Rect(rect.x + 18f, rect.y + 56f, 190f, 18f), reason, tinyStyle);
+        DrawStandardLabel(new Rect(rect.x + 18f, rect.y + 34f, 190f, 20f), selectedDie != null ? DieDisplayName(selectedDie) : "请选择目标骰", tinyStyle);
+        DrawStandardLabel(new Rect(rect.x + 18f, rect.y + 56f, 190f, 18f), reason, tinyStyle);
 
         GUI.enabled = canUse;
         if (DrawUiButton(new Rect(rect.x + 208f, rect.y + 10f, 118f, 34f), "执行", UiButtonKind.Primary))
@@ -5039,7 +13940,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void DrawCraftingInventoryPanel(Rect rect)
     {
         DrawUiSmallPanel(rect);
-        GUI.Label(new Rect(rect.x + 16f, rect.y + 15f, 86f, 22f), "改造道具", smallStyle);
+        DrawStandardLabel(new Rect(rect.x + 16f, rect.y + 15f, 86f, 22f), "改造道具", smallStyle);
         DrawCraftingInventoryButton(new Rect(rect.x + 108f, rect.y + 9f, 168f, 34f), "affix_add_stone");
         DrawCraftingInventoryButton(new Rect(rect.x + 286f, rect.y + 9f, 168f, 34f), "affix_remove_stone");
         DrawCraftingInventoryButton(new Rect(rect.x + 464f, rect.y + 9f, 168f, 34f), "affix_replace_stone");
@@ -5062,11 +13963,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (icon != null)
         {
             GUI.DrawTexture(new Rect(rect.x + 8f, rect.y + 5f, 24f, 24f), icon, ScaleMode.ScaleToFit, true);
-            GUI.Label(new Rect(rect.x + 38f, rect.y, rect.width - 42f, rect.height), name + " x" + count, count > 0 ? artButtonStyle : disabledButtonLabelStyle);
+            DrawStandardLabel(new Rect(rect.x + 38f, rect.y, rect.width - 42f, rect.height), name + " x" + count, count > 0 ? artButtonStyle : disabledButtonLabelStyle);
         }
         else
         {
-            GUI.Label(rect, name + " x" + count, count > 0 ? artButtonStyle : disabledButtonLabelStyle);
+            DrawStandardLabel(rect, name + " x" + count, count > 0 ? artButtonStyle : disabledButtonLabelStyle);
         }
     }
 
@@ -5078,12 +13979,23 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
+        if (offer.Kind == MarketOfferKind.Empty)
+        {
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), "已售出", cardTitleStyle);
+            Rect emptyIconBack = new Rect(rect.x + 52f, rect.y + 62f, 100f, 88f);
+            DrawPanel(emptyIconBack, new Color(0.68f, 0.62f, 0.54f, 0.34f));
+            DrawBorder(emptyIconBack, new Color(0.46f, 0.36f, 0.28f, 0.56f), 3f);
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 162f, rect.width - 44f, 22f), "本格不会自动补货", smallStyle);
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 188f, rect.width - 44f, 22f), "付费刷新会替换全部货架", tinyStyle);
+            return;
+        }
+
         if (offer.Kind == MarketOfferKind.CraftingItem)
         {
             if (!affixFeatureEnabled)
             {
-                GUI.Label(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), "货架刷新中", cardTitleStyle);
-                GUI.Label(new Rect(rect.x + 22f, rect.y + 160f, rect.width - 44f, 22f), "刷新后替换为骰子商品", smallStyle);
+                DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), "货架刷新中", cardTitleStyle);
+                DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 160f, rect.width - 44f, 22f), "刷新后替换为骰子商品", smallStyle);
                 return;
             }
 
@@ -5091,24 +14003,33 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), offer.Die.Name, cardTitleStyle);
+        DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), offer.Die.Name, cardTitleStyle);
         Rect iconBack = new Rect(rect.x + 52f, rect.y + 58f, 100f, 96f);
-        DrawDiceMaterialOverlay(iconBack, offer.Die.Material, 0.42f);
+        DiceMaterial material = ActiveDiceMaterial(offer.Die);
+        DrawDiceMaterialOverlay(iconBack, material, 0.42f);
         DrawDieTypeIcon(new Rect(rect.x + 58f, rect.y + 62f, 88f, 88f), offer.Die.Type);
-        Rect materialStrip = new Rect(rect.x + 22f, rect.y + 152f, rect.width - 44f, 24f);
-        DrawDiceMaterialOverlay(materialStrip, offer.Die.Material, 0.45f);
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 154f, rect.width - 44f, 22f), MaterialDisplayName(offer.Die.Material), smallStyle);
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 176f, rect.width - 44f, 22f), TypeName(offer.Die.Type) + " | " + FaceText(offer.Die.Faces), smallStyle);
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 200f, rect.width - 44f, 18f), MarketOfferHint(offer.Die), tinyStyle);
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 220f, rect.width - 44f, 18f), MaterialShortRule(offer.Die.Material), tinyStyle);
-        TrySetHoveredTooltip(rect, offer.Die, false, hoverKey + "-" + offer.Die.Id);
+        if (DiceMaterialFeatureEnabled)
+        {
+            Rect materialStrip = new Rect(rect.x + 22f, rect.y + 152f, rect.width - 44f, 24f);
+            DrawDiceMaterialOverlay(materialStrip, material, 0.45f);
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 154f, rect.width - 44f, 22f), MaterialDisplayName(material), smallStyle);
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 176f, rect.width - 44f, 22f), TypeName(offer.Die.Type) + " | " + FaceText(offer.Die.Faces), smallStyle);
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 200f, rect.width - 44f, 18f), MarketOfferHint(offer.Die), tinyStyle);
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 220f, rect.width - 44f, 18f), MaterialShortRule(material), tinyStyle);
+        }
+        else
+        {
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 160f, rect.width - 44f, 22f), TypeName(offer.Die.Type) + " | " + FaceText(offer.Die.Faces), smallStyle);
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 184f, rect.width - 44f, 20f), MarketOfferHint(offer.Die), tinyStyle);
+        }
+        TrySetHoveredTooltip(rect, offer.Die, DiceTooltipContext.MarketOffer, CurrentOfferPrice(offer), hoverKey + "-" + offer.Die.Id);
     }
 
     private void DrawCraftingMarketOffer(Rect rect, MarketOffer offer)
     {
         CraftingItemDefinition item = offer.CraftingItem;
         string name = item != null ? item.DisplayName : "改造道具";
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), name, cardTitleStyle);
+        DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), name, cardTitleStyle);
 
         Rect iconRect = new Rect(rect.x + 52f, rect.y + 62f, 100f, 88f);
         Texture2D itemIcon = CraftingItemIcon(item != null ? item.Key : string.Empty);
@@ -5126,10 +14047,10 @@ public sealed class DiceKingDemo : MonoBehaviour
             DrawRect(new Rect(iconRect.x + 34f, iconRect.y + 22f, 32f, 8f), new Color(1f, 0.96f, 0.78f, 0.7f));
         }
 
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 160f, rect.width - 44f, 22f), "市场改造道具", smallStyle);
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 184f, rect.width - 44f, 20f), item != null ? item.ShortRule : "随机改造词缀", tinyStyle);
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 206f, rect.width - 44f, 18f), "持有 " + CraftingItemCount(item != null ? item.Key : string.Empty), tinyStyle);
-        GUI.Label(new Rect(rect.x + 22f, rect.y + 226f, rect.width - 44f, 18f), "购买后市场阶段使用", tinyStyle);
+        DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 160f, rect.width - 44f, 22f), "市场改造道具", smallStyle);
+        DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 184f, rect.width - 44f, 20f), item != null ? item.ShortRule : "随机改造词缀", tinyStyle);
+        DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 206f, rect.width - 44f, 18f), "持有 " + CraftingItemCount(item != null ? item.Key : string.Empty), tinyStyle);
+        DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 226f, rect.width - 44f, 18f), "购买后市场阶段使用", tinyStyle);
     }
 
     private string MarketBuyButtonText(MarketOffer offer)
@@ -5139,31 +14060,126 @@ public sealed class DiceKingDemo : MonoBehaviour
             return "不可购买";
         }
 
+        if (offer.Kind == MarketOfferKind.Empty)
+        {
+            return "已售出";
+        }
+
         if (offer.Kind == MarketOfferKind.CraftingItem && !affixFeatureEnabled)
         {
             return "不可购买";
         }
 
-        if (offer.Kind == MarketOfferKind.Die && dice.Count >= DiceCapacity)
+        if (offer.Kind == MarketOfferKind.Die && offer.Die != null && offer.Die.Type == DieType.Tribute && dice.Count <= 0)
         {
-            return "骰袋已满";
+            return "无奉献目标";
         }
 
-        int missingGold = offer.Price - chapterGold;
+        if (offer.Kind == MarketOfferKind.Die && offer.Die != null && offer.Die.Type != DieType.Tribute && dice.Count >= DiceCapacity)
+        {
+            if (!HasDiceOfType(DieType.BloodPactCaptain))
+            {
+                return "骰袋已满";
+            }
+
+            int bloodPactPrice = CurrentOfferPrice(offer);
+            int bloodPactMissingGold = bloodPactPrice - chapterGold;
+            return bloodPactMissingGold > 0 ? "差 " + bloodPactMissingGold + " 金" : "血契吞噬 " + bloodPactPrice + " 金";
+        }
+
+        int price = CurrentOfferPrice(offer);
+        int missingGold = price - chapterGold;
         if (missingGold > 0)
         {
             return "差 " + missingGold + " 金";
         }
 
-        return "购买 " + offer.Price + " 金";
+        if (offer.Kind == MarketOfferKind.Die && offer.Die != null && offer.Die.Type == DieType.Tribute)
+        {
+            return "奉献 " + price + " 金";
+        }
+
+        return "购买 " + price + " 金";
     }
 
     private string MarketOfferHint(Die die)
+    {
+        if (die == null)
+        {
+            return string.Empty;
+        }
+
+        string baseHint = MarketOfferBaseHint(die);
+        string feedState = FeedStateShortText(die);
+        return string.IsNullOrEmpty(feedState) ? baseHint : feedState + " | " + baseHint;
+    }
+
+    private string MarketOfferBaseHint(Die die)
     {
         switch (die.Type)
         {
             case DieType.Piggy:
                 return CountDiceOfType(DieType.Piggy) > 0 ? "强化经济循环" : "早买更会赚钱";
+            case DieType.PigFarmer:
+                return "结算喂左右 +2";
+            case DieType.MeatPig:
+                return "自己被喂养时翻倍";
+            case DieType.TradePig:
+                return "卖出转移喂养";
+            case DieType.SowPig:
+                return "结算全体 +1 饲";
+            case DieType.ThreeLittlePigs:
+                return "读取全队喂养得分";
+            case DieType.GreedyPig:
+                return "别人吃时自己也吃";
+            case DieType.FeedWholesaler:
+                return "买入提高喂养质量";
+            case DieType.Imp:
+                return "过关后市场最低点 +1";
+            case DieType.Devourer:
+                return "吞噬时钱包 +1 金";
+            case DieType.Demon:
+                return "购买让本市底 +1";
+            case DieType.DemonBat:
+                return "离市吞 1 个货架";
+            case DieType.AbyssSummon:
+                return "刷新固定刷贡品";
+            case DieType.Tribute:
+                return TributeOfferHint(die);
+            case DieType.RefreshPirate:
+                return "刷新净费用 -1";
+            case DieType.PlunderPirate:
+                return "结算劫左右换金币";
+            case DieType.CrewPirate:
+                return "卖 2 次招募基础骰";
+            case DieType.PirateCaptain:
+                return "海盗买价半价";
+            case DieType.TrainingPirate:
+                return "买入后练其它骰";
+            case DieType.TreasurePirate:
+                return "金币入账后成长";
+            case DieType.RobberyPirate:
+                return "离市抢 1 个货架";
+            case DieType.PirateKing:
+                return "每 3 金全部六面+1";
+            case DieType.BlackSailBat:
+                return "刷新前吞旧货架";
+            case DieType.PackTurtle:
+                return "化壳时按喂养额外加面";
+            case DieType.TributePig:
+                return "卖出后奉献自身";
+            case DieType.BlackMarketImp:
+                return "市场吞噬积刷新折扣";
+            case DieType.BloodPactCaptain:
+                return "袋满买骰直接吞噬";
+            case DieType.ClearancePig:
+                return "离市按空货架获得喂养";
+            case DieType.SupplyPig:
+                return "刷新后喂最低价货架";
+            case DieType.SharedFeastDemonTurtle:
+                return "宿主吞噬时分给右邻";
+            case DieType.SafetyNetTurtle:
+                return "喂养抬高点数时加面";
             case DieType.Treasury:
                 return "本金越厚越稳";
             case DieType.Bribe:
@@ -5190,6 +14206,20 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "压左侧分换金币";
             case DieType.Turtle:
                 return "高点启动壳链";
+            case DieType.MoneyTurtle:
+                return "化壳后结算 +1 金";
+            case DieType.TinyTurtle:
+                return "化壳后结算时全部六面+1";
+            case DieType.DoubleTurtle:
+                return "化壳时最低面翻倍";
+            case DieType.LuckyTurtle:
+                return "化壳后始终最大面";
+            case DieType.MagnetTurtle:
+                return "化壳后给其它骰加壳";
+            case DieType.RallyTurtle:
+                return "按其它龟化壳数加面";
+            case DieType.LeaderTurtle:
+                return "其它龟化壳时复制效果";
             case DieType.Shellsmith:
                 return "小骰越多越加分";
             case DieType.Nest:
@@ -5254,10 +14284,10 @@ public sealed class DiceKingDemo : MonoBehaviour
     private bool DrawDieCard(Rect rect, Die die)
     {
         DrawUiSmallPanel(rect);
-        DrawDieToken(new Rect(rect.x + 8f, rect.y + 10f, 56f, 56f), die, die.EffectiveValue > 0 ? die.EffectiveValue : 0);
-        GUI.Label(new Rect(rect.x + 74f, rect.y + 8f, rect.width - 82f, 24f), DieDisplayName(die), smallStyle);
-        GUI.Label(new Rect(rect.x + 74f, rect.y + 32f, rect.width - 82f, 20f), TypeName(die.Type) + " | " + FaceText(die.Faces), tinyStyle);
-        GUI.Label(new Rect(rect.x + 74f, rect.y + 52f, rect.width - 82f, 20f), AffixOrRoundTag(die), tinyStyle);
+        DrawDieToken(new Rect(rect.x + 8f, rect.y + 10f, 56f, 56f), die, rollResultsLocked ? die.EffectiveValue : 0);
+        DrawStandardLabel(new Rect(rect.x + 74f, rect.y + 8f, rect.width - 82f, 24f), DieDisplayName(die), smallStyle);
+        DrawStandardLabel(new Rect(rect.x + 74f, rect.y + 32f, rect.width - 82f, 20f), TypeName(die.Type) + " | " + FaceText(die.Faces), tinyStyle);
+        DrawStandardLabel(new Rect(rect.x + 74f, rect.y + 52f, rect.width - 82f, 20f), AffixOrRoundTag(die), tinyStyle);
         return GUI.Button(rect, GUIContent.none, GUIStyle.none);
     }
 
@@ -5267,7 +14297,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         float y = area.y;
         for (int i = start; i < logLines.Count; i++)
         {
-            GUI.Label(new Rect(area.x, y, area.width, 24f), logLines[i], tinyStyle);
+            DrawStandardLabel(new Rect(area.x, y, area.width, 24f), logLines[i], tinyStyle);
             y += 24f;
         }
     }
@@ -5280,6 +14310,16 @@ public sealed class DiceKingDemo : MonoBehaviour
             for (int i = 0; i < dice.Count; i++)
             {
                 views.Add(NewTableDieView(dice[i], -1, -1));
+            }
+
+            return views;
+        }
+
+        if (settlementImpactPresentationActive)
+        {
+            for (int i = 0; i < dice.Count; i++)
+            {
+                views.Add(NewTableDieView(dice[i], i, i));
             }
 
             return views;
@@ -5312,7 +14352,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
             hiddenEndIndex = i;
             hiddenTemporaryDice++;
-            hiddenTemporaryScore += Mathf.Max(0, die.Score);
+            hiddenTemporaryScore += die.Score;
         }
 
         if (hiddenTemporaryDice > 0)
@@ -5332,6 +14372,22 @@ public sealed class DiceKingDemo : MonoBehaviour
         return views;
     }
 
+    private List<TableDieView> BuildDiceOrderDragTableViews()
+    {
+        List<TableDieView> views = new List<TableDieView>();
+        List<int> visualIndices = DiceOrderVisualIndices(DiceOrderDragSurface.RunTable);
+        for (int i = 0; i < visualIndices.Count; i++)
+        {
+            int dieIndex = visualIndices[i];
+            if (dieIndex >= 0 && dieIndex < dice.Count)
+            {
+                views.Add(NewTableDieView(dice[dieIndex], -1, -1));
+            }
+        }
+
+        return views;
+    }
+
     private TableDieView NewTableDieView(Die die, int scoreIndexStart, int scoreIndexEnd)
     {
         return new TableDieView
@@ -5339,7 +14395,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             Die = die,
             ScoreIndexStart = scoreIndexStart,
             ScoreIndexEnd = scoreIndexEnd,
-            Value = die.EffectiveValue > 0 ? die.EffectiveValue : 0,
+            Value = rollResultsLocked ? die.EffectiveValue : 0,
             ScoreFloatValue = die.Score,
             PrimaryText = string.Empty,
             SecondaryText = string.Empty,
@@ -5370,7 +14426,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         SettlementDisplayEvent settlementEvent = ActiveSettlementEventForView(view);
-        float t = settlementEvent != null ? SettlementEventProgress() : Mathf.Clamp01(scoreStepTimer / ScoreStepDuration);
+        float t = settlementEvent != null ? SettlementEventProgress() : Mathf.Clamp01(scoreStepTimer / ScoreStepDisplayDuration());
         float amplitude = settlementEvent != null && settlementEvent.Kind != SettlementEventKind.SlotScore ? 0.11f : 0.16f;
         return 1f + Mathf.Sin(t * Mathf.PI) * amplitude;
     }
@@ -5404,6 +14460,13 @@ public sealed class DiceKingDemo : MonoBehaviour
             return null;
         }
 
+        if (settlementImpactPresentationActive)
+        {
+            return view.Die != null && activeSettlementEvent.DieId == view.Die.Id
+                ? activeSettlementEvent
+                : null;
+        }
+
         if (activeSettlementEvent.ScoreIndex < 0 || view.ScoreIndexStart < 0)
         {
             return null;
@@ -5425,11 +14488,26 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         if (rollPhase == RollPhase.Scoring && activeSettlementEvent != null)
         {
-            return Mathf.Clamp01(scoreStepTimer / Mathf.Max(0.01f, activeSettlementEvent.Duration));
+            return Mathf.Clamp01(scoreStepTimer / SettlementDisplayDuration(activeSettlementEvent.Duration));
         }
 
-        float duration = scoreRevealIndex >= scoringDice.Count ? FinalScoreDuration : ScoreStepDuration;
+        float duration = scoreRevealIndex >= scoringDice.Count ? FinalScoreDisplayDuration() : ScoreStepDisplayDuration();
         return Mathf.Clamp01(scoreStepTimer / Mathf.Max(0.01f, duration));
+    }
+
+    private float SettlementDisplayDuration(float baseDuration)
+    {
+        return Mathf.Max(0.01f, baseDuration / GameplayPlaybackSpeed());
+    }
+
+    private float ScoreStepDisplayDuration()
+    {
+        return SettlementDisplayDuration(ScoreStepDuration);
+    }
+
+    private float FinalScoreDisplayDuration()
+    {
+        return SettlementDisplayDuration(FinalScoreDuration);
     }
 
     private void DrawScoreFloat(Rect dieRect, int score, float normalizedTime)
@@ -5440,9 +14518,22 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         float t = Mathf.Clamp01(normalizedTime);
+        if (UseArcadeRunVisuals())
+        {
+            float alpha = 1f - Mathf.Max(0f, t - 0.65f) * 2.2f;
+            DrawRunText(
+                new Rect(dieRect.x - 20f, dieRect.y - 28f - t * 32f, dieRect.width + 40f, 32f),
+                "+" + score,
+                18,
+                FontStyle.Bold,
+                new Color(1f, 0.65f, 0.18f, Mathf.Clamp01(alpha)),
+                TextAnchor.MiddleCenter);
+            return;
+        }
+
         Color old = GUI.color;
         GUI.color = new Color(1f, 0.86f, 0.36f, 1f - Mathf.Max(0f, t - 0.65f) * 2.2f);
-        GUI.Label(new Rect(dieRect.x - 20f, dieRect.y - 28f - t * 32f, dieRect.width + 40f, 32f), "+" + score, centerStyle);
+        DrawStandardLabel(new Rect(dieRect.x - 20f, dieRect.y - 28f - t * 32f, dieRect.width + 40f, 32f), "+" + score, centerStyle);
         GUI.color = old;
     }
 
@@ -5473,6 +14564,17 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         Rect tag = new Rect(tagX, tagY, width, 22f);
+        if (UseArcadeRunVisuals())
+        {
+            float pulse = 0.72f + Mathf.Sin(Mathf.Clamp01(progress) * Mathf.PI) * 0.2f;
+            DrawRect(new Rect(tag.x + 2f, tag.y + 2f, tag.width, tag.height), new Color(0f, 0f, 0f, 0.42f));
+            DrawRect(tag, new Color(0.018f, 0.035f, 0.038f, 0.96f));
+            DrawBorder(tag, new Color(1f, 0.61f, 0.16f, pulse), 1f);
+            DrawRect(new Rect(tag.x + 4f, tag.y + 3f, tag.width - 8f, 1f), new Color(0.1f, 0.72f, 0.66f, 0.38f));
+            DrawRunText(new Rect(tag.x + 5f, tag.y + 1f, tag.width - 10f, tag.height - 2f), settlementEvent.Label, 12, FontStyle.Bold, new Color(1f, 0.64f, 0.18f, 0.94f), TextAnchor.MiddleCenter);
+            return;
+        }
+
         Color fill = SettlementEventFillColor(settlementEvent);
         fill.a *= 0.86f + Mathf.Sin(Mathf.Clamp01(progress) * Mathf.PI) * 0.1f;
         DrawRect(new Rect(tag.x + 2f, tag.y + 2f, tag.width, tag.height), new Color(0.08f, 0.04f, 0.02f, 0.2f));
@@ -5504,12 +14606,40 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawSettlementStageFeedback(Rect area)
     {
-        if (rollPhase != RollPhase.Scoring || activeSettlementEvent == null || string.IsNullOrEmpty(activeSettlementEvent.Label))
+        if (settlementImpactPresentationActive
+            || rollPhase != RollPhase.Scoring
+            || activeSettlementEvent == null
+            || string.IsNullOrEmpty(activeSettlementEvent.Label))
         {
             return;
         }
 
         Rect banner = new Rect(area.x + area.width * 0.5f - 154f, area.y + area.height - 39f, 308f, 31f);
+        if (UseArcadeRunVisuals())
+        {
+            DrawRect(new Rect(banner.x + 3f, banner.y + 3f, banner.width, banner.height), new Color(0f, 0f, 0f, 0.44f));
+            DrawRect(banner, new Color(0.018f, 0.035f, 0.038f, 0.96f));
+            DrawBorder(banner, new Color(1f, 0.61f, 0.16f, 0.82f), 1f);
+            DrawRect(new Rect(banner.x + 5f, banner.y + 4f, banner.width - 10f, 1f), new Color(0.1f, 0.72f, 0.66f, 0.42f));
+
+            Rect arcadeTextRect = new Rect(banner.x + 14f, banner.y + 2f, banner.width - 28f, banner.height - 4f);
+            if (activeSettlementEvent.TargetArea == SettlementTargetArea.Coin)
+            {
+                DrawRunUiIcon(new Rect(banner.x + 10f, banner.y + 6f, 19f, 19f), RunUiIcon.Coin);
+                arcadeTextRect.x += 22f;
+                arcadeTextRect.width -= 22f;
+            }
+            else if (activeSettlementEvent.TargetArea == SettlementTargetArea.Target)
+            {
+                DrawRunUiIcon(new Rect(banner.x + 10f, banner.y + 6f, 19f, 19f), RunUiIcon.TargetScore);
+                arcadeTextRect.x += 22f;
+                arcadeTextRect.width -= 22f;
+            }
+
+            DrawRunText(arcadeTextRect, activeSettlementEvent.Label, 14, FontStyle.Bold, new Color(1f, 0.64f, 0.18f, 0.94f), TextAnchor.MiddleCenter);
+            return;
+        }
+
         Color fill = SettlementEventFillColor(activeSettlementEvent);
         fill.a = 0.92f;
         DrawRect(new Rect(banner.x + 3f, banner.y + 3f, banner.width, banner.height), new Color(0.08f, 0.04f, 0.02f, 0.22f));
@@ -5559,21 +14689,37 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawDieToken(Rect rect, Die die, int value)
     {
-        DieType visualType = die.Temporary ? DieType.Turtle : die.Type;
+        DieType visualType = die.Temporary ? DieType.MoneyTurtle : die.Type;
+        if (UseArcadeRunDieVisuals())
+        {
+            DrawArcadeRunDieToken(rect, die, visualType, rollPhase == RollPhase.Ready ? 0 : value, false, 0, 1f);
+            return;
+        }
+
         if (value <= 0)
         {
             DrawReadyDieToken(rect, die, visualType);
             return;
         }
 
-        DrawRuntimeDieFace(rect, value, die.Temporary ? DiceMaterial.None : die.Material);
+        DrawRuntimeDieFace(rect, value, ActiveDiceMaterial(die));
         DrawResultDieTypeMarker(rect, visualType);
     }
 
     private string DiceTableSecondaryText(Die die, int value)
     {
+        if (die.Score != 0 && (rollPhase == RollPhase.Scoring || rollPhase == RollPhase.StageClear))
+        {
+            return SignedDeltaText(die.Score);
+        }
+
         if (value <= 0)
         {
+            if (CurrentRollHasLockedResults())
+            {
+                return "点数 " + value;
+            }
+
             if (!die.Temporary && die.Type == DieType.Treasury)
             {
                 return "本金 +" + TreasuryScoreBonus();
@@ -5737,9 +14883,9 @@ public sealed class DiceKingDemo : MonoBehaviour
             return die.Temporary ? "临时" : FaceText(die.Faces);
         }
 
-        if (die.Score > 0 && (rollPhase == RollPhase.Scoring || rollPhase == RollPhase.StageClear))
+        if (die.Score != 0 && (rollPhase == RollPhase.Scoring || rollPhase == RollPhase.StageClear))
         {
-            return "+" + die.Score;
+            return SignedDeltaText(die.Score);
         }
 
         if (die.Temporary)
@@ -5855,11 +15001,6 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
 
             return die.EffectiveValue > die.GamblerThreshold ? "高于阈值" : "阈值 " + die.GamblerThreshold;
-        }
-
-        if (IsTreeGrowthType(die.Type) && die.Growth > 0)
-        {
-            return "成长 " + die.Growth;
         }
 
         if (die.Type == DieType.Turtle)
@@ -6000,6 +15141,12 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawReadyDieToken(Rect rect, Die die, DieType type)
     {
+        if (UseArcadeRunDieVisuals())
+        {
+            DrawArcadeRunDieToken(rect, die, type, 0, false, 0, 1f);
+            return;
+        }
+
         if (diceRollReadyTexture != null)
         {
             Color old = GUI.color;
@@ -6024,6 +15171,434 @@ public sealed class DiceKingDemo : MonoBehaviour
         Color typeColor = TypeColor(type);
         Color fallback = Color.Lerp(new Color(0.98f, 0.9f, 0.68f, 0.96f), typeColor, 0.22f);
         DrawDieFace(InsetRect(rect, rect.width * 0.08f, rect.height * 0.08f), 0, fallback);
+    }
+
+    private void DrawArcadeRunFaceReelDie(Rect rect, Die die, DieType type, int resultValue, int viewIndex)
+    {
+        Texture2D shell = MainGameShellForType(type);
+        if (shell == null)
+        {
+            DrawArcadeRunDieToken(rect, die, type, resultValue, false, 0, 1f);
+            return;
+        }
+
+        // The 128 x 128 slot rect is the immutable body contract for V4R6.
+        // Only content clipped inside reelWindow is allowed to move.
+        DrawTintedCircle(
+            new Rect(rect.x + rect.width * 0.12f, rect.y + rect.height * 0.88f, rect.width * 0.76f, rect.height * 0.14f),
+            new Color(0f, 0f, 0f, 0.28f));
+
+        Color previousColor = GUI.color;
+        GUI.color = Color.white;
+        DrawMainGameShell(rect, type);
+        GUI.color = previousColor;
+
+        Rect face = new Rect(
+            rect.x + rect.width * MainGameShellFaceX,
+            rect.y + rect.height * MainGameShellFaceY,
+            rect.width * MainGameShellFaceWidth,
+            rect.height * MainGameShellFaceHeight);
+        Rect reelWindow = new Rect(
+            face.x + face.width * 0.035f,
+            face.y + face.height * 0.015f,
+            face.width * 0.93f,
+            face.height * 0.715f);
+
+        int slotIndex = Mathf.Clamp(viewIndex, 0, ArcadeRunPhysicalSlotCount - 1);
+        float slotPhase = slotIndex * 0.73f;
+        if (rollPhase == RollPhase.Stopping)
+        {
+            float fastSpeed = DiceFaceReelFastSpeed();
+            float slowSpeed = DiceFaceReelSlowSpeed();
+            float startAt = slotIndex * MainGameStopSlotStagger();
+            float settleDuration = Mathf.Max(0.05f, MainGameStopSlotSettleDuration());
+            float landingStart = mainGameFlowPresentationProfile != null
+                ? Mathf.Clamp(mainGameFlowPresentationProfile.FaceReelLandingStart, 0.45f, 0.8f)
+                : 0.64f;
+            float rawProgress = Mathf.Clamp01((stopTimer - startAt) / settleDuration);
+
+            if (stopTimer < startAt)
+            {
+                float position = diceFaceReelStopTravel + slotPhase + stopTimer * fastSpeed;
+                DrawDiceFaceReelGenericStrip(reelWindow, position, 1f);
+            }
+            else if (rawProgress < landingStart)
+            {
+                float decelerationDuration = settleDuration * landingStart;
+                float decelerationProgress = Mathf.Clamp01((stopTimer - startAt) / Mathf.Max(0.01f, decelerationDuration));
+                float decelerationTravel = decelerationDuration
+                    * (fastSpeed * decelerationProgress + (slowSpeed - fastSpeed) * 0.5f * decelerationProgress * decelerationProgress);
+                float position = diceFaceReelStopTravel + slotPhase + startAt * fastSpeed + decelerationTravel;
+                DrawDiceFaceReelGenericStrip(reelWindow, position, Mathf.Lerp(1f, 0.18f, decelerationProgress));
+            }
+            else
+            {
+                float decelerationDuration = settleDuration * landingStart;
+                float landingPosition = diceFaceReelStopTravel + slotPhase + startAt * fastSpeed
+                    + decelerationDuration * (fastSpeed + slowSpeed) * 0.5f;
+                DrawDiceFaceReelLanding(reelWindow, resultValue, landingPosition, rawProgress, landingStart);
+            }
+        }
+        else
+        {
+            float elapsed = diceVisualRollStartTime > -900f ? GameplayPlaybackElapsed(diceVisualRollStartTime) : 0f;
+            float accelerationDuration = mainGameFlowPresentationProfile != null
+                ? Mathf.Max(0.02f, mainGameFlowPresentationProfile.FaceReelAccelerationDuration)
+                : 0.08f;
+            float blurAmount = Mathf.SmoothStep(0.32f, 1f, Mathf.Clamp01(elapsed / accelerationDuration));
+            DrawDiceFaceReelGenericStrip(reelWindow, DiceFaceReelTravelAtElapsed(elapsed) + slotPhase, blurAmount);
+        }
+
+        Rect resultCoreRect = new Rect(
+            face.x + face.width * 0.25f,
+            face.y + face.height * 0.75f,
+            face.width * 0.50f,
+            face.height * 0.235f);
+        DrawTypeCoreImage(resultCoreRect, die, type, false, true);
+    }
+
+    private void DrawDiceFaceReelGenericStrip(Rect reelWindow, float position, float blurAmount)
+    {
+        float cellHeight = reelWindow.height * 0.82f;
+        int baseIndex = Mathf.FloorToInt(position);
+        float fraction = position - baseIndex;
+        GUI.BeginGroup(reelWindow);
+        try
+        {
+            float centerY = reelWindow.height * 0.5f;
+            for (int offset = -2; offset <= 2; offset++)
+            {
+                int sequenceIndex = PositiveModulo(baseIndex + offset, DiceFaceReelGenericValues.Length);
+                float y = centerY + (fraction - offset) * cellHeight;
+                Rect numberRect = new Rect(0f, y - cellHeight * 0.5f, reelWindow.width, cellHeight);
+                DrawDiceFaceReelNumberWithTrail(numberRect, DiceFaceReelGenericValues[sequenceIndex], blurAmount, 1f);
+            }
+        }
+        finally
+        {
+            GUI.EndGroup();
+        }
+    }
+
+    private void DrawDiceFaceReelLanding(Rect reelWindow, int resultValue, float landingPosition, float rawProgress, float landingStart)
+    {
+        float landingProgress = Mathf.InverseLerp(landingStart, 1f, rawProgress);
+        float cellHeight = reelWindow.height * 0.82f;
+        float overshoot = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.FaceReelOvershootPixels : 7f;
+        float rebound = mainGameFlowPresentationProfile != null ? mainGameFlowPresentationProfile.FaceReelReboundPixels : 2.5f;
+        float offsetY;
+        if (landingProgress < 0.55f)
+        {
+            float t = Mathf.Clamp01(landingProgress / 0.55f);
+            float eased = 1f - Mathf.Pow(1f - t, 3f);
+            offsetY = Mathf.Lerp(-cellHeight * 1.12f, overshoot, eased);
+        }
+        else if (landingProgress < 0.82f)
+        {
+            float t = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.55f, 0.82f, landingProgress));
+            offsetY = Mathf.Lerp(overshoot, -rebound, t);
+        }
+        else
+        {
+            float t = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.82f, 1f, landingProgress));
+            offsetY = Mathf.Lerp(-rebound, 0f, t);
+        }
+
+        int outgoingIndex = PositiveModulo(Mathf.FloorToInt(landingPosition), DiceFaceReelGenericValues.Length);
+        GUI.BeginGroup(reelWindow);
+        try
+        {
+            float centerY = reelWindow.height * 0.5f;
+            Rect outgoingRect = new Rect(0f, centerY + offsetY + cellHeight * 0.5f, reelWindow.width, cellHeight);
+            DrawDiceFaceReelNumberWithTrail(outgoingRect, DiceFaceReelGenericValues[outgoingIndex], 0.08f, 1f - landingProgress);
+
+            Rect resultRect = new Rect(0f, centerY + offsetY - cellHeight * 0.5f, reelWindow.width, cellHeight);
+            DrawDiceFaceReelNumberWithTrail(resultRect, resultValue, 0f, 1f);
+        }
+        finally
+        {
+            GUI.EndGroup();
+        }
+    }
+
+    private void DrawDiceFaceReelNumberWithTrail(Rect area, int value, float blurAmount, float alpha)
+    {
+        float safeAlpha = Mathf.Clamp01(alpha);
+        float blur = Mathf.Clamp01(blurAmount);
+        Color numberColor = new Color(0.07f, 0.075f, 0.07f, safeAlpha);
+        if (blur > 0.01f)
+        {
+            float trailOffset = Mathf.Lerp(1f, 3.2f, blur);
+            Color trailColor = new Color(0.32f, 0.19f, 0.07f, safeAlpha * Mathf.Lerp(0.05f, 0.16f, blur));
+            DrawDiceFaceReelNumber(new Rect(area.x, area.y - trailOffset, area.width, area.height), value, trailColor);
+            DrawDiceFaceReelNumber(new Rect(area.x, area.y + trailOffset, area.width, area.height), value, trailColor);
+        }
+
+        DrawDiceFaceReelNumber(area, value, numberColor);
+    }
+
+    private void DrawDiceFaceReelNumber(Rect area, int value, Color textColor)
+    {
+        string text = value.ToString(CultureInfo.InvariantCulture);
+        float shortAxis = Mathf.Min(area.width, area.height);
+        float scale = text.Length <= 2 ? 0.78f : text.Length == 3 ? 0.62f : 0.5f;
+        float widthFit = area.width / Mathf.Max(1, text.Length) * 1.5f;
+        int fontSize = Mathf.RoundToInt(Mathf.Clamp(Mathf.Min(shortAxis * scale, widthFit), 8f, shortAxis * 0.9f));
+        GUIStyle style = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontStyle = FontStyle.Bold,
+            fontSize = fontSize,
+            clipping = TextClipping.Clip,
+            wordWrap = false
+        };
+
+        Color oldColor = GUI.color;
+        GUI.color = Color.white;
+        style.normal.textColor = new Color(1f, 0.94f, 0.72f, Mathf.Clamp01(textColor.a) * 0.5f);
+        GUI.Label(new Rect(area.x + 1.25f, area.y + 1.25f, area.width, area.height), text, style);
+        style.normal.textColor = textColor;
+        GUI.Label(area, text, style);
+        GUI.color = oldColor;
+    }
+
+    private static int PositiveModulo(int value, int modulus)
+    {
+        int result = value % modulus;
+        return result < 0 ? result + modulus : result;
+    }
+
+    private void DrawArcadeRunDieToken(Rect rect, Die die, DieType type, int value, bool rolling, int frameIndex, float stopProgress)
+    {
+        Texture2D shell = MainGameShellForType(type);
+        if (shell == null)
+        {
+            DrawPanel(rect, new Color(0.88f, 0.8f, 0.62f, 0.96f));
+            if (value > 0)
+            {
+                DrawDieValueNumber(InsetRect(rect, rect.width * 0.2f, rect.height * 0.2f), value, new Color(0.08f, 0.07f, 0.05f));
+            }
+            return;
+        }
+
+        DrawTintedCircle(
+            new Rect(rect.x + rect.width * 0.12f, rect.y + rect.height * 0.88f, rect.width * 0.76f, rect.height * 0.14f),
+            new Color(0f, 0f, 0f, 0.28f));
+
+        float angle = rolling
+            ? Mathf.Sin((frameIndex + (die != null ? die.Id * 0.37f : 0f)) * 0.82f) * Mathf.Lerp(6f, 1f, Mathf.Clamp01(stopProgress))
+            : 0f;
+        if (Mathf.Abs(angle) <= 0.01f)
+        {
+            DrawArcadeRunDieTokenLocal(rect, die, type, value, rolling);
+            return;
+        }
+
+        Matrix4x4 previousMatrix = GUI.matrix;
+        GUI.matrix = previousMatrix * Matrix4x4.TRS(
+            new Vector3(rect.center.x, rect.center.y, 0f),
+            Quaternion.Euler(0f, 0f, angle),
+            Vector3.one);
+        DrawArcadeRunDieTokenLocal(new Rect(-rect.width * 0.5f, -rect.height * 0.5f, rect.width, rect.height), die, type, value, rolling);
+        GUI.matrix = previousMatrix;
+    }
+
+    private void DrawArcadeRunDieTokenLocal(Rect rect, Die die, DieType type, int value, bool rolling)
+    {
+        Texture2D shell = MainGameShellForType(type);
+        if (shell == null)
+        {
+            return;
+        }
+
+        Color previousColor = GUI.color;
+        GUI.color = Color.white;
+        DrawMainGameShell(rect, type);
+        GUI.color = previousColor;
+
+        Rect face = new Rect(
+            rect.x + rect.width * MainGameShellFaceX,
+            rect.y + rect.height * MainGameShellFaceY,
+            rect.width * MainGameShellFaceWidth,
+            rect.height * MainGameShellFaceHeight);
+        if (value > 0)
+        {
+            Rect numberRect = new Rect(face.x, face.y - face.height * 0.015f, face.width, face.height * 0.76f);
+            DrawDieValueNumber(numberRect, value, new Color(0.07f, 0.075f, 0.07f, 0.98f));
+            Rect resultCoreRect = new Rect(
+                face.x + face.width * 0.25f,
+                face.y + face.height * 0.75f,
+                face.width * 0.50f,
+                face.height * 0.235f);
+            DrawTypeCoreImage(resultCoreRect, die, type, false, true);
+            return;
+        }
+
+        Rect iconRect = InsetRect(face, face.width * 0.015f, face.height * 0.015f);
+        if (!DrawTypeCoreImage(iconRect, die, type, rolling, false))
+        {
+            DrawRunText(face, ShortTypeName(type), Mathf.RoundToInt(Mathf.Clamp(face.height * 0.26f, 11f, 20f)), FontStyle.Bold, new Color(0.1f, 0.1f, 0.09f, rolling ? 0.62f : 0.92f), TextAnchor.MiddleCenter);
+        }
+
+        if (rolling)
+        {
+            float scanY = face.y + Mathf.Repeat(GameplayPlaybackTime() * 46f + (int)type * 7f, Mathf.Max(1f, face.height));
+            DrawRect(new Rect(face.x + 2f, scanY, face.width - 4f, Mathf.Max(1f, face.height * 0.035f)), new Color(0.18f, 0.72f, 0.68f, 0.24f));
+        }
+    }
+
+    private bool DrawTypeCoreImage(Rect rect, Die die, DieType type, bool rolling, bool resultMini)
+    {
+        Texture2D icon = DieTypeIcon(type);
+        if (icon == null)
+        {
+            return false;
+        }
+
+        Color previousColor = GUI.color;
+        GUI.color = new Color(1f, 1f, 1f, rolling ? 0.56f : resultMini ? 0.88f : 0.96f);
+        GUI.DrawTexture(rect, icon, ScaleMode.ScaleToFit, true);
+        GUI.color = previousColor;
+
+        if (!rolling && !resultMini)
+        {
+            DrawTypeCoreActivity(rect, die, type);
+        }
+
+        return true;
+    }
+
+    private void DrawTypeCoreActivity(Rect rect, Die die, DieType type)
+    {
+        float progress = TypeCoreIdleProgress(die);
+        if (progress < 0f)
+        {
+            return;
+        }
+
+        Texture2D activity = DieTypeActivityTexture(type);
+        if (activity == null)
+        {
+            return;
+        }
+
+        TypeCoreIdleMotion motion = TypeCoreIdleMotionForType(type);
+        float envelope = Mathf.Sin(Mathf.Clamp01(progress) * Mathf.PI);
+        float alpha = envelope;
+        Rect activityRect = rect;
+        switch (motion)
+        {
+            case TypeCoreIdleMotion.DualPulse:
+                float firstPulse = Mathf.Sin(Mathf.Clamp01(progress * 2f) * Mathf.PI);
+                float secondPulse = Mathf.Sin(Mathf.Clamp01((progress - 0.34f) / 0.66f) * Mathf.PI);
+                alpha = Mathf.Max(firstPulse, secondPulse) * 0.92f;
+                break;
+            case TypeCoreIdleMotion.Transmission:
+                activityRect.x += (progress - 0.5f) * rect.width * 0.055f;
+                alpha = envelope * 0.96f;
+                break;
+            case TypeCoreIdleMotion.Click:
+                activityRect.y -= envelope * Mathf.Max(1f, rect.height * 0.045f);
+                alpha = envelope;
+                break;
+            case TypeCoreIdleMotion.Intake:
+                activityRect = ScaleRect(rect, Mathf.Lerp(1.08f, 0.94f, Mathf.SmoothStep(0f, 1f, progress)));
+                alpha = envelope * 0.94f;
+                break;
+            case TypeCoreIdleMotion.Output:
+                activityRect = ScaleRect(rect, Mathf.Lerp(0.94f, 1.08f, Mathf.SmoothStep(0f, 1f, progress)));
+                alpha = envelope * 0.94f;
+                break;
+            case TypeCoreIdleMotion.Echo:
+                activityRect = ScaleRect(rect, 0.98f + envelope * 0.035f);
+                alpha = envelope * 0.88f;
+                break;
+            case TypeCoreIdleMotion.Stable:
+                alpha = 0.46f + envelope * 0.52f;
+                break;
+        }
+
+        Color previousColor = GUI.color;
+        GUI.color = new Color(1f, 1f, 1f, Mathf.Clamp01(alpha));
+        GUI.DrawTexture(activityRect, activity, ScaleMode.ScaleToFit, true);
+        if (motion == TypeCoreIdleMotion.Echo && progress > 0.34f)
+        {
+            float echoProgress = Mathf.Clamp01((progress - 0.34f) / 0.66f);
+            float echoAlpha = Mathf.Sin(echoProgress * Mathf.PI) * 0.58f;
+            GUI.color = new Color(1f, 1f, 1f, echoAlpha);
+            GUI.DrawTexture(ScaleRect(rect, 1f + echoProgress * 0.08f), activity, ScaleMode.ScaleToFit, true);
+        }
+        GUI.color = previousColor;
+    }
+
+    private Texture2D MainGameShellForType(DieType type)
+    {
+        return MainGameShellForFamily(MainFamilyForType(type));
+    }
+
+    private Texture2D MainGameShellForFamily(MainFamily family)
+    {
+        switch (family)
+        {
+            case MainFamily.Pig:
+                return mainGamePigShellTexture != null ? mainGamePigShellTexture : mainGameNeutralShellTexture;
+            case MainFamily.Devil:
+                return mainGameDevilShellTexture != null ? mainGameDevilShellTexture : mainGameNeutralShellTexture;
+            case MainFamily.Turtle:
+                return mainGameTurtleShellTexture != null ? mainGameTurtleShellTexture : mainGameNeutralShellTexture;
+            case MainFamily.Pirate:
+                return mainGamePirateShellTexture != null ? mainGamePirateShellTexture : mainGameNeutralShellTexture;
+        }
+
+        return mainGameNeutralShellTexture;
+    }
+
+    private void DrawMainGameShell(Rect rect, DieType type)
+    {
+        MainFamily first = MainFamily.None;
+        MainFamily second = MainFamily.None;
+        for (MainFamily family = MainFamily.Pig; family <= MainFamily.Pirate; family++)
+        {
+            if (!HasMainFamily(type, family))
+            {
+                continue;
+            }
+
+            if (first == MainFamily.None)
+            {
+                first = family;
+            }
+            else
+            {
+                second = family;
+                break;
+            }
+        }
+
+        Texture2D firstShell = MainGameShellForFamily(first);
+        Rect shellUv = new Rect(MainGameShellUvX, MainGameShellUvY, MainGameShellUvWidth, MainGameShellUvHeight);
+        if (second == MainFamily.None)
+        {
+            if (firstShell != null)
+            {
+                GUI.DrawTextureWithTexCoords(rect, firstShell, shellUv, true);
+            }
+            return;
+        }
+
+        Texture2D secondShell = MainGameShellForFamily(second);
+        if (firstShell == null && secondShell == null)
+        {
+            return;
+        }
+
+        if (firstShell == null) firstShell = secondShell;
+        if (secondShell == null) secondShell = firstShell;
+        Rect left = new Rect(rect.x, rect.y, rect.width * 0.5f, rect.height);
+        Rect right = new Rect(rect.x + rect.width * 0.5f, rect.y, rect.width * 0.5f, rect.height);
+        float halfUvWidth = shellUv.width * 0.5f;
+        GUI.DrawTextureWithTexCoords(left, firstShell, new Rect(shellUv.x, shellUv.y, halfUvWidth, shellUv.height), true);
+        GUI.DrawTextureWithTexCoords(right, secondShell, new Rect(shellUv.x + halfUvWidth, shellUv.y, halfUvWidth, shellUv.height), true);
     }
 
     private void DrawReadyDieTypeMarker(Rect rect, DieType type)
@@ -6133,7 +15708,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawDiceMaterialOverlay(Rect rect, DiceMaterial material, float alpha)
     {
-        if (material == DiceMaterial.None)
+        if (!DiceMaterialFeatureEnabled || material == DiceMaterial.None)
         {
             return;
         }
@@ -6148,7 +15723,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private bool DrawTextureWithDiceMaterial(Rect rect, Texture texture, DiceMaterial material, float alpha)
     {
-        if (material == DiceMaterial.None || texture == null)
+        if (!DiceMaterialFeatureEnabled || material == DiceMaterial.None || texture == null)
         {
             return false;
         }
@@ -6166,6 +15741,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private UnityEngine.Material DiceMaterialRenderMaterial(DiceMaterial material)
     {
+        if (!DiceMaterialFeatureEnabled)
+        {
+            return null;
+        }
+
         LoadDiceMaterialRenderMaterials();
         UnityEngine.Material renderMaterial;
         diceMaterialRenderMaterials.TryGetValue(material, out renderMaterial);
@@ -6252,7 +15832,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
-        DrawGridDiePips(area, value, pipColor);
+        DrawDieValueNumber(area, value, pipColor);
     }
 
     private void DrawStandardDiePips(Rect area, int value, Color pipColor)
@@ -6289,26 +15869,34 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
     }
 
-    private void DrawGridDiePips(Rect area, int value, Color pipColor)
+    private void DrawDieValueNumber(Rect area, int value, Color textColor)
     {
-        int columns = Mathf.Clamp(Mathf.CeilToInt(Mathf.Sqrt(value)), 3, 6);
-        int rows = Mathf.CeilToInt(value / (float)columns);
-        float cellWidth = area.width / columns;
-        float cellHeight = area.height / rows;
-        float pip = Mathf.Clamp(Mathf.Min(cellWidth, cellHeight) * 0.42f, 3f, Mathf.Min(area.width, area.height) * 0.12f);
-
-        for (int row = 0; row < rows; row++)
+        if (value <= 0)
         {
-            int rowStart = row * columns;
-            int rowCount = Mathf.Min(columns, value - rowStart);
-            float rowWidth = rowCount * cellWidth;
-            float startX = area.x + (area.width - rowWidth) * 0.5f + cellWidth * 0.5f;
-            float y = area.y + (row + 0.5f) * cellHeight;
-            for (int column = 0; column < rowCount; column++)
-            {
-                DrawPip(startX + column * cellWidth, y, pip, pipColor);
-            }
+            return;
         }
+
+        string text = value.ToString(CultureInfo.InvariantCulture);
+        float shortAxis = Mathf.Min(area.width, area.height);
+        float scale = text.Length <= 2 ? 0.78f : (text.Length == 3 ? 0.62f : 0.5f);
+        float widthFit = area.width / Mathf.Max(1, text.Length) * 1.5f;
+        int fontSize = Mathf.RoundToInt(Mathf.Clamp(Mathf.Min(shortAxis * scale, widthFit), 9f, shortAxis * 0.9f));
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.alignment = TextAnchor.MiddleCenter;
+        style.fontStyle = FontStyle.Bold;
+        style.fontSize = fontSize;
+        style.clipping = TextClipping.Clip;
+        style.wordWrap = false;
+
+        Color oldColor = GUI.color;
+        style.normal.textColor = new Color(1f, 0.94f, 0.72f, Mathf.Clamp01(textColor.a) * 0.65f);
+        GUI.color = Color.white;
+        // Explicit global-text exception: die-face values are physical embossed numerals,
+        // not cabinet copy, so they keep the existing solid face treatment.
+        GUI.Label(new Rect(area.x + 1.5f, area.y + 1.5f, area.width, area.height), text, style);
+        style.normal.textColor = textColor;
+        GUI.Label(area, text, style);
+        GUI.color = oldColor;
     }
 
     private void DrawPip(float x, float y, float size, Color color)
@@ -6335,9 +15923,9 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         DrawRect(new Rect(0f, 0f, VirtualWidth, 90f), new Color(0.16f, 0.11f, 0.07f, 0.58f));
         DrawRect(new Rect(0f, 88f, VirtualWidth, 4f), new Color(0.83f, 0.62f, 0.31f, 0.78f));
-        GUI.Label(new Rect(48f, 18f, 260f, 46f), left, hudTitleStyle);
-        GUI.Label(new Rect(316f, 26f, 440f, 32f), center, hudHeaderStyle);
-        GUI.Label(new Rect(770f, 28f, 456f, 30f), right, hudBodyStyle);
+        DrawStandardLabel(new Rect(48f, 18f, 260f, 46f), left, hudTitleStyle);
+        DrawStandardLabel(new Rect(316f, 26f, 440f, 32f), center, hudHeaderStyle);
+        DrawStandardLabel(new Rect(770f, 28f, 456f, 30f), right, hudBodyStyle);
     }
 
     private void DrawUiPanel(Rect rect)
@@ -6368,7 +15956,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         bool clicked = enabled && GUI.Button(rect, GUIContent.none, GUIStyle.none);
         bool oldEnabled = GUI.enabled;
         GUI.enabled = true;
-        GUI.Label(rect, label, enabled ? artButtonStyle : disabledButtonLabelStyle);
+        DrawStandardLabel(rect, label, enabled ? artButtonStyle : disabledButtonLabelStyle);
         GUI.enabled = oldEnabled;
         return clicked;
     }
@@ -6470,6 +16058,100 @@ public sealed class DiceKingDemo : MonoBehaviour
         DrawRect(new Rect(rect.x + rect.width * 0.76f, rect.y + rect.height * 0.32f, rect.width * 0.16f, rect.height * 0.36f), fill);
     }
 
+    private void DrawStandardLabel(Rect rect, string text, GUIStyle style)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        GUIStyle effectiveStyle = style ?? GUI.skin.label;
+        if (mainGameLedFont != null && mainGameLedFont.IsReady)
+        {
+            int requestedSize = effectiveStyle.fontSize > 0 ? effectiveStyle.fontSize : 14;
+            Color textColor = MultiplyColor(effectiveStyle.normal.textColor, GUI.contentColor);
+            if (effectiveStyle.wordWrap)
+            {
+                mainGameLedFont.DrawWrapped(rect, text, requestedSize, textColor, effectiveStyle.alignment, 0f);
+            }
+            else
+            {
+                mainGameLedFont.Draw(rect, text, requestedSize, textColor, effectiveStyle.alignment, 0f);
+            }
+            return;
+        }
+
+        // The font resource is a required runtime asset. This fallback only keeps the
+        // project operable if an import is temporarily incomplete; validation treats it
+        // as a build error and never as an accepted visual path.
+        GUI.Label(rect, text, effectiveStyle);
+    }
+
+    private bool DrawStandardToggle(Rect rect, bool value, string label)
+    {
+        GUIStyle toggleStyle = new GUIStyle(GUI.skin.toggle);
+        bool changedValue = GUI.Toggle(rect, value, GUIContent.none, toggleStyle);
+        GUIStyle labelStyle = smallStyle != null ? smallStyle : GUI.skin.label;
+        DrawStandardLabel(new Rect(rect.x + 24f, rect.y, Mathf.Max(0f, rect.width - 24f), rect.height), label, labelStyle);
+        return changedValue;
+    }
+
+    private static Color MultiplyColor(Color left, Color right)
+    {
+        return new Color(left.r * right.r, left.g * right.g, left.b * right.b, left.a * right.a);
+    }
+
+    private void DrawLedRoleText(Rect rect, string text, MainGameLedFont.TextRole role, TextAnchor alignment, float opacity = 1f)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        if (mainGameLedFont != null && mainGameLedFont.IsReady)
+        {
+            mainGameLedFont.DrawRole(rect, text, role, alignment, opacity);
+            return;
+        }
+
+        // Required resources are validated separately. The smooth fallback keeps a
+        // partially imported project operable but is never an accepted visual path.
+        GUIStyle fallback = new GUIStyle(GUI.skin.label);
+        fallback.font = uiFont;
+        fallback.fontSize = role == MainGameLedFont.TextRole.SecondaryAmber
+            || role == MainGameLedFont.TextRole.SecondaryWarm
+            || role == MainGameLedFont.TextRole.Ambient ? 14 : 20;
+        fallback.fontStyle = FontStyle.Bold;
+        fallback.normal.textColor = new Color(1f, 0.78f, 0.42f, Mathf.Clamp01(opacity));
+        fallback.alignment = alignment;
+        fallback.clipping = TextClipping.Clip;
+        GUI.Label(rect, text, fallback);
+    }
+
+    private void DrawLedRoleWrappedText(Rect rect, string text, MainGameLedFont.TextRole role, TextAnchor alignment, float opacity = 1f)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        if (mainGameLedFont != null && mainGameLedFont.IsReady)
+        {
+            mainGameLedFont.DrawRoleWrapped(rect, text, role, alignment, opacity);
+            return;
+        }
+
+        GUIStyle fallback = new GUIStyle(GUI.skin.label);
+        fallback.font = uiFont;
+        fallback.fontSize = 14;
+        fallback.fontStyle = FontStyle.Normal;
+        fallback.normal.textColor = new Color(0.78f, 0.68f, 0.48f, Mathf.Clamp01(opacity));
+        fallback.alignment = alignment;
+        fallback.wordWrap = true;
+        fallback.clipping = TextClipping.Clip;
+        GUI.Label(rect, text, fallback);
+    }
+
     private void DrawRunText(Rect rect, string text, int size, FontStyle fontStyle, Color color, TextAnchor alignment)
     {
         GUIStyle style = new GUIStyle(GUI.skin.label);
@@ -6480,7 +16162,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         style.alignment = alignment;
         style.wordWrap = false;
         style.clipping = TextClipping.Clip;
-        GUI.Label(rect, text, style);
+        DrawStandardLabel(rect, text, style);
     }
 
     private void DrawRunUiIcon(Rect rect, RunUiIcon icon)
@@ -6548,7 +16230,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             GUI.color = old;
         }
 
-        GUI.Label(new Rect(rect.x + 30f, rect.y, rect.width - 30f, rect.height), label, style);
+        DrawStandardLabel(new Rect(rect.x + 30f, rect.y, rect.width - 30f, rect.height), label, style);
     }
 
     private void DrawPanel(Rect rect, Color color)
@@ -6569,6 +16251,24 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawSceneBackdrop()
     {
+        if (mode == GameMode.Run && mainGameCommonBaseTexture != null)
+        {
+            Color previousColor = GUI.color;
+            GUI.color = Color.white;
+            GUI.DrawTexture(new Rect(0f, 0f, VirtualWidth, VirtualHeight), mainGameCommonBaseTexture, ScaleMode.StretchToFill, true);
+            GUI.color = previousColor;
+            return;
+        }
+
+        if ((mode == GameMode.InterStageMarket || mode == GameMode.ChapterShop) && UseArcadeMarketVisuals())
+        {
+            Color previousColor = GUI.color;
+            GUI.color = Color.white;
+            GUI.DrawTexture(new Rect(0f, 0f, VirtualWidth, VirtualHeight), marketCommonBaseTexture, ScaleMode.StretchToFill, true);
+            GUI.color = previousColor;
+            return;
+        }
+
         if (tableBackgroundTexture != null)
         {
             Color old = GUI.color;
@@ -6614,6 +16314,13 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         int savedStage = Mathf.Clamp(PlayerPrefs.GetInt(SavePrefix + "StageIndex", 0), 0, Mathf.Max(0, encounters.Count - 1));
         int savedGold = PlayerPrefs.GetInt(SavePrefix + "Gold", startingGold);
+        int savedLives = Mathf.Clamp(PlayerPrefs.GetInt(SavePrefix + "RemainingLives", startingLives), 1, Mathf.Max(1, startingLives));
+        int savedCurrentScore = Mathf.Max(0, PlayerPrefs.GetInt(SavePrefix + "CurrentScore", 0));
+        int savedStageStartGold = Mathf.Max(0, PlayerPrefs.GetInt(SavePrefix + "StageStartGold", savedGold));
+        int savedStageInvestmentGold = Mathf.Max(0, PlayerPrefs.GetInt(SavePrefix + "StageInvestmentGold", 0));
+        bool savedStageContinuation = PlayerPrefs.GetInt(SavePrefix + "StageContinuationPending", 0) == 1;
+        int savedFeedQuality = PlayerPrefs.GetInt(SavePrefix + "FeedQuality", feedQualityStart);
+        int savedTavernBaseMinimumBonus = PlayerPrefs.GetInt(SavePrefix + "TavernBaseMinimumBonus", 0);
 
         suppressSave = true;
         ResetRun("王室骰袋", "当前骰袋容量上限 6，关间市场负责买卖调整。");
@@ -6625,8 +16332,19 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
         stageIndex = savedStage;
         chapterGold = savedGold;
+        remainingLives = savedLives;
+        feedQuality = Mathf.Max(1, savedFeedQuality);
+        tavernBaseMinimumBonus = Mathf.Max(0, savedTavernBaseMinimumBonus);
+        marketTemporaryMinimumBonus = 0;
         suppressSave = false;
-        StartEncounter();
+        if (savedStageContinuation)
+        {
+            ResumeEncounterContinuation(savedCurrentScore, savedStageStartGold, savedStageInvestmentGold);
+        }
+        else
+        {
+            StartEncounter();
+        }
         mode = GameMode.Run;
     }
 
@@ -6640,10 +16358,36 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         seenOpening = PlayerPrefs.GetInt(SavePrefix + "SeenOpening", 0) == 1;
-        settingsVolume = PlayerPrefs.GetFloat(SavePrefix + "Volume", 1f);
-        windowed = PlayerPrefs.GetInt(SavePrefix + "Windowed", 1) == 1;
+        settingsVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(SavePrefix + "Volume", 1f));
+        settlementPlaybackSpeed = NormalizeSettlementPlaybackSpeed(PlayerPrefs.GetFloat(SavePrefix + "SettlementPlaybackSpeed", 1f));
+        CaptureDesktopResolution();
+        if (PlayerPrefs.HasKey(SavePrefix + "DisplayMode"))
+        {
+            int savedDisplayMode = PlayerPrefs.GetInt(SavePrefix + "DisplayMode", (int)DisplayModeSetting.BorderlessFullscreen);
+            displayMode = (DisplayModeSetting)Mathf.Clamp(savedDisplayMode, (int)DisplayModeSetting.Windowed, (int)DisplayModeSetting.ExclusiveFullscreen);
+        }
+        else if (PlayerPrefs.HasKey(SavePrefix + "Windowed"))
+        {
+            displayMode = PlayerPrefs.GetInt(SavePrefix + "Windowed", 0) == 1
+                ? DisplayModeSetting.Windowed
+                : DisplayModeSetting.BorderlessFullscreen;
+        }
+        else
+        {
+            displayMode = DisplayModeSetting.BorderlessFullscreen;
+        }
+
+        windowWidth = Mathf.Max(640, PlayerPrefs.GetInt(SavePrefix + "WindowWidth", DefaultWindowWidth));
+        windowHeight = Mathf.Max(360, PlayerPrefs.GetInt(SavePrefix + "WindowHeight", DefaultWindowHeight));
+        exclusiveFullscreenWidth = Mathf.Max(1, PlayerPrefs.GetInt(SavePrefix + "ExclusiveFullscreenWidth", desktopWidth));
+        exclusiveFullscreenHeight = Mathf.Max(1, PlayerPrefs.GetInt(SavePrefix + "ExclusiveFullscreenHeight", desktopHeight));
+        windowMaximized = PlayerPrefs.GetInt(SavePrefix + "WindowMaximized", 0) == 1;
+        menuLampFlickerUserEnabled = PlayerPrefs.HasKey(SavePrefix + "ReducedFlashing")
+            ? PlayerPrefs.GetInt(SavePrefix + "ReducedFlashing", 0) == 0
+            : PlayerPrefs.GetInt(SavePrefix + "MenuLampFlickerEnabled", 1) == 1;
         AudioListener.volume = settingsVolume;
-        Screen.fullScreen = !windowed;
+        RefreshDisplayResolutionOptions();
+        ApplyDisplaySettings();
     }
 
     private bool HasCurrentRunSaveVersion()
@@ -6654,9 +16398,19 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void SaveMenuState()
     {
+        CaptureNativeWindowedState();
         PlayerPrefs.SetInt(SavePrefix + "SeenOpening", seenOpening ? 1 : 0);
         PlayerPrefs.SetFloat(SavePrefix + "Volume", settingsVolume);
-        PlayerPrefs.SetInt(SavePrefix + "Windowed", windowed ? 1 : 0);
+        PlayerPrefs.SetFloat(SavePrefix + "SettlementPlaybackSpeed", NormalizeSettlementPlaybackSpeed(settlementPlaybackSpeed));
+        PlayerPrefs.SetInt(SavePrefix + "DisplayMode", (int)displayMode);
+        PlayerPrefs.SetInt(SavePrefix + "WindowWidth", Mathf.Max(1, windowWidth));
+        PlayerPrefs.SetInt(SavePrefix + "WindowHeight", Mathf.Max(1, windowHeight));
+        PlayerPrefs.SetInt(SavePrefix + "ExclusiveFullscreenWidth", Mathf.Max(1, exclusiveFullscreenWidth));
+        PlayerPrefs.SetInt(SavePrefix + "ExclusiveFullscreenHeight", Mathf.Max(1, exclusiveFullscreenHeight));
+        PlayerPrefs.SetInt(SavePrefix + "WindowMaximized", windowMaximized ? 1 : 0);
+        PlayerPrefs.SetInt(SavePrefix + "Windowed", displayMode == DisplayModeSetting.Windowed ? 1 : 0);
+        PlayerPrefs.SetInt(SavePrefix + "MenuLampFlickerEnabled", menuLampFlickerUserEnabled ? 1 : 0);
+        PlayerPrefs.SetInt(SavePrefix + "ReducedFlashing", menuLampFlickerUserEnabled ? 0 : 1);
         AudioListener.volume = settingsVolume;
         PlayerPrefs.Save();
     }
@@ -6673,6 +16427,13 @@ public sealed class DiceKingDemo : MonoBehaviour
         PlayerPrefs.SetInt(SavePrefix + "SaveVersion", CurrentSaveVersion);
         PlayerPrefs.SetInt(SavePrefix + "StageIndex", stageIndex);
         PlayerPrefs.SetInt(SavePrefix + "Gold", chapterGold);
+        PlayerPrefs.SetInt(SavePrefix + "RemainingLives", Mathf.Max(0, remainingLives));
+        PlayerPrefs.SetInt(SavePrefix + "CurrentScore", stageContinuationPending ? Mathf.Max(0, currentScore) : 0);
+        PlayerPrefs.SetInt(SavePrefix + "StageStartGold", Mathf.Max(0, stageStartGold));
+        PlayerPrefs.SetInt(SavePrefix + "StageInvestmentGold", Mathf.Max(0, stageInvestmentGold));
+        PlayerPrefs.SetInt(SavePrefix + "StageContinuationPending", stageContinuationPending ? 1 : 0);
+        PlayerPrefs.SetInt(SavePrefix + "FeedQuality", feedQuality);
+        PlayerPrefs.SetInt(SavePrefix + "TavernBaseMinimumBonus", tavernBaseMinimumBonus);
         PlayerPrefs.SetInt(SavePrefix + "SeenOpening", seenOpening ? 1 : 0);
         PlayerPrefs.SetString(SavePrefix + "DiceData", SerializeDice());
         PlayerPrefs.SetInt(SavePrefix + "AffixAddStone", affixAddStoneCount);
@@ -6689,6 +16450,13 @@ public sealed class DiceKingDemo : MonoBehaviour
         PlayerPrefs.DeleteKey(SavePrefix + "DiceData");
         PlayerPrefs.DeleteKey(SavePrefix + "StageIndex");
         PlayerPrefs.DeleteKey(SavePrefix + "Gold");
+        PlayerPrefs.DeleteKey(SavePrefix + "RemainingLives");
+        PlayerPrefs.DeleteKey(SavePrefix + "CurrentScore");
+        PlayerPrefs.DeleteKey(SavePrefix + "StageStartGold");
+        PlayerPrefs.DeleteKey(SavePrefix + "StageInvestmentGold");
+        PlayerPrefs.DeleteKey(SavePrefix + "StageContinuationPending");
+        PlayerPrefs.DeleteKey(SavePrefix + "FeedQuality");
+        PlayerPrefs.DeleteKey(SavePrefix + "TavernBaseMinimumBonus");
         PlayerPrefs.DeleteKey(SavePrefix + "AffixAddStone");
         PlayerPrefs.DeleteKey(SavePrefix + "AffixRemoveStone");
         PlayerPrefs.DeleteKey(SavePrefix + "AffixReplaceStone");
@@ -6713,7 +16481,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 data.Append("|");
             }
 
-            data.Append(die.Name.Replace("~", string.Empty).Replace("|", string.Empty));
+            data.Append(SanitizeSaveField(die.Name));
             data.Append("~");
             data.Append(die.Type.ToString());
             data.Append("~");
@@ -6726,9 +16494,34 @@ public sealed class DiceKingDemo : MonoBehaviour
             data.Append(SerializeAffixes(die.PrefixAffixes));
             data.Append("~");
             data.Append(SerializeAffixes(die.SuffixAffixes));
+            data.Append("~");
+            data.Append(Mathf.Max(0, die.FeedCount));
+            data.Append("~");
+            data.Append(Mathf.Max(0, die.FeedValue));
+            data.Append("~");
+            data.Append(Mathf.Max(0, die.LastDevourGain));
+            data.Append("~");
+            data.Append(SanitizeSaveField(die.LastDevourSource));
+            data.Append("~");
+            data.Append(SanitizeSaveField(die.LastDevourTrigger));
+            data.Append("~");
+            data.Append(SerializeTurtleAttachments(die.TurtleAttachments));
+            data.Append("~");
+            data.Append(die.InstanceSellValue);
+            data.Append("~");
+            data.Append(Mathf.Max(0, die.InvestmentGold));
+            data.Append("~");
+            data.Append(die.CollectionTriggeredThisStage ? 1 : 0);
         }
 
         return data.ToString();
+    }
+
+    private string SanitizeSaveField(string value)
+    {
+        return string.IsNullOrEmpty(value)
+            ? string.Empty
+            : value.Replace("~", string.Empty).Replace("|", string.Empty);
     }
 
     private void LoadRunCollection()
@@ -6751,6 +16544,9 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
 
             int growth;
+            int feedCount;
+            int feedValue;
+            int lastDevourGain;
             DieType type;
             if (!TryParseDieType(fields[1], out type))
             {
@@ -6764,9 +16560,31 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
 
             int.TryParse(fields[3], out growth);
+            int.TryParse(fields.Length > 7 ? fields[7] : "0", out feedCount);
+            int.TryParse(fields.Length > 8 ? fields[8] : "0", out feedValue);
+            int.TryParse(fields.Length > 9 ? fields[9] : "0", out lastDevourGain);
             Die die = NewDie(fields[0], type, ParseFaces(fields[2]));
             die.Material = material;
             die.Growth = Mathf.Max(0, growth);
+            die.FeedCount = Mathf.Max(0, feedCount);
+            die.FeedValue = Mathf.Max(0, feedValue);
+            die.LastDevourGain = Mathf.Max(0, lastDevourGain);
+            die.LastDevourSource = fields.Length > 10 ? fields[10] : string.Empty;
+            die.LastDevourTrigger = fields.Length > 11 ? fields[11] : string.Empty;
+            die.TurtleAttachments = fields.Length > 12 ? ParseTurtleAttachments(fields[12]) : new List<TurtleAttachment>();
+            int instanceSellValue = -1;
+            if (fields.Length > 13)
+            {
+                int.TryParse(fields[13], out instanceSellValue);
+            }
+
+            die.InstanceSellValue = instanceSellValue >= 0 ? instanceSellValue : -1;
+            int investmentGold = 0;
+            int collectionTriggered = 0;
+            int.TryParse(fields.Length > 14 ? fields[14] : "0", out investmentGold);
+            int.TryParse(fields.Length > 15 ? fields[15] : "0", out collectionTriggered);
+            die.InvestmentGold = Mathf.Max(0, investmentGold);
+            die.CollectionTriggeredThisStage = collectionTriggered == 1;
             die.PrefixAffixes = fields.Length > 5 ? ParseAffixes(fields[5], AffixSlot.Prefix) : new List<AffixInstance>();
             die.SuffixAffixes = fields.Length > 6 ? ParseAffixes(fields[6], AffixSlot.Suffix) : new List<AffixInstance>();
             dice.Add(die);
@@ -6858,6 +16676,136 @@ public sealed class DiceKingDemo : MonoBehaviour
         return result;
     }
 
+    private string SerializeTurtleAttachments(List<TurtleAttachment> attachments)
+    {
+        if (attachments == null || attachments.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        StringBuilder data = new StringBuilder();
+        for (int i = 0; i < attachments.Count; i++)
+        {
+            TurtleAttachment attachment = attachments[i];
+            if (attachment == null)
+            {
+                continue;
+            }
+
+            if (data.Length > 0)
+            {
+                data.Append(";");
+            }
+
+            data.Append(SanitizeSaveToken(attachment.Type.ToString()));
+            data.Append(":");
+            data.Append(Mathf.Max(0, attachment.FaceGain));
+            data.Append(":");
+            data.Append(Mathf.Max(0, attachment.SellValue));
+            data.Append(":");
+            data.Append(TurtleAttachmentSourceKey(attachment.Source));
+        }
+
+        return data.ToString();
+    }
+
+    private List<TurtleAttachment> ParseTurtleAttachments(string data)
+    {
+        List<TurtleAttachment> result = new List<TurtleAttachment>();
+        if (string.IsNullOrEmpty(data))
+        {
+            return result;
+        }
+
+        string[] parts = data.Split(';');
+        for (int i = 0; i < parts.Length; i++)
+        {
+            string part = parts[i].Trim();
+            if (part.Length == 0)
+            {
+                continue;
+            }
+
+            string[] fields = part.Split(':');
+            DieType type;
+            if (fields.Length <= 0 || !TryParseDieType(fields[0], out type))
+            {
+                continue;
+            }
+
+            int faceGain = 0;
+            int sellValue = 0;
+            TurtleAttachmentSource source = TurtleAttachmentSource.RealTurtle;
+            if (fields.Length > 1)
+            {
+                int.TryParse(fields[1], out faceGain);
+            }
+
+            if (fields.Length > 2)
+            {
+                int.TryParse(fields[2], out sellValue);
+            }
+
+            if (fields.Length > 3)
+            {
+                TryParseTurtleAttachmentSource(fields[3], out source);
+            }
+
+            result.Add(new TurtleAttachment
+            {
+                Type = type,
+                FaceGain = Mathf.Max(0, faceGain),
+                SellValue = Mathf.Max(0, sellValue),
+                Source = source
+            });
+        }
+
+        return result;
+    }
+
+    private static string TurtleAttachmentSourceKey(TurtleAttachmentSource source)
+    {
+        switch (source)
+        {
+            case TurtleAttachmentSource.BasicShell:
+                return "basic";
+            case TurtleAttachmentSource.LeaderCopy:
+                return "leader";
+        }
+
+        return "real";
+    }
+
+    private static bool TryParseTurtleAttachmentSource(string value, out TurtleAttachmentSource source)
+    {
+        source = TurtleAttachmentSource.RealTurtle;
+        if (string.IsNullOrEmpty(value))
+        {
+            return false;
+        }
+
+        string key = value.Trim().ToLowerInvariant();
+        if (key == "basic" || key == "basicshell")
+        {
+            source = TurtleAttachmentSource.BasicShell;
+            return true;
+        }
+
+        if (key == "leader" || key == "leadercopy")
+        {
+            source = TurtleAttachmentSource.LeaderCopy;
+            return true;
+        }
+
+        if (key == "real" || key == "realturtle")
+        {
+            source = TurtleAttachmentSource.RealTurtle;
+            return true;
+        }
+
+        return false;
+    }
+
     private static string SanitizeSaveToken(string value)
     {
         if (string.IsNullOrEmpty(value))
@@ -6881,8 +16829,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             if (Enum.IsDefined(typeof(DieType), typeIndex))
             {
-                type = (DieType)typeIndex;
-                return true;
+                DieType parsed = (DieType)typeIndex;
+                if (IsCurrentRosterOrSystemType(parsed))
+                {
+                    type = parsed;
+                    return true;
+                }
             }
 
             return false;
@@ -6890,7 +16842,13 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         try
         {
-            type = (DieType)Enum.Parse(typeof(DieType), value, true);
+            DieType parsed = (DieType)Enum.Parse(typeof(DieType), value, true);
+            if (!IsCurrentRosterOrSystemType(parsed))
+            {
+                return false;
+            }
+
+            type = parsed;
             return true;
         }
         catch (ArgumentException)
@@ -6986,7 +16944,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             int value;
             if (int.TryParse(parts[i], out value))
             {
-                faces[i] = Mathf.Max(1, value);
+                faces[i] = value;
             }
         }
 
@@ -7030,14 +16988,27 @@ public sealed class DiceKingDemo : MonoBehaviour
         ClearDiceVisualStates();
         pendingTreeGrowth.Clear();
         activeCraftingItemKey = string.Empty;
+        marketLeaveEffectSequenceActive = false;
+        marketLeaveEffectIndex = 0;
+        marketLeaveEffectTotalCount = 0;
+        marketLeaveEffectResolvedCount = 0;
+        marketLeaveEffectTimer = 0f;
+        marketLeaveEffectFeedback = string.Empty;
         affixAddStoneCount = 0;
         affixRemoveStoneCount = 0;
         affixReplaceStoneCount = 0;
+        currentMarketPaidRefreshCount = 0;
+        currentMarketPirateSellCount = 0;
+        feedQuality = Mathf.Max(1, feedQualityStart);
+        tavernBaseMinimumBonus = 0;
+        marketTemporaryMinimumBonus = 0;
         nextDieId = 1;
         stageIndex = 0;
         chapterGold = startingGold;
+        remainingLives = Mathf.Max(1, startingLives);
         stageStartGold = chapterGold;
         stageInvestmentGold = 0;
+        stageContinuationPending = false;
         lastBribeGoldSpent = 0;
         lastBribeScoreBonus = 0;
         lastAffixScoreBonus = 0;
@@ -7047,6 +17018,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         ClearCommittedRunScoreCounter();
         passed = false;
         rolledThisEncounter = false;
+        rollResultsLocked = false;
         rewardBanner = string.Empty;
         buildName = newBuildName;
         buildSummary = newBuildSummary;
@@ -7060,6 +17032,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void StartEncounter()
     {
         Encounter encounter = CurrentEncounter();
+        stageContinuationPending = false;
         currentScore = 0;
         resolvedScore = 0;
         scoreRevealIndex = 0;
@@ -7088,11 +17061,18 @@ public sealed class DiceKingDemo : MonoBehaviour
         scoreStepTimer = 0f;
         passed = false;
         rolledThisEncounter = false;
+        rollResultsLocked = false;
         finalScoreApplied = false;
         rollPhase = RollPhase.Ready;
         BeginDiceVisualEnter();
         cheatRerollIds.Clear();
         selectedReadySlotIndex = -1;
+        mainGameRollIgnitionStartedAt = -999f;
+        mainGameTargetCrossStartedAt = -999f;
+        stageClearPresentationStartedAt = -999f;
+        stageFailureRetryAvailable = false;
+        stageFailureTransitionActive = false;
+        stageFailureTransitionStartedAt = -999f;
         rewardBanner = string.Empty;
         scoringDice.Clear();
         pendingTreeGrowth.Clear();
@@ -7113,6 +17093,68 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         SaveRun();
         AllocateStageInvestments();
+    }
+
+    private void ResumeEncounterContinuation(int savedScore, int savedStageStartGold, int savedStageInvestmentGold)
+    {
+        Encounter encounter = CurrentEncounter();
+        stageContinuationPending = true;
+        currentScore = Mathf.Max(0, savedScore);
+        resolvedScore = currentScore;
+        scoreRevealIndex = 0;
+        stageStartGold = Mathf.Max(0, savedStageStartGold);
+        stageInvestmentGold = Mathf.Max(0, savedStageInvestmentGold);
+        lastStageFlatIncome = 0;
+        lastStageInterestIncome = 0;
+        lastStageCompoundInterestIncome = 0;
+        lastStageIncome = 0;
+        lastBribeGoldSpent = 0;
+        lastBribeScoreBonus = 0;
+        lastAffixScoreBonus = 0;
+        lastWalletIncome = 0;
+        lastComboBonus = 0;
+        lastTemporaryScore = 0;
+        ClearResultPreview();
+        ClearCommittedRunScoreCounter();
+        shakeTimer = 0f;
+        shakePower = 0f;
+        stopTimer = 0f;
+        stopStartPower = 0f;
+        lastShakeTapTime = -999f;
+        shakeExpiredPromptTimer = 0f;
+        promptPulseTimer = 0f;
+        shakeImpulseCount = 0;
+        scoreStepTimer = 0f;
+        passed = false;
+        rolledThisEncounter = true;
+        rollResultsLocked = false;
+        finalScoreApplied = false;
+        rollPhase = RollPhase.Ready;
+        BeginDiceVisualEnter();
+        cheatRerollIds.Clear();
+        selectedReadySlotIndex = -1;
+        mainGameRollIgnitionStartedAt = -999f;
+        mainGameTargetCrossStartedAt = -999f;
+        stageClearPresentationStartedAt = -999f;
+        stageFailureRetryAvailable = false;
+        stageFailureTransitionActive = false;
+        stageFailureTransitionStartedAt = -999f;
+        rewardBanner = "保留累计 " + currentScore + " 分，剩余生命 " + remainingLives + "。";
+        scoringDice.Clear();
+        pendingTreeGrowth.Clear();
+        rollsLeft = RollsPerStage;
+        cheatsLeft = CheatsPerStage;
+
+        for (int i = 0; i < dice.Count; i++)
+        {
+            ResetRoundState(dice[i]);
+        }
+
+        EnsureDiceLimit();
+        if (encounter != null)
+        {
+            AddLog("继续 " + encounter.Name + "：累计 " + currentScore + " / " + encounter.Target + "，剩余生命 " + remainingLives + "。");
+        }
     }
 
     private void AllocateStageInvestments()
@@ -7175,6 +17217,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         rolledThisEncounter = true;
+        rollResultsLocked = false;
         resolvedScore = currentScore;
         lastBribeGoldSpent = 0;
         lastBribeScoreBonus = 0;
@@ -7187,7 +17230,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         scoreRevealIndex = 0;
         scoreStepTimer = 0f;
         activeRollFeedbackConfig = rollFeedbackConfig.Clone();
-        shakeTimer = activeRollFeedbackConfig.InputWindowDuration;
+        shakeTimer = Mathf.Max(0.05f, Mathf.Max(activeRollFeedbackConfig.BaseSpinDuration, activeRollFeedbackConfig.InputWindowDuration));
         shakePower = activeRollFeedbackConfig.BasePower;
         stopTimer = 0f;
         stopStartPower = 0f;
@@ -7200,6 +17243,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         pendingTreeGrowth.Clear();
         cheatRerollIds.Clear();
         selectedReadySlotIndex = -1;
+        mainGameRollIgnitionStartedAt = Time.time;
+        mainGameTargetCrossStartedAt = -999f;
+        stageClearPresentationStartedAt = -999f;
+        stageFailureRetryAvailable = false;
+        stageFailureTransitionActive = false;
+        stageFailureTransitionStartedAt = -999f;
 
         for (int i = 0; i < dice.Count; i++)
         {
@@ -7209,21 +17258,24 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         BeginDiceVisualRoll();
         rollPhase = RollPhase.Shaking;
-        AddLog("骰子开始旋转，敲空格加速。");
+        AddLog(activeRollFeedbackConfig.InputWindowDuration > 0f
+            ? "骰面滚轴启动，可在窗口内敲空格加速。"
+            : "骰面滚轴启动，高速滚动后将自动停靠。");
         Debug.Log("DiceKingDemo: roll feedback snapshot captured from " + rollFeedbackConfigSource + ". " + RollFeedbackSummary(activeRollFeedbackConfig));
     }
 
     private void UpdateShakeRoll()
     {
         RollFeedbackConfig config = CurrentRollFeedbackConfig();
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (ShakeInputWindowActive() && Input.GetKeyDown(KeyCode.Space))
         {
             TryApplyShakeImpulse(config);
         }
 
-        shakeTimer -= Time.deltaTime;
-        UpdateRollPromptTimers();
-        shakePower = Mathf.Max(config.BasePower, shakePower - Time.deltaTime * config.PowerDecayPerSecond);
+        float playbackDeltaTime = GameplayPlaybackDeltaTime();
+        shakeTimer -= playbackDeltaTime;
+        UpdateRollPromptTimers(playbackDeltaTime);
+        shakePower = Mathf.Max(config.BasePower, shakePower - playbackDeltaTime * config.PowerDecayPerSecond);
         if (shakeTimer <= 0f)
         {
             BeginStopRoll();
@@ -7232,7 +17284,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void TryApplyShakeImpulse(RollFeedbackConfig config)
     {
-        if (config == null || shakeTimer <= 0f)
+        if (config == null || !ShakeInputWindowActive())
         {
             return;
         }
@@ -7256,16 +17308,29 @@ public sealed class DiceKingDemo : MonoBehaviour
         diceVisualImpulseTimer = DiceVisualImpulseDuration;
     }
 
+    private bool ShakeInputWindowActive()
+    {
+        RollFeedbackConfig config = CurrentRollFeedbackConfig();
+        if (rollPhase != RollPhase.Shaking || config == null || config.InputWindowDuration <= 0f || mainGameRollIgnitionStartedAt < -900f)
+        {
+            return false;
+        }
+
+        return GameplayPlaybackElapsed(mainGameRollIgnitionStartedAt) <= config.InputWindowDuration;
+    }
+
     private void BeginStopRoll()
     {
         RollFeedbackConfig config = CurrentRollFeedbackConfig();
+        float reelElapsed = diceVisualRollStartTime > -900f ? GameplayPlaybackElapsed(diceVisualRollStartTime) : 0f;
+        diceFaceReelStopTravel = DiceFaceReelTravelAtElapsed(reelElapsed);
         shakeTimer = 0f;
         stopTimer = 0f;
         stopStartPower = Mathf.Max(config.StopMinPower, shakePower);
         shakeExpiredPromptTimer = config.ExpiredPromptDuration;
         LockCurrentRollResults();
         rollPhase = RollPhase.Stopping;
-        AddLog("加力窗口结束，骰子即将停转。");
+        AddLog("骰面滚轴开始减速，六个槽位将从左到右停靠。");
     }
 
     private void UpdateStopRoll()
@@ -7276,9 +17341,14 @@ public sealed class DiceKingDemo : MonoBehaviour
             shakeExpiredPromptTimer = config.ExpiredPromptDuration;
         }
 
-        stopTimer += Time.deltaTime;
-        UpdateRollPromptTimers();
+        float playbackDeltaTime = GameplayPlaybackDeltaTime();
+        stopTimer += playbackDeltaTime;
+        UpdateRollPromptTimers(playbackDeltaTime);
         float stopDuration = Mathf.Max(0.05f, config.StopDuration);
+        if (MainGameFlowPresentationEnabled() && UseArcadeRunVisuals())
+        {
+            stopDuration = Mathf.Max(stopDuration, MainGameStopSequenceDuration(dice.Count));
+        }
         float t = Mathf.Clamp01(stopTimer / stopDuration);
         shakePower = Mathf.Max(config.StopMinPower, stopStartPower * (1f - t));
         if (stopTimer >= stopDuration)
@@ -7287,11 +17357,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
     }
 
-    private void UpdateRollPromptTimers()
+    private void UpdateRollPromptTimers(float playbackDeltaTime)
     {
-        promptPulseTimer = Mathf.Max(0f, promptPulseTimer - Time.deltaTime);
-        shakeExpiredPromptTimer = Mathf.Max(0f, shakeExpiredPromptTimer - Time.deltaTime);
-        diceVisualImpulseTimer = Mathf.Max(0f, diceVisualImpulseTimer - Time.deltaTime);
+        promptPulseTimer = Mathf.Max(0f, promptPulseTimer - playbackDeltaTime);
+        shakeExpiredPromptTimer = Mathf.Max(0f, shakeExpiredPromptTimer - playbackDeltaTime);
+        diceVisualImpulseTimer = Mathf.Max(0f, diceVisualImpulseTimer - playbackDeltaTime);
     }
 
     private void FinishShakeRoll()
@@ -7303,8 +17373,9 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         LockCurrentRollResults();
+        BeginDiceVisualReveal();
         rollPhase = RollPhase.ResultDecision;
-        AddLog("停转显点，结果锁定。可直接结算或出千。");
+        AddLog("骰面停靠完成，结果锁定并自动结算。");
     }
 
     private void LockCurrentRollResults()
@@ -7319,6 +17390,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             RollOneDie(dice[i]);
         }
+
+        rollResultsLocked = true;
 
         ApplyLoneWitnessRerolls();
         ApplyParityReviewRerolls();
@@ -7335,27 +17408,19 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private bool CurrentRollHasLockedResults()
     {
-        for (int i = 0; i < dice.Count; i++)
-        {
-            if (dice[i] != null && dice[i].EffectiveValue > 0)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return rollResultsLocked;
     }
 
     private void BeginCheatEdit()
     {
-        if (cheatsLeft <= 0 || rollPhase != RollPhase.ResultDecision || dice.Count == 0)
+        if (!V02CheatEnabled || cheatsLeft <= 0 || rollPhase != RollPhase.ResultDecision || dice.Count == 0)
         {
             return;
         }
 
         cheatRerollIds.Clear();
         rollPhase = RollPhase.CheatEdit;
-        AddLog("出千：选择最多 " + MaxCheatRerollDice + " 颗实体骰点数 +1，最高不超过骰面上限。");
+        AddLog("出千：选择最多 " + MaxCheatRerollDice + " 颗己方骰点数 +1，最高不超过骰面上限。");
     }
 
     private void CancelCheatEdit()
@@ -7373,7 +17438,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void ConfirmCheatAndSettle()
     {
-        if (cheatsLeft <= 0 || rollPhase != RollPhase.CheatEdit)
+        if (!V02CheatEnabled || cheatsLeft <= 0 || rollPhase != RollPhase.CheatEdit)
         {
             return;
         }
@@ -7381,7 +17446,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         RemoveInvalidCheatSelections();
         if (cheatRerollIds.Count == 0)
         {
-            AddLog("出千需要至少选择一颗实体骰。");
+            AddLog("出千需要至少选择一颗己方骰。");
             return;
         }
 
@@ -7413,7 +17478,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (appliedCount == 0)
         {
             cheatRerollIds.Clear();
-            AddLog("没有可改点的实体骰。");
+            AddLog("没有可改点的己方骰。");
             return;
         }
 
@@ -7429,7 +17494,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void ToggleCheatReroll(Die die)
     {
-        if (die == null || die.Temporary)
+        if (!V02CheatEnabled || die == null || die.Temporary)
         {
             return;
         }
@@ -7468,51 +17533,407 @@ public sealed class DiceKingDemo : MonoBehaviour
         return null;
     }
 
-    private void ToggleReadySlotSelection(int index)
+    private void MoveDiceSlot(int fromIndex, int targetIndex)
     {
-        if (rollPhase != RollPhase.Ready || index < 0 || index >= dice.Count)
+        if (fromIndex == targetIndex
+            || fromIndex < 0
+            || targetIndex < 0
+            || fromIndex >= dice.Count
+            || targetIndex >= dice.Count)
         {
             return;
         }
 
-        if (selectedReadySlotIndex == index)
-        {
-            selectedReadySlotIndex = -1;
-            return;
-        }
-
-        if (selectedReadySlotIndex < 0 || selectedReadySlotIndex >= dice.Count)
-        {
-            selectedReadySlotIndex = index;
-            return;
-        }
-
-        int from = selectedReadySlotIndex;
-        SwapDiceSlots(from, index);
-        selectedReadySlotIndex = -1;
-        AddLog("调整槽位：" + (from + 1) + " 与 " + (index + 1) + " 交换。");
-        SaveDiceOrderIfStageStart();
+        Die moved = dice[fromIndex];
+        dice.RemoveAt(fromIndex);
+        int insertIndex = Mathf.Clamp(targetIndex, 0, dice.Count);
+        dice.Insert(insertIndex, moved);
     }
 
-    private void SwapDiceSlots(int firstIndex, int secondIndex)
+    private int DiceIndexById(int dieId)
     {
-        if (firstIndex == secondIndex
-            || firstIndex < 0
-            || secondIndex < 0
-            || firstIndex >= dice.Count
-            || secondIndex >= dice.Count)
+        for (int i = 0; i < dice.Count; i++)
+        {
+            if (dice[i].Id == dieId)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private bool DiceOrderDragActive()
+    {
+        return diceOrderDragSurface != DiceOrderDragSurface.None
+            && diceOrderDragSourceIndex >= 0
+            && diceOrderDragSourceIndex < dice.Count
+            && DiceIndexById(diceOrderDragDieId) >= 0;
+    }
+
+    private bool IsDiceOrderDraggedDie(DiceOrderDragSurface surface, Die die)
+    {
+        return die != null
+            && diceOrderDragSurface == surface
+            && diceOrderDragMoving
+            && die.Id == diceOrderDragDieId;
+    }
+
+    private bool CanReorderDiceOnSurface(DiceOrderDragSurface surface)
+    {
+        if (dice.Count <= 1)
+        {
+            return false;
+        }
+
+        if (surface == DiceOrderDragSurface.RunTable)
+        {
+            return mode == GameMode.Run && rollPhase == RollPhase.Ready;
+        }
+
+        if (surface == DiceOrderDragSurface.MarketBag)
+        {
+            return (mode == GameMode.InterStageMarket || mode == GameMode.ChapterShop)
+                && string.IsNullOrEmpty(activeCraftingItemKey);
+        }
+
+        return false;
+    }
+
+    private void BeginDiceOrderDrag(DiceOrderDragSurface surface, int sourceIndex, Rect sourceRect)
+    {
+        if (!CanReorderDiceOnSurface(surface)
+            || sourceIndex < 0
+            || sourceIndex >= dice.Count
+            || GUIUtility.hotControl != 0)
         {
             return;
         }
 
-        Die first = dice[firstIndex];
-        dice[firstIndex] = dice[secondIndex];
-        dice[secondIndex] = first;
+        Event current = Event.current;
+        diceOrderDragSurface = surface;
+        diceOrderDragSourceIndex = sourceIndex;
+        diceOrderDragPreviewIndex = sourceIndex;
+        diceOrderDragDieId = dice[sourceIndex].Id;
+        diceOrderDragStartMouse = uiMousePosition;
+        diceOrderDragOffset = new Vector2(uiMousePosition.x - sourceRect.x, uiMousePosition.y - sourceRect.y);
+        diceOrderDragStartRect = sourceRect;
+        diceOrderDragMoving = false;
+        diceOrderDragControlId = GUIUtility.GetControlID(FocusType.Passive);
+        GUIUtility.hotControl = diceOrderDragControlId;
+
+        SelectDiceOrderSurfaceIndex(surface, sourceIndex);
+
+        if (current != null)
+        {
+            current.Use();
+        }
+    }
+
+    private void CancelDiceOrderDrag()
+    {
+        if (diceOrderDragControlId != 0 && GUIUtility.hotControl == diceOrderDragControlId)
+        {
+            GUIUtility.hotControl = 0;
+        }
+
+        diceOrderDragSurface = DiceOrderDragSurface.None;
+        diceOrderDragSourceIndex = -1;
+        diceOrderDragPreviewIndex = -1;
+        diceOrderDragDieId = -1;
+        diceOrderDragControlId = 0;
+        diceOrderDragStartMouse = Vector2.zero;
+        diceOrderDragOffset = Vector2.zero;
+        diceOrderDragStartRect = new Rect();
+        diceOrderDragMoving = false;
+    }
+
+    private void CompleteDiceOrderDrag()
+    {
+        if (!DiceOrderDragActive())
+        {
+            CancelDiceOrderDrag();
+            return;
+        }
+
+        DiceOrderDragSurface surface = diceOrderDragSurface;
+        int fromIndex = DiceIndexById(diceOrderDragDieId);
+        int targetIndex = Mathf.Clamp(diceOrderDragPreviewIndex, 0, dice.Count - 1);
+        int movedId = diceOrderDragDieId;
+        bool moved = diceOrderDragMoving && fromIndex >= 0 && targetIndex >= 0 && fromIndex != targetIndex;
+
+        if (moved)
+        {
+            MoveDiceSlot(fromIndex, targetIndex);
+            int finalIndex = DiceIndexById(movedId);
+            if (surface == DiceOrderDragSurface.RunTable)
+            {
+                selectedReadySlotIndex = finalIndex;
+                AddLog("调整槽位：" + (fromIndex + 1) + " 到 " + (finalIndex + 1) + "。");
+                SaveDiceOrderIfStageStart();
+            }
+            else if (surface == DiceOrderDragSurface.MarketBag)
+            {
+                selectedMarketDieIndex = finalIndex;
+                AddLog("调整骰袋：" + (fromIndex + 1) + " 到 " + (finalIndex + 1) + "。");
+                SaveRun();
+            }
+        }
+
+        CancelDiceOrderDrag();
+    }
+
+    private void HandleDiceOrderDragMouseDown(DiceOrderDragSurface surface, int sourceIndex, Rect sourceRect)
+    {
+        Event current = Event.current;
+        if (current == null
+            || current.type != EventType.MouseDown
+            || current.button != 0
+            || !uiMousePositionValid
+            || !sourceRect.Contains(uiMousePosition))
+        {
+            return;
+        }
+
+        if (!CanReorderDiceOnSurface(surface))
+        {
+            SelectDiceOrderSurfaceIndex(surface, sourceIndex);
+            current.Use();
+            return;
+        }
+
+        BeginDiceOrderDrag(surface, sourceIndex, sourceRect);
+    }
+
+    private void SelectDiceOrderSurfaceIndex(DiceOrderDragSurface surface, int index)
+    {
+        if (surface == DiceOrderDragSurface.RunTable)
+        {
+            if (rollPhase == RollPhase.Ready && index >= 0 && index < dice.Count)
+            {
+                selectedReadySlotIndex = index;
+            }
+
+            return;
+        }
+
+        if (surface == DiceOrderDragSurface.MarketBag && index >= 0 && index < dice.Count)
+        {
+            selectedMarketDieIndex = index;
+        }
+    }
+
+    private void UpdateDiceOrderDragFromSlots(DiceOrderDragSurface surface, Rect[] slotRects, bool horizontal)
+    {
+        if (!DiceOrderDragActive() || diceOrderDragSurface != surface)
+        {
+            return;
+        }
+
+        Event current = Event.current;
+        if (current == null)
+        {
+            return;
+        }
+
+        if (current.type == EventType.KeyDown && current.keyCode == KeyCode.Escape)
+        {
+            CancelDiceOrderDrag();
+            current.Use();
+            return;
+        }
+
+        if (current.type == EventType.MouseDown && current.button == 1)
+        {
+            CancelDiceOrderDrag();
+            current.Use();
+            return;
+        }
+
+        if (current.type == EventType.MouseDrag && current.button == 0)
+        {
+            if (!uiMousePositionValid)
+            {
+                return;
+            }
+
+            if (!diceOrderDragMoving && Vector2.Distance(uiMousePosition, diceOrderDragStartMouse) >= DiceOrderDragStartDistance)
+            {
+                diceOrderDragMoving = true;
+            }
+
+            if (diceOrderDragMoving)
+            {
+                diceOrderDragPreviewIndex = DiceOrderInsertionIndexFromMouse(uiMousePosition, slotRects, horizontal);
+            }
+
+            current.Use();
+            return;
+        }
+
+        if (current.type == EventType.Repaint && diceOrderDragMoving && uiMousePositionValid)
+        {
+            diceOrderDragPreviewIndex = DiceOrderInsertionIndexFromMouse(uiMousePosition, slotRects, horizontal);
+            return;
+        }
+
+        if (current.type == EventType.MouseUp && current.button == 0)
+        {
+            CompleteDiceOrderDrag();
+            current.Use();
+        }
+    }
+
+    private int DiceOrderInsertionIndexFromMouse(Vector2 mouse, Rect[] slotRects, bool horizontal)
+    {
+        int count = slotRects == null ? 0 : slotRects.Length;
+        if (count <= 0)
+        {
+            return Mathf.Clamp(diceOrderDragSourceIndex, 0, Mathf.Max(0, dice.Count - 1));
+        }
+
+        if (count == 1)
+        {
+            return 0;
+        }
+
+        for (int i = 0; i < count - 1; i++)
+        {
+            float currentCenter = horizontal ? slotRects[i].center.x : slotRects[i].center.y;
+            float nextCenter = horizontal ? slotRects[i + 1].center.x : slotRects[i + 1].center.y;
+            float midpoint = (currentCenter + nextCenter) * 0.5f;
+            float pointer = horizontal ? mouse.x : mouse.y;
+            if (pointer < midpoint)
+            {
+                return i;
+            }
+        }
+
+        return count - 1;
+    }
+
+    private List<int> DiceOrderVisualIndices(DiceOrderDragSurface surface)
+    {
+        List<int> indices = new List<int>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            indices.Add(i);
+        }
+
+        if (!DiceOrderDragActive()
+            || diceOrderDragSurface != surface
+            || !diceOrderDragMoving)
+        {
+            return indices;
+        }
+
+        int sourceIndex = DiceIndexById(diceOrderDragDieId);
+        int targetIndex = Mathf.Clamp(diceOrderDragPreviewIndex, 0, indices.Count - 1);
+        if (sourceIndex < 0 || sourceIndex >= indices.Count || sourceIndex == targetIndex)
+        {
+            return indices;
+        }
+
+        int moved = indices[sourceIndex];
+        indices.RemoveAt(sourceIndex);
+        indices.Insert(Mathf.Clamp(targetIndex, 0, indices.Count), moved);
+        return indices;
+    }
+
+    private void DrawDiceOrderGhost(Rect rect)
+    {
+        if (UseArcadeRunVisuals() && diceOrderDragSurface == DiceOrderDragSurface.RunTable)
+        {
+            Rect glow = new Rect(rect.x + 1f, rect.y + 1f, rect.width - 2f, rect.height - 2f);
+            DrawRect(glow, new Color(0.16f, 0.68f, 0.63f, 0.08f));
+            DrawBorder(glow, new Color(0.22f, 0.72f, 0.66f, 0.46f), 2f);
+            DrawBorder(new Rect(rect.x + 4f, rect.y + 4f, rect.width - 8f, rect.height - 8f), new Color(0.32f, 0.78f, 0.72f, 0.24f), 2f);
+            return;
+        }
+
+        DrawRect(rect, new Color(0.12f, 0.18f, 0.18f, 0.22f));
+        DrawBorder(rect, new Color(0.22f, 0.38f, 0.36f, 0.6f), 2f);
+    }
+
+    private void DrawDiceOrderInsertMarker(Rect rect, bool horizontal)
+    {
+        Color marker = new Color(0.25f, 0.74f, 0.67f, 0.95f);
+        if (horizontal && UseArcadeRunVisuals())
+        {
+            Rect preview = new Rect(rect.x + 1f, rect.y + 1f, rect.width - 2f, rect.height - 2f);
+            DrawRect(preview, new Color(marker.r, marker.g, marker.b, 0.1f));
+            DrawBorder(preview, new Color(marker.r, marker.g, marker.b, 0.72f), 3f);
+            DrawTintedCircle(new Rect(rect.x + rect.width * 0.08f, rect.y + rect.height * 0.88f, rect.width * 0.84f, rect.height * 0.14f), new Color(marker.r, marker.g, marker.b, 0.2f));
+            return;
+        }
+
+        if (horizontal)
+        {
+            DrawRect(new Rect(rect.x - 5f, rect.y + 8f, 4f, rect.height - 16f), marker);
+            DrawRect(new Rect(rect.x - 9f, rect.y + rect.height * 0.5f - 9f, 12f, 18f), marker);
+        }
+        else
+        {
+            DrawRect(new Rect(rect.x + 8f, rect.y - 5f, rect.width - 16f, 4f), marker);
+            DrawRect(new Rect(rect.x + rect.width * 0.5f - 9f, rect.y - 9f, 18f, 12f), marker);
+        }
+    }
+
+    private void DrawDiceOrderFloatingDie(DiceOrderDragSurface surface)
+    {
+        if (!DiceOrderDragActive()
+            || diceOrderDragSurface != surface
+            || !diceOrderDragMoving
+            || !uiMousePositionValid)
+        {
+            return;
+        }
+
+        Die die = FindDieById(diceOrderDragDieId);
+        if (die == null)
+        {
+            return;
+        }
+
+        Rect rect = diceOrderDragStartRect;
+        rect.width *= DiceOrderDragLiftScale;
+        rect.height *= DiceOrderDragLiftScale;
+        rect.x = uiMousePosition.x - diceOrderDragOffset.x;
+        rect.y = uiMousePosition.y - diceOrderDragOffset.y;
+
+        Color previousColor = GUI.color;
+        GUI.color = new Color(1f, 1f, 1f, 0.96f);
+        if (surface == DiceOrderDragSurface.MarketBag && UseArcadeMarketVisuals())
+        {
+            DrawArcadeMarketBagDie(rect, die, true, null, false);
+        }
+        else if (surface == DiceOrderDragSurface.MarketBag)
+        {
+            DrawCompactDieVisual(rect, die, true, null, false);
+        }
+        else
+        {
+            DrawDieToken(rect, die, die.EffectiveValue > 0 ? die.EffectiveValue : die.Faces[0]);
+        }
+
+        GUI.color = previousColor;
+        DrawBorder(rect, new Color(0.25f, 0.74f, 0.67f, 0.95f), 3f);
     }
 
     private void SaveDiceOrderIfStageStart()
     {
-        if (suppressSave || !hasSave || rolledThisEncounter || currentScore != 0)
+        if (suppressSave || !hasSave)
+        {
+            return;
+        }
+
+        if (stageContinuationPending && rollPhase == RollPhase.Ready)
+        {
+            SaveRun();
+            return;
+        }
+
+        if (rolledThisEncounter || currentScore != 0)
         {
             return;
         }
@@ -7537,7 +17958,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void BeginSettle()
     {
-        if (rollPhase != RollPhase.ResultDecision && rollPhase != RollPhase.CheatEdit)
+        if (rollPhase != RollPhase.ResultDecision && (!V02CheatEnabled || rollPhase != RollPhase.CheatEdit))
         {
             return;
         }
@@ -7557,11 +17978,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         resolvedScore = scoreBeforeSettle + rollScore;
         CaptureCommittedRunScoreCounter(scoreBeforeSettle, rollScore, resolvedScore);
         PrepareRunScoreCounterAnimation(scoreBeforeSettle);
+        settlementImpactPresentationActive = ShouldUseSettlementImpactPresentation();
+        ResetSettlementImpactPresentationState();
         PrepareSettlementDisplayEvents(scoreBeforeSettle);
         currentScore = scoreBeforeSettle;
         scoreRevealIndex = 0;
         scoreStepTimer = 0f;
         finalScoreApplied = false;
+        mainGameTargetCrossStartedAt = -999f;
         ActivateSettlementDisplayEvent(0);
         rollPhase = RollPhase.Scoring;
         AddLog("二次确认，开始从左到右结算。");
@@ -7570,7 +17994,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void UpdateScoreReveal()
     {
         scoreStepTimer += Time.deltaTime;
-        UpdateRunScoreCounterPulses(Time.deltaTime);
+        UpdateRunScoreCounterPulses(GameplayPlaybackDeltaTime());
 
         if (UpdateSettlementDisplayEvents())
         {
@@ -7598,7 +18022,15 @@ public sealed class DiceKingDemo : MonoBehaviour
             return true;
         }
 
-        float duration = Mathf.Max(0.01f, activeSettlementEvent.Duration);
+        float duration = SettlementDisplayDuration(activeSettlementEvent.Duration);
+        UpdateSettlementImpactAudio(activeSettlementEvent, duration);
+        if (activeSettlementEvent.UseCommittedSnapshot
+            && activeSettlementEvent.Kind != SettlementEventKind.TargetSettle
+            && scoreStepTimer >= duration * SettlementAbsorbFraction())
+        {
+            ApplySettlementDisplayEvent(activeSettlementEvent);
+        }
+
         if (scoreStepTimer < duration)
         {
             return true;
@@ -7624,7 +18056,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         if (scoreRevealIndex < scoringDice.Count)
         {
-            if (scoreStepTimer >= ScoreStepDuration)
+            if (scoreStepTimer >= ScoreStepDisplayDuration())
             {
                 ApplyRunScoreCounterStep(scoreRevealIndex);
                 scoreRevealIndex++;
@@ -7636,7 +18068,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (!finalScoreApplied)
         {
-            if (scoreStepTimer >= FinalScoreDuration)
+            if (scoreStepTimer >= FinalScoreDisplayDuration())
             {
                 ApplyRunScoreCounterFinal();
                 finalScoreApplied = true;
@@ -7646,7 +18078,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
-        if (scoreStepTimer >= FinalScoreDuration)
+        if (scoreStepTimer >= FinalScoreDisplayDuration())
         {
             CompleteScoreReveal();
         }
@@ -7661,6 +18093,16 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         activeSettlementEvent = settlementDisplayEvents[eventIndex];
+        settlementPrimaryAudioPlayed = false;
+        settlementFinaleAudioStage = 0;
+        if (activeSettlementEvent.Kind == SettlementEventKind.TargetSettle)
+        {
+            mainGameTargetCrossStartedAt = -999f;
+            settlementTowerAfterglowStartedAt = -999f;
+            settlementTowerAfterglowWeight = 0f;
+            settlementTowerAfterglowSign = 1;
+        }
+
         if (activeSettlementEvent.ScoreIndex >= 0 && activeSettlementEvent.ScoreIndex < scoringDice.Count)
         {
             scoreRevealIndex = activeSettlementEvent.ScoreIndex;
@@ -7673,12 +18115,19 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void ApplySettlementDisplayEvent(SettlementDisplayEvent settlementEvent)
     {
-        if (settlementEvent == null)
+        if (settlementEvent == null || settlementEvent.CounterApplied)
         {
             return;
         }
 
-        if (settlementEvent.ApplyCounterStep)
+        settlementEvent.CounterApplied = true;
+
+        if (settlementEvent.UseCommittedSnapshot)
+        {
+            ApplyCommittedSettlementSnapshot(settlementEvent);
+        }
+
+        if (!settlementEvent.UseCommittedSnapshot && settlementEvent.ApplyCounterStep)
         {
             ApplyRunScoreCounterStep(settlementEvent.CounterStepIndex);
             if (settlementEvent.ScoreIndexEnd >= 0)
@@ -7693,35 +18142,63 @@ public sealed class DiceKingDemo : MonoBehaviour
             finalScoreApplied = true;
             scoreRevealIndex = scoringDice.Count;
         }
+
+        if (settlementImpactPresentationActive
+            && (settlementEvent.Kind == SettlementEventKind.SlotScore || settlementEvent.Kind == SettlementEventKind.BribeFinal))
+        {
+            settlementTowerAfterglowStartedAt = Time.time;
+            settlementTowerAfterglowWeight = Mathf.Clamp01(settlementEvent.LocalImpactWeight01);
+            settlementTowerAfterglowSign = settlementEvent.ValueDelta < 0 ? -1 : settlementEvent.ValueDelta > 0 ? 1 : 0;
+        }
+
+        if (settlementImpactPresentationActive && settlementEvent.Kind == SettlementEventKind.TargetSettle)
+        {
+            settlementFinaleTier = settlementEvent.FeedbackTier;
+            settlementFinaleCompletedAt = Time.time;
+            settlementFinaleAfterglowActive = true;
+        }
     }
 
     private void CompleteScoreReveal()
     {
+        bool keepFinaleAfterglow = settlementImpactPresentationActive;
         currentScore = resolvedScore;
         runScoreCounterAnimationActive = false;
         ClearSettlementDisplayEvents();
+        settlementImpactPresentationActive = false;
+        settlementFinaleAfterglowActive |= keepFinaleAfterglow;
         ApplyPendingTreeGrowth();
         Encounter encounter = CurrentEncounter();
         passed = encounter != null && currentScore >= encounter.Target;
 
         if (passed)
         {
+            stageContinuationPending = false;
+            stageClearGoldBeforeIncome = chapterGold;
             ResolvePassIncome();
             rollPhase = RollPhase.StageClear;
+            stageClearPresentationStartedAt = Time.time;
             AddLog("达标：" + currentScore + " / " + encounter.Target + "。");
-        }
-        else if (rollsLeft > 0)
-        {
-            PrepareNextRollVisualReadyState();
-            rollPhase = RollPhase.Ready;
-            AddLog("未达标：" + currentScore + " / " + encounter.Target + "，还可继续出手。");
         }
         else
         {
-            rollPhase = RollPhase.StageFailed;
-            AddLog("未达标：" + currentScore + " / " + encounter.Target + "，本轮结束。");
-            ClearSave();
-            mode = GameMode.GameOver;
+            int target = encounter != null ? encounter.Target : 0;
+            remainingLives = Mathf.Max(0, remainingLives - 1);
+            if (remainingLives > 0)
+            {
+                rollsLeft = RollsPerStage;
+                stageContinuationPending = true;
+                BeginStageFailedPresentation(true);
+                SaveRun();
+                AddLog("未达标：" + currentScore + " / " + target + "，扣除 1 生命，剩余 " + remainingLives + "。");
+            }
+            else
+            {
+                stageContinuationPending = false;
+                ClearSave();
+                BeginStageFailedPresentation(false);
+                AddLog("未达标：" + currentScore + " / " + target + "，生命归零，本轮结束。");
+            }
         }
     }
 
@@ -7734,6 +18211,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         scoringDice.Clear();
         selectedReadySlotIndex = -1;
+        rollResultsLocked = false;
         BeginDiceVisualEnter();
     }
 
@@ -7774,6 +18252,12 @@ public sealed class DiceKingDemo : MonoBehaviour
             return false;
         }
 
+        if (previous >= faceLimit)
+        {
+            capped = true;
+            return false;
+        }
+
         int next = Mathf.Min(previous + 1, faceLimit);
         capped = next == previous;
         die.LoneWitnessRerolled = false;
@@ -7804,10 +18288,10 @@ public sealed class DiceKingDemo : MonoBehaviour
             return 0;
         }
 
-        int highest = Mathf.Max(1, die.Faces[0]);
+        int highest = die.Faces[0];
         for (int i = 1; i < die.Faces.Length; i++)
         {
-            int face = Mathf.Max(1, die.Faces[i]);
+            int face = die.Faces[i];
             if (face > highest)
             {
                 highest = face;
@@ -7837,6 +18321,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             : die.Faces[UnityEngine.Random.Range(0, die.Faces.Length)];
         die.LastValue = raw;
         die.EffectiveValue = raw;
+        ApplyFeedMinimum(die);
         die.RoundNote = RoundTag(die);
     }
 
@@ -7935,7 +18420,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         lastAffixScoreBonus = 0;
         lastWalletIncome = 0;
         lastMultiplier = 1f;
-        lastHandName = "无牌型";
+        lastHandName = DefaultHandName();
     }
 
     private void RefreshHandPreview()
@@ -7947,15 +18432,15 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
+        if (!rollResultsLocked)
+        {
+            ClearResultPreview();
+            return;
+        }
+
         List<int> handValues = new List<int>();
         for (int i = 0; i < dice.Count; i++)
         {
-            if (dice[i].EffectiveValue <= 0)
-            {
-                ClearResultPreview();
-                return;
-            }
-
             handValues.Add(dice[i].EffectiveValue);
         }
 
@@ -8714,6 +19199,790 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
     }
 
+    private void EmitMainFamilySettlementEvent(Die source, FamilySettlementEffectKind kind, string label, bool copied, bool copyable)
+    {
+        FamilySettlementContext context = activeFamilySettlementContext;
+        MainFamily family = source != null ? MainFamilyForType(source.Type) : MainFamily.None;
+        if (context == null || source == null || source.Temporary || family == MainFamily.None)
+        {
+            return;
+        }
+
+        bool isCopied = copied || context.CopiedEventDepth > 0;
+        FamilySettlementEffectEvent settlementEvent = new FamilySettlementEffectEvent
+        {
+            Kind = kind,
+            Family = family,
+            SourceDieId = source.Id,
+            Copied = isCopied,
+            Copyable = copyable && !isCopied,
+            Label = label
+        };
+
+        if (settlementEvent.Copyable)
+        {
+            context.LatestCopyableBySourceId[source.Id] = settlementEvent;
+        }
+
+        if (isCopied || context.TriggerDiceCount <= 0)
+        {
+            return;
+        }
+
+        int triggerBonus = context.TriggerDiceCount * 2;
+        ApplyTemporaryScoreBonus(source, triggerBonus, "触发器");
+        AddLog("触发器读取 " + DieDisplayName(source) + " 的" + label + "事件，单骰分 +" + triggerBonus + "。");
+    }
+
+    private void ApplyTemporaryScoreBonus(Die target, int amount, string sourceLabel)
+    {
+        if (target == null || target.Temporary || amount <= 0)
+        {
+            return;
+        }
+
+        target.NeutralTemporaryScoreBonus += amount;
+        FamilySettlementContext context = activeFamilySettlementContext;
+        if (context != null && context.SettledIds.Contains(target.Id))
+        {
+            target.Score += amount;
+            context.IndividualScore += amount;
+            RecordSettlementContribution(target, amount, settlementScoringCursorIndex, true, false, sourceLabel);
+        }
+
+        if (!string.IsNullOrEmpty(sourceLabel))
+        {
+            target.RoundNote = AppendNote(target.RoundNote, sourceLabel + " +" + amount);
+        }
+    }
+
+    private void ResetSettlementTemporaryScoreBonuses()
+    {
+        for (int i = 0; i < dice.Count; i++)
+        {
+            if (dice[i] == null)
+            {
+                continue;
+            }
+
+            dice[i].PigTemporaryScoreBonus = 0;
+            dice[i].NeutralTemporaryScoreBonus = 0;
+        }
+    }
+
+    private void ApplyPigFamilySettlementEffect(Die die, int dieIndex, HashSet<int> closedSlots, bool copied)
+    {
+        if (die == null || die.Temporary)
+        {
+            return;
+        }
+
+        switch (die.Type)
+        {
+            case DieType.PigFarmer:
+                int fed = FeedNeighbor(dieIndex - 1, 2, "养猪", die, closedSlots, copied)
+                    + FeedNeighbor(dieIndex + 1, 2, "养猪", die, closedSlots, copied);
+                if (fed > 0)
+                {
+                    die.RoundNote = AppendNote(die.RoundNote, copied ? "二重邻饲+" + fed : "邻饲+" + fed);
+                    MarkTypeTriggered(die);
+                    EmitMainFamilySettlementEvent(die, FamilySettlementEffectKind.PigFarmer, "养猪", copied, true);
+                }
+                break;
+            case DieType.SowPig:
+                int sowFed = 0;
+                for (int targetIndex = 0; targetIndex < dice.Count; targetIndex++)
+                {
+                    sowFed += GrantFeed(dice[targetIndex], 1, "母猪", die, true, closedSlots, copied);
+                }
+
+                if (sowFed > 0)
+                {
+                    die.RoundNote = AppendNote(die.RoundNote, copied ? "二重全饲+" + sowFed : "全体饲+" + sowFed);
+                    MarkTypeTriggered(die);
+                    EmitMainFamilySettlementEvent(die, FamilySettlementEffectKind.SowPig, "母猪", copied, true);
+                }
+                break;
+            case DieType.ThreeLittlePigs:
+                int bonus = TotalOtherFeedValue(die);
+                if (copied)
+                {
+                    ApplyTemporaryScoreBonus(die, bonus, "二重三猪");
+                }
+                else
+                {
+                    die.PigTemporaryScoreBonus = bonus;
+                }
+
+                if (bonus > 0)
+                {
+                    die.RoundNote = AppendNote(die.RoundNote, copied ? "二重三猪 +" + bonus : "三猪 +" + bonus);
+                    MarkTypeTriggered(die);
+                    EmitMainFamilySettlementEvent(die, FamilySettlementEffectKind.ThreeLittlePigs, "三只小猪", copied, true);
+                }
+                break;
+        }
+    }
+
+    private int FeedNeighbor(int index, int units, string sourceLabel, Die source, HashSet<int> closedSlots, bool copied)
+    {
+        if (index < 0 || index >= dice.Count)
+        {
+            return 0;
+        }
+
+        return GrantFeed(dice[index], units, sourceLabel, source, true, closedSlots, copied);
+    }
+
+    private int GrantFeed(Die target, int units, string sourceLabel, Die source, bool notifyGreedyPigs, HashSet<int> closedSlots, bool copied)
+    {
+        if (target == null || target.Temporary || units <= 0)
+        {
+            return 0;
+        }
+
+        int originalUnits = Mathf.Max(0, units);
+        int effectiveUnits = originalUnits;
+        bool doubled = target.Type == DieType.MeatPig;
+        if (doubled)
+        {
+            effectiveUnits *= 2;
+        }
+
+        if (effectiveUnits <= 0)
+        {
+            return 0;
+        }
+
+        int quality = Mathf.Max(1, feedQuality);
+        int valueGain = effectiveUnits * quality;
+        target.FeedCount += effectiveUnits;
+        target.FeedValue += valueGain;
+        ApplyFeedMinimumIfOpen(target, closedSlots);
+
+        string note = FeedGainNote(sourceLabel, effectiveUnits, valueGain, doubled);
+        if (doubled)
+        {
+            MarkTypeTriggered(target);
+        }
+
+        target.RoundNote = AppendNote(target.RoundNote, note);
+        AddFeedGainLog(target, source, sourceLabel, originalUnits, effectiveUnits, valueGain, quality, doubled);
+
+        if (doubled)
+        {
+            EmitMainFamilySettlementEvent(target, FamilySettlementEffectKind.MeatPig, "肉猪", copied, false);
+        }
+
+        if (notifyGreedyPigs)
+        {
+            TriggerGreedyPigResponses(target, originalUnits, closedSlots, copied);
+        }
+
+        return effectiveUnits;
+    }
+
+    private void TriggerGreedyPigResponses(Die fedDie, int originalUnits, HashSet<int> closedSlots, bool copied)
+    {
+        if (fedDie == null || originalUnits <= 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die greedy = dice[i];
+            if (greedy == null || greedy.Temporary || greedy.Type != DieType.GreedyPig || greedy.Id == fedDie.Id)
+            {
+                continue;
+            }
+
+            int gained = GrantFeed(greedy, originalUnits, "贪吃", fedDie, false, closedSlots, copied);
+            if (gained > 0)
+            {
+                MarkTypeTriggered(greedy);
+                EmitMainFamilySettlementEvent(greedy, FamilySettlementEffectKind.GreedyPig, "贪吃猪", copied, false);
+            }
+        }
+    }
+
+    private string FeedGainNote(string sourceLabel, int effectiveUnits, int valueGain, bool doubled)
+    {
+        string note = "饲+" + effectiveUnits + " 底+" + valueGain;
+        if (doubled)
+        {
+            note = "肉x2 " + note;
+        }
+
+        if (string.Equals(sourceLabel, "贪吃", StringComparison.Ordinal))
+        {
+            note = "贪吃 " + note;
+        }
+
+        return note;
+    }
+
+    private void AddFeedGainLog(Die target, Die source, string sourceLabel, int originalUnits, int effectiveUnits, int valueGain, int quality, bool doubled)
+    {
+        string sourceText = FeedSourceText(sourceLabel, source, target);
+        string qualityText = quality > 1 ? "，质量 " + quality : string.Empty;
+        string doubleText = doubled ? "，肉猪把 " + originalUnits + " 份计为 " + effectiveUnits + " 份" : string.Empty;
+        AddLog(sourceText + " -> " + DieDisplayName(target) + "：喂养 +" + effectiveUnits + "，底+" + valueGain + qualityText + doubleText + "。");
+    }
+
+    private string FeedSourceText(string sourceLabel, Die source, Die target)
+    {
+        string label = string.IsNullOrEmpty(sourceLabel) ? "喂养" : sourceLabel;
+        if (string.Equals(label, "贪吃", StringComparison.Ordinal) && source != null)
+        {
+            return "贪吃响应 " + DieDisplayName(source);
+        }
+
+        if (source == null || target == null || source.Id == target.Id)
+        {
+            return label;
+        }
+
+        return label + " " + DieDisplayName(source);
+    }
+
+    private void ApplyFeedMinimumIfOpen(Die die, HashSet<int> closedSlots)
+    {
+        if (die == null || closedSlots != null && closedSlots.Contains(die.Id))
+        {
+            return;
+        }
+
+        ApplyFeedMinimum(die);
+    }
+
+    private void ApplyFeedMinimum(Die die)
+    {
+        if (die == null || die.FeedValue <= 0)
+        {
+            return;
+        }
+
+        int minimum = MinimumFaceValue(die) + Mathf.Max(0, die.FeedValue);
+        if (die.EffectiveValue < minimum)
+        {
+            die.EffectiveValue = minimum;
+        }
+    }
+
+    private int MinimumFaceValue(Die die)
+    {
+        if (die == null || die.Faces == null || die.Faces.Length == 0)
+        {
+            return 1;
+        }
+
+        int minimum = die.Faces[0];
+        for (int i = 1; i < die.Faces.Length; i++)
+        {
+            minimum = Mathf.Min(minimum, die.Faces[i]);
+        }
+
+        return minimum;
+    }
+
+    private int TotalOtherFeedValue(Die die)
+    {
+        if (die == null)
+        {
+            return 0;
+        }
+
+        int total = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die other = dice[i];
+            if (other != null && !other.Temporary && other.Id != die.Id)
+            {
+                total += Mathf.Max(0, other.FeedValue);
+            }
+        }
+
+        return total;
+    }
+
+    private void ApplyF018TurtleAttachmentSettlementEffects(Die die, int dieIndex, HashSet<int> settledIds)
+    {
+        if (die == null || die.Temporary)
+        {
+            return;
+        }
+
+        EnsureTurtleAttachments(die);
+        if (die.TurtleAttachments.Count == 0)
+        {
+            return;
+        }
+
+        int attachmentCountAtStart = die.TurtleAttachments.Count;
+        int feedMinimum = MinimumFaceValue(die) + Mathf.Max(0, die.FeedValue);
+        bool feedActuallyRaisedNaturalRoll = die.FeedValue > 0
+            && die.LastValue < feedMinimum
+            && die.EffectiveValue >= feedMinimum;
+        for (int i = 0; i < attachmentCountAtStart; i++)
+        {
+            TurtleAttachment attachment = die.TurtleAttachments[i];
+            if (attachment == null)
+            {
+                continue;
+            }
+
+            switch (attachment.Type)
+            {
+                case DieType.TinyTurtle:
+                    GrantBasicTurtleShell(die, 1, "小小龟", die, settledIds);
+                    die.RoundNote = AppendNote(die.RoundNote, "小小龟 基壳+1");
+                    MarkTypeTriggered(die);
+                    AddLog(DieDisplayName(die) + " 的小小龟使全部六面 +1，面组 " + FaceText(die.Faces) + "。");
+                    break;
+                case DieType.LuckyTurtle:
+                    ApplyLuckyTurtleAttachment(die);
+                    break;
+                case DieType.MagnetTurtle:
+                    ApplyMagnetTurtleAttachment(die, dieIndex, settledIds);
+                    break;
+                case DieType.RallyTurtle:
+                    ApplyRallyTurtleAttachment(die, settledIds);
+                    break;
+                case DieType.SafetyNetTurtle:
+                    if (feedActuallyRaisedNaturalRoll)
+                    {
+                        HashSet<int> futureOnly = new HashSet<int> { die.Id };
+                        GrantBasicTurtleShell(die, 1, "托底龟", die, futureOnly);
+                        die.RoundNote = AppendNote(die.RoundNote, "托底生壳");
+                        MarkTypeTriggered(die);
+                        AddLog(DieDisplayName(die) + " 的自然点 " + die.LastValue + " 被喂养抬到 " + die.EffectiveValue + "，托底龟使全部六面 +1；本次锁定点数不变。");
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void ApplyLuckyTurtleAttachment(Die die)
+    {
+        if (die == null || die.Faces == null || die.Faces.Length == 0)
+        {
+            return;
+        }
+
+        int highest = HighestFaceValue(die);
+        int previous = die.EffectiveValue;
+        die.EffectiveValue = Mathf.Max(previous, highest);
+        die.RoundNote = AppendNote(die.RoundNote, previous == die.EffectiveValue ? "幸运最大" : "幸运 " + previous + "→" + die.EffectiveValue);
+        MarkTypeTriggered(die);
+    }
+
+    private void ApplyMagnetTurtleAttachment(Die source, int sourceIndex, HashSet<int> settledIds)
+    {
+        if (source == null)
+        {
+            return;
+        }
+
+        int targetCount = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die target = dice[i];
+            if (target == null || target.Temporary || target.Id == source.Id || IsAnyTurtleFamilyType(target.Type))
+            {
+                continue;
+            }
+
+            GrantBasicTurtleShell(target, 1, "磁力龟", source, settledIds);
+            targetCount++;
+        }
+
+        if (targetCount <= 0)
+        {
+            return;
+        }
+
+        source.RoundNote = AppendNote(source.RoundNote, "磁力 基壳x" + targetCount);
+        MarkTypeTriggered(source);
+        AddLog(DieDisplayName(source) + " 的磁力龟使 " + targetCount + " 颗其它非龟骰全部六面 +1。");
+    }
+
+    private void ApplyRallyTurtleAttachment(Die source, HashSet<int> settledIds)
+    {
+        if (source == null)
+        {
+            return;
+        }
+
+        int targetCount = 0;
+        int totalGain = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die target = dice[i];
+            if (target == null || target.Temporary || target.Id == source.Id)
+            {
+                continue;
+            }
+
+            int realTurtleCount = RealTurtleAttachmentCount(target);
+            if (realTurtleCount <= 0)
+            {
+                continue;
+            }
+
+            int gain = realTurtleCount * 2;
+            AddValueToAllFacesAndCurrentRoll(target, gain, settledIds);
+            target.RoundNote = AppendNote(target.RoundNote, "呼朋面+" + gain);
+            targetCount++;
+            totalGain += gain;
+        }
+
+        if (targetCount <= 0)
+        {
+            return;
+        }
+
+        source.RoundNote = AppendNote(source.RoundNote, "呼朋 +" + totalGain);
+        MarkTypeTriggered(source);
+        AddLog(DieDisplayName(source) + " 的呼朋唤友龟读取其它龟龟的实际化壳数量，使 " + targetCount + " 颗骰累计全部六面 +" + totalGain + "。");
+    }
+
+    private void GrantBasicTurtleShell(Die target, int faceGain, string sourceLabel, Die source, HashSet<int> settledIds)
+    {
+        if (target == null || target.Temporary || faceGain <= 0)
+        {
+            return;
+        }
+
+        AddTurtleAttachment(target, DieType.Basic, faceGain, 0, TurtleAttachmentSource.BasicShell, settledIds);
+        target.RoundNote = AppendNote(target.RoundNote, sourceLabel + " 基壳+" + faceGain);
+    }
+
+    private int RealTurtleAttachmentCount(Die die)
+    {
+        if (die == null || die.TurtleAttachments == null)
+        {
+            return 0;
+        }
+
+        int count = 0;
+        for (int i = 0; i < die.TurtleAttachments.Count; i++)
+        {
+            TurtleAttachment attachment = die.TurtleAttachments[i];
+            if (attachment != null
+                && attachment.Source == TurtleAttachmentSource.RealTurtle
+                && IsF018AbsorbableTurtleType(attachment.Type))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int CountTurtleAttachmentsOfType(Die die, DieType type)
+    {
+        if (die == null || die.TurtleAttachments == null)
+        {
+            return 0;
+        }
+
+        int count = 0;
+        for (int i = 0; i < die.TurtleAttachments.Count; i++)
+        {
+            TurtleAttachment attachment = die.TurtleAttachments[i];
+            if (attachment != null && attachment.Type == type)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private void ApplyF019PirateSettlementEffects(Die die, int dieIndex, HashSet<int> settledIds, bool copied = false)
+    {
+        if (die == null || die.Temporary)
+        {
+            return;
+        }
+
+        if (die.Type == DieType.PlunderPirate)
+        {
+            int plundered = 0;
+            Die left = dieIndex > 0 ? dice[dieIndex - 1] : null;
+            Die right = dieIndex + 1 < dice.Count ? dice[dieIndex + 1] : null;
+            plundered += ApplyPlunderPirateToNeighbor(die, left, settledIds);
+            plundered += ApplyPlunderPirateToNeighbor(die, right, settledIds);
+            if (plundered > 0)
+            {
+                int gold = plundered * 3;
+                string treasureText = AddGoldIncome(gold, "劫掠海盗", true);
+                die.RoundNote = AppendNote(die.RoundNote, "劫掠 +" + gold + " 金");
+                MarkTypeTriggered(die);
+                AddLog(DieDisplayName(die) + " 劫掠 " + plundered + " 个邻位，金币 +" + gold + "。" + treasureText);
+                EmitMainFamilySettlementEvent(die, FamilySettlementEffectKind.PlunderPirate, "劫掠海盗", copied, true);
+            }
+            else
+            {
+                die.RoundNote = AppendNote(die.RoundNote, "无邻可劫");
+            }
+        }
+
+        if (die.Type == DieType.PirateKing)
+        {
+            int growth = Mathf.Max(0, chapterGold) / 3;
+            if (growth <= 0)
+            {
+                die.RoundNote = AppendNote(die.RoundNote, "金币不足");
+                return;
+            }
+
+            AddValueToAllFaces(die, growth);
+            die.RoundNote = AppendNote(die.RoundNote, "王财+" + growth);
+            MarkTypeTriggered(die);
+            AddLog(DieDisplayName(die) + " 读取当前金币 " + chapterGold + "，全部六面+" + growth + "，面组 " + FaceText(die.Faces) + "。");
+            EmitMainFamilySettlementEvent(die, FamilySettlementEffectKind.PirateKing, "海贼王", copied, true);
+        }
+    }
+
+    private int ApplyPlunderPirateToNeighbor(Die source, Die target, HashSet<int> settledIds)
+    {
+        if (source == null || target == null || target.Temporary || source.Id == target.Id)
+        {
+            return 0;
+        }
+
+        AddValueToAllFacesAndCurrentRoll(target, -1, settledIds);
+        target.RoundNote = AppendNote(target.RoundNote, "被劫-1");
+        AddLog(DieDisplayName(source) + " 劫掠 " + DieDisplayName(target) + "，面组 " + FaceText(target.Faces) + "。");
+        return 1;
+    }
+
+    private void ApplyF020NeutralSettlementEffect(Die die, int dieIndex)
+    {
+        if (die == null || die.Temporary || !IsV02NeutralFamilyMarketType(die.Type))
+        {
+            return;
+        }
+
+        int familyCount = PresentMainFamilyCount();
+        switch (die.Type)
+        {
+            case DieType.Lightfang:
+                ApplyLightfangSettlementEffect(die);
+                break;
+            case DieType.Duet:
+                ApplyDuetSettlementEffect(die, dieIndex);
+                break;
+            case DieType.Relief:
+                if (familyCount > 0)
+                {
+                    string treasureText = AddGoldIncome(familyCount, "接济骰", true);
+                    die.RoundNote = AppendNote(die.RoundNote, "接济 +" + familyCount + " 金");
+                    MarkTypeTriggered(die);
+                    AddLog(DieDisplayName(die) + " 读取 " + familyCount + " 个家族，金币 +" + familyCount + "。" + treasureText);
+                }
+                break;
+            case DieType.Airstrike:
+                int airstrikeBonus = familyCount > 0 ? (4 - familyCount) * 2 : 0;
+                if (airstrikeBonus > 0)
+                {
+                    ApplyTemporaryScoreBonus(die, airstrikeBonus, "空袭");
+                    MarkTypeTriggered(die);
+                }
+                else
+                {
+                    die.RoundNote = AppendNote(die.RoundNote, familyCount <= 0 ? "空袭 0（无家族）" : "空袭 0");
+                }
+                break;
+            case DieType.Pact:
+                ApplyPactSettlementEffect(die, dieIndex);
+                break;
+            case DieType.Stitch:
+                int stitchBonus = familyCount * 2;
+                if (stitchBonus > 0)
+                {
+                    ApplyTemporaryScoreBonus(die, stitchBonus, "缝合");
+                    MarkTypeTriggered(die);
+                }
+                break;
+        }
+    }
+
+    private void ApplyLightfangSettlementEffect(Die source)
+    {
+        int strengthened = 0;
+        HashSet<int> strengthenedIds = new HashSet<int>();
+        for (MainFamily family = MainFamily.Pig; family <= MainFamily.Pirate; family++)
+        {
+            List<Die> candidates = new List<Die>();
+            for (int i = 0; i < dice.Count; i++)
+            {
+                Die candidate = dice[i];
+                if (IsEntityMainFamilyDie(candidate) && HasMainFamily(candidate.Type, family) && !strengthenedIds.Contains(candidate.Id))
+                {
+                    candidates.Add(candidate);
+                }
+            }
+
+            if (candidates.Count <= 0)
+            {
+                continue;
+            }
+
+            Die target = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+            AddValueToAllFaces(target, 2);
+            strengthenedIds.Add(target.Id);
+            target.RoundNote = AppendNote(target.RoundNote, "光牙面+2");
+            strengthened++;
+            AddLog(DieDisplayName(source) + " 为" + MainFamilyDisplayName(family) + "随机强化 " + DieDisplayName(target) + "，全部六面+2；本次锁定点数不变。");
+        }
+
+        if (strengthened > 0)
+        {
+            source.RoundNote = AppendNote(source.RoundNote, "光牙 x" + strengthened);
+            MarkTypeTriggered(source);
+        }
+    }
+
+    private void ApplyDuetSettlementEffect(Die duet, int duetIndex)
+    {
+        FamilySettlementContext context = activeFamilySettlementContext;
+        Die left = duetIndex > 0 ? dice[duetIndex - 1] : null;
+        FamilySettlementEffectEvent sourceEvent;
+        if (context == null || left == null || !context.LatestCopyableBySourceId.TryGetValue(left.Id, out sourceEvent))
+        {
+            duet.RoundNote = AppendNote(duet.RoundNote, "二重唱 无事件");
+            return;
+        }
+
+        Die source = FindDieById(sourceEvent.SourceDieId);
+        int sourceIndex = DiceIndexById(sourceEvent.SourceDieId);
+        if (source == null || sourceIndex < 0)
+        {
+            duet.RoundNote = AppendNote(duet.RoundNote, "二重唱 失效");
+            return;
+        }
+
+        context.CopiedEventDepth++;
+        try
+        {
+            switch (sourceEvent.Kind)
+            {
+                case FamilySettlementEffectKind.PigFarmer:
+                case FamilySettlementEffectKind.SowPig:
+                case FamilySettlementEffectKind.ThreeLittlePigs:
+                    ApplyPigFamilySettlementEffect(source, sourceIndex, context.SettledIds, true);
+                    break;
+                case FamilySettlementEffectKind.PlunderPirate:
+                case FamilySettlementEffectKind.PirateKing:
+                    ApplyF019PirateSettlementEffects(source, sourceIndex, context.SettledIds, true);
+                    break;
+                case FamilySettlementEffectKind.TreasurePirate:
+                    ApplyTreasurePirateSettlementEffect(source, "二重唱", true);
+                    break;
+                default:
+                    duet.RoundNote = AppendNote(duet.RoundNote, "二重唱 不可复制");
+                    return;
+            }
+        }
+        finally
+        {
+            context.CopiedEventDepth--;
+        }
+
+        duet.RoundNote = AppendNote(duet.RoundNote, "二重 " + sourceEvent.Label);
+        MarkTypeTriggered(duet);
+        AddLog(DieDisplayName(duet) + " 让左邻 " + DieDisplayName(source) + " 的" + sourceEvent.Label + "效果额外触发一次；复制事件不触发触发器。 ");
+    }
+
+    private void ApplyPactSettlementEffect(Die pact, int pactIndex)
+    {
+        Die left = pactIndex > 0 ? dice[pactIndex - 1] : null;
+        Die right = pactIndex + 1 < dice.Count ? dice[pactIndex + 1] : null;
+        MainFamily leftFamily = left != null ? MainFamilyForType(left.Type) : MainFamily.None;
+        MainFamily rightFamily = right != null ? MainFamilyForType(right.Type) : MainFamily.None;
+        if (!IsEntityMainFamilyDie(left) || !IsEntityMainFamilyDie(right) || leftFamily == rightFamily)
+        {
+            pact.RoundNote = AppendNote(pact.RoundNote, "盟约 未成立");
+            return;
+        }
+
+        ApplyTemporaryScoreBonus(left, 2, "盟约");
+        ApplyTemporaryScoreBonus(right, 2, "盟约");
+        pact.RoundNote = AppendNote(pact.RoundNote, "盟约 左右+2");
+        MarkTypeTriggered(pact);
+        AddLog(DieDisplayName(pact) + " 连接" + MainFamilyDisplayName(leftFamily) + "与" + MainFamilyDisplayName(rightFamily) + "，左右单骰分各 +2。");
+    }
+
+    private void ApplyCrownSettlementBonuses()
+    {
+        Dictionary<MainFamily, int> highestValues = new Dictionary<MainFamily, int>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (!IsEntityMainFamilyDie(die))
+            {
+                continue;
+            }
+
+            for (MainFamily family = MainFamily.Pig; family <= MainFamily.Pirate; family++)
+            {
+                int previous;
+                if (HasMainFamily(die.Type, family) && (!highestValues.TryGetValue(family, out previous) || die.EffectiveValue > previous))
+                {
+                    highestValues[family] = Mathf.Max(0, die.EffectiveValue);
+                }
+            }
+        }
+
+        int total = 0;
+        foreach (KeyValuePair<MainFamily, int> pair in highestValues)
+        {
+            total += pair.Value;
+        }
+
+        int mean = highestValues.Count > 0 ? total / highestValues.Count : 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die crown = dice[i];
+            if (crown == null || crown.Temporary || crown.Type != DieType.Crown)
+            {
+                continue;
+            }
+
+            if (mean > 0)
+            {
+                ApplyTemporaryScoreBonus(crown, mean, "王冠");
+                MarkTypeTriggered(crown);
+            }
+            else
+            {
+                crown.RoundNote = AppendNote(crown.RoundNote, "王冠 0");
+            }
+
+            AddLog(DieDisplayName(crown) + " 读取 " + highestValues.Count + " 个家族最高点均值，单骰分 +" + mean + "。");
+        }
+    }
+
+    private static string MainFamilyDisplayName(MainFamily family)
+    {
+        switch (family)
+        {
+            case MainFamily.Pig:
+                return "猪猪家族";
+            case MainFamily.Devil:
+                return "恶魔家族";
+            case MainFamily.Turtle:
+                return "龟龟家族";
+            case MainFamily.Pirate:
+                return "海盗家族";
+        }
+
+        return "无家族";
+    }
+
     private int ScoreDice()
     {
         Encounter encounter = CurrentEncounter();
@@ -8722,14 +19991,13 @@ public sealed class DiceKingDemo : MonoBehaviour
             return 0;
         }
 
-        List<int> handValues = new List<int>();
-        for (int i = 0; i < dice.Count; i++)
+        ClearCommittedSettlementContributions();
+        ResetSettlementTemporaryScoreBonuses();
+        FamilySettlementContext settlementContext = new FamilySettlementContext
         {
-            handValues.Add(dice[i].EffectiveValue);
-        }
-
-        HandResult hand = EvaluateHand(handValues, dice);
-        bool straightTriggered = hand.LongestRun >= 5;
+            TriggerDiceCount = CountDiceOfType(DieType.Trigger)
+        };
+        activeFamilySettlementContext = settlementContext;
 
         int tempCount;
         int nestBonusCount;
@@ -8738,59 +20006,110 @@ public sealed class DiceKingDemo : MonoBehaviour
         lastNestBonusDieCount = nestBonusCount;
         lastShellsmithScoreBonus = CountDiceOfType(DieType.Shellsmith) * tempCount;
 
-        int individual = 0;
         lastAffixScoreBonus = 0;
         lastWalletIncome = 0;
-        for (int i = 0; i < dice.Count; i++)
+        try
         {
-            Die die = dice[i];
-            die.Score = ScoreOneDieValue(die, encounter, true, tempCount, straightTriggered);
-            individual += die.Score;
-            lastAffixScoreBonus += AffixScoreBonusForDie(die, straightTriggered, false);
-        }
+            for (int i = 0; i < dice.Count; i++)
+            {
+                settlementScoringCursorIndex = i;
+                Die die = dice[i];
+                ApplyPigFamilySettlementEffect(die, i, settlementContext.SettledIds, false);
+                ApplyF018TurtleAttachmentSettlementEffects(die, i, settlementContext.SettledIds);
+                ApplyF019PirateSettlementEffects(die, i, settlementContext.SettledIds);
+                ApplyF020NeutralSettlementEffect(die, i);
+                HandResult slotHand = CurrentDiceHandResult();
+                bool slotStraightTriggered = slotHand.LongestRun >= 5;
+                die.Score = ScoreOneDieValue(die, encounter, true, tempCount, slotStraightTriggered);
+                settlementContext.IndividualScore += die.Score;
+                lastAffixScoreBonus += AffixScoreBonusForDie(die, slotStraightTriggered, false);
+                int foldedTemporaryScore = TakePendingSettlementTemporaryScore(die);
+                RecordSettlementContribution(
+                    die,
+                    die.Score + foldedTemporaryScore,
+                    i,
+                    false,
+                    foldedTemporaryScore != 0,
+                    SettlementSemanticLabelForDie(die, foldedTemporaryScore != 0));
+                settlementContext.SettledIds.Add(die.Id);
+            }
 
-        int bribeGoldCapacity = BribeGoldCapacityInCurrentOrder(hand, chapterGold, tempCount);
-        lastWalletIncome = WalletIncomeForCurrentRoll(hand, tempCount, null, true, ref individual);
-        if (lastWalletIncome > 0)
+            settlementPhysicalContributionCaptureComplete = true;
+            settlementScoringCursorIndex = -1;
+            HandResult hand = CurrentDiceHandResult();
+            int bribeGoldCapacity = BribeGoldCapacityInCurrentOrder(hand, chapterGold, tempCount);
+            int walletAdjustedIndividualScore = settlementContext.IndividualScore;
+            lastWalletIncome = WalletIncomeForCurrentRoll(hand, tempCount, null, true, ref walletAdjustedIndividualScore);
+            settlementContext.IndividualScore = walletAdjustedIndividualScore;
+            if (lastWalletIncome > 0)
+            {
+                AddGoldIncome(lastWalletIncome, "结算钱包收入", true);
+            }
+
+            ApplyCrownSettlementBonuses();
+            int individual = settlementContext.IndividualScore;
+            int ruleBonus = RuleComboBonus(hand, encounter);
+            float parityMultiplier = ParityMultiplier(hand, encounter);
+            float multiplier = Mathf.Max(hand.Multiplier, parityMultiplier);
+            int baseRollScore = Mathf.RoundToInt((individual + tempScore + ruleBonus) * multiplier);
+            int bribeScore = ApplyBribeIfNeeded(baseRollScore, bribeGoldCapacity);
+            int rollScore = baseRollScore + bribeScore;
+            ReconcileCommittedSettlementContributions(individual + tempScore + ruleBonus);
+            QueueTreeGrowths(hand, rollScore);
+            previewIndividualScore = individual;
+            previewTemporaryScore = tempScore;
+            previewTurtleTemporaryDieCount = tempCount;
+            previewNestBonusDieCount = nestBonusCount;
+            previewShellsmithScoreBonus = lastShellsmithScoreBonus;
+            previewAffixScoreBonus = lastAffixScoreBonus;
+            previewWalletIncome = lastWalletIncome;
+            previewRuleBonus = ruleBonus;
+            previewRollScore = rollScore;
+            previewHasTurtleRandomness = false;
+            lastComboBonus = ruleBonus;
+            lastTemporaryScore = tempScore;
+            lastMultiplier = multiplier;
+            lastHandName = FinalHandName(hand, parityMultiplier);
+
+            string shellsmithText = lastShellsmithScoreBonus > 0 ? "，壳匠 +" + lastShellsmithScoreBonus : string.Empty;
+            if (V02HandScoringEnabled)
+            {
+                string bribeText = bribeScore > 0 ? " + 贿赂 " + bribeScore : string.Empty;
+                AddLog("本次 " + rollScore + " = (" + individual + " + 小骰 " + tempScore + " + 规则 " + ruleBonus + ") x " + MultiplierText(multiplier) + bribeText + shellsmithText + "。");
+            }
+            else
+            {
+                List<string> scoreParts = new List<string>();
+                scoreParts.Add("单骰 " + individual);
+                if (tempScore > 0)
+                {
+                    scoreParts.Add("小骰 " + tempScore);
+                }
+
+                if (bribeScore > 0)
+                {
+                    scoreParts.Add("贿赂 " + bribeScore);
+                }
+
+                AddLog("本次 " + rollScore + " = " + string.Join(" + ", scoreParts.ToArray()) + shellsmithText + "。");
+            }
+            if (lastWalletIncome > 0)
+            {
+                AddLog("本次金币收入直接入钱包 +" + lastWalletIncome + "。");
+            }
+            return rollScore;
+        }
+        finally
         {
-            chapterGold += lastWalletIncome;
+            settlementScoringCursorIndex = -1;
+            settlementPhysicalContributionCaptureComplete = false;
+            activeFamilySettlementContext = null;
         }
-
-        int ruleBonus = RuleComboBonus(hand, encounter);
-        float parityMultiplier = ParityMultiplier(hand, encounter);
-        float multiplier = Mathf.Max(hand.Multiplier, parityMultiplier);
-        int baseRollScore = Mathf.RoundToInt((individual + tempScore + ruleBonus) * multiplier);
-        int bribeScore = ApplyBribeIfNeeded(baseRollScore, bribeGoldCapacity);
-        int rollScore = baseRollScore + bribeScore;
-        QueueTreeGrowths(hand, rollScore);
-        previewIndividualScore = individual;
-        previewTemporaryScore = tempScore;
-        previewTurtleTemporaryDieCount = tempCount;
-        previewNestBonusDieCount = nestBonusCount;
-        previewShellsmithScoreBonus = lastShellsmithScoreBonus;
-        previewAffixScoreBonus = lastAffixScoreBonus;
-        previewWalletIncome = lastWalletIncome;
-        previewRuleBonus = ruleBonus;
-        previewRollScore = rollScore;
-        previewHasTurtleRandomness = false;
-        lastComboBonus = ruleBonus;
-        lastTemporaryScore = tempScore;
-        lastMultiplier = multiplier;
-        lastHandName = FinalHandName(hand, parityMultiplier);
-
-        string bribeText = bribeScore > 0 ? " + 贿赂 " + bribeScore : string.Empty;
-        string shellsmithText = lastShellsmithScoreBonus > 0 ? "，壳匠 +" + lastShellsmithScoreBonus : string.Empty;
-        AddLog("本次 " + rollScore + " = (" + individual + " + 小骰 " + tempScore + " + 规则 " + ruleBonus + ") x " + MultiplierText(multiplier) + bribeText + shellsmithText + "。");
-        if (lastWalletIncome > 0)
-        {
-            AddLog("本次金币收入直接入钱包 +" + lastWalletIncome + "。");
-        }
-        return rollScore;
     }
 
     private int ScoreOneDieValue(Die die, Encounter encounter, bool updateNote, int turtleTemporaryDieCount = 0, bool straightTriggered = false)
     {
-        int value = Mathf.Max(1, die.EffectiveValue);
+        int value = die.EffectiveValue;
         int baseScore = value * BaseScorePerPip;
         int score = baseScore;
 
@@ -8948,28 +20267,35 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
         }
 
+        if (die.Type == DieType.ThreeLittlePigs && die.PigTemporaryScoreBonus > 0)
+        {
+            score += die.PigTemporaryScoreBonus;
+        }
+
         score = ApplyMaterialScore(die, score, updateNote);
         score = ApplyAffixScoreBonuses(die, score, straightTriggered, updateNote);
 
-        if (encounter.Rule == RuleKind.OddLedger && value % 2 == 1)
+        if (encounter.Rule == RuleKind.OddLedger && Mathf.Abs(value) % 2 == 1)
         {
             score += 1;
         }
-        else if (encounter.Rule == RuleKind.LowFog && value <= 2)
+        else if (encounter.Rule == RuleKind.LowFog && (value == 1 || value == 2))
         {
-            score = Mathf.Max(0, score - 1);
+            score -= 1;
         }
         else if (encounter.Rule == RuleKind.DoubleJudge)
         {
-            score = value % 2 == 0 ? score + 1 : Mathf.Max(0, score - 1);
+            score = value % 2 == 0 ? score + 1 : score - 1;
         }
+
+        score += Mathf.Max(0, die.NeutralTemporaryScoreBonus);
 
         return score;
     }
 
     private int ApplyMaterialScore(Die die, int score, bool updateNote)
     {
-        if (die == null || die.Temporary)
+        if (!DiceMaterialFeatureEnabled || die == null || die.Temporary)
         {
             return score;
         }
@@ -9090,6 +20416,12 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         bool straightTriggered = hand != null && hand.LongestRun >= 5;
         int income = 0;
+        int turtleMoney = TurtleMoneyIncome(die, updateNote);
+        if (turtleMoney > 0)
+        {
+            income += turtleMoney;
+        }
+
         if (die.Type == DieType.Piggy && die.EffectiveValue == die.TargetFace)
         {
             int piggyGold = Mathf.Max(0, piggyGoldPerHit);
@@ -9203,7 +20535,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
         }
 
-        if (die.Material == DiceMaterial.GiltSeal && RolledHighestFace(die))
+        if (DiceMaterialFeatureEnabled && die.Material == DiceMaterial.GiltSeal && RolledHighestFace(die))
         {
             income += 1;
             if (updateNote)
@@ -9245,6 +20577,24 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         return income;
+    }
+
+    private int TurtleMoneyIncome(Die die, bool updateNote)
+    {
+        int count = CountTurtleAttachmentsOfType(die, DieType.MoneyTurtle);
+        if (count <= 0)
+        {
+            return 0;
+        }
+
+        if (updateNote)
+        {
+            die.RoundNote = AppendNote(die.RoundNote, "金钱龟 +" + count + " 金");
+            MarkTypeTriggered(die);
+            AddLog(DieDisplayName(die) + " 的金钱龟结算，金币 +" + count + "。");
+        }
+
+        return count;
     }
 
     private int HandTaxGold(HandResult hand)
@@ -9329,6 +20679,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             target.RoundNote = AppendNote(target.RoundNote, "伐木 -" + actualPenalty);
             die.RoundNote = AppendNote(die.RoundNote, "伐木 +" + gold + " 金");
             MarkTypeTriggered(die);
+            RecordSettlementContribution(target, -actualPenalty, dieIndex, true, false, "伐木");
         }
 
         return gold;
@@ -9493,14 +20844,23 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < nestBonusDieCount; i++)
+        int remainingNestBonusDice = nestBonusDieCount;
+        for (int i = 0; i < dice.Count && remainingNestBonusDice > 0; i++)
         {
+            Die nest = dice[i];
+            if (nest == null || nest.Temporary || nest.Type != DieType.Nest)
+            {
+                continue;
+            }
+
             Die temp = NewTemporaryDie("巢穴 d1", 1);
             temp.Score = BaseScorePerPip;
             temp.RoundNote = "巢穴补骰";
             scoringDice.Add(temp);
             total += temp.Score;
             temporaryDieCount++;
+            AccumulateSettlementTemporaryScore(nest, temp.Score);
+            remainingNestBonusDice--;
         }
 
         return total;
@@ -9511,10 +20871,10 @@ public sealed class DiceKingDemo : MonoBehaviour
         int value = Mathf.Max(1, source.EffectiveValue);
         bool slow = source.Type == DieType.SlowTurtle;
         int seedMax = TurtleChainSeedMax(value, slow);
-        return ScoreTemporaryTurtleChainFromSeed(seedMax, slow, out chainCount);
+        return ScoreTemporaryTurtleChainFromSeed(seedMax, slow, out chainCount, source);
     }
 
-    private int ScoreTemporaryTurtleChainFromSeed(int seedMax, bool slow, out int chainCount)
+    private int ScoreTemporaryTurtleChainFromSeed(int seedMax, bool slow, out int chainCount, Die source = null)
     {
         int total = 0;
         int currentMax = Mathf.Max(0, seedMax);
@@ -9529,6 +20889,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             scoringDice.Add(temp);
             total += temp.Score;
             chainCount++;
+            AccumulateSettlementTemporaryScore(source, temp.Score);
             currentMax--;
         }
 
@@ -9640,7 +21001,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             {
                 for (int f = 0; f < die.Faces.Length; f++)
                 {
-                    die.Faces[f] = Mathf.Max(1, die.Faces[f] + 1);
+                    die.Faces[f] += 1;
                 }
 
                 die.Growth++;
@@ -9664,11 +21025,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         lastStageInterestIncome = interestGold;
         lastStageCompoundInterestIncome = compoundGold;
         lastStageIncome = income;
-        chapterGold += income;
+        string treasureText = AddGoldIncome(income, "过关收入", true);
         string flatText = flatGold > 0 ? "固定 +" + flatGold + "，" : string.Empty;
         string compoundText = compoundGold > 0 ? "，复利 +" + compoundGold : string.Empty;
-        rewardBanner = flatText + "利息 +" + interestGold + compoundText + "，金币 +" + income + "。";
-        AddLog("过关收入 +" + income + " 金币（固定 " + flatGold + "，利息 " + interestGold + "，复利 " + compoundGold + "）。");
+        rewardBanner = flatText + "利息 +" + interestGold + compoundText + "，金币 +" + income + "。" + treasureText;
+        AddLog("过关收入 +" + income + " 金币（固定 " + flatGold + "，利息 " + interestGold + "，复利 " + compoundGold + "）。" + treasureText);
         SaveRun();
     }
 
@@ -9738,10 +21099,20 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void EnterMarket(bool chapterMarket)
     {
+        ClearActionTip();
         currentMarketIsChapter = chapterMarket;
         marketRefreshesWithoutHighTier = 0;
+        currentMarketPaidRefreshCount = 0;
+        currentMarketBlackMarketRefreshDiscount = 0;
+        marketTemporaryMinimumBonus = 0;
         marketRecentPurchaseRoute = MarketRoute.None;
         activeCraftingItemKey = string.Empty;
+        marketLeaveEffectSequenceActive = false;
+        marketLeaveEffectIndex = 0;
+        marketLeaveEffectTotalCount = 0;
+        marketLeaveEffectResolvedCount = 0;
+        marketLeaveEffectTimer = 0f;
+        marketLeaveEffectFeedback = string.Empty;
         rewardBanner = string.Empty;
         BuildMarketOffers(false);
     }
@@ -9750,15 +21121,20 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         HashSet<DieType> previousRefreshTypes = paidRefresh ? CurrentOfferDieTypes(-1) : null;
         marketOffers.Clear();
-        marketTendencySlotIndex = marketTestRandomRefresh ? -1 : UnityEngine.Random.Range(0, 3);
+        bool explicitFamilyTestMarket = HasExplicitV02MarketTestPool();
+        bool suppressLegacyTendency = explicitFamilyTestMarket || UsesV02CoreFamiliesMarketPool();
+        marketTendencySlotIndex = marketTestRandomRefresh || suppressLegacyTendency ? -1 : UnityEngine.Random.Range(0, 3);
         MarketRuleConfig rule = CurrentMarketRule();
-        bool forceHighTier = !marketTestRandomRefresh && paidRefresh && rule.HighTierPityRefreshes > 0 && marketRefreshesWithoutHighTier >= rule.HighTierPityRefreshes;
+        bool forceHighTier = !marketTestRandomRefresh && !explicitFamilyTestMarket && paidRefresh && rule.HighTierPityRefreshes > 0 && marketRefreshesWithoutHighTier >= rule.HighTierPityRefreshes;
         bool hasHighTier = false;
+        int tributeSlot = HasDiceOfType(DieType.AbyssSummon) ? 0 : -1;
         HashSet<DieType> usedTypes = new HashSet<DieType>();
         HashSet<string> usedCraftingItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         for (int i = 0; i < 3; i++)
         {
-            MarketOffer offer = MakeRandomMarketOffer(usedTypes, usedCraftingItems, forceHighTier && i == 2, !marketTestRandomRefresh && i == marketTendencySlotIndex, previousRefreshTypes);
+            MarketOffer offer = i == tributeSlot
+                ? MakeTributeMarketOffer()
+                : MakeRandomMarketOffer(usedTypes, usedCraftingItems, forceHighTier && i == 2, !marketTestRandomRefresh && i == marketTendencySlotIndex, previousRefreshTypes);
             if (offer.Kind == MarketOfferKind.Die && offer.Die != null)
             {
                 usedTypes.Add(offer.Die.Type);
@@ -9775,10 +21151,86 @@ public sealed class DiceKingDemo : MonoBehaviour
             marketOffers.Add(offer);
         }
 
+        ApplyCurrentTavernMinimumToMarketOffers();
+        ApplySupplyPigMarketFeed();
+
         if (paidRefresh)
         {
-            marketRefreshesWithoutHighTier = marketTestRandomRefresh ? 0 : (hasHighTier ? 0 : marketRefreshesWithoutHighTier + 1);
+            marketRefreshesWithoutHighTier = marketTestRandomRefresh || explicitFamilyTestMarket ? 0 : (hasHighTier ? 0 : marketRefreshesWithoutHighTier + 1);
         }
+    }
+
+    private void ApplySupplyPigMarketFeed()
+    {
+        for (int sourceIndex = 0; sourceIndex < dice.Count; sourceIndex++)
+        {
+            Die supplyPig = dice[sourceIndex];
+            if (supplyPig == null || supplyPig.Temporary || supplyPig.Type != DieType.SupplyPig)
+            {
+                continue;
+            }
+
+            int targetIndex = -1;
+            int lowestPrice = int.MaxValue;
+            for (int offerIndex = 0; offerIndex < marketOffers.Count; offerIndex++)
+            {
+                MarketOffer offer = marketOffers[offerIndex];
+                if (offer == null || offer.Kind != MarketOfferKind.Die || offer.Die == null)
+                {
+                    continue;
+                }
+
+                int price = CurrentOfferPrice(offer);
+                if (price < lowestPrice)
+                {
+                    lowestPrice = price;
+                    targetIndex = offerIndex;
+                }
+            }
+
+            if (targetIndex < 0)
+            {
+                continue;
+            }
+
+            Die target = marketOffers[targetIndex].Die;
+            target.FeedCount += 1;
+            target.FeedValue += Mathf.Max(1, feedQuality);
+            target.RoundNote = AppendNote(target.RoundNote, "补给 饲+1 底+" + Mathf.Max(1, feedQuality));
+            MarkTypeTriggered(supplyPig);
+            supplyPig.RoundNote = AppendNote(supplyPig.RoundNote, "补给第" + (targetIndex + 1) + "格");
+            AddLog(DieDisplayName(supplyPig) + " 对第 " + (targetIndex + 1) + " 格 " + DieDisplayName(target) + " 进行 1 次喂养，最低点 +" + Mathf.Max(1, feedQuality) + "。");
+        }
+    }
+
+    private string ResolveBlackSailRefreshDevours()
+    {
+        List<string> effects = new List<string>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die blackSail = dice[i];
+            if (blackSail == null || blackSail.Temporary || blackSail.Type != DieType.BlackSailBat)
+            {
+                continue;
+            }
+
+            int offerIndex = NextDevourableMarketOfferIndex();
+            MarkTypeTriggered(blackSail);
+            if (offerIndex < 0)
+            {
+                blackSail.RoundNote = AppendNote(blackSail.RoundNote, "刷新无货");
+                continue;
+            }
+
+            Die source = marketOffers[offerIndex].Die;
+            string sourceName = DieDisplayName(source);
+            string devourText = ResolveDevour(source, "黑帆吞噬");
+            marketOffers[offerIndex] = EmptyMarketOffer();
+            blackSail.RoundNote = AppendNote(blackSail.RoundNote, "吞第" + (offerIndex + 1) + "格");
+            effects.Add("黑帆吞掉第 " + (offerIndex + 1) + " 格 " + sourceName + "。" + devourText);
+        }
+
+        return CombineMarketEffectTexts(effects);
     }
 
     private MarketOffer MakeRandomMarketOffer(HashSet<DieType> excludedTypes, HashSet<string> excludedCraftingItems, bool forceHighTier, bool tendencySlot, HashSet<DieType> previousRefreshTypes = null)
@@ -9803,12 +21255,35 @@ public sealed class DiceKingDemo : MonoBehaviour
         DiceMaterial material = PickDiceMaterial();
         Die die = NewDie(DefaultName(type), type, FacesForTemplate(faceTemplate, type));
         die.Material = material;
+        ApplyCurrentTavernMinimum(die);
 
         return new MarketOffer
         {
             Kind = MarketOfferKind.Die,
             Die = die,
             Price = MarketOfferPrice(type, faceTemplate, material)
+        };
+    }
+
+    private MarketOffer MakeTributeMarketOffer()
+    {
+        Die die = NewDie(DefaultName(DieType.Tribute), DieType.Tribute, DefaultFaces(DieType.Tribute));
+        die.Material = DiceMaterial.None;
+        ApplyCurrentTavernMinimum(die);
+        return new MarketOffer
+        {
+            Kind = MarketOfferKind.Die,
+            Die = die,
+            Price = Mathf.Max(1, BuyPrice(DieType.Tribute))
+        };
+    }
+
+    private MarketOffer EmptyMarketOffer()
+    {
+        return new MarketOffer
+        {
+            Kind = MarketOfferKind.Empty,
+            Price = 0
         };
     }
 
@@ -9833,22 +21308,37 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return;
             }
 
-            chapterGold -= offer.Price;
+            int price = CurrentOfferPrice(offer);
+            chapterGold -= price;
             AddCraftingItem(item.Key, 1);
             activeCraftingItemKey = string.Empty;
-            rewardBanner = "购买 " + item.DisplayName + "，持有 " + CraftingItemCount(item.Key) + "。";
-            AddLog("买入 " + item.DisplayName + "，-" + offer.Price + " 金币。");
-            HashSet<DieType> usedTypesForItem = CurrentOfferDieTypes(index);
-            HashSet<string> usedItemsForItem = CurrentOfferCraftingItems(index);
-            marketOffers[index] = MakeRandomMarketOffer(usedTypesForItem, usedItemsForItem, false, index == marketTendencySlotIndex);
+            marketOffers[index] = EmptyMarketOffer();
+            string devilPurchaseText = ResolveDevilPurchaseEffects();
+            rewardBanner = "购买 " + item.DisplayName + "，持有 " + CraftingItemCount(item.Key) + "。货架已空。" + devilPurchaseText;
+            AddLog("买入 " + item.DisplayName + "，-" + price + " 金币。货架已空。" + devilPurchaseText);
             SaveRun();
             return;
         }
 
-        chapterGold -= offer.Price;
+        int buyPrice = CurrentOfferPrice(offer);
+        chapterGold -= buyPrice;
+        if (offer.Die != null && offer.Die.Type == DieType.Tribute)
+        {
+            string devourText = ResolveDevour(offer.Die, "贡品奉献");
+            marketOffers[index] = EmptyMarketOffer();
+            string devilPurchaseText = ResolveDevilPurchaseEffects();
+            rewardBanner = "购买 " + DieDisplayName(offer.Die) + "，未进入骰袋。" + devourText + devilPurchaseText;
+            AddLog("买入 " + DieDisplayName(offer.Die) + "，-" + buyPrice + " 金币。" + devourText + devilPurchaseText);
+            SaveRun();
+            return;
+        }
+
         Die bought = offer.Die.Clone(nextDieId++);
         ResetRoundState(bought);
+        bool bloodPactDevour = dice.Count >= DiceCapacity && HasDiceOfType(DieType.BloodPactCaptain);
         dice.Add(bought);
+        string buyEffectText = ResolvePigMarketActionEffects(MarketActionKind.BuyDie, bought, dice.Count - 1);
+        buyEffectText += ResolveTrainingPirateBuyEffects(bought);
         MarketRoute boughtRoute = MarketRouteForType(bought.Type);
         if (boughtRoute != MarketRoute.None)
         {
@@ -9856,31 +21346,48 @@ public sealed class DiceKingDemo : MonoBehaviour
             marketTendencySlotIndex = index;
         }
 
-        rewardBanner = "购买 " + DieDisplayName(bought) + "，骰袋 " + dice.Count + " / " + DiceCapacity + "。";
-        AddLog("买入 " + DieDisplayName(bought) + "，-" + offer.Price + " 金币。");
-        HashSet<DieType> excludedTypes = new HashSet<DieType>();
-        for (int i = 0; i < marketOffers.Count; i++)
+        if (bloodPactDevour)
         {
-            if (i != index && marketOffers[i].Kind == MarketOfferKind.Die && marketOffers[i].Die != null)
-            {
-                excludedTypes.Add(marketOffers[i].Die.Type);
-            }
+            dice.RemoveAt(dice.Count - 1);
         }
 
-        marketOffers[index] = MakeRandomMarketOffer(excludedTypes, CurrentOfferCraftingItems(index), false, index == marketTendencySlotIndex);
+        marketOffers[index] = EmptyMarketOffer();
+        string purchaseEffectText = ResolveDevilPurchaseEffects();
+        if (bloodPactDevour)
+        {
+            purchaseEffectText += ResolveDevour(bought, "血契吞噬");
+            MarkAllDiceOfTypeTriggered(DieType.BloodPactCaptain, "满袋血契");
+            rewardBanner = "购买 " + DieDisplayName(bought) + "，血契未入袋并直接吞噬。货架已空。" + buyEffectText + purchaseEffectText;
+            AddLog("血契买入 " + DieDisplayName(bought) + "，-" + buyPrice + " 金币；未入袋并直接吞噬。" + buyEffectText + purchaseEffectText);
+            SaveRun();
+            return;
+        }
+
+        rewardBanner = "购买 " + DieDisplayName(bought) + "，骰袋 " + dice.Count + " / " + DiceCapacity + "。货架已空。" + buyEffectText + purchaseEffectText;
+        AddLog("买入 " + DieDisplayName(bought) + "，-" + buyPrice + " 金币。货架已空。" + buyEffectText + purchaseEffectText);
         SaveRun();
     }
 
     private bool CanBuyMarketOffer(MarketOffer offer)
     {
-        if (offer == null || chapterGold < offer.Price)
+        if (offer == null || offer.Kind == MarketOfferKind.Empty || chapterGold < CurrentOfferPrice(offer))
         {
             return false;
         }
 
         if (offer.Kind == MarketOfferKind.Die)
         {
-            return offer.Die != null && dice.Count < DiceCapacity;
+            if (offer.Die == null)
+            {
+                return false;
+            }
+
+            if (offer.Die.Type == DieType.Tribute)
+            {
+                return dice.Count > 0;
+            }
+
+            return dice.Count < DiceCapacity || dice.Count > 0 && HasDiceOfType(DieType.BloodPactCaptain);
         }
 
         return affixFeatureEnabled && offer.Kind == MarketOfferKind.CraftingItem && offer.CraftingItem != null;
@@ -9920,7 +21427,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private bool ShouldMakeCraftingItemOffer(HashSet<DieType> excludedTypes, HashSet<string> excludedCraftingItems, bool forceHighTier)
     {
-        if (!affixFeatureEnabled || marketTestRandomRefresh)
+        if (!affixFeatureEnabled || marketTestRandomRefresh || HasRestrictedV02MarketPool())
         {
             return false;
         }
@@ -10601,6 +22108,11 @@ public sealed class DiceKingDemo : MonoBehaviour
                 continue;
             }
 
+            if (!IsMarketTypeAllowedByActiveV02Pool(config.Type))
+            {
+                continue;
+            }
+
             if (excludedTypes != null && excludedTypes.Contains(config.Type))
             {
                 continue;
@@ -10614,24 +22126,458 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private bool IsRetiredMarketDieType(DieType type)
     {
-        return type == DieType.Tree || type == DieType.Gardener || type == DieType.Irrigation;
+        return type == DieType.Tribute || !IsCurrentRosterOrSystemType(type);
+    }
+
+    private bool HasExplicitV02MarketTestPool()
+    {
+        return v02PigFamilyMarketOnly
+            || v02DevilFamilyMarketOnly
+            || v02TurtleAttachmentMarketOnly
+            || v02PirateFamilyMarketOnly
+            || v02NeutralFamilyMarketOnly
+            || v02DualFamilyMarketOnly;
+    }
+
+    private bool UsesV02CoreFamiliesMarketPool()
+    {
+        return v02CoreFamiliesMarketOnly && !HasExplicitV02MarketTestPool();
+    }
+
+    private bool HasRestrictedV02MarketPool()
+    {
+        return HasExplicitV02MarketTestPool() || UsesV02CoreFamiliesMarketPool();
+    }
+
+    private bool IsMarketTypeAllowedByActiveV02Pool(DieType type)
+    {
+        if (v02NeutralFamilyMarketOnly)
+        {
+            return IsV02NeutralFamilyMarketType(type);
+        }
+
+        if (v02DualFamilyMarketOnly)
+        {
+            return IsV02DualFamilyMarketType(type);
+        }
+
+        if (v02TurtleAttachmentMarketOnly)
+        {
+            return IsV02TurtleCoreMarketType(type);
+        }
+
+        if (v02PirateFamilyMarketOnly)
+        {
+            return IsV02PirateCoreMarketType(type);
+        }
+
+        if (v02DevilFamilyMarketOnly)
+        {
+            return IsV02DevilCoreMarketType(type);
+        }
+
+        if (v02PigFamilyMarketOnly)
+        {
+            return IsV02PigCoreMarketType(type);
+        }
+
+        return !UsesV02CoreFamiliesMarketPool() || IsV02CurrentRosterMarketType(type);
+    }
+
+    private static bool IsV02PigCoreMarketType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.PigFarmer:
+            case DieType.MeatPig:
+            case DieType.TradePig:
+            case DieType.SowPig:
+            case DieType.ThreeLittlePigs:
+            case DieType.GreedyPig:
+            case DieType.FeedWholesaler:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsV02DevilCoreMarketType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.Imp:
+            case DieType.Devourer:
+            case DieType.Demon:
+            case DieType.DemonBat:
+            case DieType.AbyssSummon:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsV02TurtleCoreMarketType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.MoneyTurtle:
+            case DieType.TinyTurtle:
+            case DieType.DoubleTurtle:
+            case DieType.LuckyTurtle:
+            case DieType.MagnetTurtle:
+            case DieType.RallyTurtle:
+            case DieType.LeaderTurtle:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsV02PirateCoreMarketType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.RefreshPirate:
+            case DieType.PlunderPirate:
+            case DieType.CrewPirate:
+            case DieType.PirateCaptain:
+            case DieType.TrainingPirate:
+            case DieType.TreasurePirate:
+            case DieType.RobberyPirate:
+            case DieType.PirateKing:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsV02CurrentRosterMarketType(DieType type)
+    {
+        return IsV02PigCoreMarketType(type)
+            || IsV02DevilCoreMarketType(type)
+            || IsV02TurtleCoreMarketType(type)
+            || IsV02PirateCoreMarketType(type)
+            || IsV02NeutralFamilyMarketType(type)
+            || IsV02DualFamilyMarketType(type);
+    }
+
+    private static bool IsCurrentRosterOrSystemType(DieType type)
+    {
+        return type == DieType.Basic
+            || type == DieType.Tribute
+            || IsV02CurrentRosterMarketType(type);
+    }
+
+    private static bool IsV02PigFamilyMarketType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.PigFarmer:
+            case DieType.MeatPig:
+            case DieType.TradePig:
+            case DieType.SowPig:
+            case DieType.ThreeLittlePigs:
+            case DieType.GreedyPig:
+            case DieType.FeedWholesaler:
+            case DieType.PackTurtle:
+            case DieType.TributePig:
+            case DieType.ClearancePig:
+            case DieType.SupplyPig:
+            case DieType.SafetyNetTurtle:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsV02DevilFamilyMarketType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.Imp:
+            case DieType.Devourer:
+            case DieType.Demon:
+            case DieType.DemonBat:
+            case DieType.AbyssSummon:
+            case DieType.BlackSailBat:
+            case DieType.TributePig:
+            case DieType.BlackMarketImp:
+            case DieType.BloodPactCaptain:
+            case DieType.SharedFeastDemonTurtle:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsV02TurtleAttachmentMarketType(DieType type)
+    {
+        return IsV02TurtleCoreMarketType(type);
+    }
+
+    private static bool IsV02PirateFamilyMarketType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.RefreshPirate:
+            case DieType.PlunderPirate:
+            case DieType.CrewPirate:
+            case DieType.PirateCaptain:
+            case DieType.TrainingPirate:
+            case DieType.TreasurePirate:
+            case DieType.RobberyPirate:
+            case DieType.PirateKing:
+            case DieType.BlackSailBat:
+            case DieType.BlackMarketImp:
+            case DieType.BloodPactCaptain:
+            case DieType.ClearancePig:
+            case DieType.SupplyPig:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsV02DualFamilyMarketType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.BlackSailBat:
+            case DieType.PackTurtle:
+            case DieType.TributePig:
+            case DieType.BlackMarketImp:
+            case DieType.BloodPactCaptain:
+            case DieType.ClearancePig:
+            case DieType.SupplyPig:
+            case DieType.SharedFeastDemonTurtle:
+            case DieType.SafetyNetTurtle:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsV02NeutralFamilyMarketType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.Lightfang:
+            case DieType.Duet:
+            case DieType.Trigger:
+            case DieType.Crown:
+            case DieType.Relief:
+            case DieType.Airstrike:
+            case DieType.Pact:
+            case DieType.Stitch:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static MainFamily MainFamilyForType(DieType type)
+    {
+        if (IsMainPigFamilyType(type))
+        {
+            return MainFamily.Pig;
+        }
+
+        if (IsV02DevilFamilyMarketType(type))
+        {
+            return MainFamily.Devil;
+        }
+
+        if (IsAnyTurtleFamilyType(type))
+        {
+            return MainFamily.Turtle;
+        }
+
+        if (IsV02PirateFamilyMarketType(type))
+        {
+            return MainFamily.Pirate;
+        }
+
+        return MainFamily.None;
+    }
+
+    private static bool IsEntityMainFamilyDie(Die die)
+    {
+        return die != null && !die.Temporary && MainFamilyForType(die.Type) != MainFamily.None;
+    }
+
+    private static bool IsMainPigFamilyType(DieType type)
+    {
+        return IsV02PigFamilyMarketType(type);
+    }
+
+    private static bool HasMainFamily(DieType type, MainFamily family)
+    {
+        switch (family)
+        {
+            case MainFamily.Pig:
+                return IsMainPigFamilyType(type);
+            case MainFamily.Devil:
+                return IsV02DevilFamilyMarketType(type);
+            case MainFamily.Turtle:
+                return IsAnyTurtleFamilyType(type);
+            case MainFamily.Pirate:
+                return IsV02PirateFamilyMarketType(type);
+        }
+
+        return false;
+    }
+
+    private int PresentMainFamilyCount()
+    {
+        HashSet<MainFamily> families = new HashSet<MainFamily>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (!IsEntityMainFamilyDie(die))
+            {
+                continue;
+            }
+
+            for (MainFamily family = MainFamily.Pig; family <= MainFamily.Pirate; family++)
+            {
+                if (HasMainFamily(die.Type, family))
+                {
+                    families.Add(family);
+                }
+            }
+        }
+
+        return families.Count;
     }
 
     private DieType FallbackMarketOfferType()
     {
-        return IsMarketDieUnlocked(DieType.Odd, CurrentChapterIndex()) ? DieType.Odd : DieType.Basic;
+        if (v02NeutralFamilyMarketOnly)
+        {
+            return DieType.Lightfang;
+        }
+
+        if (v02DualFamilyMarketOnly)
+        {
+            return DieType.SupplyPig;
+        }
+
+        if (v02TurtleAttachmentMarketOnly)
+        {
+            return DieType.MoneyTurtle;
+        }
+
+        if (v02PirateFamilyMarketOnly)
+        {
+            return DieType.RefreshPirate;
+        }
+
+        if (v02DevilFamilyMarketOnly)
+        {
+            return DieType.Imp;
+        }
+
+        if (v02PigFamilyMarketOnly)
+        {
+            return DieType.PigFarmer;
+        }
+
+        if (UsesV02CoreFamiliesMarketPool())
+        {
+            return DieType.PigFarmer;
+        }
+
+        return DieType.PigFarmer;
     }
 
     private int MarketOfferPrice(DieType type, FaceTemplateConfig faceTemplate, DiceMaterial material)
     {
-        int price = BuyPrice(type);
+        int price = FormulaBuyPrice(type, faceTemplate != null ? FacesForTemplate(faceTemplate, type) : DefaultFaces(type), material);
         if (faceTemplate != null)
         {
             price += faceTemplate.PriceModifier;
         }
 
-        price += MaterialPriceModifier(material);
         return Mathf.Max(1, price);
+    }
+
+    private int CurrentOfferPrice(MarketOffer offer)
+    {
+        if (offer == null || offer.Kind == MarketOfferKind.Empty)
+        {
+            return 0;
+        }
+
+        int price = Mathf.Max(0, offer.Price);
+        if (offer.Kind == MarketOfferKind.Die && offer.Die != null && IsV02PirateFamilyMarketType(offer.Die.Type) && CountDiceOfType(DieType.PirateCaptain) > 0)
+        {
+            price = Mathf.FloorToInt(price * 0.5f);
+        }
+
+        return Mathf.Max(0, price);
+    }
+
+    private int FormulaBuyPrice(DieType type, int[] faces, DiceMaterial material)
+    {
+        int value = FormulaDieValue(type, faces, material, 0);
+        return Mathf.Max(0, Mathf.CeilToInt(value));
+    }
+
+    private int FormulaSellPrice(Die die)
+    {
+        if (die == null)
+        {
+            return 0;
+        }
+
+        return FormulaSellPrice(die.Type, die.Faces, ActiveDiceMaterial(die), die.InstanceSellValue, Mathf.Max(0, die.FeedCount) + TurtleAttachmentSellValue(die));
+    }
+
+    private int FormulaSellPrice(DieType type, int[] faces, DiceMaterial material, int instanceSellValue, int stateValue)
+    {
+        if (instanceSellValue >= 0)
+        {
+            return Mathf.Max(0, instanceSellValue);
+        }
+
+        int typeBuy = Mathf.Max(1, BuyPrice(type));
+        int typeSell = Mathf.Max(0, BaseSellPrice(type));
+        int value = FormulaDieValue(type, faces, material, Mathf.Max(0, stateValue));
+        return Mathf.Max(0, Mathf.FloorToInt(value * (float)typeSell / typeBuy));
+    }
+
+    private int FormulaDieValue(DieType type, int[] faces, DiceMaterial material, int stateValue)
+    {
+        return Mathf.Max(0, BuyPrice(type) + FaceValueModifier(type, faces) + MaterialPriceModifier(material) + stateValue);
+    }
+
+    private int FaceValueModifier(DieType type, int[] faces)
+    {
+        if (faces == null || faces.Length == 0)
+        {
+            return 0;
+        }
+
+        int[] baseline = DefaultFaces(type);
+        int faceSum = FaceValueSum(faces);
+        int baselineSum = FaceValueSum(baseline);
+        return Mathf.FloorToInt((faceSum - baselineSum) / 6f);
+    }
+
+    private int FaceValueSum(int[] faces)
+    {
+        if (faces == null)
+        {
+            return 0;
+        }
+
+        int sum = 0;
+        for (int i = 0; i < faces.Length; i++)
+        {
+            sum += faces[i];
+        }
+
+        return sum;
     }
 
     private int BuyPrice(DieType type)
@@ -10646,6 +22592,1207 @@ public sealed class DiceKingDemo : MonoBehaviour
     }
 
     private int SellPrice(DieType type)
+    {
+        return FormulaSellPrice(type, DefaultFaces(type), DiceMaterial.None, -1, 0);
+    }
+
+    private int SellPrice(Die die)
+    {
+        if (die == null)
+        {
+            return 0;
+        }
+
+        if (die.Type == DieType.TributePig)
+        {
+            return BaseSellPrice(die.Type);
+        }
+
+        return FormulaSellPrice(die);
+    }
+
+    private string FeedSellDetailText(Die die)
+    {
+        if (die == null)
+        {
+            return string.Empty;
+        }
+
+        if (die.Type == DieType.TributePig)
+        {
+            return "基础卖价 " + BaseSellPrice(die.Type) + "，喂养不提高卖价";
+        }
+
+        int feedCount = Mathf.Max(0, die.FeedCount);
+        int turtleSell = TurtleAttachmentSellValue(die);
+        if (die.InstanceSellValue >= 0)
+        {
+            return "这颗骰卖价 " + die.InstanceSellValue;
+        }
+
+        int faceModifier = FaceValueModifier(die.Type, die.Faces);
+        if (feedCount <= 0 && turtleSell <= 0 && faceModifier == 0)
+        {
+            return "当前卖价 " + SellPrice(die);
+        }
+
+        string text = "当前卖价 " + SellPrice(die);
+        if (faceModifier != 0)
+        {
+            text += " 面值" + SignedDeltaText(faceModifier);
+        }
+
+        if (feedCount > 0)
+        {
+            text += " + 喂养 " + feedCount;
+        }
+
+        if (turtleSell > 0)
+        {
+            text += " + 龟壳 " + turtleSell;
+        }
+
+        return text;
+    }
+
+    private int TurtleAttachmentSellValue(Die die)
+    {
+        if (die == null || die.TurtleAttachments == null)
+        {
+            return 0;
+        }
+
+        int total = 0;
+        for (int i = 0; i < die.TurtleAttachments.Count; i++)
+        {
+            TurtleAttachment attachment = die.TurtleAttachments[i];
+            if (attachment != null && attachment.Source == TurtleAttachmentSource.RealTurtle)
+            {
+                total += Mathf.Max(0, attachment.SellValue);
+            }
+        }
+
+        return total;
+    }
+
+    private string FeedStateText(Die die)
+    {
+        if (die == null || die.FeedCount <= 0 && die.FeedValue <= 0)
+        {
+            return string.Empty;
+        }
+
+        return "喂养 " + Mathf.Max(0, die.FeedCount) + " 次"
+            + "｜最低点 +" + Mathf.Max(0, die.FeedValue)
+            + "｜卖价 +" + Mathf.Max(0, die.FeedCount);
+    }
+
+    private string DevourStateText(Die die)
+    {
+        if (die == null || die.LastDevourGain <= 0)
+        {
+            return string.Empty;
+        }
+
+        string source = TooltipTrim(die.LastDevourSource, 12);
+        if (string.IsNullOrEmpty(source))
+        {
+            source = "货架骰";
+        }
+
+        return "上次吞噬：" + source
+            + "｜全部六面 +" + Mathf.Max(0, die.LastDevourGain)
+            + "｜" + DevourTriggerShortText(die.LastDevourTrigger);
+    }
+
+    private string DevourTriggerShortText(string trigger)
+    {
+        if (string.IsNullOrEmpty(trigger))
+        {
+            return "吞噬";
+        }
+
+        if (trigger.Contains("魔蝠"))
+        {
+            return "魔蝠";
+        }
+
+        if (trigger.Contains("贡品"))
+        {
+            return "贡品";
+        }
+
+        return TooltipTrim(trigger, 8);
+    }
+
+    private string TurtleAttachmentStateText(Die die)
+    {
+        if (die == null || die.TurtleAttachments == null || die.TurtleAttachments.Count <= 0)
+        {
+            return string.Empty;
+        }
+
+        int totalFaceGain = 0;
+        for (int i = 0; i < die.TurtleAttachments.Count; i++)
+        {
+            TurtleAttachment attachment = die.TurtleAttachments[i];
+            if (attachment == null)
+            {
+                continue;
+            }
+
+            totalFaceGain += Mathf.Max(0, attachment.FaceGain);
+        }
+
+        StringBuilder text = new StringBuilder();
+        text.Append("化壳 ").Append(die.TurtleAttachments.Count).Append(" 颗")
+            .Append("｜全部六面 +").Append(totalFaceGain)
+            .Append("｜卖价 +").Append(TurtleAttachmentSellValue(die));
+
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.MoneyTurtle, "金钱", "结算金币");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.TinyTurtle, "小小", "结算时全部六面 +1");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.DoubleTurtle, "双倍", "已翻倍最低面");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.LuckyTurtle, "幸运", "按最大面");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.MagnetTurtle, "磁力", "结算分发");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.RallyTurtle, "呼朋", "读取化壳数量");
+
+        return text.ToString();
+    }
+
+    private void AppendTurtleAttachmentEffectSummary(StringBuilder text, Die die, DieType type, string label, string effect)
+    {
+        int count = CountTurtleAttachmentsOfType(die, type);
+        if (count <= 0)
+        {
+            return;
+        }
+
+        text.Append("\n").Append(label).Append("x").Append(count).Append("：").Append(effect);
+    }
+
+    private string TurtleAttachmentShortText(Die die)
+    {
+        if (die == null || die.TurtleAttachments == null || die.TurtleAttachments.Count <= 0)
+        {
+            return string.Empty;
+        }
+
+        return "化壳" + die.TurtleAttachments.Count;
+    }
+
+    private string FeedStateShortText(Die die)
+    {
+        if (die == null || die.FeedCount <= 0 && die.FeedValue <= 0)
+        {
+            return string.Empty;
+        }
+
+        return "喂养" + Mathf.Max(0, die.FeedCount) + " 最低点+" + Mathf.Max(0, die.FeedValue);
+    }
+
+    private string ResolvePigMarketActionEffects(MarketActionKind action, Die subject, int subjectOriginalIndex)
+    {
+        if (subject == null)
+        {
+            return string.Empty;
+        }
+
+        List<Die> orderedDice = MarketActionResolutionOrder(action, subject, subjectOriginalIndex);
+        List<string> effectTexts = new List<string>();
+        for (int i = 0; i < orderedDice.Count; i++)
+        {
+            Die die = orderedDice[i];
+            if (die == null || die.Temporary)
+            {
+                continue;
+            }
+
+            string effectText = PigMarketActionEffectText(action, die, subject);
+            if (!string.IsNullOrEmpty(effectText))
+            {
+                effectTexts.Add(effectText);
+            }
+        }
+
+        return CombineMarketEffectTexts(effectTexts);
+    }
+
+    private List<Die> MarketActionResolutionOrder(MarketActionKind action, Die subject, int subjectOriginalIndex)
+    {
+        List<Die> orderedDice = new List<Die>();
+        if (action == MarketActionKind.SellDie)
+        {
+            int insertIndex = Mathf.Clamp(subjectOriginalIndex, 0, dice.Count);
+            for (int i = 0; i <= dice.Count; i++)
+            {
+                if (i == insertIndex)
+                {
+                    orderedDice.Add(subject);
+                }
+
+                if (i < dice.Count)
+                {
+                    orderedDice.Add(dice[i]);
+                }
+            }
+
+            return orderedDice;
+        }
+
+        for (int i = 0; i < dice.Count; i++)
+        {
+            orderedDice.Add(dice[i]);
+        }
+
+        return orderedDice;
+    }
+
+    private string PigMarketActionEffectText(MarketActionKind action, Die die, Die subject)
+    {
+        if (die == null || subject == null)
+        {
+            return string.Empty;
+        }
+
+        if (action == MarketActionKind.BuyDie && die.Id == subject.Id && die.Type == DieType.FeedWholesaler)
+        {
+            return ApplyFeedWholesalerBuyEffect(die);
+        }
+
+        if (action == MarketActionKind.SellDie && die.Id == subject.Id && die.Type == DieType.TradePig)
+        {
+            return TradePigSellTransfer(subject);
+        }
+
+        return string.Empty;
+    }
+
+    private string CombineMarketEffectTexts(List<string> effectTexts)
+    {
+        if (effectTexts == null || effectTexts.Count <= 0)
+        {
+            return string.Empty;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < effectTexts.Count; i++)
+        {
+            string text = effectTexts[i];
+            if (string.IsNullOrEmpty(text))
+            {
+                continue;
+            }
+
+            builder.Append(" ");
+            builder.Append(text.Trim());
+        }
+
+        return builder.ToString();
+    }
+
+    private string AddGoldIncome(int amount, string sourceLabel, bool triggerTreasurePirates)
+    {
+        if (amount <= 0)
+        {
+            return string.Empty;
+        }
+
+        chapterGold += amount;
+        return triggerTreasurePirates ? ResolveTreasurePirateGoldEvent(sourceLabel) : string.Empty;
+    }
+
+    private string ResolveTreasurePirateGoldEvent(string sourceLabel)
+    {
+        List<string> effectTexts = new List<string>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die treasure = dice[i];
+            if (treasure == null || treasure.Temporary || treasure.Type != DieType.TreasurePirate)
+            {
+                continue;
+            }
+
+            string effect = ApplyTreasurePirateSettlementEffect(treasure, sourceLabel, false);
+            if (!string.IsNullOrEmpty(effect))
+            {
+                effectTexts.Add(effect);
+            }
+        }
+
+        return CombineMarketEffectTexts(effectTexts);
+    }
+
+    private string ApplyTreasurePirateSettlementEffect(Die treasure, string sourceLabel, bool copied)
+    {
+        if (treasure == null || treasure.Temporary || treasure.Type != DieType.TreasurePirate)
+        {
+            return string.Empty;
+        }
+
+        Die target = RandomNonTemporaryDie(-1);
+        if (target == null)
+        {
+            return string.Empty;
+        }
+
+        AddValueToAllFaces(target, 1);
+        MarkTypeTriggered(treasure);
+        treasure.RoundNote = AppendNote(treasure.RoundNote, copied ? "二重财宝" : "财宝成长");
+        target.RoundNote = AppendNote(target.RoundNote, "财宝+1");
+        string effect = "财宝海盗读取" + (string.IsNullOrEmpty(sourceLabel) ? "金币" : sourceLabel) + "，" + DieDisplayName(target) + " 全部六面+1";
+        AddLog(effect + "，面组 " + FaceText(target.Faces) + "。");
+        EmitMainFamilySettlementEvent(treasure, FamilySettlementEffectKind.TreasurePirate, "财宝海盗", copied, true);
+        return effect;
+    }
+
+    private Die RandomNonTemporaryDie(int excludedId)
+    {
+        List<Die> candidates = new List<Die>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die != null && !die.Temporary && die.Id != excludedId)
+            {
+                candidates.Add(die);
+            }
+        }
+
+        if (candidates.Count <= 0)
+        {
+            return null;
+        }
+
+        return candidates[UnityEngine.Random.Range(0, candidates.Count)];
+    }
+
+    private bool HasCrewPirateSellSource(Die soldDie)
+    {
+        if (soldDie != null && soldDie.Type == DieType.CrewPirate)
+        {
+            return true;
+        }
+
+        return CountDiceOfType(DieType.CrewPirate) > 0;
+    }
+
+    private string ResolveCrewPirateSellEffect(bool hasCrewPirate)
+    {
+        if (!hasCrewPirate)
+        {
+            return string.Empty;
+        }
+
+        currentMarketPirateSellCount++;
+        if (currentMarketPirateSellCount % 2 != 0)
+        {
+            return " 人口海盗记账 " + currentMarketPirateSellCount % 2 + "/2。";
+        }
+
+        if (dice.Count >= DiceCapacity)
+        {
+            return " 人口海盗招募失败：骰袋已满。";
+        }
+
+        Die recruit = NewDie("招募基础骰", DieType.Basic, new int[] { 1, 2, 3, 4, 5, 6 });
+        recruit.InstanceSellValue = UnityEngine.Random.Range(0, 4);
+        dice.Add(recruit);
+        string text = "人口海盗招募 " + DieDisplayName(recruit) + "，随机售价 " + recruit.InstanceSellValue + "。";
+        AddLog(text);
+        return " " + text;
+    }
+
+    private string ResolveTrainingPirateBuyEffects(Die bought)
+    {
+        if (bought == null)
+        {
+            return string.Empty;
+        }
+
+        List<string> effectTexts = new List<string>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die trainer = dice[i];
+            if (trainer == null || trainer.Temporary || trainer.Type != DieType.TrainingPirate)
+            {
+                continue;
+            }
+
+            Die target = RandomNonTemporaryDie(trainer.Id);
+            if (target == null)
+            {
+                effectTexts.Add("练腿海盗没有其它骰可训练。");
+                continue;
+            }
+
+            AddValueToAllFaces(target, 1);
+            trainer.RoundNote = AppendNote(trainer.RoundNote, "练腿+1");
+            target.RoundNote = AppendNote(target.RoundNote, "练腿+1");
+            string effect = "练腿海盗训练 " + DieDisplayName(target) + "，全部六面+1";
+            effectTexts.Add(effect);
+            AddLog(effect + "，面组 " + FaceText(target.Faces) + "。");
+        }
+
+        return CombineMarketEffectTexts(effectTexts);
+    }
+
+    private string TradePigSellTransfer(Die soldDie)
+    {
+        if (soldDie == null || soldDie.Type != DieType.TradePig || soldDie.FeedCount <= 0 || soldDie.FeedValue <= 0)
+        {
+            return string.Empty;
+        }
+
+        List<Die> candidates = new List<Die>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die candidate = dice[i];
+            if (candidate != null && !candidate.Temporary && candidate.Id != soldDie.Id)
+            {
+                candidates.Add(candidate);
+            }
+        }
+
+        if (candidates.Count <= 0)
+        {
+            return "喂养无人继承。";
+        }
+
+        Die target = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        int count = Mathf.Max(0, soldDie.FeedCount);
+        int value = Mathf.Max(0, soldDie.FeedValue);
+        target.FeedCount += count;
+        target.FeedValue += value;
+        ApplyFeedMinimum(target);
+        target.RoundNote = AppendNote(target.RoundNote, "贸易 饲+" + count + " 底+" + value);
+        AddLog("贸易猪卖出：把 " + count + " 份喂养 / 底+" + value + " 转给 " + DieDisplayName(target) + "。");
+        return "贸易猪把 " + count + " 喂养 / 底+" + value + " 转给 " + DieDisplayName(target) + "。";
+    }
+
+    private string ApplyFeedWholesalerBuyEffect(Die bought)
+    {
+        if (bought == null || bought.Type != DieType.FeedWholesaler)
+        {
+            return string.Empty;
+        }
+
+        int previousQuality = Mathf.Max(1, feedQuality);
+        feedQuality = previousQuality + 1;
+        MarkTypeTriggered(bought);
+        bought.RoundNote = AppendNote(bought.RoundNote, "质 " + previousQuality + "→" + feedQuality);
+        return "喂养质量 " + previousQuality + "→" + feedQuality + "。";
+    }
+
+    private string ResolveImpStageEndTavernGrowth()
+    {
+        int count = CountDiceOfType(DieType.Imp);
+        if (count <= 0)
+        {
+            return string.Empty;
+        }
+
+        int previousMinimum = TavernMinimumValue();
+        tavernBaseMinimumBonus += count;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            if (dice[i] != null && dice[i].Type == DieType.Imp)
+            {
+                MarkTypeTriggered(dice[i]);
+                dice[i].RoundNote = AppendNote(dice[i].RoundNote, "市场最低点+" + count);
+            }
+        }
+
+        string text = "小鬼让市场最低 " + previousMinimum + "→" + TavernMinimumValue() + "。";
+        AddLog(text);
+        return text;
+    }
+
+    private int TavernMinimumValue()
+    {
+        return 1 + Mathf.Max(0, tavernBaseMinimumBonus) + Mathf.Max(0, marketTemporaryMinimumBonus);
+    }
+
+    private void ApplyCurrentTavernMinimumToMarketOffers()
+    {
+        for (int i = 0; i < marketOffers.Count; i++)
+        {
+            MarketOffer offer = marketOffers[i];
+            if (offer != null && offer.Kind == MarketOfferKind.Die && offer.Die != null)
+            {
+                ApplyCurrentTavernMinimum(offer.Die);
+            }
+        }
+    }
+
+    private void ApplyCurrentTavernMinimum(Die die)
+    {
+        if (die == null || die.Faces == null)
+        {
+            return;
+        }
+
+        int minimum = TavernMinimumValue();
+        if (minimum <= 1)
+        {
+            return;
+        }
+
+        for (int i = 0; i < die.Faces.Length; i++)
+        {
+            die.Faces[i] = Mathf.Max(minimum, die.Faces[i]);
+        }
+
+        Array.Sort(die.Faces);
+    }
+
+    private string ResolveDevilPurchaseEffects()
+    {
+        int demonCount = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die == null || die.Temporary || die.Type != DieType.Demon)
+            {
+                continue;
+            }
+
+            demonCount++;
+            MarkTypeTriggered(die);
+            die.RoundNote = AppendNote(die.RoundNote, "本市底+1");
+        }
+
+        if (demonCount <= 0)
+        {
+            return string.Empty;
+        }
+
+        int previousMinimum = TavernMinimumValue();
+        marketTemporaryMinimumBonus += demonCount;
+        ApplyCurrentTavernMinimumToMarketOffers();
+        return " 恶魔骰子让本市市场最低 " + previousMinimum + "→" + TavernMinimumValue() + "。";
+    }
+
+    private string ResolveDemonBatLeaveDevour(Die bat)
+    {
+        if (bat == null || bat.Temporary || bat.Type != DieType.DemonBat)
+        {
+            return string.Empty;
+        }
+
+        int offerIndex = NextDevourableMarketOfferIndex();
+        if (offerIndex < 0)
+        {
+            MarkTypeTriggered(bat);
+            bat.RoundNote = AppendNote(bat.RoundNote, "无货可吞");
+            return DieDisplayName(bat) + "无货可吞。";
+        }
+
+        MarketOffer offer = marketOffers[offerIndex];
+        Die source = offer != null ? offer.Die : null;
+        if (source == null)
+        {
+            MarkTypeTriggered(bat);
+            bat.RoundNote = AppendNote(bat.RoundNote, "无货可吞");
+            return DieDisplayName(bat) + "无货可吞。";
+        }
+
+        MarkTypeTriggered(bat);
+        bat.RoundNote = AppendNote(bat.RoundNote, "吞货架");
+        string sourceName = DieDisplayName(source);
+        string devourText = ResolveDevour(source, "魔蝠吞噬");
+        marketOffers[offerIndex] = EmptyMarketOffer();
+        AddLog("魔蝠离开市场吞掉第 " + (offerIndex + 1) + " 格 " + sourceName + "。" + devourText);
+        return DieDisplayName(bat) + "吞掉第 " + (offerIndex + 1) + " 格 " + sourceName + "。" + devourText;
+    }
+
+    private string ResolveRobberyPirateLeaveSteal(Die robber)
+    {
+        if (robber == null || robber.Temporary || robber.Type != DieType.RobberyPirate)
+        {
+            return string.Empty;
+        }
+
+        MarkTypeTriggered(robber);
+        if (dice.Count >= DiceCapacity)
+        {
+            robber.RoundNote = AppendNote(robber.RoundNote, "袋满停抢");
+            return DieDisplayName(robber) + "袋满，停止抢劫。";
+        }
+
+        int offerIndex = RandomRobbableMarketOfferIndex();
+        if (offerIndex < 0)
+        {
+            robber.RoundNote = AppendNote(robber.RoundNote, "无货可抢");
+            return DieDisplayName(robber) + "没有非空货架可抢。";
+        }
+
+        MarketOffer offer = marketOffers[offerIndex];
+        Die source = offer != null ? offer.Die : null;
+        if (source == null)
+        {
+            robber.RoundNote = AppendNote(robber.RoundNote, "无货可抢");
+            return DieDisplayName(robber) + "没有非空货架可抢。";
+        }
+
+        Die stolen = source.Clone(nextDieId++);
+        ResetRoundState(stolen);
+        dice.Add(stolen);
+        marketOffers[offerIndex] = EmptyMarketOffer();
+        robber.RoundNote = AppendNote(robber.RoundNote, "抢第" + (offerIndex + 1) + "格");
+        string text = DieDisplayName(robber) + "抢走第 " + (offerIndex + 1) + " 格 " + DieDisplayName(stolen) + "，加入骰袋末尾。";
+        AddLog(text);
+        return text;
+    }
+
+    private string ResolveClearancePigLeaveFeed(Die clearancePig)
+    {
+        if (clearancePig == null || clearancePig.Temporary || clearancePig.Type != DieType.ClearancePig)
+        {
+            return string.Empty;
+        }
+
+        int emptyCount = EmptyMarketOfferCount();
+        MarkTypeTriggered(clearancePig);
+        if (emptyCount <= 0)
+        {
+            clearancePig.RoundNote = AppendNote(clearancePig.RoundNote, "无空位");
+            return DieDisplayName(clearancePig) + "没有空货架可清仓。";
+        }
+
+        int gained = GrantFeed(clearancePig, emptyCount, "清仓猪", clearancePig, true, null, false);
+        clearancePig.RoundNote = AppendNote(clearancePig.RoundNote, "空位饲+" + gained);
+        return DieDisplayName(clearancePig) + "读取 " + emptyCount + " 个空货架，获得 " + gained + " 份当前质量喂养。";
+    }
+
+    private int EmptyMarketOfferCount()
+    {
+        int count = 0;
+        for (int i = 0; i < marketOffers.Count; i++)
+        {
+            MarketOffer offer = marketOffers[i];
+            if (offer == null || offer.Kind == MarketOfferKind.Empty)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int RandomRobbableMarketOfferIndex()
+    {
+        List<int> candidates = new List<int>();
+        for (int i = 0; i < marketOffers.Count; i++)
+        {
+            MarketOffer offer = marketOffers[i];
+            if (offer != null && offer.Kind == MarketOfferKind.Die && offer.Die != null)
+            {
+                candidates.Add(i);
+            }
+        }
+
+        if (candidates.Count <= 0)
+        {
+            return -1;
+        }
+
+        return candidates[UnityEngine.Random.Range(0, candidates.Count)];
+    }
+
+    private string DemonBatLeavePreviewText()
+    {
+        int batCount = CountDiceOfType(DieType.DemonBat);
+        if (batCount <= 0)
+        {
+            return string.Empty;
+        }
+
+        int available = AvailableDevourableMarketOfferCount();
+        if (available <= 0)
+        {
+            return "离开：魔蝠无货可吞";
+        }
+
+        return "离开：魔蝠吞 " + Mathf.Min(batCount, available) + " 个货架";
+    }
+
+    private string MarketLeavePreviewText()
+    {
+        int total = CountMarketLeaveEffectDice();
+        if (total <= 0)
+        {
+            return string.Empty;
+        }
+
+        int turtleCount = 0;
+        int batCount = 0;
+        int robberCount = 0;
+        int clearanceCount = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die == null || die.Temporary)
+            {
+                continue;
+            }
+
+            if (die.Type == DieType.DemonBat)
+            {
+                batCount++;
+            }
+            else if (die.Type == DieType.RobberyPirate)
+            {
+                robberCount++;
+            }
+            else if (die.Type == DieType.ClearancePig)
+            {
+                clearanceCount++;
+            }
+            else if (IsF018AbsorbableTurtleType(die.Type) && NextPositionTurtleAttachmentHost(i) != null)
+            {
+                turtleCount++;
+            }
+        }
+
+        if (clearanceCount > 0 && robberCount <= 0 && turtleCount <= 0 && batCount <= 0)
+        {
+            return "离开：清仓猪按 " + EmptyMarketOfferCount() + " 个空货架获得喂养";
+        }
+
+        if (robberCount > 0 && turtleCount <= 0 && batCount <= 0 && clearanceCount <= 0)
+        {
+            int available = AvailableDevourableMarketOfferCount();
+            if (dice.Count >= DiceCapacity)
+            {
+                return "离开：抢劫海盗袋满停抢";
+            }
+
+            return available > 0 ? "离开：抢劫 " + Mathf.Min(robberCount, available) + " 个货架" : "离开：抢劫海盗无货可抢";
+        }
+
+        if (turtleCount > 0 && batCount <= 0 && robberCount <= 0 && clearanceCount <= 0)
+        {
+            return "离开：" + turtleCount + " 颗龟龟尝试向后一格化壳";
+        }
+
+        if (batCount > 0 && turtleCount <= 0 && robberCount <= 0 && clearanceCount <= 0)
+        {
+            return DemonBatLeavePreviewText();
+        }
+
+        return "离开：离场效果 " + total + " 个";
+    }
+
+    private int AvailableDevourableMarketOfferCount()
+    {
+        int count = 0;
+        for (int i = 0; i < marketOffers.Count; i++)
+        {
+            MarketOffer offer = marketOffers[i];
+            if (offer != null && offer.Kind == MarketOfferKind.Die && offer.Die != null)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int NextDevourableMarketOfferIndex()
+    {
+        for (int i = 0; i < marketOffers.Count; i++)
+        {
+            MarketOffer offer = marketOffers[i];
+            if (offer != null && offer.Kind == MarketOfferKind.Die && offer.Die != null)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private string ResolveDevour(Die source, string triggerLabel, bool tavernSource = true)
+    {
+        if (source == null)
+        {
+            return string.Empty;
+        }
+
+        Die target = LowestMinimumFaceDie();
+        if (target == null)
+        {
+            return " 没有可吞噬目标。";
+        }
+
+        int transfer = DevourTransferValue(source);
+        AddValueToAllFaces(target, transfer);
+        target.RoundNote = AppendNote(target.RoundNote, "吞+" + transfer);
+        RecordDevourState(target, source, transfer, triggerLabel);
+        string sharedFeastText = ResolveSharedFeastDevourSplit(target, transfer);
+        string goldText = ResolveDevourerGold();
+        string blackMarketText = tavernSource ? ResolveBlackMarketImpDiscount() : string.Empty;
+        AddLog(triggerLabel + "：" + DieDisplayName(source) + " 期望+" + transfer + " 给 " + DieDisplayName(target) + "，面组 " + FaceText(target.Faces) + "。" + sharedFeastText + goldText + blackMarketText);
+        return " " + triggerLabel + " +" + transfer + " 给 " + DieDisplayName(target) + "。" + sharedFeastText + goldText + blackMarketText;
+    }
+
+    private string ResolveSharedFeastDevourSplit(Die host, int devourGain)
+    {
+        int layerCount = CountTurtleAttachmentsOfType(host, DieType.SharedFeastDemonTurtle);
+        if (host == null || layerCount <= 0)
+        {
+            return string.Empty;
+        }
+
+        int hostIndex = DiceIndexById(host.Id);
+        if (hostIndex < 0 || hostIndex + 1 >= dice.Count)
+        {
+            return string.Empty;
+        }
+
+        Die target = dice[hostIndex + 1];
+        if (target == null || target.Temporary || IsAnyTurtleFamilyType(target.Type))
+        {
+            return string.Empty;
+        }
+
+        int perLayerGain = Mathf.Max(1, Mathf.Max(0, devourGain) / 2);
+        int totalGain = perLayerGain * layerCount;
+        AddValueToAllFaces(target, totalGain);
+        target.RoundNote = AppendNote(target.RoundNote, "共食+" + totalGain);
+        host.RoundNote = AppendNote(host.RoundNote, "共食x" + layerCount);
+        AddLog(DieDisplayName(host) + " 的共食魔龟把吞噬成长分给右邻 " + DieDisplayName(target) + "，全部六面 +" + totalGain + "；不会再次触发吞噬效果。");
+        return " 共食右邻 +" + totalGain + "。";
+    }
+
+    private string ResolveBlackMarketImpDiscount()
+    {
+        int count = CountDiceOfType(DieType.BlackMarketImp);
+        if (count <= 0)
+        {
+            return string.Empty;
+        }
+
+        currentMarketBlackMarketRefreshDiscount += count;
+        MarkAllDiceOfTypeTriggered(DieType.BlackMarketImp, "下刷-" + currentMarketBlackMarketRefreshDiscount);
+        return " 黑市下次刷新 -" + count + "（累计 -" + currentMarketBlackMarketRefreshDiscount + "）。";
+    }
+
+    private void RecordDevourState(Die target, Die source, int transfer, string triggerLabel)
+    {
+        if (target == null || target.Temporary)
+        {
+            return;
+        }
+
+        target.LastDevourGain = Mathf.Max(0, transfer);
+        target.LastDevourSource = DieDisplayName(source);
+        target.LastDevourTrigger = string.IsNullOrEmpty(triggerLabel) ? "吞噬" : triggerLabel;
+    }
+
+    private string ResolveDevourerGold()
+    {
+        int count = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die == null || die.Temporary || die.Type != DieType.Devourer)
+            {
+                continue;
+            }
+
+            count++;
+            MarkTypeTriggered(die);
+            die.RoundNote = AppendNote(die.RoundNote, "吞金+1");
+        }
+
+        if (count <= 0)
+        {
+            return string.Empty;
+        }
+
+        string treasureText = AddGoldIncome(count, "吞噬骰子", true);
+        return " 吞噬骰子 +" + count + " 金。" + treasureText;
+    }
+
+    private Die LowestMinimumFaceDie()
+    {
+        Die target = null;
+        int bestMinimum = int.MaxValue;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die == null || die.Temporary || die.Faces == null || die.Faces.Length == 0)
+            {
+                continue;
+            }
+
+            int minimum = MinimumFaceValue(die);
+            if (minimum < bestMinimum)
+            {
+                bestMinimum = minimum;
+                target = die;
+            }
+        }
+
+        return target;
+    }
+
+    private int DevourTransferValue(Die source)
+    {
+        if (source == null || source.Faces == null || source.Faces.Length == 0)
+        {
+            return 1;
+        }
+
+        int sum = 0;
+        for (int i = 0; i < source.Faces.Length; i++)
+        {
+            sum += source.Faces[i];
+        }
+
+        return Mathf.Max(1, Mathf.FloorToInt(sum / (float)source.Faces.Length));
+    }
+
+    private void AddValueToAllFaces(Die target, int value)
+    {
+        if (target == null || target.Faces == null || target.Faces.Length == 0 || value == 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < target.Faces.Length; i++)
+        {
+            target.Faces[i] += value;
+        }
+
+        Array.Sort(target.Faces);
+    }
+
+    private void AddValueToAllFacesAndCurrentRoll(Die target, int value, HashSet<int> settledIds)
+    {
+        if (target == null || value == 0)
+        {
+            return;
+        }
+
+        AddValueToAllFaces(target, value);
+        if (rollResultsLocked && (settledIds == null || !settledIds.Contains(target.Id)))
+        {
+            target.EffectiveValue += value;
+        }
+    }
+
+    private static bool IsF018AbsorbableTurtleType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.MoneyTurtle:
+            case DieType.TinyTurtle:
+            case DieType.DoubleTurtle:
+            case DieType.LuckyTurtle:
+            case DieType.MagnetTurtle:
+            case DieType.RallyTurtle:
+            case DieType.PackTurtle:
+            case DieType.SharedFeastDemonTurtle:
+            case DieType.SafetyNetTurtle:
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsF018TurtleFamilyType(DieType type)
+    {
+        return IsF018AbsorbableTurtleType(type) || type == DieType.LeaderTurtle;
+    }
+
+    private static bool IsAnyTurtleFamilyType(DieType type)
+    {
+        return IsF018TurtleFamilyType(type);
+    }
+
+    private Die NextPositionTurtleAttachmentHost(int sourceIndex)
+    {
+        if (sourceIndex < 0 || sourceIndex + 1 >= dice.Count)
+        {
+            return null;
+        }
+
+        Die candidate = dice[sourceIndex + 1];
+        if (candidate != null && !candidate.Temporary && !IsAnyTurtleFamilyType(candidate.Type))
+        {
+            return candidate;
+        }
+
+        return null;
+    }
+
+    private string ResolveF018TurtleAbsorption(Die turtle)
+    {
+        if (turtle == null || turtle.Temporary || !IsF018AbsorbableTurtleType(turtle.Type))
+        {
+            return string.Empty;
+        }
+
+        int turtleIndex = DiceIndexById(turtle.Id);
+        if (turtleIndex < 0)
+        {
+            return string.Empty;
+        }
+
+        Die host = NextPositionTurtleAttachmentHost(turtleIndex);
+        if (host == null)
+        {
+            return TypeName(turtle.Type) + "后一格没有可化壳目标，仍留在骰袋。";
+        }
+
+        int transfer = DevourTransferValue(turtle);
+        int sellValue = BaseSellPrice(turtle.Type);
+        string applyText = AddTurtleAttachment(host, turtle.Type, transfer, sellValue, TurtleAttachmentSource.RealTurtle, null);
+        int packShellCount = turtle.Type == DieType.PackTurtle ? Mathf.Max(0, turtle.FeedValue) / 2 : 0;
+        for (int shellIndex = 0; shellIndex < packShellCount; shellIndex++)
+        {
+            GrantBasicTurtleShell(host, 1, "驮粮龟", turtle, null);
+        }
+        if (packShellCount > 0)
+        {
+            applyText += "，按喂养额外全部六面+" + packShellCount;
+        }
+        string sourceName = DieDisplayName(turtle);
+        string hostName = DieDisplayName(host);
+        int hostId = host.Id;
+        int targetIndex = turtleIndex + 1;
+        dice.RemoveAt(turtleIndex);
+        host.RoundNote = AppendNote(host.RoundNote, TypeName(turtle.Type) + "化壳+" + transfer);
+        SetMarketLeaveAttachmentVisual(turtle.Type, hostId, turtleIndex, targetIndex);
+        string leaderText = ResolveLeaderTurtleCopies(turtle.Type, transfer);
+        string result = TypeName(turtle.Type) + "完成化壳，附着到 " + hostName + "，全部六面 +" + transfer + applyText + leaderText;
+        AddLog(sourceName + " 完成化壳并离开骰袋，" + hostName + " 全部六面 +" + transfer + "，面组 " + FaceText(host.Faces) + "。" + leaderText);
+        return result;
+    }
+
+    private void SetMarketLeaveAttachmentVisual(DieType type, int hostId, int sourceIndex, int targetIndex)
+    {
+        marketLeaveEffectVisualType = type;
+        marketLeaveEffectVisualHostId = hostId;
+        marketLeaveEffectVisualSourceIndex = sourceIndex;
+        marketLeaveEffectVisualTargetIndex = targetIndex;
+    }
+
+    private void ClearMarketLeaveEffectVisual()
+    {
+        marketLeaveEffectVisualHostId = -1;
+        marketLeaveEffectVisualType = DieType.Basic;
+        marketLeaveEffectVisualSourceIndex = -1;
+        marketLeaveEffectVisualTargetIndex = -1;
+    }
+
+    private string ResolveLeaderTurtleCopies(DieType absorbedType, int transfer)
+    {
+        int copyCount = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die leader = dice[i];
+            if (leader == null || leader.Temporary || leader.Type != DieType.LeaderTurtle)
+            {
+                continue;
+            }
+
+            AddTurtleAttachment(leader, absorbedType, transfer, 0, TurtleAttachmentSource.LeaderCopy, null);
+            leader.RoundNote = AppendNote(leader.RoundNote, "首领复制 " + TypeName(absorbedType));
+            copyCount++;
+        }
+
+        if (copyCount <= 0)
+        {
+            return string.Empty;
+        }
+
+        return " 首领复制x" + copyCount + "。";
+    }
+
+    private string AddTurtleAttachment(Die target, DieType type, int faceGain, int sellValue, TurtleAttachmentSource source, HashSet<int> settledIds)
+    {
+        if (target == null)
+        {
+            return string.Empty;
+        }
+
+        EnsureTurtleAttachments(target);
+        target.TurtleAttachments.Add(new TurtleAttachment
+        {
+            Type = type,
+            FaceGain = Mathf.Max(0, faceGain),
+            SellValue = Mathf.Max(0, sellValue),
+            Source = source
+        });
+
+        if (faceGain > 0)
+        {
+            AddValueToAllFacesAndCurrentRoll(target, faceGain, settledIds);
+        }
+
+        if (type == DieType.DoubleTurtle)
+        {
+            return ApplyDoubleTurtleMinimum(target, settledIds);
+        }
+
+        return string.Empty;
+    }
+
+    private string ApplyDoubleTurtleMinimum(Die target, HashSet<int> settledIds)
+    {
+        if (target == null || target.Faces == null || target.Faces.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        int minimum = MinimumFaceValue(target);
+        if (minimum == 0)
+        {
+            return string.Empty;
+        }
+
+        int changed = 0;
+        for (int i = 0; i < target.Faces.Length; i++)
+        {
+            if (target.Faces[i] == minimum)
+            {
+                target.Faces[i] *= 2;
+                changed++;
+            }
+        }
+
+        if (changed <= 0)
+        {
+            return string.Empty;
+        }
+
+        if (target.EffectiveValue == minimum && (settledIds == null || !settledIds.Contains(target.Id)))
+        {
+            target.EffectiveValue *= 2;
+        }
+
+        Array.Sort(target.Faces);
+        return "，最低面x2";
+    }
+
+    private void EnsureTurtleAttachments(Die die)
+    {
+        if (die != null && die.TurtleAttachments == null)
+        {
+            die.TurtleAttachments = new List<TurtleAttachment>();
+        }
+    }
+
+    private string TributeOfferHint(Die die)
+    {
+        Die target = LowestMinimumFaceDie();
+        string targetText = target != null ? DieDisplayName(target) : "最低点骰";
+        return "奉献 +" + DevourTransferValue(die) + " 给 " + targetText;
+    }
+
+    private int BaseSellPrice(DieType type)
     {
         MarketDieConfig config;
         if (marketDieConfigs.TryGetValue(type, out config))
@@ -10757,6 +23904,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private DiceMaterial PickDiceMaterial()
     {
+        if (!DiceMaterialFeatureEnabled)
+        {
+            return DiceMaterial.None;
+        }
+
         int chapter = CurrentChapterIndex();
         int totalWeight = 0;
         foreach (DiceMaterialConfig config in diceMaterialConfigs.Values)
@@ -10886,55 +24038,56 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         switch (type)
         {
-            case DieType.Odd:
-            case DieType.LoneWitness:
-            case DieType.Stamp:
-                return MarketRoute.Odd;
-            case DieType.Even:
-            case DieType.HalfStep:
-            case DieType.Track:
-                return MarketRoute.Even;
-            case DieType.ParityNeighborDiff:
-            case DieType.ParityNeighborSame:
-            case DieType.ParityComplete:
-            case DieType.ParityReview:
-            case DieType.ParityFlipScore:
-            case DieType.ParityHoldScore:
-            case DieType.ParityTurner:
-                return MarketRoute.Parity;
-            case DieType.Piggy:
-            case DieType.Treasury:
-            case DieType.Bribe:
-            case DieType.Investment:
-            case DieType.BountyGold:
-            case DieType.TopGold:
-            case DieType.HandTax:
-            case DieType.Collection:
-            case DieType.CompoundInterest:
-            case DieType.LeadTicket:
-            case DieType.ShellTax:
-            case DieType.CounterGold:
-            case DieType.LumberGold:
+            case DieType.Basic:
+            case DieType.Tribute:
+            case DieType.Lightfang:
+            case DieType.Duet:
+            case DieType.Trigger:
+            case DieType.Crown:
+            case DieType.Relief:
+            case DieType.Airstrike:
+            case DieType.Pact:
+            case DieType.Stitch:
+                return MarketRoute.None;
+            case DieType.PigFarmer:
+            case DieType.MeatPig:
+            case DieType.TradePig:
+            case DieType.SowPig:
+            case DieType.ThreeLittlePigs:
+            case DieType.GreedyPig:
+            case DieType.FeedWholesaler:
+            case DieType.RefreshPirate:
+            case DieType.PlunderPirate:
+            case DieType.CrewPirate:
+            case DieType.PirateCaptain:
+            case DieType.TrainingPirate:
+            case DieType.TreasurePirate:
+            case DieType.RobberyPirate:
+            case DieType.PirateKing:
+            case DieType.BlackSailBat:
+            case DieType.BlackMarketImp:
+            case DieType.BloodPactCaptain:
+            case DieType.ClearancePig:
+            case DieType.SupplyPig:
+            case DieType.TributePig:
                 return MarketRoute.Gold;
-            case DieType.Turtle:
-            case DieType.Shellsmith:
-            case DieType.Nest:
-            case DieType.SlowTurtle:
-                return MarketRoute.Turtle;
-            case DieType.Tree:
-            case DieType.Gardener:
-            case DieType.Irrigation:
-            case DieType.PointSeedTree:
-            case DieType.PatternTree:
-            case DieType.CanopyTree:
-            case DieType.RingTree:
-            case DieType.FertilizerTree:
-            case DieType.PruningTree:
-            case DieType.RootTree:
-                return MarketRoute.Tree;
-            case DieType.Double:
-            case DieType.Gambler:
+            case DieType.Imp:
+            case DieType.Devourer:
+            case DieType.Demon:
+            case DieType.DemonBat:
+            case DieType.AbyssSummon:
                 return MarketRoute.Burst;
+            case DieType.MoneyTurtle:
+            case DieType.TinyTurtle:
+            case DieType.DoubleTurtle:
+            case DieType.LuckyTurtle:
+            case DieType.MagnetTurtle:
+            case DieType.RallyTurtle:
+            case DieType.LeaderTurtle:
+            case DieType.PackTurtle:
+            case DieType.SharedFeastDemonTurtle:
+            case DieType.SafetyNetTurtle:
+                return MarketRoute.Turtle;
         }
 
         return MarketRoute.None;
@@ -11053,6 +24206,11 @@ public sealed class DiceKingDemo : MonoBehaviour
             return false;
         }
 
+        if (!IsMarketTypeAllowedByActiveV02Pool(config.Type))
+        {
+            return false;
+        }
+
         if (route != MarketRoute.None && MarketRouteForType(config.Type) != route)
         {
             return false;
@@ -11088,62 +24246,16 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private bool IsMarketDieUnlocked(DieType type, int chapter)
     {
-        chapter = Mathf.Max(1, chapter);
-        switch (type)
-        {
-            case DieType.Basic:
-            case DieType.Odd:
-            case DieType.Even:
-            case DieType.Piggy:
-            case DieType.Turtle:
-            case DieType.Double:
-                return true;
-            case DieType.LoneWitness:
-            case DieType.Stamp:
-            case DieType.HalfStep:
-            case DieType.Track:
-            case DieType.ParityNeighborDiff:
-            case DieType.ParityNeighborSame:
-            case DieType.ParityComplete:
-            case DieType.ParityReview:
-            case DieType.Shellsmith:
-            case DieType.SlowTurtle:
-            case DieType.Treasury:
-            case DieType.Bribe:
-            case DieType.BountyGold:
-            case DieType.TopGold:
-            case DieType.HandTax:
-            case DieType.Collection:
-            case DieType.ShellTax:
-            case DieType.CounterGold:
-            case DieType.Tree:
-            case DieType.PointSeedTree:
-                return chapter >= 2;
-            case DieType.Nest:
-            case DieType.Gardener:
-            case DieType.Irrigation:
-            case DieType.Gambler:
-            case DieType.Investment:
-            case DieType.CompoundInterest:
-            case DieType.LeadTicket:
-            case DieType.LumberGold:
-            case DieType.ParityFlipScore:
-            case DieType.ParityHoldScore:
-            case DieType.ParityTurner:
-            case DieType.PatternTree:
-            case DieType.CanopyTree:
-            case DieType.RingTree:
-            case DieType.FertilizerTree:
-            case DieType.PruningTree:
-            case DieType.RootTree:
-                return chapter >= 3;
-        }
-
-        return chapter >= 4;
+        return IsCurrentRosterOrSystemType(type);
     }
 
     private bool IsDiceMaterialUnlocked(DiceMaterial material, int chapter)
     {
+        if (!DiceMaterialFeatureEnabled)
+        {
+            return false;
+        }
+
         chapter = Mathf.Max(1, chapter);
         switch (material)
         {
@@ -11245,13 +24357,54 @@ public sealed class DiceKingDemo : MonoBehaviour
     private int RefreshCost(bool chapterMarket)
     {
         MarketRuleConfig rule = CurrentMarketRule();
-        return Mathf.Max(0, chapterMarket ? rule.BossRefreshCost : rule.NormalRefreshCost);
+        int baseCost = Mathf.Max(0, chapterMarket ? rule.BossRefreshCost : rule.NormalRefreshCost);
+        bool usesEscalatingV02Refresh = v02PigFamilyMarketOnly
+            || v02PirateFamilyMarketOnly
+            || v02DualFamilyMarketOnly
+            || UsesV02CoreFamiliesMarketPool();
+        if (v02DevilFamilyMarketOnly || marketRefreshCostStep <= 0 || !usesEscalatingV02Refresh)
+        {
+            return baseCost;
+        }
+
+        return baseCost + Mathf.Max(0, currentMarketPaidRefreshCount) * marketRefreshCostStep;
+    }
+
+    private int CurrentMarketRefreshNetCost(bool chapterMarket)
+    {
+        return RefreshCost(chapterMarket)
+            - CountDiceOfType(DieType.RefreshPirate)
+            - Mathf.Max(0, currentMarketBlackMarketRefreshDiscount);
+    }
+
+    private string DefaultHandName()
+    {
+        return V02HandScoringEnabled ? "无牌型" : "牌型关闭";
+    }
+
+    private HandResult NoHandResult()
+    {
+        return new HandResult
+        {
+            Name = DefaultHandName(),
+            Multiplier = 1f,
+            LongestRun = 0,
+            AllOdd = false,
+            AllEven = false,
+            UsedHalfStep = false,
+            UsedParityComplete = false
+        };
     }
 
     private HandResult EvaluateHand(List<int> values, List<Die> handDice = null)
     {
         ClearHalfStepBorrowMarks(handDice);
         ClearParityCompleteMarks(handDice);
+        if (!V02HandScoringEnabled)
+        {
+            return NoHandResult();
+        }
+
         Dictionary<int, int> counts = new Dictionary<int, int>();
         for (int i = 0; i < values.Count; i++)
         {
@@ -11344,6 +24497,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private float ParityMultiplier(HandResult hand, Encounter encounter)
     {
+        if (!V02HandScoringEnabled)
+        {
+            return 1f;
+        }
+
         float multiplier = 1f;
         if (hand.AllOdd)
         {
@@ -11359,6 +24517,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string FinalHandName(HandResult hand, float parityMultiplier)
     {
+        if (!V02HandScoringEnabled || hand == null)
+        {
+            return DefaultHandName();
+        }
+
         if (parityMultiplier > hand.Multiplier)
         {
             return hand.AllOdd ? "全奇" : "全偶";
@@ -11384,6 +24547,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private int RuleComboBonus(HandResult hand, Encounter encounter)
     {
+        if (!V02HandScoringEnabled)
+        {
+            return 0;
+        }
+
         if (encounter.Rule == RuleKind.HandAudit && hand.Multiplier > 1f)
         {
             return 2;
@@ -11599,6 +24767,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void ResetGlobalConfigDefaults()
     {
         startingGold = 18;
+        startingLives = 3;
         stageClearBaseGold = 2;
         rollLeftGoldBonus = 0;
         cheatLeftGoldBonus = 0;
@@ -11619,6 +24788,20 @@ public sealed class DiceKingDemo : MonoBehaviour
         counterGold = 1;
         lumberGold = 2;
         lumberScorePenalty = 1;
+        v02CoreFamiliesMarketOnly = true;
+        v02PigFamilyMarketOnly = false;
+        v02DevilFamilyMarketOnly = false;
+        v02TurtleAttachmentMarketOnly = false;
+        v02PirateFamilyMarketOnly = false;
+        v02NeutralFamilyMarketOnly = false;
+        v02DualFamilyMarketOnly = false;
+        feedQualityStart = 1;
+        feedQuality = Mathf.Max(1, feedQualityStart);
+        marketRefreshCostStep = 1;
+        currentMarketPaidRefreshCount = 0;
+        currentMarketBlackMarketRefreshDiscount = 0;
+        tavernBaseMinimumBonus = 0;
+        marketTemporaryMinimumBonus = 0;
         affixFeatureEnabled = false;
         treasuryGoldStep = 10;
         treasuryScoreCap = 0;
@@ -11687,6 +24870,9 @@ public sealed class DiceKingDemo : MonoBehaviour
             case "starting_gold":
                 startingGold = Mathf.Max(0, value);
                 return true;
+            case "starting_lives":
+                startingLives = Mathf.Max(1, value);
+                return true;
             case "stage_clear_base_gold":
                 stageClearBaseGold = Mathf.Max(0, value);
                 return true;
@@ -11750,6 +24936,37 @@ public sealed class DiceKingDemo : MonoBehaviour
             case "market_test_random_refresh":
                 marketTestRandomRefresh = value > 0;
                 return true;
+            case "v02_core_families_market_only":
+                v02CoreFamiliesMarketOnly = value > 0;
+                return true;
+            case "v02_pig_family_market_only":
+                v02PigFamilyMarketOnly = value > 0;
+                return true;
+            case "v02_devil_family_market_only":
+                v02DevilFamilyMarketOnly = value > 0;
+                return true;
+            case "v02_turtle_attachment_market_only":
+                v02TurtleAttachmentMarketOnly = value > 0;
+                return true;
+            case "v02_pirate_family_market_only":
+                v02PirateFamilyMarketOnly = value > 0;
+                return true;
+            case "v02_neutral_family_market_only":
+                v02NeutralFamilyMarketOnly = value > 0;
+                return true;
+            case "v02_dual_family_market_only":
+                v02DualFamilyMarketOnly = value > 0;
+                return true;
+            case "feed_quality_start":
+                feedQualityStart = Mathf.Max(1, value);
+                if (!hasSave)
+                {
+                    feedQuality = feedQualityStart;
+                }
+                return true;
+            case "market_refresh_cost_step":
+                marketRefreshCostStep = Mathf.Max(0, value);
+                return true;
             case "affix_feature_enabled":
                 affixFeatureEnabled = value > 0;
                 return true;
@@ -11777,6 +24994,426 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void LoadMainMenuVisualConfig(bool manualReload)
+    {
+        MainMenuVisualConfig candidate = MainMenuVisualConfig.CreateDefault();
+        TextAsset table = Resources.Load<TextAsset>(MainMenuVisualConfigResourcePath);
+        int loadedRows = 0;
+        int skippedRows = 0;
+        bool loaded = table != null
+            && !string.IsNullOrEmpty(table.text)
+            && TryApplyMainMenuVisualConfigCsv(table.text, candidate, out loadedRows, out skippedRows);
+
+        candidate.Normalize();
+        mainMenuVisualConfig = candidate;
+        if (!loaded)
+        {
+            Debug.LogWarning("DiceKingDemo: main menu visual config missing or invalid. Using fallback timing values.");
+        }
+        else if (manualReload)
+        {
+            Debug.Log("DiceKingDemo: main menu visual config reloaded from Resources/" + MainMenuVisualConfigResourcePath + " (" + loadedRows + " rows, " + skippedRows + " skipped).");
+        }
+
+        if (mode == GameMode.MainMenu)
+        {
+            ClearMainMenuLampEvent();
+            mainMenuLampProtectionUntil = Time.unscaledTime;
+            mainMenuLampNextEventAt = Time.unscaledTime + mainMenuVisualConfig.FirstEventDelay;
+        }
+    }
+
+    private void LoadMainMenuRainProfile()
+    {
+        MainMenuRainProfile loaded = Resources.Load<MainMenuRainProfile>(MainMenuRainProfile.ResourcePath);
+        if (loaded != null)
+        {
+            loaded.Normalize();
+            mainMenuRainProfile = loaded;
+            mainMenuRainProfileIsRuntimeFallback = false;
+            return;
+        }
+
+        mainMenuRainProfile = MainMenuRainProfile.CreateRuntimeDefault();
+        mainMenuRainProfileIsRuntimeFallback = true;
+        Debug.LogWarning("DiceKingDemo: main menu rain Inspector profile is missing at Resources/" + MainMenuRainProfile.ResourcePath + ". Using safe runtime defaults.");
+    }
+
+    private void LoadMainMenuMarqueeProfile()
+    {
+        MainMenuMarqueeProfile loaded = Resources.Load<MainMenuMarqueeProfile>(MainMenuMarqueeProfile.ResourcePath);
+        if (loaded != null)
+        {
+            loaded.Normalize();
+            mainMenuMarqueeProfile = loaded;
+            mainMenuMarqueeProfileIsRuntimeFallback = false;
+            return;
+        }
+
+        mainMenuMarqueeProfile = MainMenuMarqueeProfile.CreateRuntimeDefault();
+        mainMenuMarqueeProfileIsRuntimeFallback = true;
+        Debug.LogWarning("DiceKingDemo: DICE KING marquee Inspector profile is missing at Resources/" + MainMenuMarqueeProfile.ResourcePath + ". Using safe runtime defaults.");
+    }
+
+    private void LoadMainGameFlowPresentationProfile()
+    {
+        MainGameFlowPresentationProfile loaded = Resources.Load<MainGameFlowPresentationProfile>(MainGameFlowPresentationProfile.ResourcePath);
+        if (loaded != null)
+        {
+            loaded.Normalize();
+            mainGameFlowPresentationProfile = loaded;
+            mainGameFlowPresentationProfileIsRuntimeFallback = false;
+            return;
+        }
+
+        mainGameFlowPresentationProfile = MainGameFlowPresentationProfile.CreateRuntimeDefault();
+        mainGameFlowPresentationProfileIsRuntimeFallback = true;
+        Debug.LogWarning("DiceKingDemo: main-game flow Inspector profile is missing at Resources/" + MainGameFlowPresentationProfile.ResourcePath + ". Using safe runtime defaults.");
+    }
+
+    private void InitializeSettlementAudio()
+    {
+        if (settlementAudioSource == null)
+        {
+            settlementAudioSource = gameObject.AddComponent<AudioSource>();
+            settlementAudioSource.playOnAwake = false;
+            settlementAudioSource.loop = false;
+            settlementAudioSource.spatialBlend = 0f;
+            settlementAudioSource.volume = 1f;
+        }
+
+        settlementAbsorbClip = CreateSettlementAudioClip("F009 Glass Absorb", SettlementAudioCue.Absorb);
+        settlementNegativeClip = CreateSettlementAudioClip("F009 Rust Rollback", SettlementAudioCue.Negative);
+        settlementLatchClip = CreateSettlementAudioClip("F009 Target Latch", SettlementAudioCue.Latch);
+        settlementRelayClip = CreateSettlementAudioClip("F009 Relay Preload", SettlementAudioCue.Relay);
+        settlementOverloadClip = CreateSettlementAudioClip("F009 Tower Overload", SettlementAudioCue.Overload);
+        settlementPressureClip = CreateSettlementAudioClip("F009 Cabinet Pressure", SettlementAudioCue.Pressure);
+        settlementBreakthroughClip = CreateSettlementAudioClip("F009 Vacuum Breakthrough", SettlementAudioCue.Breakthrough);
+        settlementAftershockClip = CreateSettlementAudioClip("F009 Cabinet Aftershock", SettlementAudioCue.Aftershock);
+    }
+
+    private AudioClip CreateSettlementAudioClip(string clipName, SettlementAudioCue cue)
+    {
+        const int sampleRate = 44100;
+        float duration;
+        switch (cue)
+        {
+            case SettlementAudioCue.Negative:
+                duration = 0.16f;
+                break;
+            case SettlementAudioCue.Latch:
+                duration = 0.20f;
+                break;
+            case SettlementAudioCue.Relay:
+                duration = 0.11f;
+                break;
+            case SettlementAudioCue.Overload:
+                duration = 0.36f;
+                break;
+            case SettlementAudioCue.Pressure:
+                duration = 0.78f;
+                break;
+            case SettlementAudioCue.Breakthrough:
+                duration = 0.68f;
+                break;
+            case SettlementAudioCue.Aftershock:
+                duration = 0.48f;
+                break;
+            default:
+                duration = 0.13f;
+                break;
+        }
+
+        int sampleCount = Mathf.CeilToInt(duration * sampleRate);
+        float[] samples = new float[sampleCount];
+        uint noiseState = 0x7A31B2C5u + (uint)cue * 977u;
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float time = i / (float)sampleRate;
+            float normalized = Mathf.Clamp01(time / duration);
+            noiseState = noiseState * 1664525u + 1013904223u;
+            float noise = ((noiseState >> 8) & 0xFFFFu) / 32767.5f - 1f;
+            float sample;
+            if (cue == SettlementAudioCue.Absorb)
+            {
+                float envelope = Mathf.Pow(1f - normalized, 2.4f);
+                float frequency = Mathf.Lerp(880f, 390f, normalized);
+                sample = Mathf.Sin(time * frequency * Mathf.PI * 2f) * envelope * 0.22f
+                    + noise * envelope * 0.035f;
+            }
+            else if (cue == SettlementAudioCue.Negative)
+            {
+                float envelope = Mathf.Pow(1f - normalized, 1.7f);
+                sample = (Mathf.Sin(time * 148f * Mathf.PI * 2f) * 0.16f
+                    + Mathf.Sin(time * 91f * Mathf.PI * 2f) * 0.10f
+                    + noise * 0.045f) * envelope;
+            }
+            else if (cue == SettlementAudioCue.Latch)
+            {
+                float first = Mathf.Exp(-Mathf.Max(0f, time - 0.018f) * 58f) * (time >= 0.018f ? 1f : 0f);
+                float second = Mathf.Exp(-Mathf.Max(0f, time - 0.092f) * 72f) * (time >= 0.092f ? 1f : 0f);
+                sample = (Mathf.Sin(time * 610f * Mathf.PI * 2f) * first * 0.18f)
+                    + (Mathf.Sin(time * 940f * Mathf.PI * 2f) * second * 0.15f)
+                    + noise * (first + second) * 0.022f;
+            }
+            else if (cue == SettlementAudioCue.Relay)
+            {
+                float envelope = Mathf.Exp(-normalized * 8.5f);
+                sample = noise * envelope * 0.18f + Mathf.Sin(time * 265f * Mathf.PI * 2f) * envelope * 0.12f;
+            }
+            else if (cue == SettlementAudioCue.Pressure)
+            {
+                float rise = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.02f, 0.72f, normalized));
+                float cut = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.72f, 1f, normalized));
+                float envelope = rise * cut;
+                float lowFrequency = Mathf.Lerp(72f, 176f, normalized);
+                float whineFrequency = Mathf.Lerp(620f, 1980f, normalized * normalized);
+                sample = Mathf.Sin(time * lowFrequency * Mathf.PI * 2f) * envelope * 0.18f
+                    + Mathf.Sin(time * whineFrequency * Mathf.PI * 2f) * envelope * 0.055f
+                    + noise * envelope * 0.026f;
+            }
+            else if (cue == SettlementAudioCue.Breakthrough)
+            {
+                float transient = Mathf.Exp(-normalized * 24f);
+                float lowTail = Mathf.Exp(-normalized * 5.8f);
+                float lowFrequency = Mathf.Lerp(62f, 38f, normalized);
+                float metal = Mathf.Max(0f, time - 0.018f);
+                float lift = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.01f, 0.08f, normalized))
+                    * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.36f, 0.82f, normalized)));
+                float liftFrequency = Mathf.Lerp(138f, 640f, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.02f, 0.52f, normalized)));
+                sample = Mathf.Sin(time * lowFrequency * Mathf.PI * 2f) * lowTail * 0.42f
+                    + Mathf.Sin(time * 124f * Mathf.PI * 2f) * lowTail * 0.15f
+                    + Mathf.Sin(time * liftFrequency * Mathf.PI * 2f) * lift * 0.16f
+                    + (Mathf.Sin(metal * 2360f * Mathf.PI * 2f) * 0.24f + noise * 0.34f) * transient
+                    + noise * Mathf.Exp(-normalized * 8.2f) * 0.07f;
+            }
+            else if (cue == SettlementAudioCue.Aftershock)
+            {
+                float first = Mathf.Exp(-normalized * 4.6f);
+                float secondTime = Mathf.Max(0f, time - 0.065f);
+                float second = time >= 0.065f ? Mathf.Exp(-secondTime * 9.5f) : 0f;
+                sample = Mathf.Sin(time * 54f * Mathf.PI * 2f) * first * 0.34f
+                    + Mathf.Sin(secondTime * 92f * Mathf.PI * 2f) * second * 0.18f
+                    + noise * (first * 0.045f + second * 0.075f);
+            }
+            else
+            {
+                float thump = Mathf.Sin(time * Mathf.Lerp(92f, 54f, normalized) * Mathf.PI * 2f)
+                    * Mathf.Exp(-normalized * 4.2f) * 0.34f;
+                float strikeTime = Mathf.Max(0f, time - 0.055f);
+                float strike = (Mathf.Sin(strikeTime * 760f * Mathf.PI * 2f) * 0.18f + noise * 0.13f)
+                    * Mathf.Exp(-strikeTime * 20f)
+                    * (time >= 0.055f ? 1f : 0f);
+                float tail = Mathf.Sin(time * 132f * Mathf.PI * 2f) * Mathf.Pow(1f - normalized, 2f) * 0.08f;
+                sample = thump + strike + tail;
+            }
+
+            samples[i] = Mathf.Clamp(sample, -0.72f, 0.72f);
+        }
+
+        AudioClip clip = AudioClip.Create(clipName, sampleCount, 1, sampleRate, false);
+        clip.SetData(samples, 0);
+        return clip;
+    }
+
+    private void DestroySettlementAudioClip(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            Destroy(clip);
+        }
+    }
+
+    private void UpdateSettlementImpactAudio(SettlementDisplayEvent settlementEvent, float duration)
+    {
+        if (!settlementImpactPresentationActive || settlementEvent == null || duration <= 0f)
+        {
+            return;
+        }
+
+        float progress = Mathf.Clamp01(scoreStepTimer / duration);
+        if (settlementEvent.Kind == SettlementEventKind.SlotScore || settlementEvent.Kind == SettlementEventKind.BribeFinal)
+        {
+            if (!settlementPrimaryAudioPlayed && progress >= SettlementAbsorbFraction())
+            {
+                SettlementAudioCue cue = settlementEvent.ValueDelta < 0
+                    ? SettlementAudioCue.Negative
+                    : SettlementAudioCue.Absorb;
+                PlaySettlementAudio(cue, Mathf.Lerp(0.55f, 1f, settlementEvent.LocalImpactWeight01));
+                settlementPrimaryAudioPlayed = true;
+            }
+            return;
+        }
+
+        if (settlementEvent.Kind != SettlementEventKind.TargetSettle)
+        {
+            return;
+        }
+
+        SettlementFeedbackTier tier = settlementEvent.FeedbackTier;
+        if (tier == SettlementFeedbackTier.Critical)
+        {
+            if (settlementFinaleAudioStage < 1 && progress >= 0.03f)
+            {
+                PlaySettlementAudio(SettlementAudioCue.Relay, 0.88f);
+                settlementFinaleAudioStage = 1;
+            }
+            if (settlementFinaleAudioStage < 2 && progress >= 0.12f)
+            {
+                PlaySettlementAudio(SettlementAudioCue.Pressure, 0.92f);
+                settlementFinaleAudioStage = 2;
+            }
+            if (settlementFinaleAudioStage < 3 && progress >= SettlementCriticalVacuumStart() - 0.025f)
+            {
+                PlaySettlementAudio(SettlementAudioCue.Latch, 0.46f);
+                settlementFinaleAudioStage = 3;
+            }
+            if (settlementFinaleAudioStage < 4 && progress >= SettlementCriticalBreakthrough())
+            {
+                PlaySettlementAudio(SettlementAudioCue.Breakthrough, 1f);
+                settlementFinaleAudioStage = 4;
+            }
+            if (settlementFinaleAudioStage < 5 && progress >= SettlementCriticalAftershock())
+            {
+                PlaySettlementAudio(SettlementAudioCue.Aftershock, 0.88f);
+                settlementFinaleAudioStage = 5;
+            }
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.Miss)
+        {
+            if (settlementFinaleAudioStage < 1 && progress >= 0.14f)
+            {
+                PlaySettlementAudio(SettlementAudioCue.Negative, 0.76f);
+                settlementFinaleAudioStage = 1;
+            }
+            if (settlementFinaleAudioStage < 2 && progress >= 0.72f)
+            {
+                PlaySettlementAudio(SettlementAudioCue.Relay, 0.46f);
+                settlementFinaleAudioStage = 2;
+            }
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.Pass)
+        {
+            if (settlementFinaleAudioStage < 1 && progress >= 0.28f)
+            {
+                PlaySettlementAudio(SettlementAudioCue.Latch, 0.70f);
+                settlementFinaleAudioStage = 1;
+            }
+            return;
+        }
+
+        if (tier == SettlementFeedbackTier.Exceed)
+        {
+            if (settlementFinaleAudioStage < 1 && progress >= 0.22f)
+            {
+                PlaySettlementAudio(SettlementAudioCue.Latch, 0.80f);
+                settlementFinaleAudioStage = 1;
+            }
+            if (settlementFinaleAudioStage < 2 && progress >= 0.56f)
+            {
+                PlaySettlementAudio(SettlementAudioCue.Relay, 0.72f);
+                settlementFinaleAudioStage = 2;
+            }
+            return;
+        }
+
+        if (settlementFinaleAudioStage < 1 && progress >= 0.08f)
+        {
+            PlaySettlementAudio(SettlementAudioCue.Pressure, 0.64f);
+            settlementFinaleAudioStage = 1;
+        }
+        if (settlementFinaleAudioStage < 2 && progress >= 0.52f)
+        {
+            PlaySettlementAudio(SettlementAudioCue.Overload, 0.84f);
+            settlementFinaleAudioStage = 2;
+        }
+    }
+
+    private void PlaySettlementAudio(SettlementAudioCue cue, float cueVolume)
+    {
+        if (settlementAudioSource == null || mainGameFlowPresentationProfile == null || mainGameFlowPresentationProfile.SettlementAudioVolume <= 0f)
+        {
+            return;
+        }
+
+        AudioClip clip;
+        switch (cue)
+        {
+            case SettlementAudioCue.Negative:
+                clip = settlementNegativeClip;
+                break;
+            case SettlementAudioCue.Latch:
+                clip = settlementLatchClip;
+                break;
+            case SettlementAudioCue.Relay:
+                clip = settlementRelayClip;
+                break;
+            case SettlementAudioCue.Overload:
+                clip = settlementOverloadClip;
+                break;
+            case SettlementAudioCue.Pressure:
+                clip = settlementPressureClip;
+                break;
+            case SettlementAudioCue.Breakthrough:
+                clip = settlementBreakthroughClip;
+                break;
+            case SettlementAudioCue.Aftershock:
+                clip = settlementAftershockClip;
+                break;
+            default:
+                clip = settlementAbsorbClip;
+                break;
+        }
+        if (clip != null)
+        {
+            settlementAudioSource.pitch = GameplayPlaybackSpeed();
+            settlementAudioSource.PlayOneShot(clip, Mathf.Clamp01(cueVolume) * mainGameFlowPresentationProfile.SettlementAudioVolume);
+        }
+    }
+
+    private static bool TryApplyMainMenuVisualConfigCsv(string text, MainMenuVisualConfig config, out int loadedCount, out int skippedCount)
+    {
+        loadedCount = 0;
+        skippedCount = 0;
+        if (config == null || string.IsNullOrEmpty(text))
+        {
+            return false;
+        }
+
+        string[] lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length <= 1)
+        {
+            return false;
+        }
+
+        Dictionary<string, int> columns = CsvColumns(SplitCsvLine(lines[0]));
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string line = lines[i].Trim();
+            if (line.Length == 0 || line.StartsWith("#", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            List<string> fields = SplitCsvLine(lines[i]);
+            string key = CsvValue(fields, columns, "key", string.Empty);
+            float value;
+            if (string.IsNullOrEmpty(key) || !CsvFloat(fields, columns, "value", out value) || !config.ApplyValue(key, value))
+            {
+                skippedCount++;
+                continue;
+            }
+
+            loadedCount++;
+        }
+
+        return loadedCount > 0;
     }
 
     private void LoadRollFeedbackConfig(bool manualReload)
@@ -11935,7 +25572,8 @@ public sealed class DiceKingDemo : MonoBehaviour
             return "无配置";
         }
 
-        return "窗口 " + ConfigFloatText(config.InputWindowDuration)
+        return "基础滚动 " + ConfigFloatText(config.BaseSpinDuration)
+            + " 秒，窗口 " + ConfigFloatText(config.InputWindowDuration)
             + " 秒，冲量上限 " + config.MaxImpulseCount
             + "，回落 " + ConfigFloatText(config.StopDuration)
             + " 秒。";
@@ -11971,12 +25609,15 @@ public sealed class DiceKingDemo : MonoBehaviour
         FillMissingMarketDieConfigs();
         BuildFaceTemplateConfigs();
 
-        if (!TryLoadDiceMaterialConfigsFromCsv())
+        if (DiceMaterialFeatureEnabled && !TryLoadDiceMaterialConfigsFromCsv())
         {
             BuildFallbackDiceMaterialConfigs();
         }
 
-        FillMissingDiceMaterialConfigs();
+        if (DiceMaterialFeatureEnabled)
+        {
+            FillMissingDiceMaterialConfigs();
+        }
 
         if (!TryLoadMarketRuleConfigsFromCsv())
         {
@@ -12074,6 +25715,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         for (int i = 0; i < values.Length; i++)
         {
             DieType type = (DieType)values.GetValue(i);
+            if (!IsCurrentRosterOrSystemType(type))
+            {
+                continue;
+            }
+
             diceTypeTooltipConfigs[type] = DefaultDiceTypeTooltipConfig(type);
         }
     }
@@ -12084,6 +25730,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         for (int i = 0; i < values.Length; i++)
         {
             DieType type = (DieType)values.GetValue(i);
+            if (!IsCurrentRosterOrSystemType(type))
+            {
+                continue;
+            }
+
             if (!diceTypeTooltipConfigs.ContainsKey(type))
             {
                 diceTypeTooltipConfigs[type] = DefaultDiceTypeTooltipConfig(type);
@@ -12100,6 +25751,344 @@ public sealed class DiceKingDemo : MonoBehaviour
             DisplayName = displayName,
             TooltipEffect = displayName + "效果说明未配置"
         };
+    }
+
+    private void LoadKeywordConfigs()
+    {
+        keywordGlossaryConfigs.Clear();
+        dieKeywordBindings.Clear();
+        stateKeywordBindings.Clear();
+
+        Dictionary<string, KeywordGlossaryConfig> loadedGlossary;
+        if (!TryLoadKeywordGlossaryConfigsFromCsv(out loadedGlossary))
+        {
+            return;
+        }
+
+        Dictionary<DieType, List<KeywordBindingConfig>> loadedDieBindings;
+        Dictionary<string, List<KeywordBindingConfig>> loadedStateBindings;
+        if (!TryLoadKeywordBindingConfigsFromCsv(loadedGlossary, out loadedDieBindings, out loadedStateBindings))
+        {
+            return;
+        }
+
+        if (!ValidateKeywordTooltipCoverage(loadedGlossary, loadedDieBindings, loadedStateBindings))
+        {
+            return;
+        }
+
+        foreach (KeyValuePair<string, KeywordGlossaryConfig> pair in loadedGlossary)
+        {
+            keywordGlossaryConfigs[pair.Key] = pair.Value;
+        }
+
+        foreach (KeyValuePair<DieType, List<KeywordBindingConfig>> pair in loadedDieBindings)
+        {
+            SortKeywordBindings(pair.Value);
+            dieKeywordBindings[pair.Key] = pair.Value;
+        }
+
+        foreach (KeyValuePair<string, List<KeywordBindingConfig>> pair in loadedStateBindings)
+        {
+            SortKeywordBindings(pair.Value);
+            stateKeywordBindings[pair.Key] = pair.Value;
+        }
+    }
+
+    private bool TryLoadKeywordGlossaryConfigsFromCsv(out Dictionary<string, KeywordGlossaryConfig> loaded)
+    {
+        loaded = new Dictionary<string, KeywordGlossaryConfig>(StringComparer.OrdinalIgnoreCase);
+        TextAsset table = Resources.Load<TextAsset>(KeywordGlossaryConfigResourcePath);
+        if (table == null || string.IsNullOrEmpty(table.text))
+        {
+            Debug.LogError("DiceKingDemo: keyword glossary config is missing at Resources/" + KeywordGlossaryConfigResourcePath + ". Keyword explanations are disabled.");
+            return false;
+        }
+
+        string[] lines = table.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length <= 1)
+        {
+            Debug.LogError("DiceKingDemo: keyword glossary config has no data rows. Keyword explanations are disabled.");
+            return false;
+        }
+
+        Dictionary<string, int> columns = CsvColumns(SplitCsvLine(lines[0]));
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string line = lines[i].Trim();
+            if (line.Length == 0 || line.StartsWith("#", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            List<string> fields = SplitCsvLine(lines[i]);
+            string key = CsvValue(fields, columns, "keyword_key", string.Empty).Trim();
+            string displayName = CsvValue(fields, columns, "display_name", string.Empty).Trim();
+            string explanation = CsvValue(fields, columns, "explanation", string.Empty).Trim();
+            string accentFamily = CsvValue(fields, columns, "accent_family", string.Empty).Trim();
+            string showExplanationText = CsvValue(fields, columns, "show_explanation", string.Empty).Trim();
+            int showExplanationValue;
+            bool hasValidShowExplanation = int.TryParse(showExplanationText, out showExplanationValue)
+                && (showExplanationValue == 0 || showExplanationValue == 1);
+            bool showExplanation = showExplanationValue == 1;
+            if (!IsValidKeywordKey(key)
+                || string.IsNullOrEmpty(displayName)
+                || !hasValidShowExplanation
+                || (showExplanation && (string.IsNullOrEmpty(explanation) || !IsValidTooltipAccentFamily(accentFamily))))
+            {
+                Debug.LogError("DiceKingDemo: invalid keyword glossary row " + (i + 1).ToString(CultureInfo.InvariantCulture) + ". Keyword explanations are disabled.");
+                return false;
+            }
+
+            if (loaded.ContainsKey(key))
+            {
+                Debug.LogError("DiceKingDemo: duplicate keyword glossary key '" + key + "'. Keyword explanations are disabled.");
+                return false;
+            }
+
+            loaded[key] = new KeywordGlossaryConfig
+            {
+                Key = key,
+                DisplayName = displayName,
+                Explanation = explanation,
+                AccentFamily = accentFamily,
+                DefaultOrder = CsvInt(fields, columns, "default_order", 0),
+                ShowExplanation = showExplanation
+            };
+        }
+
+        if (loaded.Count == 0)
+        {
+            Debug.LogError("DiceKingDemo: keyword glossary config contains no valid entries. Keyword explanations are disabled.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool TryLoadKeywordBindingConfigsFromCsv(
+        Dictionary<string, KeywordGlossaryConfig> glossary,
+        out Dictionary<DieType, List<KeywordBindingConfig>> loadedDieBindings,
+        out Dictionary<string, List<KeywordBindingConfig>> loadedStateBindings)
+    {
+        loadedDieBindings = new Dictionary<DieType, List<KeywordBindingConfig>>();
+        loadedStateBindings = new Dictionary<string, List<KeywordBindingConfig>>(StringComparer.OrdinalIgnoreCase);
+        TextAsset table = Resources.Load<TextAsset>(KeywordBindingConfigResourcePath);
+        if (table == null || string.IsNullOrEmpty(table.text))
+        {
+            Debug.LogError("DiceKingDemo: keyword binding config is missing at Resources/" + KeywordBindingConfigResourcePath + ". Keyword explanations are disabled.");
+            return false;
+        }
+
+        string[] lines = table.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length <= 1)
+        {
+            Debug.LogError("DiceKingDemo: keyword binding config has no data rows. Keyword explanations are disabled.");
+            return false;
+        }
+
+        Dictionary<string, int> columns = CsvColumns(SplitCsvLine(lines[0]));
+        HashSet<string> uniqueRows = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string line = lines[i].Trim();
+            if (line.Length == 0 || line.StartsWith("#", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            List<string> fields = SplitCsvLine(lines[i]);
+            string sourceKind = CsvValue(fields, columns, "source_kind", string.Empty).Trim().ToLowerInvariant();
+            string sourceKey = CsvValue(fields, columns, "source_key", string.Empty).Trim();
+            string keywordKey = CsvValue(fields, columns, "keyword_key", string.Empty).Trim();
+            if (string.IsNullOrEmpty(sourceKey) || !glossary.ContainsKey(keywordKey))
+            {
+                Debug.LogError("DiceKingDemo: invalid keyword binding row " + (i + 1).ToString(CultureInfo.InvariantCulture) + ". Keyword explanations are disabled.");
+                return false;
+            }
+
+            string uniqueKey = sourceKind + "|" + sourceKey + "|" + keywordKey;
+            if (!uniqueRows.Add(uniqueKey))
+            {
+                Debug.LogError("DiceKingDemo: duplicate keyword binding '" + uniqueKey + "'. Keyword explanations are disabled.");
+                return false;
+            }
+
+            KeywordBindingConfig binding = new KeywordBindingConfig
+            {
+                SourceKind = sourceKind,
+                SourceKey = sourceKey,
+                KeywordKey = keywordKey,
+                DisplayOrder = CsvInt(fields, columns, "display_order", glossary[keywordKey].DefaultOrder)
+            };
+
+            if (string.Equals(sourceKind, KeywordBindingSourceDieType, StringComparison.Ordinal))
+            {
+                DieType type;
+                if (!TryParseDieType(sourceKey, out type) || !IsCurrentRosterOrSystemType(type))
+                {
+                    Debug.LogError("DiceKingDemo: keyword binding references unknown die type '" + sourceKey + "'. Keyword explanations are disabled.");
+                    return false;
+                }
+
+                List<KeywordBindingConfig> bindings;
+                if (!loadedDieBindings.TryGetValue(type, out bindings))
+                {
+                    bindings = new List<KeywordBindingConfig>();
+                    loadedDieBindings[type] = bindings;
+                }
+                bindings.Add(binding);
+            }
+            else if (string.Equals(sourceKind, KeywordBindingSourceState, StringComparison.Ordinal))
+            {
+                if (!IsKnownKeywordState(sourceKey))
+                {
+                    Debug.LogError("DiceKingDemo: keyword binding references unknown state '" + sourceKey + "'. Keyword explanations are disabled.");
+                    return false;
+                }
+
+                List<KeywordBindingConfig> bindings;
+                if (!loadedStateBindings.TryGetValue(sourceKey, out bindings))
+                {
+                    bindings = new List<KeywordBindingConfig>();
+                    loadedStateBindings[sourceKey] = bindings;
+                }
+                bindings.Add(binding);
+            }
+            else
+            {
+                Debug.LogError("DiceKingDemo: keyword binding row " + (i + 1).ToString(CultureInfo.InvariantCulture) + " has an unsupported source kind. Keyword explanations are disabled.");
+                return false;
+            }
+        }
+
+        if (uniqueRows.Count == 0)
+        {
+            Debug.LogError("DiceKingDemo: keyword binding config contains no valid entries. Keyword explanations are disabled.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool ValidateKeywordTooltipCoverage(
+        Dictionary<string, KeywordGlossaryConfig> glossary,
+        Dictionary<DieType, List<KeywordBindingConfig>> dieBindings,
+        Dictionary<string, List<KeywordBindingConfig>> stateBindings)
+    {
+        bool valid = true;
+        HashSet<string> referencedKeywords = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (KeyValuePair<DieType, List<KeywordBindingConfig>> pair in dieBindings)
+        {
+            for (int i = 0; i < pair.Value.Count; i++)
+            {
+                referencedKeywords.Add(pair.Value[i].KeywordKey);
+            }
+        }
+        foreach (KeyValuePair<string, List<KeywordBindingConfig>> pair in stateBindings)
+        {
+            for (int i = 0; i < pair.Value.Count; i++)
+            {
+                referencedKeywords.Add(pair.Value[i].KeywordKey);
+            }
+        }
+
+        foreach (KeyValuePair<string, KeywordGlossaryConfig> pair in glossary)
+        {
+            if (!referencedKeywords.Contains(pair.Key))
+            {
+                Debug.LogError("DiceKingDemo: keyword glossary entry '" + pair.Key + "' has no binding.");
+                valid = false;
+            }
+        }
+
+        foreach (KeyValuePair<DieType, DiceTypeTooltipConfig> pair in diceTypeTooltipConfigs)
+        {
+            List<string> tokenKeys = ExtractKeywordTokenKeys(pair.Value.TooltipEffect);
+            for (int i = 0; i < tokenKeys.Count; i++)
+            {
+                string keywordKey = tokenKeys[i];
+                if (!glossary.ContainsKey(keywordKey))
+                {
+                    Debug.LogError("DiceKingDemo: tooltip for " + pair.Key + " references undefined keyword '" + keywordKey + "'.");
+                    valid = false;
+                    continue;
+                }
+
+                if (!HasKeywordBinding(dieBindings, pair.Key, keywordKey))
+                {
+                    Debug.LogError("DiceKingDemo: tooltip for " + pair.Key + " uses keyword '" + keywordKey + "' without a die binding.");
+                    valid = false;
+                }
+            }
+        }
+
+        return valid;
+    }
+
+    private static bool HasKeywordBinding(Dictionary<DieType, List<KeywordBindingConfig>> bindingsByType, DieType type, string keywordKey)
+    {
+        List<KeywordBindingConfig> bindings;
+        if (!bindingsByType.TryGetValue(type, out bindings))
+        {
+            return false;
+        }
+
+        for (int i = 0; i < bindings.Count; i++)
+        {
+            if (string.Equals(bindings[i].KeywordKey, keywordKey, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void SortKeywordBindings(List<KeywordBindingConfig> bindings)
+    {
+        bindings.Sort(delegate (KeywordBindingConfig left, KeywordBindingConfig right)
+        {
+            int order = left.DisplayOrder.CompareTo(right.DisplayOrder);
+            return order != 0 ? order : string.Compare(left.KeywordKey, right.KeywordKey, StringComparison.OrdinalIgnoreCase);
+        });
+    }
+
+    private static bool IsKnownKeywordState(string sourceKey)
+    {
+        return string.Equals(sourceKey, KeywordStateFeedStatus, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(sourceKey, KeywordStateDevourHistory, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(sourceKey, KeywordStateShellAttachment, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsValidKeywordKey(string key)
+    {
+        if (string.IsNullOrEmpty(key))
+        {
+            return false;
+        }
+
+        for (int i = 0; i < key.Length; i++)
+        {
+            char character = key[i];
+            if (!(character >= 'a' && character <= 'z')
+                && !(character >= '0' && character <= '9')
+                && character != '_')
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsValidTooltipAccentFamily(string family)
+    {
+        return string.Equals(family, "pig", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(family, "devil", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(family, "turtle", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(family, "pirate", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(family, "neutral", StringComparison.OrdinalIgnoreCase);
     }
 
     private void LoadAffixConfigs()
@@ -12580,6 +26569,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         for (int i = 0; i < values.Length; i++)
         {
             DieType type = (DieType)values.GetValue(i);
+            if (!IsCurrentRosterOrSystemType(type))
+            {
+                continue;
+            }
+
             marketDieConfigs[type] = DefaultMarketDieConfig(type);
         }
     }
@@ -12590,6 +26584,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         for (int i = 0; i < values.Length; i++)
         {
             DieType type = (DieType)values.GetValue(i);
+            if (!IsCurrentRosterOrSystemType(type))
+            {
+                continue;
+            }
+
             if (!marketDieConfigs.ContainsKey(type))
             {
                 marketDieConfigs[type] = DefaultMarketDieConfig(type);
@@ -12723,90 +26722,96 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             case DieType.Basic:
                 return new MarketDieConfig { Type = type, BuyPrice = 3, SellPrice = 1, Tier = "T0", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
-            case DieType.Odd:
-                return new MarketDieConfig { Type = type, BuyPrice = 5, SellPrice = 3, Tier = "T1", WeightChapter1To2 = 20, WeightChapter3To5 = 16, WeightChapter6To10 = 12 };
-            case DieType.Even:
-                return new MarketDieConfig { Type = type, BuyPrice = 5, SellPrice = 3, Tier = "T1", WeightChapter1To2 = 20, WeightChapter3To5 = 16, WeightChapter6To10 = 12 };
-            case DieType.LoneWitness:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
-            case DieType.Stamp:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 7, WeightChapter6To10 = 8 };
-            case DieType.HalfStep:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
-            case DieType.Track:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 7, WeightChapter6To10 = 8 };
-            case DieType.ParityNeighborDiff:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 10, WeightChapter3To5 = 12, WeightChapter6To10 = 10 };
-            case DieType.ParityNeighborSame:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 10, WeightChapter3To5 = 12, WeightChapter6To10 = 10 };
-            case DieType.ParityComplete:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 9, WeightChapter3To5 = 12, WeightChapter6To10 = 10 };
-            case DieType.ParityReview:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 11, WeightChapter6To10 = 10 };
-            case DieType.ParityFlipScore:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 0, WeightChapter3To5 = 11, WeightChapter6To10 = 10 };
-            case DieType.ParityHoldScore:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 0, WeightChapter3To5 = 10, WeightChapter6To10 = 10 };
-            case DieType.ParityTurner:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 8, WeightChapter6To10 = 10 };
-            case DieType.Piggy:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 3, Tier = "T1", WeightChapter1To2 = 18, WeightChapter3To5 = 13, WeightChapter6To10 = 8 };
-            case DieType.Turtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 10, WeightChapter3To5 = 10, WeightChapter6To10 = 10 };
-            case DieType.Shellsmith:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
-            case DieType.Nest:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 7 };
-            case DieType.SlowTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 7, WeightChapter6To10 = 8 };
-            case DieType.Double:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 8, WeightChapter6To10 = 9 };
-            case DieType.Tree:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
-            case DieType.Gardener:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
-            case DieType.Irrigation:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
-            case DieType.PointSeedTree:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 8 };
-            case DieType.PatternTree:
-                return new MarketDieConfig { Type = type, BuyPrice = 11, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
-            case DieType.CanopyTree:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
-            case DieType.RingTree:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 0, WeightChapter3To5 = 8, WeightChapter6To10 = 9 };
-            case DieType.FertilizerTree:
-                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 6, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 7, WeightChapter6To10 = 8 };
-            case DieType.PruningTree:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 8, WeightChapter6To10 = 9 };
-            case DieType.RootTree:
-                return new MarketDieConfig { Type = type, BuyPrice = 11, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 8, WeightChapter6To10 = 9 };
-            case DieType.Gambler:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 8 };
-            case DieType.Treasury:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 9, WeightChapter6To10 = 7 };
-            case DieType.Bribe:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
-            case DieType.Investment:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 7 };
-            case DieType.BountyGold:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 12, WeightChapter3To5 = 13, WeightChapter6To10 = 10 };
-            case DieType.TopGold:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 13, WeightChapter3To5 = 13, WeightChapter6To10 = 10 };
-            case DieType.HandTax:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 12, WeightChapter3To5 = 13, WeightChapter6To10 = 10 };
-            case DieType.Collection:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 12, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.CompoundInterest:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 9, WeightChapter6To10 = 8 };
-            case DieType.LeadTicket:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 0, WeightChapter3To5 = 10, WeightChapter6To10 = 10 };
-            case DieType.ShellTax:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 11, WeightChapter3To5 = 12, WeightChapter6To10 = 10 };
-            case DieType.CounterGold:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 12, WeightChapter3To5 = 12, WeightChapter6To10 = 10 };
-            case DieType.LumberGold:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.PigFarmer:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 16, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.MeatPig:
+                return new MarketDieConfig { Type = type, BuyPrice = 7, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.TradePig:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 12, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.SowPig:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 8 };
+            case DieType.ThreeLittlePigs:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 11, WeightChapter6To10 = 10 };
+            case DieType.GreedyPig:
+                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.FeedWholesaler:
+                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.Imp:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.Devourer:
+                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.Demon:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.DemonBat:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.AbyssSummon:
+                return new MarketDieConfig { Type = type, BuyPrice = 11, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 7, WeightChapter6To10 = 9 };
+            case DieType.RefreshPirate:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.PlunderPirate:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.CrewPirate:
+                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.PirateCaptain:
+                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 4, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
+            case DieType.TrainingPirate:
+                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.TreasurePirate:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 10, WeightChapter6To10 = 10 };
+            case DieType.RobberyPirate:
+                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 4, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
+            case DieType.PirateKing:
+                return new MarketDieConfig { Type = type, BuyPrice = 13, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 8 };
+            case DieType.BlackSailBat:
+                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
+            case DieType.PackTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.TributePig:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
+            case DieType.BlackMarketImp:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 8, WeightChapter6To10 = 9 };
+            case DieType.BloodPactCaptain:
+                return new MarketDieConfig { Type = type, BuyPrice = 13, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 8 };
+            case DieType.ClearancePig:
+                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.SupplyPig:
+                return new MarketDieConfig { Type = type, BuyPrice = 7, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 12, WeightChapter3To5 = 11, WeightChapter6To10 = 8 };
+            case DieType.SharedFeastDemonTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
+            case DieType.SafetyNetTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.Tribute:
+                return new MarketDieConfig { Type = type, BuyPrice = 1, SellPrice = 0, Tier = "T0", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
+            case DieType.MoneyTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.TinyTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.DoubleTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.LuckyTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 11, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
+            case DieType.MagnetTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.RallyTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 11, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
+            case DieType.LeaderTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 8 };
+            case DieType.Lightfang:
+                return new MarketDieConfig { Type = type, BuyPrice = 13, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 5, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
+            case DieType.Duet:
+                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 6, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
+            case DieType.Trigger:
+                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.Crown:
+                return new MarketDieConfig { Type = type, BuyPrice = 14, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 4, WeightChapter3To5 = 7, WeightChapter6To10 = 7 };
+            case DieType.Relief:
+                return new MarketDieConfig { Type = type, BuyPrice = 7, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.Airstrike:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.Pact:
+                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 10, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.Stitch:
+                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 10, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
         }
 
         return new MarketDieConfig { Type = DieType.Basic, BuyPrice = 3, SellPrice = 1, Tier = "T0", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
@@ -12923,10 +26928,10 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void BuildFallbackEncounters()
     {
         encounters.Clear();
-        encounters.Add(new Encounter("1-1", "1-1 柜台试投", 89, RuleKind.None, "无额外规则，检查基础骰袋。", false, 1, 1, 3, 1, 4));
-        encounters.Add(new Encounter("1-2", "1-2 账房抽查", 102, RuleKind.OddLedger, "奇数结果更有利，鼓励奇偶控制。", false, 1, 2, 3, 1, 4));
-        encounters.Add(new Encounter("1-3", "1-3 印章复核", 115, RuleKind.HandAudit, "三同、顺子等有效牌型额外 +2 分。", false, 1, 3, 3, 1, 4));
-        encounters.Add(new Encounter("1-boss", "1-boss 第1章总审", 130, RuleKind.DoubleJudge, "偶数 +1、奇数 -1；顺子额外 +4。", true, 1, 4, 3, 1, 4));
+        encounters.Add(new Encounter("1-1", "1-1 柜台试投", 14, RuleKind.None, "无额外规则，检查基础骰袋。", false, 1, 1, 3, 1, 4));
+        encounters.Add(new Encounter("1-2", "1-2 账房抽查", 18, RuleKind.OddLedger, "奇数结果更有利，鼓励奇偶控制。", false, 1, 2, 3, 1, 4));
+        encounters.Add(new Encounter("1-3", "1-3 印章复核", 19, RuleKind.None, "无额外规则，牌型已关闭。", false, 1, 3, 3, 1, 4));
+        encounters.Add(new Encounter("1-boss", "1-boss 第1章总审", 21, RuleKind.DoubleJudge, "偶数 +1、奇数 -1。", true, 1, 4, 3, 1, 4));
     }
 
     private Encounter CurrentEncounter()
@@ -13148,6 +27153,13 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private Die NewDie(string name, DieType type, int[] faces)
     {
+        if (!IsCurrentRosterOrSystemType(type))
+        {
+            type = DieType.Basic;
+            name = "基础骰";
+            faces = new int[] { 1, 2, 3, 4, 5, 6 };
+        }
+
         return new Die
         {
             Id = nextDieId++,
@@ -13159,10 +27171,19 @@ public sealed class DiceKingDemo : MonoBehaviour
             EffectiveValue = 0,
             Score = 0,
             Growth = 0,
+            FeedCount = 0,
+            FeedValue = 0,
+            LastDevourGain = 0,
+            LastDevourSource = string.Empty,
+            LastDevourTrigger = string.Empty,
+            InstanceSellValue = -1,
+            PigTemporaryScoreBonus = 0,
+            NeutralTemporaryScoreBonus = 0,
             TargetFace = 0,
             PatternTarget = TreePatternTarget.None,
             GamblerThreshold = 0,
             InvestmentGold = 0,
+            TurtleAttachments = new List<TurtleAttachment>(),
             LoneWitnessRerolled = false,
             LoneWitnessPreviousValue = 0,
             HalfStepBorrowed = false,
@@ -13190,10 +27211,19 @@ public sealed class DiceKingDemo : MonoBehaviour
             EffectiveValue = value,
             Score = 0,
             Growth = 0,
+            FeedCount = 0,
+            FeedValue = 0,
+            LastDevourGain = 0,
+            LastDevourSource = string.Empty,
+            LastDevourTrigger = string.Empty,
+            InstanceSellValue = -1,
+            PigTemporaryScoreBonus = 0,
+            NeutralTemporaryScoreBonus = 0,
             TargetFace = 0,
             PatternTarget = TreePatternTarget.None,
             GamblerThreshold = 0,
             InvestmentGold = 0,
+            TurtleAttachments = new List<TurtleAttachment>(),
             LoneWitnessRerolled = false,
             LoneWitnessPreviousValue = 0,
             HalfStepBorrowed = false,
@@ -13229,6 +27259,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         die.LastValue = 0;
         die.EffectiveValue = 0;
         die.Score = 0;
+        die.PigTemporaryScoreBonus = 0;
+        die.NeutralTemporaryScoreBonus = 0;
         die.TargetFace = 0;
         die.PatternTarget = TreePatternTarget.None;
         die.GamblerThreshold = 0;
@@ -13288,7 +27320,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         List<int> faces = new List<int>();
         for (int i = 0; i < die.Faces.Length; i++)
         {
-            int face = Mathf.Max(1, die.Faces[i]);
+            int face = die.Faces[i];
             if (!faces.Contains(face))
             {
                 faces.Add(face);
@@ -13340,6 +27372,8 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         switch (type)
         {
+            case DieType.Tribute:
+                return new int[] { 1, 1, 1, 1, 1, 1 };
             case DieType.Odd:
             case DieType.LoneWitness:
             case DieType.Stamp:
@@ -13359,8 +27393,82 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             case DieType.Piggy:
                 return "猪猪骰";
+            case DieType.PigFarmer:
+                return "养猪骰";
+            case DieType.MeatPig:
+                return "肉猪骰";
+            case DieType.TradePig:
+                return "贸易猪骰";
+            case DieType.SowPig:
+                return "母猪骰";
+            case DieType.ThreeLittlePigs:
+                return "三只小猪骰";
+            case DieType.GreedyPig:
+                return "贪吃猪骰";
+            case DieType.FeedWholesaler:
+                return "批发商骰";
+            case DieType.Imp:
+                return "小鬼骰";
+            case DieType.Devourer:
+                return "吞噬骰";
+            case DieType.Demon:
+                return "恶魔骰";
+            case DieType.DemonBat:
+                return "魔蝠骰";
+            case DieType.AbyssSummon:
+                return "深渊召唤";
+            case DieType.Tribute:
+                return "贡品骰";
             case DieType.Turtle:
                 return "龟龟骰";
+            case DieType.MoneyTurtle:
+                return "金钱龟骰";
+            case DieType.TinyTurtle:
+                return "小小龟骰";
+            case DieType.DoubleTurtle:
+                return "双倍龟骰";
+            case DieType.LuckyTurtle:
+                return "幸运龟骰";
+            case DieType.MagnetTurtle:
+                return "磁力龟骰";
+            case DieType.RallyTurtle:
+                return "呼朋唤友龟骰";
+            case DieType.LeaderTurtle:
+                return "首领龟骰";
+            case DieType.RefreshPirate:
+                return "刷新海盗骰";
+            case DieType.PlunderPirate:
+                return "劫掠海盗骰";
+            case DieType.CrewPirate:
+                return "人口海盗骰";
+            case DieType.PirateCaptain:
+                return "海盗头领骰";
+            case DieType.TrainingPirate:
+                return "练腿海盗骰";
+            case DieType.TreasurePirate:
+                return "财宝海盗骰";
+            case DieType.RobberyPirate:
+                return "抢劫海盗骰";
+            case DieType.PirateKing:
+                return "海贼王骰";
+            case DieType.BlackSailBat:
+                return "黑帆魔蝠骰";
+            case DieType.PackTurtle:
+                return "驮粮龟骰";
+            case DieType.TributePig:
+                return "贡猪骰";
+            case DieType.BlackMarketImp:
+                return "黑市小鬼骰";
+            case DieType.BloodPactCaptain:
+                return "血契船长骰";
+            case DieType.ClearancePig:
+                return "清仓猪骰";
+            case DieType.SupplyPig:
+                return "补给猪骰";
+            case DieType.SharedFeastDemonTurtle:
+                return "共食魔龟骰";
+            case DieType.SafetyNetTurtle:
+                return "托底龟骰";
             case DieType.Shellsmith:
                 return "壳匠骰";
             case DieType.Nest:
@@ -13441,6 +27549,22 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "柜台骰";
             case DieType.LumberGold:
                 return "伐木骰";
+            case DieType.Lightfang:
+                return "光牙骰";
+            case DieType.Duet:
+                return "二重唱骰";
+            case DieType.Trigger:
+                return "触发器骰";
+            case DieType.Crown:
+                return "王冠骰";
+            case DieType.Relief:
+                return "接济骰";
+            case DieType.Airstrike:
+                return "空袭骰";
+            case DieType.Pact:
+                return "盟约骰";
+            case DieType.Stitch:
+                return "缝合骰";
         }
 
         return "基础骰";
@@ -13462,9 +27586,19 @@ public sealed class DiceKingDemo : MonoBehaviour
         return material + " " + die.Name;
     }
 
+    private DiceMaterial ActiveDiceMaterial(Die die)
+    {
+        if (!DiceMaterialFeatureEnabled || die == null || die.Temporary)
+        {
+            return DiceMaterial.None;
+        }
+
+        return die.Material;
+    }
+
     private string MaterialDisplayName(DiceMaterial material)
     {
-        if (material == DiceMaterial.None)
+        if (!DiceMaterialFeatureEnabled || material == DiceMaterial.None)
         {
             return string.Empty;
         }
@@ -13480,7 +27614,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string MaterialShortRule(DiceMaterial material)
     {
-        if (material == DiceMaterial.None)
+        if (!DiceMaterialFeatureEnabled || material == DiceMaterial.None)
         {
             return string.Empty;
         }
@@ -13496,7 +27630,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private int MaterialPriceModifier(DiceMaterial material)
     {
-        if (material == DiceMaterial.None)
+        if (!DiceMaterialFeatureEnabled || material == DiceMaterial.None)
         {
             return 0;
         }
@@ -13516,8 +27650,82 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             case DieType.Piggy:
                 return "猪猪";
+            case DieType.PigFarmer:
+                return "养猪";
+            case DieType.MeatPig:
+                return "肉猪";
+            case DieType.TradePig:
+                return "贸易猪";
+            case DieType.SowPig:
+                return "母猪";
+            case DieType.ThreeLittlePigs:
+                return "三只小猪";
+            case DieType.GreedyPig:
+                return "贪吃猪";
+            case DieType.FeedWholesaler:
+                return "批发商";
+            case DieType.Imp:
+                return "小鬼";
+            case DieType.Devourer:
+                return "吞噬";
+            case DieType.Demon:
+                return "恶魔";
+            case DieType.DemonBat:
+                return "魔蝠";
+            case DieType.AbyssSummon:
+                return "深渊";
+            case DieType.Tribute:
+                return "贡品";
             case DieType.Turtle:
                 return "龟龟";
+            case DieType.MoneyTurtle:
+                return "金钱龟";
+            case DieType.TinyTurtle:
+                return "小小龟";
+            case DieType.DoubleTurtle:
+                return "双倍龟";
+            case DieType.LuckyTurtle:
+                return "幸运龟";
+            case DieType.MagnetTurtle:
+                return "磁力龟";
+            case DieType.RallyTurtle:
+                return "呼朋龟";
+            case DieType.LeaderTurtle:
+                return "首领龟";
+            case DieType.RefreshPirate:
+                return "刷新海盗";
+            case DieType.PlunderPirate:
+                return "劫掠海盗";
+            case DieType.CrewPirate:
+                return "人口海盗";
+            case DieType.PirateCaptain:
+                return "海盗头领";
+            case DieType.TrainingPirate:
+                return "练腿海盗";
+            case DieType.TreasurePirate:
+                return "财宝海盗";
+            case DieType.RobberyPirate:
+                return "抢劫海盗";
+            case DieType.PirateKing:
+                return "海贼王";
+            case DieType.BlackSailBat:
+                return "黑帆魔蝠";
+            case DieType.PackTurtle:
+                return "驮粮龟";
+            case DieType.TributePig:
+                return "贡猪";
+            case DieType.BlackMarketImp:
+                return "黑市小鬼";
+            case DieType.BloodPactCaptain:
+                return "血契船长";
+            case DieType.ClearancePig:
+                return "清仓猪";
+            case DieType.SupplyPig:
+                return "补给猪";
+            case DieType.SharedFeastDemonTurtle:
+                return "共食魔龟";
+            case DieType.SafetyNetTurtle:
+                return "托底龟";
             case DieType.Shellsmith:
                 return "壳匠";
             case DieType.Nest:
@@ -13598,6 +27806,22 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "柜台";
             case DieType.LumberGold:
                 return "伐木";
+            case DieType.Lightfang:
+                return "光牙";
+            case DieType.Duet:
+                return "二重唱";
+            case DieType.Trigger:
+                return "触发器";
+            case DieType.Crown:
+                return "王冠";
+            case DieType.Relief:
+                return "接济";
+            case DieType.Airstrike:
+                return "空袭";
+            case DieType.Pact:
+                return "盟约";
+            case DieType.Stitch:
+                return "缝合";
         }
 
         return "基础";
@@ -13612,7 +27836,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         if (!affixFeatureEnabled)
         {
-            return die == null ? string.Empty : MaterialDisplayName(die.Material);
+            return die == null ? string.Empty : TypeName(die.Type);
         }
 
         if (die == null || die.Temporary)
@@ -13697,6 +27921,126 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (die.Temporary)
         {
             return "临时";
+        }
+
+        if (ShouldHighlightRecentDevour(die))
+        {
+            return "吞+" + Mathf.Max(0, die.LastDevourGain);
+        }
+
+        string turtleAttachmentText = TurtleAttachmentShortText(die);
+        if (!string.IsNullOrEmpty(turtleAttachmentText))
+        {
+            return turtleAttachmentText;
+        }
+
+        switch (die.Type)
+        {
+            case DieType.BlackSailBat:
+                return "刷新吞旧货";
+            case DieType.PackTurtle:
+                return "饲2转基壳";
+            case DieType.TributePig:
+                return "卖出奉献";
+            case DieType.BlackMarketImp:
+                return currentMarketBlackMarketRefreshDiscount > 0 ? "下刷-" + currentMarketBlackMarketRefreshDiscount : "吞噬减刷";
+            case DieType.BloodPactCaptain:
+                return "满袋血契";
+            case DieType.ClearancePig:
+                string clearanceFeed = FeedStateShortText(die);
+                return string.IsNullOrEmpty(clearanceFeed) ? "空位吃料" : clearanceFeed;
+            case DieType.SupplyPig:
+                string supplyFeed = FeedStateShortText(die);
+                return string.IsNullOrEmpty(supplyFeed) ? "刷新补给" : supplyFeed;
+            case DieType.SharedFeastDemonTurtle:
+                return "吞噬分右邻";
+            case DieType.SafetyNetTurtle:
+                return "托底生壳";
+        }
+
+        if (IsV02NeutralFamilyMarketType(die.Type))
+        {
+            switch (die.Type)
+            {
+                case DieType.Lightfang:
+                    return "每家族面+2";
+                case DieType.Duet:
+                    return "复制左邻";
+                case DieType.Trigger:
+                    return "事件 +2";
+                case DieType.Crown:
+                    return "最高点均值";
+                case DieType.Relief:
+                    return "每家族 +1金";
+                case DieType.Airstrike:
+                    return "缺家族 +2";
+                case DieType.Pact:
+                    return "异族邻位 +2";
+                case DieType.Stitch:
+                    return "每家族 +2";
+            }
+        }
+
+        if (IsV02PigFamilyMarketType(die.Type))
+        {
+            if (die.Type == DieType.ThreeLittlePigs && die.PigTemporaryScoreBonus > 0)
+            {
+                return "三猪 +" + die.PigTemporaryScoreBonus;
+            }
+
+            string feedText = FeedStateShortText(die);
+            return string.IsNullOrEmpty(feedText) ? TypeName(die.Type) : feedText;
+        }
+
+        if (IsV02DevilFamilyMarketType(die.Type))
+        {
+            if (die.Type == DieType.Imp)
+            {
+                return "市场最低点";
+            }
+
+            if (die.Type == DieType.Devourer)
+            {
+                return "吞噬金";
+            }
+
+            if (die.Type == DieType.Demon)
+            {
+                return "本市底";
+            }
+
+            if (die.Type == DieType.DemonBat)
+            {
+                return "离市吞";
+            }
+
+            if (die.Type == DieType.AbyssSummon)
+            {
+                return "贡品";
+            }
+        }
+
+        if (IsV02PirateFamilyMarketType(die.Type))
+        {
+            switch (die.Type)
+            {
+                case DieType.RefreshPirate:
+                    return "刷新-1";
+                case DieType.PlunderPirate:
+                    return "劫左右";
+                case DieType.CrewPirate:
+                    return "招募 " + currentMarketPirateSellCount % 2 + "/2";
+                case DieType.PirateCaptain:
+                    return "海盗半价";
+                case DieType.TrainingPirate:
+                    return "买后练腿";
+                case DieType.TreasurePirate:
+                    return "读金币";
+                case DieType.RobberyPirate:
+                    return "离市抢";
+                case DieType.PirateKing:
+                    return "王财 x" + Mathf.Max(0, chapterGold) / 3;
+            }
         }
 
         if (die.Type == DieType.Piggy && die.TargetFace > 0)
@@ -13904,11 +28248,6 @@ public sealed class DiceKingDemo : MonoBehaviour
             return "慢壳链";
         }
 
-        if (IsTreeGrowthType(die.Type) && die.Growth > 0)
-        {
-            return "成长 " + die.Growth;
-        }
-
         return TypeName(die.Type);
     }
 
@@ -13916,10 +28255,88 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         switch (type)
         {
+            case DieType.Lightfang:
+                return new Color(0.88f, 0.72f, 0.34f);
+            case DieType.Duet:
+                return new Color(0.58f, 0.46f, 0.82f);
+            case DieType.Trigger:
+                return new Color(0.82f, 0.42f, 0.36f);
+            case DieType.Crown:
+                return new Color(0.86f, 0.66f, 0.22f);
+            case DieType.Relief:
+                return new Color(0.34f, 0.68f, 0.58f);
+            case DieType.Airstrike:
+                return new Color(0.34f, 0.58f, 0.78f);
+            case DieType.Pact:
+                return new Color(0.7f, 0.42f, 0.68f);
+            case DieType.Stitch:
+                return new Color(0.48f, 0.58f, 0.72f);
+            case DieType.BlackSailBat:
+                return new Color(0.28f, 0.38f, 0.54f);
+            case DieType.PackTurtle:
+                return new Color(0.62f, 0.62f, 0.34f);
+            case DieType.TributePig:
+                return new Color(0.72f, 0.38f, 0.38f);
+            case DieType.BlackMarketImp:
+                return new Color(0.42f, 0.34f, 0.58f);
+            case DieType.BloodPactCaptain:
+                return new Color(0.54f, 0.26f, 0.34f);
+            case DieType.ClearancePig:
+                return new Color(0.74f, 0.48f, 0.34f);
+            case DieType.SupplyPig:
+                return new Color(0.82f, 0.62f, 0.36f);
+            case DieType.SharedFeastDemonTurtle:
+                return new Color(0.34f, 0.5f, 0.52f);
+            case DieType.SafetyNetTurtle:
+                return new Color(0.5f, 0.66f, 0.42f);
             case DieType.Piggy:
                 return new Color(0.9f, 0.58f, 0.48f);
+            case DieType.PigFarmer:
+                return new Color(0.9f, 0.56f, 0.48f);
+            case DieType.MeatPig:
+                return new Color(0.82f, 0.48f, 0.42f);
+            case DieType.TradePig:
+                return new Color(0.88f, 0.62f, 0.36f);
+            case DieType.SowPig:
+                return new Color(0.92f, 0.6f, 0.58f);
+            case DieType.ThreeLittlePigs:
+                return new Color(0.94f, 0.68f, 0.46f);
+            case DieType.GreedyPig:
+                return new Color(0.78f, 0.44f, 0.48f);
+            case DieType.FeedWholesaler:
+                return new Color(0.76f, 0.58f, 0.34f);
             case DieType.Turtle:
                 return new Color(0.38f, 0.62f, 0.46f);
+            case DieType.MoneyTurtle:
+                return new Color(0.72f, 0.62f, 0.24f);
+            case DieType.TinyTurtle:
+                return new Color(0.42f, 0.7f, 0.5f);
+            case DieType.DoubleTurtle:
+                return new Color(0.58f, 0.68f, 0.32f);
+            case DieType.LuckyTurtle:
+                return new Color(0.36f, 0.66f, 0.62f);
+            case DieType.MagnetTurtle:
+                return new Color(0.32f, 0.58f, 0.7f);
+            case DieType.RallyTurtle:
+                return new Color(0.48f, 0.64f, 0.36f);
+            case DieType.LeaderTurtle:
+                return new Color(0.64f, 0.56f, 0.28f);
+            case DieType.RefreshPirate:
+                return new Color(0.28f, 0.62f, 0.64f);
+            case DieType.PlunderPirate:
+                return new Color(0.62f, 0.42f, 0.24f);
+            case DieType.CrewPirate:
+                return new Color(0.42f, 0.58f, 0.66f);
+            case DieType.PirateCaptain:
+                return new Color(0.78f, 0.58f, 0.24f);
+            case DieType.TrainingPirate:
+                return new Color(0.36f, 0.62f, 0.5f);
+            case DieType.TreasurePirate:
+                return new Color(0.88f, 0.68f, 0.22f);
+            case DieType.RobberyPirate:
+                return new Color(0.5f, 0.42f, 0.68f);
+            case DieType.PirateKing:
+                return new Color(0.86f, 0.5f, 0.18f);
             case DieType.Shellsmith:
                 return new Color(0.58f, 0.62f, 0.34f);
             case DieType.Nest:
@@ -14050,12 +28467,25 @@ public sealed class DiceKingDemo : MonoBehaviour
         return result.ToString();
     }
 
+    private string SignedDeltaText(int value)
+    {
+        return value >= 0 ? "+" + value : value.ToString();
+    }
+
     private Texture2D DieTypeIcon(DieType type)
     {
         LoadDieTypeIcons();
         Texture2D icon;
         dieTypeIconTextures.TryGetValue(type, out icon);
         return icon;
+    }
+
+    private Texture2D DieTypeActivityTexture(DieType type)
+    {
+        LoadDieTypeIcons();
+        Texture2D activity;
+        dieTypeActivityTextures.TryGetValue(type, out activity);
+        return activity;
     }
 
     private void LoadDieTypeIcons()
@@ -14067,24 +28497,64 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         dieTypeIconsLoaded = true;
         dieTypeIconTextures.Clear();
+        dieTypeActivityTextures.Clear();
         Array values = Enum.GetValues(typeof(DieType));
         for (int i = 0; i < values.Length; i++)
         {
             DieType type = (DieType)values.GetValue(i);
+            if (!IsCurrentRosterOrSystemType(type))
+            {
+                continue;
+            }
+
             string path = DiceTypeIconResourcePrefix + DieTypeIconFileName(type);
             Texture2D icon = Resources.Load<Texture2D>(path);
             if (icon == null)
             {
-                Debug.LogWarning("DiceKingDemo: dice type icon not found at Resources/" + path + ". Falling back to procedural die face.");
-                continue;
+                string fallbackPath = DiceTypeIconResourcePrefix + FallbackDieTypeIconFileName(type);
+                if (!string.Equals(path, fallbackPath, StringComparison.Ordinal))
+                {
+                    icon = Resources.Load<Texture2D>(fallbackPath);
+                }
+
+                if (icon == null)
+                {
+                    Debug.LogWarning("DiceKingDemo: dice type icon not found at Resources/" + path + ". Falling back to procedural die face.");
+                }
+                else
+                {
+                    Debug.LogWarning("DiceKingDemo: dedicated type core not found at Resources/" + path + ". Using " + fallbackPath + ".");
+                }
             }
 
-            dieTypeIconTextures[type] = icon;
+            if (icon != null)
+            {
+                dieTypeIconTextures[type] = icon;
+            }
+
+            if (HasDedicatedTypeCore(type))
+            {
+                string activityPath = DiceTypeIconResourcePrefix + DedicatedTypeCoreFileName(type) + "_activity";
+                Texture2D activity = Resources.Load<Texture2D>(activityPath);
+                if (activity != null)
+                {
+                    dieTypeActivityTextures[type] = activity;
+                }
+                else
+                {
+                    Debug.LogWarning("DiceKingDemo: type core activity mask not found at Resources/" + activityPath + ". Static identity remains available.");
+                }
+            }
         }
     }
 
     private void LoadDiceMaterialRenderMaterials()
     {
+        if (!DiceMaterialFeatureEnabled)
+        {
+            return;
+        }
+
         if (diceMaterialOverlayShader == null)
         {
             diceMaterialOverlayShader = Resources.Load<Shader>(DiceMaterialShaderResourcePath);
@@ -14123,95 +28593,169 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string DieTypeIconFileName(DieType type)
     {
+        string dedicated = DedicatedTypeCoreFileName(type);
+        return string.IsNullOrEmpty(dedicated) ? FallbackDieTypeIconFileName(type) : dedicated;
+    }
+
+    private static bool HasDedicatedTypeCore(DieType type)
+    {
+        return !string.IsNullOrEmpty(DedicatedTypeCoreFileName(type));
+    }
+
+    private static string DedicatedTypeCoreFileName(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.Basic: return "arcade_type_core_basic";
+            case DieType.PigFarmer: return "arcade_type_core_pig_farmer";
+            case DieType.MeatPig: return "arcade_type_core_meat_pig";
+            case DieType.TradePig: return "arcade_type_core_trade_pig";
+            case DieType.SowPig: return "arcade_type_core_sow_pig";
+            case DieType.ThreeLittlePigs: return "arcade_type_core_three_little_pigs";
+            case DieType.GreedyPig: return "arcade_type_core_greedy_pig";
+            case DieType.FeedWholesaler: return "arcade_type_core_feed_wholesaler";
+            case DieType.Imp: return "arcade_type_core_imp";
+            case DieType.Devourer: return "arcade_type_core_devourer";
+            case DieType.Demon: return "arcade_type_core_demon";
+            case DieType.DemonBat: return "arcade_type_core_demon_bat";
+            case DieType.AbyssSummon: return "arcade_type_core_abyss_summon";
+            case DieType.Tribute: return "arcade_type_core_tribute";
+            case DieType.MoneyTurtle: return "arcade_type_core_money_turtle";
+            case DieType.TinyTurtle: return "arcade_type_core_tiny_turtle";
+            case DieType.DoubleTurtle: return "arcade_type_core_double_turtle";
+            case DieType.LuckyTurtle: return "arcade_type_core_lucky_turtle";
+            case DieType.MagnetTurtle: return "arcade_type_core_magnet_turtle";
+            case DieType.RallyTurtle: return "arcade_type_core_rally_turtle";
+            case DieType.LeaderTurtle: return "arcade_type_core_leader_turtle";
+            case DieType.RefreshPirate: return "arcade_type_core_refresh_pirate";
+            case DieType.PlunderPirate: return "arcade_type_core_plunder_pirate";
+            case DieType.CrewPirate: return "arcade_type_core_crew_pirate";
+            case DieType.PirateCaptain: return "arcade_type_core_pirate_captain";
+            case DieType.TrainingPirate: return "arcade_type_core_training_pirate";
+            case DieType.TreasurePirate: return "arcade_type_core_treasure_pirate";
+            case DieType.RobberyPirate: return "arcade_type_core_robbery_pirate";
+            case DieType.PirateKing: return "arcade_type_core_pirate_king";
+            case DieType.Lightfang: return "arcade_type_core_lightfang";
+            case DieType.Duet: return "arcade_type_core_duet";
+            case DieType.Trigger: return "arcade_type_core_trigger";
+            case DieType.Crown: return "arcade_type_core_crown";
+            case DieType.Relief: return "arcade_type_core_relief";
+            case DieType.Airstrike: return "arcade_type_core_airstrike";
+            case DieType.Pact: return "arcade_type_core_pact";
+            case DieType.Stitch: return "arcade_type_core_stitch";
+        }
+
+        return string.Empty;
+    }
+
+    private static string FallbackDieTypeIconFileName(DieType type)
+    {
         switch (type)
         {
             case DieType.Piggy:
+            case DieType.PigFarmer:
+            case DieType.MeatPig:
+            case DieType.TradePig:
+            case DieType.SowPig:
+            case DieType.ThreeLittlePigs:
+            case DieType.GreedyPig:
+            case DieType.FeedWholesaler:
+            case DieType.TributePig:
+            case DieType.ClearancePig:
+            case DieType.SupplyPig:
                 return "piggy_die_icon";
+            case DieType.Imp:
+            case DieType.BlackMarketImp:
+            case DieType.Devourer:
+            case DieType.Demon:
+            case DieType.DemonBat:
+            case DieType.BlackSailBat:
+            case DieType.AbyssSummon:
+            case DieType.Tribute:
+                return "basic_die_icon";
             case DieType.Turtle:
+            case DieType.MoneyTurtle:
+            case DieType.TinyTurtle:
+            case DieType.DoubleTurtle:
+            case DieType.LuckyTurtle:
+            case DieType.MagnetTurtle:
+            case DieType.RallyTurtle:
+            case DieType.LeaderTurtle:
+            case DieType.PackTurtle:
+            case DieType.SharedFeastDemonTurtle:
+            case DieType.SafetyNetTurtle:
                 return "turtle_die_icon";
-            case DieType.Shellsmith:
-                return "shellsmith_die_icon";
-            case DieType.Nest:
-                return "nest_die_icon";
-            case DieType.SlowTurtle:
-                return "slow_turtle_die_icon";
-            case DieType.Double:
-                return "double_die_icon";
-            case DieType.Odd:
-                return "odd_die_icon";
-            case DieType.Even:
-                return "even_die_icon";
-            case DieType.LoneWitness:
-                return "lone_witness_die_icon";
-            case DieType.Stamp:
-                return "stamp_die_icon";
-            case DieType.HalfStep:
-                return "half_step_die_icon";
-            case DieType.Track:
-                return "track_die_icon";
-            case DieType.ParityNeighborDiff:
-                return "parity_neighbor_diff_die_icon";
-            case DieType.ParityNeighborSame:
-                return "parity_neighbor_same_die_icon";
-            case DieType.ParityComplete:
-                return "parity_complete_die_icon";
-            case DieType.ParityReview:
-                return "parity_review_die_icon";
-            case DieType.ParityFlipScore:
-                return "parity_flip_score_die_icon";
-            case DieType.ParityHoldScore:
-                return "parity_hold_score_die_icon";
-            case DieType.ParityTurner:
-                return "parity_turner_die_icon";
-            case DieType.Tree:
-                return "tree_die_icon";
-            case DieType.Gardener:
-                return "gardener_die_icon";
-            case DieType.Irrigation:
-                return "irrigation_die_icon";
-            case DieType.PointSeedTree:
-                return "point_seed_tree_die_icon";
-            case DieType.PatternTree:
-                return "pattern_tree_die_icon";
-            case DieType.CanopyTree:
-                return "canopy_tree_die_icon";
-            case DieType.RingTree:
-                return "ring_tree_die_icon";
-            case DieType.FertilizerTree:
-                return "fertilizer_tree_die_icon";
-            case DieType.PruningTree:
-                return "pruning_tree_die_icon";
-            case DieType.RootTree:
-                return "root_tree_die_icon";
-            case DieType.Gambler:
-                return "gambler_die_icon";
-            case DieType.Treasury:
-                return "treasury_die_icon";
-            case DieType.Bribe:
-                return "bribe_die_icon";
-            case DieType.Investment:
-                return "investment_die_icon";
-            case DieType.BountyGold:
-                return "bounty_gold_die_icon";
-            case DieType.TopGold:
-                return "top_gold_die_icon";
-            case DieType.HandTax:
-                return "hand_tax_die_icon";
-            case DieType.Collection:
-                return "collection_die_icon";
-            case DieType.CompoundInterest:
-                return "compound_interest_die_icon";
-            case DieType.LeadTicket:
-                return "lead_ticket_die_icon";
-            case DieType.ShellTax:
-                return "shell_tax_die_icon";
-            case DieType.CounterGold:
-                return "counter_gold_die_icon";
-            case DieType.LumberGold:
-                return "lumber_gold_die_icon";
+            case DieType.RefreshPirate:
+            case DieType.PlunderPirate:
+            case DieType.CrewPirate:
+            case DieType.PirateCaptain:
+            case DieType.TrainingPirate:
+            case DieType.TreasurePirate:
+            case DieType.RobberyPirate:
+            case DieType.PirateKing:
+            case DieType.BloodPactCaptain:
+            case DieType.Lightfang:
+            case DieType.Duet:
+            case DieType.Trigger:
+            case DieType.Crown:
+            case DieType.Relief:
+            case DieType.Airstrike:
+            case DieType.Pact:
+            case DieType.Stitch:
+                return "basic_die_icon";
         }
 
         return "basic_die_icon";
+    }
+
+    private static TypeCoreIdleMotion TypeCoreIdleMotionForType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.PlunderPirate:
+            case DieType.Pact:
+                return TypeCoreIdleMotion.DualPulse;
+            case DieType.MeatPig:
+            case DieType.TreasurePirate:
+            case DieType.PirateKing:
+            case DieType.Stitch:
+                return TypeCoreIdleMotion.Transmission;
+            case DieType.MoneyTurtle:
+            case DieType.FeedWholesaler:
+            case DieType.Imp:
+            case DieType.Devourer:
+            case DieType.Demon:
+            case DieType.LuckyTurtle:
+            case DieType.RefreshPirate:
+            case DieType.PirateCaptain:
+            case DieType.TrainingPirate:
+            case DieType.Trigger:
+            case DieType.Airstrike:
+                return TypeCoreIdleMotion.Click;
+            case DieType.ThreeLittlePigs:
+            case DieType.GreedyPig:
+            case DieType.DemonBat:
+            case DieType.MagnetTurtle:
+            case DieType.RallyTurtle:
+            case DieType.RobberyPirate:
+            case DieType.Crown:
+            case DieType.Relief:
+                return TypeCoreIdleMotion.Intake;
+            case DieType.PigFarmer:
+            case DieType.TradePig:
+            case DieType.SowPig:
+            case DieType.Lightfang:
+                return TypeCoreIdleMotion.Output;
+            case DieType.AbyssSummon:
+            case DieType.TinyTurtle:
+            case DieType.DoubleTurtle:
+            case DieType.LeaderTurtle:
+            case DieType.CrewPirate:
+            case DieType.Duet:
+                return TypeCoreIdleMotion.Echo;
+        }
+
+        return TypeCoreIdleMotion.Stable;
     }
 
     private void EnsureGui()
@@ -14241,6 +28785,8 @@ public sealed class DiceKingDemo : MonoBehaviour
             runtimeDieFaceBaseTexture = Resources.Load<Texture2D>(RuntimeDieFaceBaseResourcePath);
         }
 
+        LoadMainMenuTextures();
+        LoadMainGameTextures();
         LoadDiceRollTextures();
         LoadUiTextures();
         LoadTooltipUiTextures();
@@ -14297,6 +28843,95 @@ public sealed class DiceKingDemo : MonoBehaviour
         disabledButtonLabelStyle.alignment = TextAnchor.MiddleCenter;
     }
 
+    private void LoadMainMenuTextures()
+    {
+        if (mainMenuTexturesLoadAttempted)
+        {
+            return;
+        }
+
+        mainMenuTexturesLoadAttempted = true;
+        mainMenuLampOnTexture = Resources.Load<Texture2D>(MainMenuLampOnResourcePath);
+        mainMenuLampOffTexture = Resources.Load<Texture2D>(MainMenuLampOffResourcePath);
+        mainMenuLampGlowTexture = Resources.Load<Texture2D>(MainMenuLampGlowResourcePath);
+        mainMenuLampCoreTexture = Resources.Load<Texture2D>(MainMenuLampCoreResourcePath);
+        mainMenuWindowCleanPatchTexture = Resources.Load<Texture2D>(MainMenuWindowCleanPatchResourcePath);
+        mainMenuMarqueeOffTexture = Resources.Load<Texture2D>(MainMenuMarqueeOffResourcePath);
+        mainMenuMarqueeGlowTexture = Resources.Load<Texture2D>(MainMenuMarqueeGlowResourcePath);
+        if (mainMenuLampOnTexture == null)
+        {
+            Debug.LogWarning("DiceKingDemo: new arcade main menu art is missing. Falling back to the legacy main menu.");
+        }
+        else if (mainMenuLampOffTexture == null)
+        {
+            Debug.LogWarning("DiceKingDemo: arcade main menu lamp-off layer is missing. The new menu remains usable with the lamp held on.");
+        }
+
+        if (mainMenuLampOnTexture != null && mainMenuWindowCleanPatchTexture == null)
+        {
+            Debug.LogWarning("DiceKingDemo: clean main-menu window patch is missing. Procedural rain is disabled to avoid drawing over baked window artifacts.");
+        }
+
+        if (mainMenuLampOnTexture != null && mainMenuMarqueeOffTexture == null)
+        {
+            Debug.LogWarning("DiceKingDemo: DICE KING marquee dim layer is missing. The title remains safely held at its baked full-bright state.");
+        }
+        else if (mainMenuLampOnTexture != null && mainMenuMarqueeGlowTexture == null)
+        {
+            Debug.LogWarning("DiceKingDemo: DICE KING marquee glow layer is missing. Brownout timing remains available without relight bloom.");
+        }
+    }
+
+    private void LoadMainGameTextures()
+    {
+        if (mainGameTexturesLoadAttempted)
+        {
+            return;
+        }
+
+        mainGameTexturesLoadAttempted = true;
+        mainGameCommonBaseTexture = Resources.Load<Texture2D>(MainGameCommonBaseResourcePath);
+        mainGameNeutralShellTexture = Resources.Load<Texture2D>(MainGameNeutralShellResourcePath);
+        mainGamePigShellTexture = Resources.Load<Texture2D>(MainGamePigShellResourcePath);
+        mainGameTurtleShellTexture = Resources.Load<Texture2D>(MainGameTurtleShellResourcePath);
+        mainGameDevilShellTexture = Resources.Load<Texture2D>(MainGameDevilShellResourcePath);
+        mainGamePirateShellTexture = Resources.Load<Texture2D>(MainGamePirateShellResourcePath);
+        marketCommonBaseTexture = Resources.Load<Texture2D>(MarketCommonBaseResourcePath);
+        mainGameLedFont = MainGameLedFont.LoadFromResources();
+        physicalKeyLabelFont = Resources.Load<Font>(PhysicalKeyLabelFontResourcePath);
+
+        if (mainGameCommonBaseTexture == null)
+        {
+            Debug.LogWarning("DiceKingDemo: main-game arcade clean plate is missing. Falling back to the legacy run UI.");
+            return;
+        }
+
+        if (mainGameNeutralShellTexture == null)
+        {
+            Debug.LogWarning("DiceKingDemo: neutral main-game die shell is missing. The arcade base remains active and dice fall back to the legacy visuals.");
+        }
+
+        if (mainGameLedFont == null || !mainGameLedFont.IsReady)
+        {
+            Debug.LogWarning("DiceKingDemo: global LED font atlas, glyph map, named-style contract, semantic-role contract, or same-grade brightness contract is missing or invalid. Dynamic copy falls back to the smooth system font and must fail visual validation.");
+        }
+
+        if (physicalKeyLabelFont == null)
+        {
+            Debug.LogWarning("DiceKingDemo: approved physical-key label font is missing. Light market keys fall back to the UI font and must fail visual validation.");
+        }
+
+        if (mainGamePigShellTexture == null || mainGameTurtleShellTexture == null || mainGameDevilShellTexture == null || mainGamePirateShellTexture == null)
+        {
+            Debug.LogWarning("DiceKingDemo: one or more family die shells are missing. Missing families fall back to the neutral shell.");
+        }
+
+        if (marketCommonBaseTexture == null)
+        {
+            Debug.LogWarning("DiceKingDemo: inter-stage market clean plate is missing. Falling back to the legacy market UI.");
+        }
+    }
+
     private void LoadDiceRollTextures()
     {
         if (diceRollReadyTexture == null)
@@ -14351,6 +28986,15 @@ public sealed class DiceKingDemo : MonoBehaviour
             tooltipLabelChipBlueTexture = Resources.Load<Texture2D>(TooltipUiResourcePrefix + "ui_tooltip_label_chip_blue");
             tooltipLabelChipGreenTexture = Resources.Load<Texture2D>(TooltipUiResourcePrefix + "ui_tooltip_label_chip_green");
             tooltipFaceCellTexture = Resources.Load<Texture2D>(TooltipUiResourcePrefix + "ui_tooltip_face_cell");
+        }
+
+        if (tooltipArcadePanelShortTexture == null)
+        {
+            tooltipArcadePanelShortTexture = Resources.Load<Texture2D>(TooltipUiResourcePrefix + "ui_tooltip_arcade_panel_short");
+            tooltipArcadePanelMediumTexture = Resources.Load<Texture2D>(TooltipUiResourcePrefix + "ui_tooltip_arcade_panel_medium");
+            tooltipArcadePanelTallTexture = Resources.Load<Texture2D>(TooltipUiResourcePrefix + "ui_tooltip_arcade_panel_tall");
+            tooltipArcadeFaceCellTexture = Resources.Load<Texture2D>(TooltipUiResourcePrefix + "ui_tooltip_arcade_face_cell");
+            tooltipArcadeTypeCoreFrameTexture = Resources.Load<Texture2D>(TooltipUiResourcePrefix + "ui_tooltip_arcade_type_core_frame");
         }
     }
 

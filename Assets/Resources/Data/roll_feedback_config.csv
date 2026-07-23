@@ -1,13 +1,14 @@
 key,value,comment
 start_response_time,0.15,起摇响应时间
-input_window_duration,1.35,加力窗口时长
+base_spin_duration,0.56,无输入也会完整播放的基础高速滚动时长
+input_window_duration,0,可选加力窗口时长，首版关闭
 input_debounce,0.06,输入去抖
 max_impulse_count,8,有效冲量上限
 base_power,0.45,起摇基础强度
 impulse_power,0.18,单次冲量强度
 max_power,1.75,最大表现强度
 power_decay_per_second,0.22,摇晃阶段自然衰减
-stop_duration,0.90,停转显点时长
+stop_duration,0.66,减速与六槽错峰停靠总时长
 stop_min_power,0.02,回落最低强度
 expired_prompt_duration,0.12,超时提示闪烁时长
 cup_x_amplitude,32,骰盅横向振幅

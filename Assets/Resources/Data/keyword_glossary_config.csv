@@ -1,0 +1,7 @@
+keyword_key,display_name,explanation,accent_family,default_order,show_explanation
+feed,喂养,每 1 次喂养都会使卖价 +1，并按当前喂养值永久提高这颗骰结算时的最低点；六个骰面本身不变。,pig,10,1
+market_floor,市场最低点,,,20,0
+devour,吞噬,移除一颗来源骰，并把它当前六个面的平均值（向下取整，至少 +1）永久加到规则指定骰的全部六面。,devil,30,1
+shell,化壳,离开市场时，龟龟只会化壳到后一个位置的非龟骰；自身离开骰袋，把六面平均值（向下取整，至少 +1）永久加给对方，并保留效果与卖价。,turtle,40,1
+family,家族,,,50,0
+dual_family,双阵营,,,60,0

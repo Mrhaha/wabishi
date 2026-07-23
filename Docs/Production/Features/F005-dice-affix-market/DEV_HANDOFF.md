@@ -1,7 +1,7 @@
 # F005 程序交接
 
 状态：已实现待 Unity 验证
-功能：F005 骰子词缀与商店改造道具
+功能：F005 骰子词缀与市场改造道具
 关联主文档：PROJECT_CONTEXT.md、GAME_FLOW.md、DICE_ARCHETYPES.md
 实现事实来源：Assets/Scripts/DiceKingDemo.cs
 最后更新：2026-06-11
@@ -13,7 +13,7 @@
 - 首批改造道具：`加印石 / 剥印石 / 换印石`。
 - 三类道具均为全随机，且必须遵守槽位上限和同家族不重复。
 - 三类道具不强制购买后立即使用；购买后可持有，使用入口只在市场阶段开放。
-- 首版商店不能刷出自带词缀的成品骰。
+- 首版市场不能刷出自带词缀的成品骰。
 - F005 取消本关账本概念，金币来源按左到右单向流式钱包结算。
 - 猪猪骰、鎏印材质和所有旧账本金币源必须复查并统一迁移为直接进入钱包。
 - 金币后缀每次出手计算一次，同一条后缀在一次出手中最多触发一次。
@@ -25,7 +25,7 @@
 在当前 Unity 原型中接入一版可玩的骰子词缀系统：
 
 1. 骰子可以保存和展示词缀实例。
-2. 商店可以刷出和出售三类改造道具。
+2. 市场可以刷出和出售三类改造道具。
 3. 玩家可以持有三类改造道具，并且只能在市场阶段选择目标骰随机改造。
 4. 首版启用词缀能参与预览和真实结算。
 5. 金币来源按左到右顺序直接进入钱包，并可被后续对象读取或消费。
@@ -54,7 +54,7 @@
 | 升级存档 | Assets/Scripts/DiceKingDemo.cs | 词缀实例 | `DiceData` 写入词缀 key 和 T 阶；旧版本运行记录处理明确 | 已实现待 Unity 验证 |
 | 新增改造道具配置 | Assets/Resources/Data/dice_crafting_item_config.csv | F005 道具规则 | 能配置价格、章节权重、道具类型 | 已实现待 Unity 验证 |
 | 新增改造道具持有状态 | Assets/Scripts/DiceKingDemo.cs | F005-01 | 能保存和读取三类道具数量，且只在市场阶段开放使用 | 已实现待 Unity 验证 |
-| 接入商店道具货架 | Assets/Scripts/DiceKingDemo.cs | 改造道具配置 | 市场能出现三类道具并购买 | 已实现待 Unity 验证 |
+| 接入市场道具货架 | Assets/Scripts/DiceKingDemo.cs | 改造道具配置 | 市场能出现三类道具并购买 | 已实现待 Unity 验证 |
 | 实现市场阶段目标选择 | Assets/Scripts/DiceKingDemo.cs | UI 规格 | 不合法目标不可选且不消耗道具 | 已实现待 Unity 验证 |
 | 实现三类随机改造 | Assets/Scripts/DiceKingDemo.cs | 词缀池和道具 | 添加、删除、替换符合规则 | 已实现待 Unity 验证 |
 | 接入词缀预览 | Assets/Scripts/DiceKingDemo.cs | 结算路径 | 结果预览显示词缀影响 | 已实现待 Unity 验证 |
@@ -152,7 +152,7 @@
 | 文档 | 是否需要更新 | 已确认来源 |
 |---|---|---|
 | PROJECT_CONTEXT.md | 实现完成后需要 | F005 已确认规则 |
-| GAME_FLOW.md | 实现完成后需要 | 流式钱包、商店道具、存档版本 |
+| GAME_FLOW.md | 实现完成后需要 | 流式钱包、市场道具、存档版本 |
 | DICE_ARCHETYPES.md | 实现完成后需要 | 猪猪、鎏印、金币路线边界迁移 |
 | ART_ASSETS.md | 已更新 | 三类道具图标 |
 | Docs/DesignDialogues/F005-dice-affix-market.md | 生产包创建和实现后需要 | 生产包路径、状态 |

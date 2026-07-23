@@ -1,6 +1,6 @@
 # F009 程序交接
 
-状态：已接入统一资源首版，待运行验证
+状态：摇骰 V4R6 与结算 V6B-R5 已完成 Unity 首版接入；来源 / 回环触发语义修正已通过 Unity 2019.4.33 编译与双分辨率自动运行验证，待用户连续实机回归
 功能：F009 骰子过程动画表现
 关联主文档：PROJECT_CONTEXT.md、GAME_FLOW.md
 实现事实来源：Assets/Scripts/DiceKingDemo.cs
@@ -15,6 +15,43 @@
 ## 实现目标
 
 在当前单文件原型中新增或封装一层只读骰子视觉表现，让主流程能播放入场、固定槽位内序列帧旋转、左到右停转显点和结算点名。该层读取当前 `dice`、`rollPhase`、真实骰面、槽位顺序、`scoringDice`、`SettlementDisplayEvent` 和 `RunScoreCounterState` 相关展示状态，但不拥有玩法结果。
+
+## V5 接入前置结论
+
+V5R2 不再沿用 V4 的 `UnderTrayCharge`、槽间电流或贯穿骰列扫描，也不允许 V5R1 的实体骰离槽 / 撞塔 / 回程。未来实现保持六骰原槽绘制，只为当前骰叠加低幅来源聚焦，并生成一枚小型积分光晕直接进入左侧本关得分 / 积分塔；积分塔是唯一全局计分反馈锚点。
+
+当前代码事实与目标流程仍有三处明确差异，本轮不修改代码：
+
+1. `Assets/Resources/Data/roll_feedback_config.csv` 的 `input_window_duration` 当前仍为 `1.35`，目标首版值为 `0`。
+2. `DiceKingDemo.cs` 当前仍在 `ResultDecision` 等待输入后调用 `BeginSettle()`，目标是结果锁定后自动交接，不保留第二次主动结算。
+3. `AddSettlementSlotEvent()` 当前对 `ValueDelta` 使用 `Mathf.Max(0, valueDelta)`，会吞掉负贡献；V5 需要带符号展示值才能正确表现扣分包。
+
+### 未来展示数据合同
+
+建议新增只读的“物理槽贡献包”视图，不改变真实结算：
+
+- `SourceSlotIndex`：来源物理槽。
+- `SourceDieId`：来源实体骰。
+- `SignedContribution`：本槽聚合后的带符号贡献。
+- `ProgressScoreAfterImpact`：命中积分塔后的真实累计分。
+- `LocalChainCount`：本槽局部连锁数量，只用于包体密度，不逐事件发弹丸。
+- `IncludesTemporaryScore`：是否折入临时骰 / 附属得分。
+- `LocalImpactWeight01`：由 `abs(SignedContribution)` 相对可配置关卡参考量，经 `sqrt` / `log` 一类压缩曲线并钳制到 `0..1`；必须保持同手内真实贡献强弱顺序，不显示给玩家。
+- `FinalHandStrengthTier` / `FinalHandStrength01`：按最终已提交总分计算的整手五档与档内连续值，只驱动积分塔最终负载；不得反向覆盖单骰重量。
+- `CrossesTarget`：本包是否首次跨过目标，只触发一次目标锁扣。
+
+聚合规则必须以当前物理槽为单位：当前槽的点数、类型效果、遭遇修正和可归属临时得分合成一个包；本槽局部连锁清空后再提交。临时骰没有可靠来源时应阻塞 V5 正式接入，不能退回逐临时骰弹丸或新增托盘。
+
+### 未来表现状态
+
+- `SourceFocus`：当前骰保持原槽，只叠加 `40–60ms` 的紧凑边缘、骰面短亮和接触影收紧。
+- `HaloCondense`：用约 `50–80ms` 在当前骰面上方凝成小型积分光晕。
+- `HaloFlight`：单枚光晕约 `100–140ms` 飞向积分塔，只保留贴身短残影。
+- `ScoreTowerImpact`：积分塔约 `100–160ms` 吸收和回弹；幅度读取 `LocalImpactWeight01`。
+- `TowerAfterglow`：余辉与下一骰来源聚焦交叠 `60–80ms`。
+- `CriticalImpact`：只在积分塔区域执行预压、主击、余震和恢复；不得横扫骰列。
+
+同屏积分光晕上限固定为 `1`。下一骰来源聚焦可以和上一击余辉重叠，但下一枚光晕必须等上一枚被积分塔吸收后再生成，避免交叉飞行重新形成杂乱网络。
 
 ## 已确认行为
 
@@ -37,6 +74,18 @@
 | 接入结算点名 | Assets/Scripts/DiceKingDemo.cs | `SettlementDisplayEvent`、`scoringDice` | 当前骰高亮 / 轻抬与左侧计分同步 | 已实现待运行验证 |
 | 实现回退开关 | Assets/Scripts/DiceKingDemo.cs 或调试配置 | 当前 2D 绘制路径 | 关闭 F009 后主流程仍可玩 | 已实现待运行验证 |
 | 验证不侵入规则 | 代码检查 / Play Mode | `ScoreDice()`、钱包、成长、临时小骰 | 无重复计分、无重复入账、无存档变化 | 静态已检查，运行待验证 |
+
+V5 / V6 追加任务已按用户确认和 Unity 接入授权执行；以下状态覆盖早期暂停口径：
+
+| 任务 | 文件 / 数据 | 关键验收 | 状态 |
+|---|---|---|---|
+| 取消第二次主动结算并将加力默认值改为 `0` | `DiceKingDemo.cs`、`roll_feedback_config.csv` | 一次 `Space` 后自动完成滚动、停靠和结算；基础滚动保留 `0.56s` | 已完成并验证 |
+| 生成物理槽贡献包视图 | `DiceKingDemo.cs` | 六个物理槽各至多一个包，临时分可归属，负分不丢失 | 已完成 |
+| 接入单向积分光晕 | 展示层 | 骰子本体原位；轨迹不连接骰子；同屏最多一枚，只命中积分塔 | 已完成 |
+| 接入积分塔五档承击 | 展示层 / 表现配置 | 五档隐藏、连续插值；暴击只在积分塔产生一次主峰 | 已完成首版 |
+| 接入实体骰离槽直击与回程 | 展示层 / 表现配置 | V5R1 已退回，不得实现 | 取消 |
+| 接入单骰连续重量 | 展示层 / 表现配置 | 强弱顺序与真实贡献一致；局部峰值不冒充整手暴击 | 已完成 |
+| 双分辨率与来源 / 回环验证 | Play Mode / 截图 | `1280×720 / 1920×1080`，覆盖普通触发、再触发和跨槽响应 | 已完成自动验证，连续实机待回归 |
 
 ## 代码影响
 
@@ -143,7 +192,7 @@
 2026-06-16：
 
 - 已按用户确认的三阶段统一方向替换运行资源：`Ready` / 重置阶段优先读取 `Art/DiceRoll/f009_unified_ready_die_256`，`Shaking` 阶段优先读取 `Art/DiceRoll/f009_unified_spin_loop_strip_24f_256`，`Stopping` 阶段优先读取 `Art/DiceRoll/f009_unified_spin_stop_strip_8f_256`，`ResultDecision` 和 `Scoring` 的 1 到 6 点结果优先读取 `Art/DiceFaces/f009_unified_result_die_faces_6x256`。
-- `DiceKingDemo.cs` 保留旧桌面摩擦 strip 作为 `Shaking` / `Stopping` 资源缺失时的回退；`7+` 点结果继续回退到程序点阵，避免成长骰高点数无法显示。
+- `DiceKingDemo.cs` 保留旧桌面摩擦 strip 作为 `Shaking` / `Stopping` 资源缺失时的回退；`7+` 点结果直接在运行时骰面底图上显示居中数字，避免成长骰高点数无法读清。
 - `DrawReadyDieToken()` 改为优先绘制统一待机骰，非基础骰叠加小类型标记，不恢复外框或槽位数字。
 - `DrawDiceSequenceFrame()` 改为在结果可见且点数为 1 到 6 时优先绘制统一结果骰面，再叠加原有类型保底标记；不改变停转吸附、出千、结算或分数来源。
 - 已新增运行时资源和 `.meta`，并同步 `ART_ASSETS.md`、`PROJECT_CONTEXT.md`、`GAME_FLOW.md` 和 F009 包文档。
@@ -158,4 +207,27 @@
 
 ## 阻塞项
 
-无硬阻塞。当前阻塞在运行验收：需要 Unity Play Mode、录屏和 `1280x720` / `1920x1080` 截图确认遮挡、节奏和可读性。
+V5R2 新接入阻塞于用户对“原槽聚焦 + 积分光晕入塔 + 单骰连续贡献重量”静态板及后续动态样片的确认。确认前不得修改 `input_window_duration`、主动结算状态机、展示事件结构或运行资源。进入实现后还必须先解决带符号贡献、临时骰来源聚合、`LocalImpactWeight01` 参考量和光晕层绘制所有权；否则不能正确覆盖负分、附属得分和六骰身份边界。旧统一资源首版的运行验收仍保留，但不能替代 V5R2 的新视觉门禁。
+
+## 2026-07-21 V4R6 摇骰实现记录
+
+本节只解除摇骰分支的旧暂停条件；结算 V5 / V6 视觉仍保持独立门禁。
+
+- `DiceKingDemo.DrawDiceProcessToken()` 在 F021 主流程内直接把 `Shaking / Stopping` 路由到 `DrawArcadeRunFaceReelDie()`，不再对 `128×128` 物理槽应用旧 `DiceVisualAnimatedRect()`、整骰旋转矩阵或类型档案速度。
+- `DrawArcadeRunFaceReelDie()` 先绘制现有家族壳与固定接触影，再用 `GUI.BeginGroup(reelWindow)` 裁切面值带；底部类型芯保持固定，只有数字层移动。
+- `RollFeedbackConfig` 新增 `base_spin_duration=0.56`，并允许 `input_window_duration=0`；默认 `stop_duration=0.66`。`MainGameFlowPresentationProfile` 新增滚轴加速、快慢格速、结果接入点、下冲和回勾参数。
+- `ResultDecision` 在关闭 V0.2 出千时仅承担 `0.20s` 稳定读点，之后自动调用既有 `BeginSettle()`；未新增随机、计分或存档入口。
+- `WabishF009FaceReelCapture` 覆盖两档分辨率的高速、停靠波和自动结算截图。隔离 Unity 2019.4.33 批处理编译成功，运行状态记录为 `PASS`。
+- 静态边界复核：没有新增 `ScoreDice()` 调用，没有修改 `CurrentSaveVersion` / `PlayerPrefs`，没有让动画候选值写回 `EffectiveValue`。
+
+验证证据：`Docs/QA/20260721_f009_face_reel_runtime.md` 与同名前缀六张 PNG。
+
+## 2026-07-22 V6B-R5 结算接入与来源语义修正记录
+
+- `SettlementContributionRecord` 保留带符号贡献并新增 `SemanticLabel`；同来源、同阶段记录合并时同步合并机制语义。可归属临时贡献折入对应物理槽，不再在展示层把负值钳成零。
+- `PrepareImpactSettlementDisplayEvents()` 使用只读贡献记录生成单枚积分光晕事件；光晕大小、密度、短尾和积分塔承击读取连续 `LocalImpactWeight01`，最终隐藏五档只控制整手塔体收束。
+- 来源标签通过 `SettlementContributionDisplayLabel()`、`SettlementSemanticLabelForDie()` 和复制 / 响应 helper 生成。普通事件锚定真实来源槽；局部回环中同时绘制来源槽 `再触发 / 响应` 与低强度 `主槽·…` 上下文，右侧终端回声当前机制。
+- 新结算路径继续抑制旧逐骰大号 `+N`、骰旁大幅抬升和底部重复横幅；没有增加骰间连线、共享轨迹、第二枚并发光晕或新的暂停节点。
+- 自动验收入口为 `Assets/Editor/WabishF009SettlementSourceCapture.cs`，覆盖 `养猪·触发器`、`再触发·三只小猪`、`响应·盟约` 三类归因场景。
+- 隔离 Unity 2019.4.33f1 编译为 `0 error`；原生 `1920×1080 / 1280×720` 共六张运行截图和 `0.606×` 显示压力检查均通过。详细记录见 `Docs/QA/20260722_f009_settlement_source_clarity.md` 与 `Docs/QA/20260722_f009_settlement_source_metrics.json`。
+- 未修改随机、真实计分、钱包、长期成长、骰子效果、`PlayerPrefs` 或 `CurrentSaveVersion`。剩余门禁仅为用户在当前工程连续播放真实整手，确认来源标签不增噪且声音 / 节奏成立。
