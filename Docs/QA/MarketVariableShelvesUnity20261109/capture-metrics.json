@@ -1,0 +1,258 @@
+{
+  "date": "2026-11-09",
+  "native": [
+    {
+      "file": "normal_market_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "chapter_market_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "4dice_4spells_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "6dice_6spells_last_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "8dice_8spells_first_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "8dice_8spells_last_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "32dice_32spells_last_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "purchase_empty_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "spell_hover_longest_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "spell_target_last_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "market_leave_locked_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "owned_spell_cards_1280x720.png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "normal_market_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "chapter_market_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "4dice_4spells_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "6dice_6spells_last_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "8dice_8spells_first_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "8dice_8spells_last_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "32dice_32spells_last_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "purchase_empty_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "spell_hover_longest_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "spell_target_last_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "market_leave_locked_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "owned_spell_cards_1920x1080.png",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "pressure": [
+    "4dice_4spells_pressure_1164x654.png",
+    "spell_hover_longest_pressure_1164x654.png",
+    "owned_spell_cards_pressure_1164x654.png"
+  ],
+  "native_crops": [
+    "dice_price_key_1to1.png",
+    "spell_card_1to1.png"
+  ],
+  "font": {
+    "before_glyphs": 961,
+    "after_glyphs": 973,
+    "old_shapes_changed": [],
+    "added": [
+      "及",
+      "宫",
+      "帽",
+      "干",
+      "拉",
+      "拟",
+      "捕",
+      "板",
+      "矩",
+      "虚",
+      "采",
+      "针",
+      "键"
+    ],
+    "removed_unreferenced_by_current_sources": [
+      "视"
+    ],
+    "contract_all_passed": true
+  },
+  "price_normal_core": [
+    {
+      "resolution": 1280,
+      "kind": "dice",
+      "slot": 0,
+      "normal_core_pixels": 177
+    },
+    {
+      "resolution": 1280,
+      "kind": "dice",
+      "slot": 1,
+      "normal_core_pixels": 177
+    },
+    {
+      "resolution": 1280,
+      "kind": "dice",
+      "slot": 2,
+      "normal_core_pixels": 177
+    },
+    {
+      "resolution": 1280,
+      "kind": "dice",
+      "slot": 3,
+      "normal_core_pixels": 177
+    },
+    {
+      "resolution": 1280,
+      "kind": "spell",
+      "slot": 0,
+      "normal_core_pixels": 170
+    },
+    {
+      "resolution": 1280,
+      "kind": "spell",
+      "slot": 1,
+      "normal_core_pixels": 170
+    },
+    {
+      "resolution": 1280,
+      "kind": "spell",
+      "slot": 2,
+      "normal_core_pixels": 170
+    },
+    {
+      "resolution": 1280,
+      "kind": "spell",
+      "slot": 3,
+      "normal_core_pixels": 170
+    },
+    {
+      "resolution": 1920,
+      "kind": "dice",
+      "slot": 0,
+      "normal_core_pixels": 405
+    },
+    {
+      "resolution": 1920,
+      "kind": "dice",
+      "slot": 1,
+      "normal_core_pixels": 405
+    },
+    {
+      "resolution": 1920,
+      "kind": "dice",
+      "slot": 2,
+      "normal_core_pixels": 405
+    },
+    {
+      "resolution": 1920,
+      "kind": "dice",
+      "slot": 3,
+      "normal_core_pixels": 405
+    },
+    {
+      "resolution": 1920,
+      "kind": "spell",
+      "slot": 0,
+      "normal_core_pixels": 388
+    },
+    {
+      "resolution": 1920,
+      "kind": "spell",
+      "slot": 1,
+      "normal_core_pixels": 388
+    },
+    {
+      "resolution": 1920,
+      "kind": "spell",
+      "slot": 2,
+      "normal_core_pixels": 388
+    },
+    {
+      "resolution": 1920,
+      "kind": "spell",
+      "slot": 3,
+      "normal_core_pixels": 388
+    }
+  ],
+  "runtime_script_sha256": "cc2e1dc989e9196f32732127a291d41af975a58c07e7e155668c52de8df3970c",
+  "scope": "原生尺寸、已批准字形守恒及价格核心色检查；非整数图仅作识别压力，不替代人工字体与连续交互验收。"
+}

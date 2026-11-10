@@ -1,0 +1,8 @@
+{
+  "tool": "image_gen.imagegen",
+  "mode": "edit",
+  "transparent_background": false,
+  "referenced_image_paths": [
+    "market_variable_shelves_pilot_v2_20261109.png"
+  ]
+}
