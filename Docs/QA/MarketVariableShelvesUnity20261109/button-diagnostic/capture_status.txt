@@ -1,0 +1,5 @@
+失败：System.InvalidOperationException: 测试GUI宿主绘制异常：System.InvalidOperationException: 受控原始MouseDown由生产GUI.Button消费，非先验要求hotControl非零
+  at WabishMarketVariableUiCapture.Require (System.Boolean condition, System.String message) [0x0001b] in C:\Users\admin\AppData\Local\Temp\wabish-market-ui-20261109\Assets\Editor\WabishMarketVariableUiCapture.cs:1018 
+  at WabishMarketVariableUiCapture.DrawProductionGuiForValidation () [0x003dc] in C:\Users\admin\AppData\Local\Temp\wabish-market-ui-20261109\Assets\Editor\WabishMarketVariableUiCapture.cs:944 
+  at WabishMarketVariableUiInputDriver.OnGUI () [0x00016] in C:\Users\admin\AppData\Local\Temp\wabish-market-ui-20261109\Assets\Editor\WabishMarketVariableUiCapture.cs:1088 
+  at WabishMarketVariableUiCapture.Tick () [0x00037] in C:\Users\admin\AppData\Local\Temp\wabish-market-ui-20261109\Assets\Editor\WabishMarketVariableUiCapture.cs:271 

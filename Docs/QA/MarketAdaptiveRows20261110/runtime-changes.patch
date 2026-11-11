@@ -1,0 +1,43 @@
+diff --git a/Temp/20261110_market_buttons_layout_before.cs b/Assets/Scripts/DiceKingDemo.cs
+index fb89bcb..70fbeda 100644
+--- a/Temp/20261110_market_buttons_layout_before.cs
++++ b/Assets/Scripts/DiceKingDemo.cs
+@@ -9769,7 +9769,15 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private Rect VariableMarketOfferRect(bool spells, int visibleSlot)
+     {
+-        return new Rect(236f + visibleSlot * 256f, spells ? 390f : 128f, 240f, spells ? 224f : 204f);
++        const float rowLeft = 236f;
++        const float rowWidth = 1008f;
++        const float cardWidth = 240f;
++        const float minimumGap = 16f;
++        // 已售空位仍占本页原单元，避免交易后其余商品跳位。
++        int count = Mathf.Clamp(VisibleMarketShelfIndices(spells).Count, 1, 4);
++        float cellWidth = (rowWidth - minimumGap * (count - 1)) / count;
++        float x = rowLeft + visibleSlot * (cellWidth + minimumGap) + (cellWidth - cardWidth) * 0.5f;
++        return new Rect(x, spells ? 390f : 128f, cardWidth, spells ? 224f : 204f);
+     }
+ 
+     private Rect VariableMarketPriceRect(bool spells, Rect offerRect)
+@@ -10277,13 +10285,19 @@ public sealed class DiceKingDemo : MonoBehaviour
+         Color focus = lightKey
+             ? new Color(1f, 0.67f, 0.2f, 0.94f)
+             : new Color(0.2f, 0.88f, 0.8f, 0.94f);
++        if (enabled && lightKey)
++        {
++            // 可执行实体键常亮；悬停只增强焦点，不再承担可用状态的唯一提示。
++            DrawRect(InsetRect(rect, 4f, 4f), new Color(1f, 0.82f, 0.48f, 0.14f));
++            DrawBorder(InsetRect(rect, 2f, 2f), new Color(1f, 0.72f, 0.3f, 0.76f), 2f);
++        }
+         if (!enabled)
+         {
+             Color disabledTint = lightKey
+-                ? new Color(0.035f, 0.04f, 0.04f, blockedPressed ? 0.72f : 0.62f)
++                ? new Color(0.06f, 0.065f, 0.065f, blockedPressed ? 0.88f : 0.8f)
+                 : new Color(0.006f, 0.012f, 0.014f, blockedPressed ? 0.76f : 0.64f);
+             Rect blockedFace = new Rect(rect.x + 3f, rect.y + 3f, rect.width - 6f, rect.height - 6f);
+-            DrawRect(blockedFace, disabledTint);
++            DrawRect(lightKey ? rect : blockedFace, disabledTint);
+             DrawBorder(blockedFace, new Color(0.05f, 0.055f, 0.052f, 0.9f), 3f);
+             DrawRect(
+                 new Rect(blockedFace.x + 4f, blockedFace.y + blockedFace.height - 7f, blockedFace.width - 8f, 3f),
