@@ -1,0 +1,73 @@
+AssertionError [ERR_ASSERTION]: 四位价格压力 文字装入/缺字失败 [{"id":"d0-price","text":"9999 金","style":"compact","box":{"x":248,"y":278,"w":100,"h":31},"measuredWidth":103,"measuredHeight":31,"lineCount":1,"missing":[],"fits":false},{"id":"d1-price","text":"9999 金","style":"compact","box":{"x":504,"y":278,"w":100,"h":31},"measuredWidth":103,"measuredHeight":31,"lineCount":1,"missing":[],"fits":false},{"id":"d2-price","text":"9999 金","style":"compact","box":{"x":760,"y":278,"w":100,"h":31},"measuredWidth":103,"measuredHeight":31,"lineCount":1,"missing":[],"fits":false},{"id":"d3-price","text":"9999 金","style":"compact","box":{"x":1016,"y":278,"w":100,"h":31},"measuredWidth":103,"measuredHeight":31,"lineCount":1,"missing":[],"fits":false}]
++ actual - expected
+
++ [
++   {
++     box: {
++       h: 31,
++       w: 100,
++       x: 248,
++       y: 278
++     },
++     fits: false,
++     id: 'd0-price',
++     lineCount: 1,
++     measuredHeight: 31,
++     measuredWidth: 103,
++     missing: [],
++     style: 'compact',
++     text: '9999 金'
++   },
++   {
++     box: {
++       h: 31,
++       w: 100,
++       x: 504,
++       y: 278
++     },
++     fits: false,
++     id: 'd1-price',
++     lineCount: 1,
++     measuredHeight: 31,
++     measuredWidth: 103,
++     missing: [],
++     style: 'compact',
++     text: '9999 金'
++   },
++   {
++     box: {
++       h: 31,
++       w: 100,
++       x: 760,
++       y: 278
++     },
++     fits: false,
++     id: 'd2-price',
++     lineCount: 1,
++     measuredHeight: 31,
++     measuredWidth: 103,
++     missing: [],
++     style: 'compact',
++     text: '9999 金'
++   },
++   {
++     box: {
++       h: 31,
++       w: 100,
++       x: 1016,
++       y: 278
++     },
++     fits: false,
++     id: 'd3-price',
++     lineCount: 1,
++     measuredHeight: 31,
++     measuredWidth: 103,
++     missing: [],
++     style: 'compact',
++     text: '9999 金'
++   }
++ ]
+- []
+
+    at checkSnapshot (F:\unity\wabish\Docs\QA\MarketVariableShelvesStress20261109\run-stress.cjs:28:95)
+    at F:\unity\wabish\Docs\QA\MarketVariableShelvesStress20261109\run-stress.cjs:43:111

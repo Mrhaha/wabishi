@@ -1,0 +1,16 @@
+{
+  "nativeCaptureCount": 46,
+  "nativeDimensionsVerified": true,
+  "mixedAffordabilityButtonMeanLuma": {
+    "1280x720": [
+      46.19,
+      134.3,
+      134.3
+    ],
+    "1920x1080": [
+      45.21,
+      135.39,
+      135.39
+    ]
+  }
+}

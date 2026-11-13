@@ -1,0 +1,1053 @@
+diff --git a/Temp/20261109_market_ui_before.cs b/Assets/Scripts/DiceKingDemo.cs
+index 396d733..fb89bcb 100644
+--- a/Temp/20261109_market_ui_before.cs
++++ b/Assets/Scripts/DiceKingDemo.cs
+@@ -1358,6 +1358,7 @@ public sealed class DiceKingDemo : MonoBehaviour
+     private const string PhysicalKeyLabelFontResourcePath = MainGameArtResourcePrefix + "Flow/wabish_physical_key_sans_sc_semibold";
+     private const string MarketArtResourcePrefix = "Art/Market/";
+     private const string MarketCommonBaseResourcePath = MarketArtResourcePrefix + "arcade_market_common_base";
++    private const string SpellCardArtResourcePath = MarketArtResourcePrefix + "spell_card_art_pilot_strip";
+     private const int ArcadeRunPhysicalSlotCount = 6;
+     private const float ArcadeRunDieSlotSize = 128f;
+     private const float ArcadeRunDieSlotGap = 0f;
+@@ -1523,6 +1524,7 @@ public sealed class DiceKingDemo : MonoBehaviour
+     private Texture2D mainGameDevilShellTexture;
+     private Texture2D mainGamePirateShellTexture;
+     private Texture2D marketCommonBaseTexture;
++    private Texture2D spellCardArtTexture;
+     private AudioSource settlementAudioSource;
+     private AudioClip settlementAbsorbClip;
+     private AudioClip settlementNegativeClip;
+@@ -1658,6 +1660,28 @@ public sealed class DiceKingDemo : MonoBehaviour
+     private int spellMarketMaximumShelves = 2;
+     private int spellMarketExtraShelfChancePercent = 35;
+     private bool spellPanelOpen;
++    private int spellBagPage;
++    private int marketDieShelfPage;
++    private int marketSpellShelfPage;
++    private bool variableMarketUnderlayPass;
++    private readonly List<MarketOfferKind> marketShelfDisplayKinds = new List<MarketOfferKind>();
++    private SpellDefinition spellHoverCandidateDefinition;
++    private string spellHoverCandidateKey = string.Empty;
++    private Rect spellHoverCandidateRect;
++    private SpellDefinition spellHoverDefinition;
++    private string spellHoverKey = string.Empty;
++    private Rect spellHoverRect;
++    private float spellHoverStartedAt = -999f;
++    private float spellHoverDelay = TooltipHoverDelay;
++    private bool spellHoverVisible;
++    private int spellHoverScreenWidth;
++    private int spellHoverScreenHeight;
++    private bool marketLedMetricsLoaded;
++    private readonly Dictionary<char, int> marketLedGlyphWidths = new Dictionary<char, int>();
++    private int marketLedDot = 1;
++    private int marketLedPitch = 2;
++    private int marketLedCharacterGap = 2;
++    private int marketLedLineGap = 4;
+     private int spellCastingRackIndex = -1;
+     private SpellCastStep spellCastStep = SpellCastStep.None;
+     private MainFamily selectedSpellFamily = MainFamily.None;
+@@ -2108,6 +2132,7 @@ public sealed class DiceKingDemo : MonoBehaviour
+         float offsetY = (Screen.height - DesignHeight * scale) * 0.5f;
+         UpdateUiMousePosition(scale, offsetX, offsetY);
+         BeginDiceHoverTooltipFrame();
++        BeginSpellHoverFrame();
+         if (diceOrderDragSurface != DiceOrderDragSurface.None
+             && (!DiceOrderDragActive() || !CanReorderDiceOnSurface(diceOrderDragSurface)))
+         {
+@@ -2154,11 +2179,17 @@ public sealed class DiceKingDemo : MonoBehaviour
+             DrawSpellPanel();
+         }
+ 
+-        if (!spellPanelOpen)
++        if (!spellPanelOpen && spellHoverCandidateDefinition == null)
+         {
+             UpdateDiceHoverTooltipState();
+             DrawDiceHoverTooltip();
+         }
++        else if (spellHoverCandidateDefinition != null)
++        {
++            ClearDiceHoverTooltip();
++        }
++        UpdateSpellHoverState();
++        DrawSpellHoverTooltip();
+         DrawActionTip();
+ 
+         GUI.matrix = oldMatrix;
+@@ -9659,185 +9690,481 @@ public sealed class DiceKingDemo : MonoBehaviour
+             && !affixFeatureEnabled;
+     }
+ 
+-    private void DrawArcadeMarket(bool chapterMarket)
++    private void ResetMarketShelfPresentation()
+     {
+-        Encounter encounter = CurrentEncounter();
+-        string title = chapterMarket && encounter != null ? "章节市场" : "关间市场";
+-        int refreshCost = CurrentMarketRefreshNetCost(chapterMarket);
+-        bool marketLeaveLocked = marketLeaveEffectSequenceActive || spellPanelOpen;
++        marketShelfDisplayKinds.Clear();
++        marketDieShelfPage = 0;
++        marketSpellShelfPage = 0;
++        ClearSpellHover();
++    }
+ 
+-        if (selectedMarketDieIndex >= dice.Count)
++    private void EnsureMarketShelfPresentation()
++    {
++        while (marketShelfDisplayKinds.Count > marketOffers.Count)
+         {
+-            selectedMarketDieIndex = dice.Count - 1;
++            marketShelfDisplayKinds.RemoveAt(marketShelfDisplayKinds.Count - 1);
+         }
+-        if (selectedMarketDieIndex < 0 && dice.Count > 0 && !marketLeaveLocked)
++        while (marketShelfDisplayKinds.Count < marketOffers.Count)
+         {
+-            selectedMarketDieIndex = 0;
++            marketShelfDisplayKinds.Add(MarketOfferKind.Die);
+         }
+-
+-        DrawLedRoleText(new Rect(66f, 17f, 220f, 48f), title, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+-        DrawLedRoleText(new Rect(322f, 17f, 246f, 48f), "金币 " + chapterGold, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+-
+-        List<int> marketVisualIndices = DiceOrderVisualIndices(DiceOrderDragSurface.MarketBag);
+-        Rect[] marketSlotRects = new Rect[marketVisualIndices.Count];
+-        for (int i = 0; i < marketVisualIndices.Count; i++)
++        bool changed = false;
++        for (int i = 0; i < marketOffers.Count; i++)
+         {
+-            int dieIndex = marketVisualIndices[i];
+-            if (dieIndex < 0 || dieIndex >= dice.Count)
++            MarketOffer offer = marketOffers[i];
++            if (offer == null || offer.Kind == MarketOfferKind.Empty)
+             {
+                 continue;
+             }
+-
+-            Die die = dice[dieIndex];
+-            Rect rect = MarketBagSlotRect(i);
+-            marketSlotRects[i] = rect;
+-            bool draggedGhost = IsDiceOrderDraggedDie(DiceOrderDragSurface.MarketBag, die);
+-            if (draggedGhost)
++            MarketOfferKind kind = offer.Kind == MarketOfferKind.Spell ? MarketOfferKind.Spell : MarketOfferKind.Die;
++            if (marketShelfDisplayKinds[i] != kind)
+             {
+-                DrawDiceOrderInsertMarker(rect, false);
+-                DrawDiceOrderGhost(rect);
+-            }
+-            else
+-            {
+-                DrawArcadeMarketBagDie(rect, die, dieIndex == selectedMarketDieIndex, "market-bag-" + die.Id, true);
++                marketShelfDisplayKinds[i] = kind;
++                changed = true;
+             }
++        }
++        if (changed)
++        {
++            ClearSpellHover();
++        }
++    }
+ 
+-            if (marketLeaveEffectSequenceActive && die != null && die.Id == marketLeaveEffectVisualHostId)
++    private List<int> MarketShelfIndices(bool spells)
++    {
++        EnsureMarketShelfPresentation();
++        List<int> indices = new List<int>();
++        for (int i = 0; i < marketOffers.Count; i++)
++        {
++            if ((marketShelfDisplayKinds[i] == MarketOfferKind.Spell) == spells)
+             {
+-                DrawMarketLeaveAttachmentTarget(rect);
++                indices.Add(i);
+             }
++        }
++        return indices;
++    }
+ 
+-            DrawArcadeMarketLeaveScan(rect, dieIndex);
+-            if (!marketLeaveLocked)
++    private int MarketShelfPageCount(bool spells)
++    {
++        return Mathf.Max(1, Mathf.CeilToInt(MarketShelfIndices(spells).Count / 4f));
++    }
++
++    private void SetMarketShelfPage(bool spells, int page)
++    {
++        int bounded = Mathf.Clamp(page, 0, MarketShelfPageCount(spells) - 1);
++        if (spells) marketSpellShelfPage = bounded;
++        else marketDieShelfPage = bounded;
++        ClearSpellHover();
++        ClearDiceHoverTooltip();
++    }
++
++    private List<int> VisibleMarketShelfIndices(bool spells)
++    {
++        List<int> all = MarketShelfIndices(spells);
++        int page = Mathf.Clamp(spells ? marketSpellShelfPage : marketDieShelfPage, 0, Mathf.Max(0, (all.Count - 1) / 4));
++        if (spells) marketSpellShelfPage = page;
++        else marketDieShelfPage = page;
++        int start = page * 4;
++        return all.GetRange(Mathf.Min(start, all.Count), Mathf.Min(4, Mathf.Max(0, all.Count - start)));
++    }
++
++    private Rect VariableMarketOfferRect(bool spells, int visibleSlot)
++    {
++        return new Rect(236f + visibleSlot * 256f, spells ? 390f : 128f, 240f, spells ? 224f : 204f);
++    }
++
++    private Rect VariableMarketPriceRect(bool spells, Rect offerRect)
++    {
++        return new Rect(offerRect.x + 12f, offerRect.y + (spells ? 140f : 121f), offerRect.width - 24f, 31f);
++    }
++
++    private Rect VariableMarketBuyRect(bool spells, Rect offerRect)
++    {
++        return new Rect(offerRect.x + 12f, offerRect.y + (spells ? 177f : 158f), offerRect.width - 24f, 40f);
++    }
++
++    private void DrawVariableMarketPanel(Rect rect, bool glass)
++    {
++        DrawRect(rect, glass ? new Color(0.026f, 0.052f, 0.067f, 1f) : new Color(0.055f, 0.09f, 0.12f, 1f));
++        DrawBorder(rect, new Color(0.25f, 0.32f, 0.33f, 1f), 1f);
++        DrawBorder(InsetRect(rect, 3f, 3f), new Color(0.065f, 0.10f, 0.12f, 1f), 1f);
++    }
++
++    private void DrawVariableMarketKeyFace(Rect rect, bool light)
++    {
++        if (marketCommonBaseTexture == null)
++        {
++            DrawRect(rect, light ? new Color(0.83f, 0.72f, 0.55f, 1f) : new Color(0.07f, 0.23f, 0.23f, 1f));
++            DrawBorder(rect, new Color(0.42f, 0.39f, 0.31f, 1f), 2f);
++            return;
++        }
++        // 只采样旧无字底板的干净键帽，九宫保留边缘，不拉伸整张旧货柜。
++        Rect source = light ? new Rect(618f, 475f, 215f, 57f) : new Rect(61f, 604f, 238f, 76f);
++        float border = 10f;
++        float[] sx = { source.x, source.x + border, source.xMax - border, source.xMax };
++        float[] sy = { source.y, source.y + border, source.yMax - border, source.yMax };
++        float[] dx = { rect.x, rect.x + border, rect.xMax - border, rect.xMax };
++        float[] dy = { rect.y, rect.y + border, rect.yMax - border, rect.yMax };
++        Color previous = GUI.color;
++        GUI.color = Color.white;
++        for (int y = 0; y < 3; y++)
++        {
++            for (int x = 0; x < 3; x++)
+             {
+-                HandleDiceOrderDragMouseDown(DiceOrderDragSurface.MarketBag, dieIndex, rect);
++                Rect destination = Rect.MinMaxRect(dx[x], dy[y], dx[x + 1], dy[y + 1]);
++                Rect uv = new Rect(sx[x] / VirtualWidth, 1f - sy[y + 1] / VirtualHeight,
++                    (sx[x + 1] - sx[x]) / VirtualWidth, (sy[y + 1] - sy[y]) / VirtualHeight);
++                GUI.DrawTextureWithTexCoords(destination, marketCommonBaseTexture, uv, true);
+             }
+         }
++        GUI.color = previous;
++    }
+ 
+-        if (!marketLeaveLocked)
++    private ArcadeMarketButtonResult DrawVariableMarketButton(Rect rect, string label, bool enabled, bool light, string key)
++    {
++        DrawVariableMarketKeyFace(rect, light);
++        return DrawArcadeMarketButton(rect, label, enabled, light, key, !variableMarketUnderlayPass);
++    }
++
++    private void DrawArcadeMarket(bool chapterMarket)
++    {
++        EnsureMarketShelfPresentation();
++        variableMarketUnderlayPass = spellPanelOpen;
++        bool locked = marketLeaveEffectSequenceActive || spellPanelOpen;
++        DrawRect(new Rect(16f, 12f, 1248f, 696f), new Color(0.055f, 0.09f, 0.12f, 1f));
++        DrawVariableMarketPanel(new Rect(14f, 12f, 1252f, 64f), true);
++        DrawVariableMarketPanel(new Rect(18f, 84f, 188f, 540f), true);
++        DrawVariableMarketPanel(new Rect(214f, 84f, 1048f, 250f), true);
++        DrawVariableMarketPanel(new Rect(214f, 342f, 1048f, 282f), true);
++        DrawLedRoleText(new Rect(30f, 20f, 330f, 47f), chapterMarket ? "章节市场" : "关间市场", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
++        Encounter encounter = CurrentEncounter();
++        if (encounter != null)
+         {
+-            UpdateDiceOrderDragFromSlots(DiceOrderDragSurface.MarketBag, marketSlotRects, false);
++            DrawLedRoleText(new Rect(410f, 26f, 320f, 31f), "第 " + encounter.ChapterIndex + " 章", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++        }
++        DrawLedRoleText(new Rect(800f, 26f, 430f, 31f), "金币 " + chapterGold, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleRight);
++        DrawLedRoleText(new Rect(28f, 94f, 170f, 31f), "骰袋 " + dice.Count + " / " + DiceCapacity, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++        selectedMarketDieIndex = dice.Count > 0 ? Mathf.Clamp(selectedMarketDieIndex, 0, dice.Count - 1) : -1;
++        List<int> visual = DiceOrderVisualIndices(DiceOrderDragSurface.MarketBag);
++        Rect[] slots = new Rect[visual.Count];
++        for (int i = 0; i < DiceCapacity; i++)
++        {
++            Rect slot = MarketBagSlotRect(i);
++            DrawVariableMarketPanel(slot, true);
++            if (i >= visual.Count) continue;
++            int index = visual[i];
++            if (index < 0 || index >= dice.Count) continue;
++            Die die = dice[index];
++            slots[i] = slot;
++            if (IsDiceOrderDraggedDie(DiceOrderDragSurface.MarketBag, die))
++            {
++                DrawDiceOrderInsertMarker(slot, false);
++                DrawDiceOrderGhost(slot);
++            }
++            else DrawArcadeMarketBagDie(slot, die, index == selectedMarketDieIndex, "market-bag-" + die.Id, !locked);
++            if (marketLeaveEffectSequenceActive && die.Id == marketLeaveEffectVisualHostId) DrawMarketLeaveAttachmentTarget(slot);
++            DrawArcadeMarketLeaveScan(slot, index);
++            if (!locked) HandleDiceOrderDragMouseDown(DiceOrderDragSurface.MarketBag, index, slot);
+         }
++        if (!locked) UpdateDiceOrderDragFromSlots(DiceOrderDragSurface.MarketBag, slots, false);
+         DrawDiceOrderFloatingDie(DiceOrderDragSurface.MarketBag);
+         DrawMarketLeaveAttachmentFlyVisual();
+-
+-        Rect sellKey = new Rect(59f, 496f, 172f, 72f);
+-        bool hasSelectedDie = selectedMarketDieIndex >= 0 && selectedMarketDieIndex < dice.Count;
+-        ArcadeMarketButtonResult sellResult = DrawArcadeMarketButton(
+-            sellKey,
+-            "卖出",
+-            hasSelectedDie && !marketLeaveLocked,
+-            true,
+-            "market-sell");
+-        if (sellResult == ArcadeMarketButtonResult.Activated)
++        bool selected = selectedMarketDieIndex >= 0 && selectedMarketDieIndex < dice.Count;
++        DrawLedRoleText(new Rect(30f, 534f, 164f, 31f), "售价 " + (selected ? SellPrice(dice[selectedMarketDieIndex]) : 0) + " 金", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++        ArcadeMarketButtonResult sell = DrawVariableMarketButton(new Rect(34f, 574f, 156f, 44f), "卖出", selected && !locked, true, "market-sell");
++        if (sell == ArcadeMarketButtonResult.Activated)
+         {
++            ClearSpellHover();
+             SellSelectedMarketDie();
+             ShowActionTip("已卖出", ActionTipSemantic.Success, "market-action");
+         }
+-        else if (sellResult == ArcadeMarketButtonResult.Blocked)
++        else if (sell == ArcadeMarketButtonResult.Blocked) ShowActionTip(MarketSellBlockedReason(selected), ActionTipSemantic.Warning, "market-action");
++
++        DrawVariableMarketShelf(false, locked, false);
++        DrawVariableMarketShelf(true, locked, false);
++        int refreshCost = CurrentMarketRefreshNetCost(chapterMarket);
++        ArcadeMarketButtonResult refresh = DrawVariableMarketButton(new Rect(24f, 642f, 176f, 52f), "刷新", !locked && (refreshCost <= 0 || chapterGold >= refreshCost), false, "market-refresh");
++        if (refresh == ArcadeMarketButtonResult.Activated)
+         {
+-            ShowActionTip(MarketSellBlockedReason(hasSelectedDie), ActionTipSemantic.Warning, "market-action");
++            RefreshMarketOffers(chapterMarket);
++            ShowActionTip("已刷新", ActionTipSemantic.Success, "market-action");
+         }
+-
+-        float[] offerXs = { 292f, 586f, 879f };
+-        for (int i = 0; i < offerXs.Length; i++)
++        else if (refresh == ArcadeMarketButtonResult.Blocked) ShowActionTip(MarketRefreshBlockedReason(refreshCost, locked), ActionTipSemantic.Warning, "market-action");
++        string cost = refreshCost < 0 ? "刷新返利 " + (-refreshCost) + " 金" : refreshCost == 0 ? "整批刷新 免费" : "整批刷新 " + refreshCost + " 金";
++        DrawLedRoleText(new Rect(224f, 653f, 298f, 31f), cost, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
++        if (spellSystemEnabled)
++        {
++            string bag = "法术袋 " + spellBag.Count + " / " + Mathf.Max(1, spellBagCapacity);
++            ArcadeMarketButtonResult open = DrawVariableMarketButton(new Rect(530f, 642f, 340f, 52f), bag, !locked && IsSpellMarketPhase(), false, "market-spell-bag");
++            if (open == ArcadeMarketButtonResult.Activated) ToggleSpellPanel();
++            else if (open == ArcadeMarketButtonResult.Blocked) ShowActionTip(locked ? "离场结算中" : "当前不可打开法术袋", ActionTipSemantic.Warning, "market-action");
++        }
++        ArcadeMarketButtonResult leave = DrawVariableMarketButton(new Rect(900f, 642f, 348f, 52f), "离开市场", dice.Count > 0 && !locked, true, "market-leave");
++        if (leave == ArcadeMarketButtonResult.Activated) ActivateMarketLeave();
++        else if (leave == ArcadeMarketButtonResult.Blocked) ShowActionTip(MarketLeaveBlockedReason(locked), ActionTipSemantic.Warning, "market-action");
++        if (marketLeaveEffectSequenceActive)
+         {
+-            MarketOffer offer = i < marketOffers.Count ? marketOffers[i] : null;
+-            Rect offerRect = new Rect(offerXs[i], 118f, 277f, 430f);
+-            DrawArcadeMarketOffer(offerRect, offer, "market-offer-" + i);
++            DrawVariableMarketPanel(new Rect(224f, 348f, 1020f, 32f), true);
++            string fullFeedback = ArcadeMarketFeedbackText(chapterMarket) ?? string.Empty;
++            string feedback = fullFeedback;
++            int feedbackLimit = fullFeedback.Length;
++            while (feedbackLimit > 0 && MarketLedLineWidth(feedback) > 1004f)
++            {
++                feedback = TooltipTrim(fullFeedback, --feedbackLimit);
++            }
++            DrawLedRoleText(new Rect(232f, 348f, 1004f, 31f), feedback, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
++        }
++        GUI.enabled = true;
++        variableMarketUnderlayPass = false;
++    }
+ 
+-            if (!HasArcadeMarketPurchaseAction(offer))
++    private void DrawVariableMarketShelf(bool spells, bool locked, bool chooseTarget)
++    {
++        List<int> all = MarketShelfIndices(spells);
++        int live = 0;
++        for (int i = 0; i < all.Count; i++)
++        {
++            MarketOffer offer = marketOffers[all[i]];
++            if (offer != null && offer.Kind != MarketOfferKind.Empty) live++;
++        }
++        float headerY = spells ? 348f : 88f;
++        DrawLedRoleText(new Rect(224f, headerY + 3f, 670f, 31f), (spells ? "法术牌 " : "骰子货架 ") + live + " / " + all.Count + (spells ? " 张" : " 件"), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
++        int pages = MarketShelfPageCount(spells);
++        int page = Mathf.Clamp(spells ? marketSpellShelfPage : marketDieShelfPage, 0, pages - 1);
++        if (pages > 1)
++        {
++            ArcadeMarketButtonResult previous = DrawVariableMarketButton(new Rect(1000f, headerY, 48f, 36f), "<", !locked && page > 0, false, (spells ? "spell" : "die") + "-previous");
++            DrawLedRoleText(new Rect(1056f, headerY + 3f, 132f, 31f), (page + 1) + " / " + pages, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++            ArcadeMarketButtonResult next = DrawVariableMarketButton(new Rect(1196f, headerY, 48f, 36f), ">", !locked && page + 1 < pages, false, (spells ? "spell" : "die") + "-next");
++            if (previous == ArcadeMarketButtonResult.Activated) SetMarketShelfPage(spells, page - 1);
++            if (next == ArcadeMarketButtonResult.Activated) SetMarketShelfPage(spells, page + 1);
++        }
++        List<int> visible = VisibleMarketShelfIndices(spells);
++        for (int slot = 0; slot < visible.Count; slot++)
++        {
++            int index = visible[slot];
++            MarketOffer offer = marketOffers[index];
++            Rect rect = VariableMarketOfferRect(spells, slot);
++            DrawVariableMarketPanel(rect, true);
++            if (offer == null || offer.Kind == MarketOfferKind.Empty)
+             {
++                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 76f, rect.width - 24f, 31f), "已售出", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+                 continue;
+             }
+-
+-            bool canBuy = !marketLeaveLocked && CanBuyMarketOffer(offer);
+-            Rect buyKey = new Rect(offerRect.x + 31f, offerRect.y + 354f, 215f, 57f);
+-            ArcadeMarketButtonResult buyResult = DrawArcadeMarketButton(
+-                buyKey,
+-                "购买",
+-                canBuy,
+-                true,
+-                "market-buy-" + i);
+-            if (buyResult == ArcadeMarketButtonResult.Activated)
++            if (spells && offer.Spell != null)
+             {
+-                BuyOffer(i);
+-                ShowActionTip("已购买", ActionTipSemantic.Success, "market-action");
+-                break;
++                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 8f, rect.width - 24f, 31f), offer.Spell.DisplayName, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++                DrawSpellCardIllustration(new Rect(rect.x + 12f, rect.y + 44f, rect.width - 24f, 92f), offer.Spell);
++                if (!locked) TrySetSpellHover(rect, offer.Spell, "market-spell-" + index + "-" + offer.Spell.Type);
++            }
++            else if (offer.Die != null)
++            {
++                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 8f, rect.width - 24f, 31f), DieDisplayName(offer.Die), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++                DrawArcadeRunDieToken(new Rect(rect.x + (rect.width - 76f) * 0.5f, rect.y + 43f, 76f, 76f), offer.Die, offer.Die.Type, 0, false, 0, 1f);
++                if (!locked) TrySetHoveredTooltip(rect, offer.Die, DiceTooltipContext.MarketOffer, CurrentOfferPrice(offer), "market-offer-" + index + "-" + offer.Die.Id);
+             }
+-            if (buyResult == ArcadeMarketButtonResult.Blocked)
++            else
++            {
++                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 8f, rect.width - 24f, 31f), SpellShelfOfferName(offer), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++            }
++            DrawLedRoleText(VariableMarketPriceRect(spells, rect), CurrentOfferPrice(offer) + " 金", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++            bool canAct = !locked && (chooseTarget || CanBuyMarketOffer(offer));
++            ArcadeMarketButtonResult result = DrawVariableMarketButton(VariableMarketBuyRect(spells, rect), chooseTarget ? "选择" : "购买", canAct, true, (chooseTarget ? "spell-target-" : "market-buy-") + index);
++            if (result == ArcadeMarketButtonResult.Activated)
+             {
+-                ShowActionTip(MarketBuyBlockedReason(offer, marketLeaveLocked), ActionTipSemantic.Warning, "market-action");
++                ClearSpellHover();
++                ClearDiceHoverTooltip();
++                if (chooseTarget) CommitSpellShelf(index);
++                else
++                {
++                    BuyOffer(index);
++                    ShowActionTip("已购买", ActionTipSemantic.Success, "market-action");
++                }
++                return;
+             }
++            if (result == ArcadeMarketButtonResult.Blocked && !chooseTarget) ShowActionTip(MarketBuyBlockedReason(offer, locked), ActionTipSemantic.Warning, "market-action");
+         }
++        if (all.Count == 0)
++        {
++            DrawLedRoleText(new Rect(236f, spells ? 478f : 200f, 1008f, 31f), "本批暂无商品", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++        }
++    }
+ 
+-        bool canRefresh = !marketLeaveLocked && (refreshCost <= 0 || chapterGold >= refreshCost);
+-        ArcadeMarketButtonResult refreshResult = DrawArcadeMarketButton(
+-            new Rect(58f, 601f, 244f, 82f),
+-            "刷新",
+-            canRefresh,
+-            false,
+-            "market-refresh");
+-        if (refreshResult == ArcadeMarketButtonResult.Activated)
++    private int SpellCardIllustrationPanel(SpellType type)
++    {
++        if (type == SpellType.ChainDividend || type == SpellType.FeedBag || type == SpellType.PeakCashout) return 1;
++        if (type == SpellType.EchoCommand || type == SpellType.TargetedRestock || type == SpellType.ShiftVoucher) return 2;
++        return 0;
++    }
++
++    private void DrawSpellCardIllustration(Rect rect, SpellDefinition definition)
++    {
++        if (spellCardArtTexture == null || definition == null)
+         {
+-            RefreshMarketOffers(chapterMarket);
+-            ShowActionTip("已刷新", ActionTipSemantic.Success, "market-action");
++            DrawRect(rect, new Color(0.04f, 0.13f, 0.14f, 1f));
++            return;
+         }
+-        else if (refreshResult == ArcadeMarketButtonResult.Blocked)
++        float tileWidth = spellCardArtTexture.width / 3f;
++        float sourceHeight = Mathf.Min(spellCardArtTexture.height, tileWidth * rect.height / Mathf.Max(1f, rect.width));
++        float sourceY = (spellCardArtTexture.height - sourceHeight) * 0.5f;
++        Rect uv = new Rect((SpellCardIllustrationPanel(definition.Type) * tileWidth + 2f) / spellCardArtTexture.width,
++            1f - (sourceY + sourceHeight) / spellCardArtTexture.height,
++            (tileWidth - 4f) / spellCardArtTexture.width, sourceHeight / spellCardArtTexture.height);
++        Color old = GUI.color;
++        GUI.color = Color.white;
++        GUI.DrawTextureWithTexCoords(rect, spellCardArtTexture, uv, true);
++        GUI.color = old;
++    }
++
++    private void BeginSpellHoverFrame()
++    {
++        spellHoverCandidateDefinition = null;
++        spellHoverCandidateKey = string.Empty;
++        if (spellHoverScreenWidth != Screen.width || spellHoverScreenHeight != Screen.height)
+         {
+-            ShowActionTip(MarketRefreshBlockedReason(refreshCost, marketLeaveLocked), ActionTipSemantic.Warning, "market-action");
++            ClearSpellHover();
++            spellHoverScreenWidth = Screen.width;
++            spellHoverScreenHeight = Screen.height;
+         }
++    }
+ 
+-        string marketFeedback = ArcadeMarketFeedbackText(chapterMarket);
+-        DrawLedRoleText(
+-            new Rect(302f, 552f, 582f, 42f),
+-            TooltipTrim(marketFeedback, 48),
+-            marketLeaveLocked ? MainGameLedFont.TextRole.FocusTeal : MainGameLedFont.TextRole.SecondaryWarm,
+-            TextAnchor.MiddleCenter);
++    private void ClearSpellHover()
++    {
++        spellHoverCandidateDefinition = null;
++        spellHoverCandidateKey = string.Empty;
++        spellHoverDefinition = null;
++        spellHoverKey = string.Empty;
++        spellHoverStartedAt = -999f;
++        spellHoverVisible = false;
++    }
+ 
+-        if (spellSystemEnabled)
++    private void TrySetSpellHover(Rect rect, SpellDefinition definition, string key)
++    {
++        if (definition == null || variableMarketUnderlayPass || marketLeaveEffectSequenceActive || DiceOrderDragActive()
++            || !uiMousePositionValid || !rect.Contains(uiMousePosition)) return;
++        spellHoverCandidateDefinition = definition;
++        spellHoverCandidateKey = key;
++        spellHoverCandidateRect = rect;
++    }
++
++    private void UpdateSpellHoverState()
++    {
++        if (spellHoverCandidateDefinition == null || marketLeaveEffectSequenceActive || DiceOrderDragActive()
++            || (mode != GameMode.InterStageMarket && mode != GameMode.ChapterShop && !(mode == GameMode.Run && rollPhase == RollPhase.Ready)))
++        {
++            ClearSpellHover();
++            return;
++        }
++        if (!string.Equals(spellHoverKey, spellHoverCandidateKey, StringComparison.Ordinal)
++            || spellHoverDefinition != spellHoverCandidateDefinition)
+         {
+-            ArcadeMarketButtonResult spellCastResult = DrawArcadeMarketButton(
+-                new Rect(334f, 601f, 230f, 82f),
+-                "打开法术袋",
+-                !spellPanelOpen && IsSpellMarketPhase(),
+-                false,
+-                "market-spell-bag");
+-            if (spellCastResult == ArcadeMarketButtonResult.Activated)
++            spellHoverDelay = spellHoverVisible ? TooltipContentSwapDuration : TooltipHoverDelay;
++            spellHoverDefinition = spellHoverCandidateDefinition;
++            spellHoverKey = spellHoverCandidateKey;
++            spellHoverRect = spellHoverCandidateRect;
++            spellHoverStartedAt = Time.unscaledTime;
++            spellHoverVisible = false;
++        }
++        spellHoverVisible = Time.unscaledTime - spellHoverStartedAt >= spellHoverDelay;
++    }
++
++    private void LoadMarketLedMetrics()
++    {
++        if (marketLedMetricsLoaded) return;
++        marketLedMetricsLoaded = true;
++        TextAsset map = Resources.Load<TextAsset>("Art/MainGame/Flow/main_game_led_font_map");
++        if (map != null)
++        {
++            string[] lines = map.text.Split('\n');
++            for (int i = 1; i < lines.Length; i++)
+             {
+-                ToggleSpellPanel();
++                string[] fields = lines[i].Trim().Split(',');
++                int code;
++                int width;
++                if (fields.Length > 5 && int.TryParse(fields[0], out code) && int.TryParse(fields[5], out width) && code <= char.MaxValue)
++                    marketLedGlyphWidths[(char)code] = width;
+             }
+-            else if (spellCastResult == ArcadeMarketButtonResult.Blocked)
++        }
++        TextAsset styles = Resources.Load<TextAsset>("Art/MainGame/Flow/main_game_led_font_styles");
++        if (styles == null) return;
++        string[] styleLines = styles.text.Split('\n');
++        for (int i = 1; i < styleLines.Length; i++)
++        {
++            string[] fields = styleLines[i].Trim().Split(',');
++            int dot, pitch, gap, lineGap;
++            if (fields.Length >= 5 && fields[0] == "compact" && int.TryParse(fields[1], out dot)
++                && int.TryParse(fields[2], out pitch) && int.TryParse(fields[3], out gap) && int.TryParse(fields[4], out lineGap))
+             {
+-                ShowActionTip(marketLeaveEffectSequenceActive ? "离场结算中" : "当前不可打开法术袋", ActionTipSemantic.Warning, "market-action");
++                marketLedDot = dot;
++                marketLedPitch = pitch;
++                marketLedCharacterGap = gap;
++                marketLedLineGap = lineGap;
+             }
+-
+-            DrawLedRoleText(
+-                new Rect(574f, 609f, 310f, 64f),
+-                TooltipTrim(SpellBagStateText(), 28),
+-                marketLeaveLocked ? MainGameLedFont.TextRole.FocusTeal : MainGameLedFont.TextRole.SecondaryAmber,
+-                TextAnchor.MiddleCenter);
+         }
++    }
+ 
+-        bool canLeave = dice.Count > 0 && !marketLeaveLocked;
+-        ArcadeMarketButtonResult leaveResult = DrawArcadeMarketButton(
+-            new Rect(912f, 601f, 301f, 82f),
+-            "离开市场",
+-            canLeave,
+-            true,
+-            "market-leave");
+-        if (leaveResult == ArcadeMarketButtonResult.Activated)
++    private float MarketLedLineWidth(string text)
++    {
++        LoadMarketLedMetrics();
++        int width = 0;
++        for (int i = 0; i < text.Length; i++)
+         {
+-            ActivateMarketLeave();
++            char c = text[i];
++            int active;
++            if (c == '\t') width += marketLedPitch * 6;
++            else if (char.IsWhiteSpace(c)) width += marketLedPitch * 3;
++            else
++            {
++                if (!marketLedGlyphWidths.TryGetValue(c, out active)) active = 8;
++                width += active * marketLedPitch - (marketLedPitch - marketLedDot) + marketLedCharacterGap;
++            }
+         }
+-        else if (leaveResult == ArcadeMarketButtonResult.Blocked)
++        return Mathf.Max(0, width - marketLedCharacterGap);
++    }
++
++    private float MeasureSpellHoverRuleHeight(string text, float width)
++    {
++        LoadMarketLedMetrics();
++        string[] sources = (text ?? string.Empty).Replace("\r", string.Empty).Split('\n');
++        int count = 0;
++        for (int i = 0; i < sources.Length; i++)
+         {
+-            ShowActionTip(MarketLeaveBlockedReason(marketLeaveLocked), ActionTipSemantic.Warning, "market-action");
++            string line = string.Empty;
++            count++;
++            for (int j = 0; j < sources[i].Length; j++)
++            {
++                string next = line + sources[i][j];
++                if (line.Length > 0 && MarketLedLineWidth(next) > width)
++                {
++                    count++;
++                    line = sources[i][j].ToString();
++                }
++                else line = next;
++            }
+         }
++        int cell = 16 * marketLedPitch - (marketLedPitch - marketLedDot);
++        return cell + Mathf.Max(0, count - 1) * (cell + marketLedLineGap);
++    }
+ 
+-        GUI.enabled = true;
++    private Rect SpellHoverPanelRect()
++    {
++        float body = MeasureSpellHoverRuleHeight(spellHoverDefinition != null ? spellHoverDefinition.RuleText : string.Empty, 464f);
++        float height = 65f + body;
++        float x = Mathf.Clamp(spellHoverRect.x, 16f, VirtualWidth - 16f - 496f);
++        float y = Mathf.Max(84f, 268f - height);
++        return new Rect(x, y, 496f, height);
++    }
++
++    private void DrawSpellHoverTooltip()
++    {
++        if (!spellHoverVisible || spellHoverDefinition == null) return;
++        Rect rect = SpellHoverPanelRect();
++        DrawVariableMarketPanel(rect, true);
++        DrawBorder(rect, new Color(0.61f, 0.53f, 0.37f, 1f), 2f);
++        DrawLedRoleText(new Rect(rect.x + 16f, rect.y + 12f, 464f, 31f), spellHoverDefinition.DisplayName, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.UpperLeft);
++        DrawLedRoleWrappedText(new Rect(rect.x + 16f, rect.y + 51f, 464f, rect.height - 65f), spellHoverDefinition.RuleText, MainGameLedFont.TextRole.SecondaryWarm, TextAnchor.UpperLeft);
+     }
+ 
++
+     private void DrawArcadeMarketBagDie(Rect rect, Die die, bool selected, string hoverKey, bool acceptHover)
+     {
+         if (die == null)
+@@ -9939,9 +10266,10 @@ public sealed class DiceKingDemo : MonoBehaviour
+         string label,
+         bool enabled,
+         bool lightKey,
+-        string interactionKey)
++        string interactionKey,
++        bool acceptInput = true)
+     {
+-        bool pointerHovered = uiMousePositionValid && rect.Contains(uiMousePosition);
++        bool pointerHovered = acceptInput && uiMousePositionValid && rect.Contains(uiMousePosition);
+         bool hovered = enabled && pointerHovered;
+         bool pressed = hovered && Input.GetMouseButton(0);
+         bool blockedPressed = !enabled && pointerHovered && Input.GetMouseButton(0);
+@@ -10005,10 +10333,33 @@ public sealed class DiceKingDemo : MonoBehaviour
+                 TextAnchor.MiddleCenter);
+         }
+ 
++        if (!acceptInput)
++        {
++            return ArcadeMarketButtonResult.None;
++        }
+         bool previousEnabled = GUI.enabled;
+-        GUI.enabled = true;
+-        bool clicked = GUI.Button(rect, GUIContent.none, GUIStyle.none);
+-        GUI.enabled = previousEnabled;
++        Event pointerEvent = Event.current;
++        bool alignPointer = uiMousePositionValid && pointerEvent != null
++            && (pointerEvent.type == EventType.MouseDown
++                || pointerEvent.type == EventType.MouseUp
++                || pointerEvent.type == EventType.MouseDrag
++                || pointerEvent.type == EventType.MouseMove);
++        Vector2 previousMousePosition = alignPointer ? pointerEvent.mousePosition : Vector2.zero;
++        bool clicked;
++        try
++        {
++            GUI.enabled = true;
++            // 本入口仅承载根级虚拟画布按钮；分组、滚动或旋转子空间不得复用此坐标对齐。
++            // GUIClip 重设矩阵后可能更新原始事件坐标，命中与悬停统一读取同一归一化指针。
++            if (alignPointer) pointerEvent.mousePosition = uiMousePosition;
++            clicked = GUI.Button(rect, GUIContent.none, GUIStyle.none);
++        }
++        finally
++        {
++            if (alignPointer) pointerEvent.mousePosition = previousMousePosition;
++            GUI.enabled = previousEnabled;
++            // 只恢复位置；保留 GUI.Button 对事件类型的 Use 消费以及其原生控制捕获。
++        }
+         if (!clicked)
+         {
+             return ArcadeMarketButtonResult.None;
+@@ -10083,6 +10434,10 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private Rect ArcadePhysicalKeyLabelRect(Rect keyRect)
+     {
++        if (keyRect.height <= 46f)
++        {
++            return new Rect(keyRect.x + 8f, keyRect.y + 4f, keyRect.width - 16f, keyRect.height - 8f);
++        }
+         if (keyRect.width < 190f)
+         {
+             return new Rect(keyRect.x + 12f, keyRect.y + 14f, keyRect.width - 24f, keyRect.height - 28f);
+@@ -10618,6 +10973,8 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void BuyMarketSpell(int marketOfferIndex)
+     {
++        EnsureMarketShelfPresentation();
++        ClearSpellHover();
+         if (marketOfferIndex < 0 || marketOfferIndex >= marketOffers.Count)
+         {
+             return;
+@@ -10674,6 +11031,8 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void ToggleSpellPanel()
+     {
++        ClearSpellHover();
++        ClearDiceHoverTooltip();
+         if (!CanOpenSpellPanel())
+         {
+             CloseSpellPanel();
+@@ -10689,12 +11048,14 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void CloseSpellPanel()
+     {
++        ClearSpellHover();
+         spellPanelOpen = false;
+         CancelSpellCastSelection();
+     }
+ 
+     private void CancelSpellCastSelection()
+     {
++        ClearSpellHover();
+         spellCastingRackIndex = -1;
+         spellCastStep = SpellCastStep.None;
+         selectedSpellFamily = MainFamily.None;
+@@ -10713,6 +11074,7 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void BeginSpellCast(int rackIndex)
+     {
++        ClearSpellHover();
+         if (rackIndex < 0 || rackIndex >= spellBag.Count)
+         {
+             return;
+@@ -10877,6 +11239,7 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void CommitSpellFamily(MainFamily family)
+     {
++        ClearSpellHover();
+         SpellDefinition definition = CurrentCastingSpellDefinition();
+         if (definition == null
+             || definition.Type != SpellType.TargetedRestock
+@@ -10912,6 +11275,8 @@ public sealed class DiceKingDemo : MonoBehaviour
+         }
+ 
+         marketOffers[shelfIndex] = replacement;
++        EnsureMarketShelfPresentation();
++        ClearSpellHover();
+         string effectText = "第 " + (shelfIndex + 1) + " 格换成 " + MainFamilyDisplayName(selectedSpellFamily) + "的「" + DieDisplayName(replacement.Die) + "」";
+         CompleteSpellCast(definition, effectText);
+     }
+@@ -11066,71 +11431,87 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void DrawSpellPanel()
+     {
++        if (spellCastStep == SpellCastStep.ChooseShelf && IsSpellMarketPhase())
++        {
++            DrawSpellShelfTargetStep();
++            return;
++        }
+         DrawRect(new Rect(0f, 0f, VirtualWidth, VirtualHeight), new Color(0.01f, 0.015f, 0.02f, 0.78f));
+         Rect panel = new Rect(145f, 58f, 990f, 604f);
+-        DrawUiPanel(panel);
+-        DrawStandardLabel(new Rect(180f, 86f, 500f, 36f), "法术袋  " + spellBag.Count + " / " + Mathf.Max(1, spellBagCapacity), headerStyle);
+-        DrawStandardLabel(
+-            new Rect(180f, 123f, 720f, 26f),
+-            IsSpellMarketPhase() ? "市场阶段：可连续施放；换货类仅在此阶段可用" : "投掷前阶段：开始投掷后将直接结算",
+-            smallStyle);
+-
+-        if (DrawUiButton(new Rect(974f, 82f, 124f, 46f), "关闭", UiButtonKind.Secondary))
++        DrawVariableMarketPanel(panel, true);
++        DrawLedRoleText(new Rect(180f, 86f, 500f, 36f), "法术袋 " + spellBag.Count + " / " + Mathf.Max(1, spellBagCapacity), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
++        DrawLedRoleText(new Rect(180f, 126f, 760f, 31f), IsSpellMarketPhase() ? "市场阶段：可连续施放" : "投掷前：开始投掷后自动结算", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleLeft);
++        if (DrawVariableMarketButton(new Rect(974f, 82f, 124f, 46f), "关闭", true, false, "spell-close") == ArcadeMarketButtonResult.Activated)
+         {
+             CloseSpellPanel();
+             return;
+         }
+-
+         if (spellCastStep == SpellCastStep.ChooseDie)
+         {
+             DrawSpellDieTargetStep();
+             return;
+         }
+-
+         if (spellCastStep == SpellCastStep.ChooseFamily)
+         {
+             DrawSpellFamilyTargetStep();
+             return;
+         }
+ 
+-        if (spellCastStep == SpellCastStep.ChooseShelf)
++        int pageCount = Mathf.Max(1, Mathf.CeilToInt(spellBag.Count / 3f));
++        spellBagPage = Mathf.Clamp(spellBagPage, 0, pageCount - 1);
++        if (pageCount > 1)
+         {
+-            DrawSpellShelfTargetStep();
+-            return;
++            if (DrawVariableMarketButton(new Rect(744f, 82f, 44f, 36f), "<", spellBagPage > 0, false, "spell-bag-previous") == ArcadeMarketButtonResult.Activated)
++            {
++                spellBagPage--;
++                ClearSpellHover();
++            }
++            DrawLedRoleText(new Rect(796f, 84f, 94f, 31f), (spellBagPage + 1) + " / " + pageCount, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++            if (DrawVariableMarketButton(new Rect(902f, 82f, 44f, 36f), ">", spellBagPage + 1 < pageCount, false, "spell-bag-next") == ArcadeMarketButtonResult.Activated)
++            {
++                spellBagPage++;
++                ClearSpellHover();
++            }
+         }
+-
+-        if (spellBag.Count <= 0)
++        if (spellBag.Count == 0)
+         {
+-            DrawStandardLabel(new Rect(180f, 270f, 920f, 70f), "法术袋为空。法术牌会按权重出现在市场的三格货架中。", bodyStyle);
++            DrawLedRoleText(new Rect(180f, 270f, 920f, 70f), "法术袋为空", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+         }
+-        else
++        for (int slot = 0; slot < 3; slot++)
+         {
+-            for (int i = 0; i < spellBag.Count; i++)
++            int index = spellBagPage * 3 + slot;
++            if (index >= spellBag.Count) break;
++            SpellDefinition definition = SpellDefinitionFor(spellBag[index]);
++            Rect card = new Rect(180f + slot * 308f, 184f, 288f, 340f);
++            DrawVariableMarketPanel(card, true);
++            if (definition == null)
+             {
+-                SpellDefinition definition = SpellDefinitionFor(spellBag[i]);
+-                Rect card = new Rect(180f, 164f + i * 126f, 920f, 108f);
+-                DrawUiSmallPanel(card);
+-                string displayName = definition != null ? definition.DisplayName : spellBag[i].ToString();
+-                string ruleText = definition != null ? definition.RuleText : "法术配置缺失。";
+-                DrawStandardLabel(new Rect(card.x + 22f, card.y + 14f, 250f, 28f), displayName, headerStyle);
+-                DrawStandardLabel(new Rect(card.x + 22f, card.y + 45f, 660f, 50f), ruleText, tinyStyle);
+-
+-                bool canCast = CanCastSpellNow(definition);
+-                GUI.enabled = canCast;
+-                if (DrawUiButton(new Rect(card.x + 720f, card.y + 28f, 166f, 52f), canCast ? "施放" : SpellAllowedPhaseText(definition), UiButtonKind.Primary))
+-                {
+-                    BeginSpellCast(i);
+-                    GUI.enabled = true;
+-                    return;
+-                }
+-                GUI.enabled = true;
++                DrawLedRoleText(new Rect(card.x + 16f, card.y + 12f, 256f, 31f), "法术配置缺失", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++                continue;
++            }
++            DrawLedRoleText(new Rect(card.x + 16f, card.y + 12f, 256f, 31f), definition.DisplayName, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++            DrawSpellCardIllustration(new Rect(card.x + 16f, card.y + 54f, 256f, 170f), definition);
++            string phase = definition.AllowMarket && definition.AllowPreRoll ? "市场 / 投掷前" : SpellAllowedPhaseText(definition);
++            DrawLedRoleText(new Rect(card.x + 16f, card.y + 238f, 256f, 31f), phase, MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleCenter);
++            TrySetSpellHover(card, definition, "spell-bag-" + index + "-" + definition.Type);
++            bool canCast = CanCastSpellNow(definition);
++            ArcadeMarketButtonResult result = DrawVariableMarketButton(new Rect(card.x + 16f, card.y + 286f, 256f, 44f), "施放", canCast, false, "spell-cast-" + index);
++            if (result == ArcadeMarketButtonResult.Activated)
++            {
++                ClearSpellHover();
++                BeginSpellCast(index);
++                return;
++            }
++            if (result == ArcadeMarketButtonResult.Blocked)
++            {
++                ShowActionTip(SpellAllowedPhaseText(definition), ActionTipSemantic.Warning, "spell");
+             }
+         }
+-
+-        DrawStandardLabel(new Rect(180f, 560f, 910f, 52f), PendingSpellStateText(), smallStyle);
+-        DrawStandardLabel(new Rect(180f, 616f, 910f, 22f), "Esc 或“关闭”返回；同一阶段可连续施放多张。", tinyStyle);
++        DrawLedRoleWrappedText(new Rect(180f, 548f, 910f, 68f), PendingSpellStateText(), MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.UpperLeft);
++        DrawLedRoleText(new Rect(180f, 622f, 910f, 31f), "Esc 或关闭返回", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleLeft);
+     }
+ 
++
+     private string SpellAllowedPhaseText(SpellDefinition definition)
+     {
+         if (definition == null)
+@@ -11237,37 +11618,27 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void DrawSpellShelfTargetStep()
+     {
+-        DrawStandardLabel(
+-            new Rect(180f, 164f, 900f, 34f),
+-            "选择要换掉的非空货架位：" + MainFamilyDisplayName(selectedSpellFamily),
+-            headerStyle);
+-
+-        for (int i = 0; i < 3; i++)
+-        {
+-            MarketOffer offer = i < marketOffers.Count ? marketOffers[i] : null;
+-            bool available = offer != null && offer.Kind != MarketOfferKind.Empty;
+-            Rect rect = new Rect(192f + i * 296f, 238f, 266f, 146f);
+-            DrawUiSmallPanel(rect);
+-            DrawStandardLabel(new Rect(rect.x + 16f, rect.y + 16f, rect.width - 32f, 28f), "货架 " + (i + 1), headerStyle);
+-            DrawStandardLabel(new Rect(rect.x + 16f, rect.y + 52f, rect.width - 32f, 28f), SpellShelfOfferName(offer), smallStyle);
+-            GUI.enabled = available;
+-            if (DrawUiButton(new Rect(rect.x + 46f, rect.y + 94f, 174f, 38f), available ? "替换此格" : "空货架", UiButtonKind.Primary))
+-            {
+-                CommitSpellShelf(i);
+-                GUI.enabled = true;
+-                return;
+-            }
+-            GUI.enabled = true;
+-        }
+-
+-        DrawStandardLabel(new Rect(192f, 416f, 888f, 52f), "换货不会被视为刷新、购买或出售；新商品保留在货架，之后仍需支付其正常价格购买。", smallStyle);
+-        if (DrawUiButton(new Rect(180f, 586f, 150f, 42f), "返回选家族", UiButtonKind.Secondary))
+-        {
++        EnsureMarketShelfPresentation();
++        DrawVariableMarketPanel(new Rect(214f, 84f, 1048f, 250f), true);
++        DrawVariableMarketPanel(new Rect(214f, 342f, 1048f, 282f), true);
++        DrawVariableMarketPanel(new Rect(360f, 14f, 430f, 58f), true);
++        DrawLedRoleText(new Rect(370f, 26f, 410f, 31f), "定向换货 · " + MainFamilyDisplayName(selectedSpellFamily), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
++        DrawVariableMarketShelf(false, false, true);
++        DrawVariableMarketShelf(true, false, true);
++        DrawRect(new Rect(16f, 632f, 1248f, 70f), new Color(0.055f, 0.09f, 0.12f, 1f));
++        if (DrawVariableMarketButton(new Rect(224f, 642f, 340f, 52f), "返回选家族", true, false, "spell-shelf-back") == ArcadeMarketButtonResult.Activated)
++        {
++            ClearSpellHover();
+             spellCastStep = SpellCastStep.ChooseFamily;
+             selectedSpellFamily = MainFamily.None;
+         }
++        if (DrawVariableMarketButton(new Rect(900f, 642f, 348f, 52f), "取消选择", true, false, "spell-shelf-cancel") == ArcadeMarketButtonResult.Activated)
++        {
++            CancelSpellCastSelection();
++        }
+     }
+ 
++
+     private string SpellShelfOfferName(MarketOffer offer)
+     {
+         if (offer == null || offer.Kind == MarketOfferKind.Empty)
+@@ -11292,6 +11663,7 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void ActivateMarketLeave()
+     {
++        ClearSpellHover();
+         if (dice.Count <= 0 || marketLeaveEffectSequenceActive)
+         {
+             return;
+@@ -11620,7 +11992,7 @@ public sealed class DiceKingDemo : MonoBehaviour
+     {
+         if (UseArcadeMarketVisuals())
+         {
+-            return new Rect(86f, 95f + visualIndex * 61f, 126f, 52f);
++            return new Rect(44f, 136f + visualIndex * 64f, 136f, 58f);
+         }
+ 
+         return new Rect(64f, 204f + visualIndex * 58f, 350f, 52f);
+@@ -11707,6 +12079,8 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void BeginMarketLeaveEffects()
+     {
++        ClearSpellHover();
++        ClearDiceHoverTooltip();
+         CancelDiceOrderDrag();
+         activeCraftingItemKey = string.Empty;
+         selectedMarketDieIndex = -1;
+@@ -11893,6 +12267,8 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void CompleteMarketLeave()
+     {
++        ClearSpellHover();
++        ClearDiceHoverTooltip();
+         string leaveFeedback = marketLeaveEffectFeedback;
+         if (activeGameplayChain != null
+             && string.Equals(activeGameplayChain.Phase, "market_leave", StringComparison.Ordinal))
+@@ -18500,6 +18876,8 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void ResetRun(string newBuildName, string newBuildSummary)
+     {
++        ResetMarketShelfPresentation();
++        spellBagPage = 0;
+         dice.Clear();
+         marketOffers.Clear();
+         spellBag.Clear();
+@@ -23769,6 +24147,7 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void BuildMarketOffers(bool paidRefresh)
+     {
++        ResetMarketShelfPresentation();
+         HashSet<DieType> previousRefreshTypes = paidRefresh ? CurrentOfferDieTypes(-1) : null;
+         marketOffers.Clear();
+         bool explicitFamilyTestMarket = HasExplicitV02MarketTestPool();
+@@ -23851,6 +24230,8 @@ public sealed class DiceKingDemo : MonoBehaviour
+         ApplyCurrentTavernMinimumToMarketOffers();
+         ApplySupplyPigMarketFeed();
+ 
++        EnsureMarketShelfPresentation();
++
+         if (paidRefresh)
+         {
+             marketRefreshesWithoutHighTier = marketTestRandomRefresh || explicitFamilyTestMarket ? 0 : (hasHighTier ? 0 : marketRefreshesWithoutHighTier + 1);
+@@ -23987,6 +24368,8 @@ public sealed class DiceKingDemo : MonoBehaviour
+ 
+     private void BuyOffer(int index)
+     {
++        EnsureMarketShelfPresentation();
++        ClearSpellHover();
+         if (index < 0 || index >= marketOffers.Count)
+         {
+             return;
+@@ -32430,6 +32813,7 @@ public sealed class DiceKingDemo : MonoBehaviour
+         mainGameDevilShellTexture = Resources.Load<Texture2D>(MainGameDevilShellResourcePath);
+         mainGamePirateShellTexture = Resources.Load<Texture2D>(MainGamePirateShellResourcePath);
+         marketCommonBaseTexture = Resources.Load<Texture2D>(MarketCommonBaseResourcePath);
++        spellCardArtTexture = Resources.Load<Texture2D>(SpellCardArtResourcePath);
+         mainGameLedFont = MainGameLedFont.LoadFromResources();
+         physicalKeyLabelFont = Resources.Load<Font>(PhysicalKeyLabelFontResourcePath);
+ 
