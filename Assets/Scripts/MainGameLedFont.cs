@@ -157,6 +157,11 @@ public sealed class MainGameLedFont
         DrawRoleInternal(rect, text, role, alignment, true, opacity);
     }
 
+    public Color RoleColor(TextRole role)
+    {
+        return roles[role].CoreColor;
+    }
+
     public void DrawRoleWrappedHighlights(
         Rect rect,
         string text,

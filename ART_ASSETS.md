@@ -412,6 +412,21 @@ Assets/ArtSource/Legacy/dice_cup_legacy_dark_realistic.png
 
 生成提示、参考图职责、构建命令与哈希见 `Assets/ArtSource/Production/ArcadeDiceKing/InterStageMarketRuntimeV1/README.md`。Unity 于 2026-07-17 使用 `Assets/Editor/WabishMarketRuntimeCapture.cs` 对常态、购买后留空和离场锁定三状态生成 `1920×1080 / 1280×720` 六张截图并通过尺寸校验；详见 `Docs/QA/20260717_market_runtime_validation.md`。现有 Tooltip 与拖拽逻辑已复用，但真实鼠标停留和完整拖拽手势仍保留人工门禁。F021 V4 全局文字标准随后已接入本市场的动态文字入口；这只改变文字渲染，不改变本资源包的布局与流程。
 
+## F021 可变数量商店法术插画原型运行资源（2026-11-09）
+
+用户在第七十七轮确认价格在上、购买键在下后，明确授权开始修改 Unity 工程。本节仅将已评审的三张插画示意按已确认原型接入，未新增或批量生成其余法术的正式卡画，不代表八张开放法术美术已经完稿。
+
+| 资源 | 源文件 / 运行时文件 | Unity 加载 key | 状态 | 备注 |
+|---|---|---|---|---|
+| 三栏法术卡面插画源图 | `Assets/ArtSource/Production/ArcadeDiceKing/SpellCardIllustrationPilotV1/spell_card_art_three_panel_pilot_v1_20261109.png` | 不适用 | 已批准用于当前原型运行接入 | `2172×724` 不透明 PNG；从左到右分别为冲关增幅、连锁分红与回声指令，每栏 `724×724`。不含卡名、规则、价格或购买键。 |
+| 法术卡面插画原型运行图 | `Assets/Resources/Art/Market/spell_card_art_pilot_strip.png` | `Art/Market/spell_card_art_pilot_strip` | 已准备运行资源，程序接入与运行验证另行记录 | 与源图字节完全相同，SHA-256 为 `524FD1B0FF684819B3080DCB5246AF6081F45CA242A4B94C35BC5214122C7D61`。以普通 `Texture2D` 导入，保留原图尺寸；最大边限制 `4096`、无非二次幂缩放、无压缩、无 mipmap、双线性过滤与 Clamp。 |
+
+原型复用映射保持与已确认网页一致：冲关增幅、精密校准、超额悬赏使用第零栏；连锁分红、饲料袋、削峰套现使用第一栏；回声指令、定向换货使用第二栏。此映射只用于本次原型运行接入，不定义后续逐牌正式插画内容，也不开放当前禁用的托盘法术。
+
+当前整幅 `arcade_market_common_base` 含旧左骰袋、右三大货柜与旧购买键，不能把其固定位槽当作新商品数量上限。新布局可将旧底板作为外框与材质来源，再由独立陈列面、商品卡及真实按钮热区承接新排版；不能让旧三柜轮廓透过新区域，也不能用整幅三柜图伸缩伪装可变货架。此条是资源使用边界，不提前宣称新布局的 Unity 截图或人工验收已通过。
+
+源图生成请求与原型说明见 `Assets/ArtSource/Production/ArcadeDiceKing/SpellCardIllustrationPilotV1/`。本次没有生成新画稿、改变牌效或增加正式供给数量；Notion 未同步。
+
 ## F021 通关与失败收束 V1 评审图
 
 以 F021 已通过的主游戏功能分区、连续低矮托盘、旧娱乐街机外壳和“家族壳 + 类型芯 + 数字面”为共同母版，生成三张同规格结果收束关键帧。用户于 2026-07-15 确认三图没有问题，已冻结为通关、可重试失败和生命归零的静态视觉基准。三图都是 `1672x941` 不透明评审源图，不是运行时贴图；下一门禁为三条分支的动态分镜，动效验收前仍不拆入 `Assets/Resources/Art/`，也没有 Unity 加载 key。
@@ -605,8 +620,8 @@ V4 响应用户“字形通过，但不处于同一水平线”的反馈，只�
 
 | 资源 | 当前文件 | Unity 加载 key | 状态 | 备注 |
 |---|---|---|---|---|
-| V4 正式二值字形 atlas | `Assets/Resources/Art/MainGame/Flow/main_game_led_font_atlas.png` | `Art/MainGame/Flow/main_game_led_font_atlas` | 已生成并接入 | `576×486`、当前 `850` 字形；生成器按代码 / 数据字符集合动态重算，Alpha 仅 `0 / 255`，`Point`、无 mipmap、无压缩。 |
-| V4 正式字形 map | `Assets/Resources/Art/MainGame/Flow/main_game_led_font_map.csv` | `Art/MainGame/Flow/main_game_led_font_map` | 已生成并接入 | 每字记录 `16` 行位图、活动宽度和锚点；当前代码 / 数据字符全覆盖，无重复 codepoint。 |
+| V4 正式二值字形 atlas | `Assets/Resources/Art/MainGame/Flow/main_game_led_font_atlas.png` | `Art/MainGame/Flow/main_game_led_font_atlas` | 已生成并接入 | `576×558`、当前 `973` 字形；2026-11-09 随图文商店文案重建，生成器按代码 / 数据字符集合动态重算，Alpha 仅 `0 / 255`，`Point`、无 mipmap、无压缩。 |
+| V4 正式字形 map | `Assets/Resources/Art/MainGame/Flow/main_game_led_font_map.csv` | `Art/MainGame/Flow/main_game_led_font_map` | 已生成并接入 | 当前 `973` 字形，每字记录 `16` 行位图、活动宽度和锚点；当前代码 / 数据字符全覆盖，共有旧字形位图与活动宽度守恒，无重复 codepoint。最新验证见 `Docs/QA/MarketVariableShelvesUnity20261109/capture-metrics.json`。 |
 | V4 三档共享样式合同 | `Assets/Resources/Art/MainGame/Flow/main_game_led_font_styles.csv` | `Art/MainGame/Flow/main_game_led_font_styles` | 已生成并接入 | `Display / Compact / Micro` 的灯珠、点距、字间和行距由同一 CSV 提供给离线生成器与 C# 运行时，禁止两边复制不同常量。 |
 | V4 双分辨率真值与上下文图 | `Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontRuntimeV4/` | 不适用 | 离线检查通过 | 包含全局真值板，以及主菜单、Run Ready、市场的 `1280×720 / 1920×1080` 同源上下文图。 |
 | V4 自动指标 | `Assets/ArtSource/Production/ArcadeDiceKing/MainGameFlowV1/LedFontRuntimeV4/led_font_runtime_metrics_v4_20260717.json` | 不适用 | 全部检查通过 | 字形守恒、底线偏差 `0`、二值 atlas、缺字、绘制入口白名单和命名样式均通过。 |

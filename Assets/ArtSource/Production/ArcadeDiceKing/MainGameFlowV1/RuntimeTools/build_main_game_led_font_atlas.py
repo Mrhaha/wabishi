@@ -442,17 +442,26 @@ def make_market_context(scale: float, path: Path) -> None:
     draw_runtime_text(image, (322, 17, 246, 48), "金币 8", 18, AMBER, "middle-center", False, scale)
     draw_runtime_text(image, (606, 17, 270, 48), "骰袋 6 / 6", 18, AMBER, "middle-center", False, scale)
     draw_runtime_text(image, (900, 17, 286, 48), "刷新 2 金", 18, AMBER_DIM, "middle-center", False, scale)
-    for x, name, faces in (
-        (292, "基础骰", "1 / 2 / 3 / 4 / 5 / 6"),
-        (586, "奇数骰", "1 / 3 / 5 / 7 / 9 / 11"),
-        (879, "金币骰", "1 / 2 / 3 / 4 / 5 / 6"),
-    ):
-        draw_runtime_text(image, (x + 24, 400, 229, 31), name, 17, AMBER, "middle-center", False, scale)
-        draw_runtime_text(image, (x + 18, 429, 241, 28), faces, 13, AMBER_DIM, "middle-center", False, scale)
-        draw_runtime_text(image, (x + 31, 472, 215, 57), "购买 3 金", 17, (43, 26, 14, 255), "middle-center", False, scale)
+    spell_cards = (
+        (292, "冲关增幅", "下一次结算结束、达标判定前，额外获得 5 分。", 2),
+        (586, "定向换货", "选择 1 个家族和 1 个非空货架位，将该商品替换为当前章节该家族的随机骰子。新商品仍需正常购买。", 3),
+    )
+    for x, name, rule, price in spell_cards:
+        card_rect = (x + 24, 160, 229, 188)
+        fill_virtual_rect(image, card_rect, (6, 20, 23, 235), scale)
+        outline_virtual_rect(image, card_rect, (51, 219, 199, 219), 3, scale)
+        outline_virtual_rect(image, (x + 33, 169, 211, 170), (235, 158, 51, 158), 2, scale)
+        draw_runtime_text(image, (x + 36, 178, 205, 52), name, 20, AMBER, "middle-center", False, scale)
+        draw_runtime_text(image, (x + 38, 232, 201, 86), rule, 14, (189, 165, 122, 255), "middle-center", True, scale)
+        draw_runtime_text(image, (x + 18, 407, 241, 56), f"法术牌 · {price} 金", 20, TEAL, "middle-center", False, scale)
+
+    draw_runtime_text(image, (897, 407, 241, 56), "磁力龟", 20, AMBER, "middle-center", False, scale)
+    for x in (292, 586, 879):
+        draw_runtime_text(image, (x + 31, 472, 215, 57), "购买", 17, (43, 26, 14, 255), "middle-center", False, scale)
     draw_runtime_text(image, (58, 601, 244, 82), "刷新 2 金", 17, (128, 240, 222, 255), "middle-center", False, scale)
-    draw_runtime_text(image, (334, 609, 550, 64), "悬停商品查看骰面与效果", 14, TEAL, "middle-center", False, scale)
-    draw_runtime_text(image, (912, 601, 301, 82), "SPACE 离开市场", 17, (43, 26, 14, 255), "middle-center", False, scale)
+    draw_runtime_text(image, (334, 609, 230, 64), "打开法术袋", 17, (43, 26, 14, 255), "middle-center", False, scale)
+    draw_runtime_text(image, (574, 609, 310, 64), "法术袋 1 / 3", 14, TEAL, "middle-center", False, scale)
+    draw_runtime_text(image, (912, 601, 301, 82), "离开市场", 17, (43, 26, 14, 255), "middle-center", False, scale)
     image.convert("RGB").save(path, optimize=True)
 
 
@@ -633,8 +642,9 @@ def build() -> None:
             "other_text_widget_calls": other_text_widget_calls,
             "serialized_text_component_hits": serialized_text_component_hits,
             "raw_gui_label_allowlist": [
-                "2 physical die-face numeral draws",
-                "1 missing-resource safety fallback",
+                "1 approved physical key-label draw",
+                "4 approved physical die-face numeral draws",
+                "3 missing-resource safety fallbacks",
             ],
             "raw_gui_toggle_allowlist": ["1 empty-content hit/control draw; label is rendered separately"],
             "raw_gui_button_allowlist": ["empty-content hit/control draws only; labels are rendered separately"],
@@ -664,7 +674,7 @@ def build() -> None:
             "no_halo_or_antialias": True,
             "physical_pixel_rounding_only": True,
             "all_dynamic_label_sites_route_standard": standard_label_calls >= 87,
-            "raw_gui_labels_match_allowlist": raw_label_calls == 3,
+            "raw_gui_labels_match_allowlist": raw_label_calls == 8,
             "raw_gui_toggle_matches_allowlist": raw_toggle_calls == 1,
             "raw_gui_buttons_are_textless": len(text_bearing_raw_button_lines) == 0,
             "no_other_text_widget_bypass": other_text_widget_calls == 0,

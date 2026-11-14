@@ -1,0 +1,9 @@
+{
+  "tool": "image_gen.imagegen",
+  "mode": "edit",
+  "transparent_background": false,
+  "referenced_image_paths": [
+    "Assets/ArtSource/Production/ArcadeDiceKing/MarketSeparatedShelvesV1/market_separated_shelves_pilot_v2_20261109.png",
+    "Assets/Resources/Art/DiceTypes/arcade_type_core_lucky_turtle.png"
+  ]
+}

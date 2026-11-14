@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-09",
+  "results": [
+    {
+      "entry": "index.html",
+      "redirectedTo": "index.html",
+      "diceOptions": 9,
+      "spellOptions": 9,
+      "automaticCounts": [
+        4,
+        6,
+        8,
+        32
+      ],
+      "independentPaging": true,
+      "lastPageEmptyStable": true,
+      "rebuild": true,
+      "resolutionAndHitboxes": [
+        1280,
+        1920
+      ],
+      "browserErrors": [],
+      "passed": true
+    },
+    {
+      "entry": "stress-template.html",
+      "redirectedTo": "index.html",
+      "diceOptions": 9,
+      "spellOptions": 9,
+      "automaticCounts": [
+        4,
+        6,
+        8,
+        32
+      ],
+      "independentPaging": true,
+      "lastPageEmptyStable": true,
+      "rebuild": true,
+      "resolutionAndHitboxes": [
+        1280,
+        1920
+      ],
+      "browserErrors": [],
+      "passed": true
+    },
+    {
+      "entry": "缺失数据故障注入",
+      "visibleError": true,
+      "passed": true
+    }
+  ]
+}
