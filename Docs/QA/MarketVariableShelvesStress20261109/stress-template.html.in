@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>商店可变数量压力测试</title><style>
+@font-face{font-family:WabishKey;src:url('__PHYSICAL_FONT__')}
+*{box-sizing:border-box}body{margin:0;background:#091017;color:#ffc04a;font:16px 'Microsoft YaHei',sans-serif}.review{padding:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.review label{display:flex;gap:8px;align-items:center}.review select,.review button{font:inherit;padding:6px 12px;background:#1b3038;color:#ffc04a;border:1px solid #73817b;border-radius:5px}.review p{margin:0;width:100%}#stage{position:relative}canvas{display:block}#hit-layer{position:absolute;inset:0}#hit-layer button{position:absolute;background:transparent;border:0;border-radius:6px;cursor:pointer;color:transparent}#hit-layer button:focus-visible{outline:2px solid #ffd36a;outline-offset:2px}#status{padding:12px}
+</style></head><body>
+<div class="review"><label>骰子数量<select id="dice-count"></select></label><label>法术数量<select id="spell-count"></select></label><label>原生分辨率<select id="resolution"><option value="1280">1280×720</option><option value="1920">1920×1080</option></select></label><button id="refresh-test">重建测试批次</button><p>图文卡展示原型：悬停法术卡查看完整效果。三张插画为评审示意，其余牌暂复用；购买只模拟留空。</p></div>
+<div id="stage"><canvas id="screen" width="1280" height="720" role="img" aria-label="可翻页的骰子与图文法术卡"></canvas><div id="hit-layer"></div><div id="spell-tooltip" role="tooltip" hidden style="position:absolute;pointer-events:none;z-index:3"><canvas id="spell-tooltip-canvas"></canvas><span id="spell-tooltip-description" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)"></span></div></div><div id="status" role="status" aria-live="polite">正在加载字库和图片…</div>
+<script>
+window.QA_BOOT_FAIL=function(message){window.QA_ERROR=message;document.getElementById('status').textContent='页面初始化失败：'+message+'。请重新打开本目录的 index.html。';};
+window.addEventListener('error',function(event){if(event.message)window.QA_BOOT_FAIL(event.message);});
+window.addEventListener('unhandledrejection',function(event){window.QA_BOOT_FAIL(event.reason&&event.reason.message||String(event.reason));});
+window.QA_DATA=__QA_DATA__;
+</script><script src="market-layout.js" onerror="QA_BOOT_FAIL('无法加载布局脚本')"></script><script src="stress-ui.js" onerror="QA_BOOT_FAIL('无法加载交互脚本')"></script></body></html>

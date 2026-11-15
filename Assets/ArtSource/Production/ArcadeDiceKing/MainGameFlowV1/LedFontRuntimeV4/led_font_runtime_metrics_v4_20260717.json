@@ -42,33 +42,34 @@
       "line_px": 18
     }
   },
-  "glyph_count": 911,
+  "glyph_count": 973,
   "atlas": {
     "size": [
       576,
-      522
+      558
     ],
-    "sha256": "0E79A8F12E9757278B82BE476B4D8B420CECABBD1DF8740D85F08A27BF62923A"
+    "sha256": "A2F9CCA44E887A20E2EA2CF9AB66A90FC51B7CB07B7A5B7C90D333029F34DFD7"
   },
   "map": {
-    "row_count": 911,
-    "sha256": "DA02A4F5502F2D312EE8F032B385CE814357BF252F399342A8A071A23C6E6C9E"
+    "row_count": 973,
+    "sha256": "E5C3283B6861C499996D157C420556224C4830FEE0764E7723D532B3A3550E05"
   },
   "styles": {
     "row_count": 3,
     "sha256": "5A81193E067F7BFEEDCDC721399C97D912A593726B36B58649690D889057BA0E"
   },
   "implementation_audit": {
-    "dynamic_label_sites_routed_to_standard_renderer": 92,
+    "dynamic_label_sites_routed_to_standard_renderer": 106,
     "raw_gui_label_calls": 8,
     "raw_gui_toggle_calls": 1,
-    "raw_gui_button_calls": 15,
+    "raw_gui_button_calls": 16,
     "text_bearing_raw_gui_button_calls": 0,
     "other_text_widget_calls": 0,
     "serialized_text_component_hits": [],
     "raw_gui_label_allowlist": [
-      "2 physical die-face numeral draws",
-      "1 missing-resource safety fallback"
+      "1 approved physical key-label draw",
+      "4 approved physical die-face numeral draws",
+      "3 missing-resource safety fallbacks"
     ],
     "raw_gui_toggle_allowlist": [
       "1 empty-content hit/control draw; label is rendered separately"
@@ -116,7 +117,7 @@
         1280,
         720
       ],
-      "sha256": "656D8E0E86EF59CE816D94778D2E5F0BFD615F292246B3C1804E39838F12ADE1"
+      "sha256": "60FC519F133560291F2E1C3FB3FA7EEB306E5DFC80C52D4F3853AA58921F33C3"
     },
     "led_font_runtime_v4_main_menu_1920x1080.png": {
       "size": [
@@ -137,7 +138,7 @@
         1920,
         1080
       ],
-      "sha256": "B403740969A80B31CC720DEAA5D270AB7BCBF13D2DC7500EFA003C09CC550C40"
+      "sha256": "A74289A6713B6682F10E94510159C5390514C13DC7E2DE74C9217C46FA966919"
     }
   },
   "checks": {
@@ -150,7 +151,7 @@
     "no_halo_or_antialias": true,
     "physical_pixel_rounding_only": true,
     "all_dynamic_label_sites_route_standard": true,
-    "raw_gui_labels_match_allowlist": false,
+    "raw_gui_labels_match_allowlist": true,
     "raw_gui_toggle_matches_allowlist": true,
     "raw_gui_buttons_are_textless": true,
     "no_other_text_widget_bypass": true,

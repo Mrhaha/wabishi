@@ -1,0 +1,234 @@
+{
+  "date": "2026-11-09",
+  "checks": [
+    {
+      "resolution": 1280,
+      "spell": "s0",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1280,
+      "spell": "s1",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1280,
+      "spell": "s2",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1280,
+      "spell": "s3",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1280,
+      "spell": "s4",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1280,
+      "spell": "s5",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1280,
+      "spell": "s6",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1280,
+      "spell": "s7",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1280,
+      "keyboardFocus": true,
+      "escape": true,
+      "blur": true
+    },
+    {
+      "resolution": 1280,
+      "cancelPending": "page",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "cancelPending": "rebuild",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "cancelPending": "buy",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "cancelPending": "leave",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "cancelPending": "resize",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "cancelPending": "replace",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "hoverThenBuy": true,
+      "originalIndex": true,
+      "clearedAfterPurchase": true
+    },
+    {
+      "resolution": 1920,
+      "spell": "s0",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1920,
+      "spell": "s1",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1920,
+      "spell": "s2",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1920,
+      "spell": "s3",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1920,
+      "spell": "s4",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1920,
+      "spell": "s5",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1920,
+      "spell": "s6",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1920,
+      "spell": "s7",
+      "fullRule": true,
+      "inBounds": true,
+      "buttonsUnobscured": true,
+      "stableNode": true,
+      "moveWithinCardStable": true
+    },
+    {
+      "resolution": 1920,
+      "keyboardFocus": true,
+      "escape": true,
+      "blur": true
+    },
+    {
+      "resolution": 1920,
+      "cancelPending": "page",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "cancelPending": "rebuild",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "cancelPending": "buy",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "cancelPending": "leave",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "cancelPending": "resize",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "cancelPending": "replace",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "hoverThenBuy": true,
+      "originalIndex": true,
+      "clearedAfterPurchase": true
+    }
+  ],
+  "errors": []
+}

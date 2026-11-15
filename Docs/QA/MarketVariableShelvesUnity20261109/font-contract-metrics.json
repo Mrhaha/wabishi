@@ -1,0 +1,163 @@
+{
+  "contract": "Wabish global LED text V4",
+  "scope": "all dynamic runtime text unless explicitly exempted",
+  "explicit_exceptions": [
+    "physical embossed die-face numerals",
+    "baked DICE KING cabinet marquee"
+  ],
+  "source_font": "C:\\Windows\\Fonts\\NotoSansSC-VF.ttf",
+  "source_font_weight": 500,
+  "logical_grid": [
+    16,
+    16
+  ],
+  "baseline_row": 14,
+  "midline_row": 7,
+  "named_styles_720p": {
+    "display": {
+      "name": "display",
+      "dot": 2,
+      "pitch": 3,
+      "char_gap": 4,
+      "line_gap": 6,
+      "cell_px": 47,
+      "line_px": 53
+    },
+    "compact": {
+      "name": "compact",
+      "dot": 1,
+      "pitch": 2,
+      "char_gap": 2,
+      "line_gap": 4,
+      "cell_px": 31,
+      "line_px": 35
+    },
+    "micro": {
+      "name": "micro",
+      "dot": 1,
+      "pitch": 1,
+      "char_gap": 1,
+      "line_gap": 2,
+      "cell_px": 16,
+      "line_px": 18
+    }
+  },
+  "glyph_count": 973,
+  "atlas": {
+    "size": [
+      576,
+      558
+    ],
+    "sha256": "A2F9CCA44E887A20E2EA2CF9AB66A90FC51B7CB07B7A5B7C90D333029F34DFD7"
+  },
+  "map": {
+    "row_count": 973,
+    "sha256": "E5C3283B6861C499996D157C420556224C4830FEE0764E7723D532B3A3550E05"
+  },
+  "styles": {
+    "row_count": 3,
+    "sha256": "5A81193E067F7BFEEDCDC721399C97D912A593726B36B58649690D889057BA0E"
+  },
+  "implementation_audit": {
+    "dynamic_label_sites_routed_to_standard_renderer": 106,
+    "raw_gui_label_calls": 8,
+    "raw_gui_toggle_calls": 1,
+    "raw_gui_button_calls": 16,
+    "text_bearing_raw_gui_button_calls": 0,
+    "other_text_widget_calls": 0,
+    "serialized_text_component_hits": [],
+    "raw_gui_label_allowlist": [
+      "1 approved physical key-label draw",
+      "4 approved physical die-face numeral draws",
+      "3 missing-resource safety fallbacks"
+    ],
+    "raw_gui_toggle_allowlist": [
+      "1 empty-content hit/control draw; label is rendered separately"
+    ],
+    "raw_gui_button_allowlist": [
+      "empty-content hit/control draws only; labels are rendered separately"
+    ],
+    "main_menu_baked_copy_is_covered": true,
+    "renderer_uses_named_styles": true,
+    "renderer_loads_shared_style_contract": true,
+    "renderer_forces_point_filter": true,
+    "renderer_uses_physical_pixel_rounding": true
+  },
+  "truth_outputs": {
+    "led_font_runtime_v4_truth_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "17B8FB804136504C83B09C24E4238EF86A177DDCAFC0F4D04BB878F9735DAC32"
+    },
+    "led_font_runtime_v4_truth_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "F1777B941CA8799F64531741CC9A02CC9939E1092E630719AA9E559CEDDA83FD"
+    },
+    "led_font_runtime_v4_main_menu_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "0F3D35D014B3CB18957569700C682CBD5587C0DB38389081F793E09D1C62AC92"
+    },
+    "led_font_runtime_v4_run_ready_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "D627F0572A97CA764D670CF37331A0B7A6CE768FDFCFE909F5745D1702EDA655"
+    },
+    "led_font_runtime_v4_market_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "60FC519F133560291F2E1C3FB3FA7EEB306E5DFC80C52D4F3853AA58921F33C3"
+    },
+    "led_font_runtime_v4_main_menu_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "0CF87D12EC2ED4912048EC1BCA9284C16E970F14E76306DE422A318DCC3AC6B1"
+    },
+    "led_font_runtime_v4_run_ready_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "5C38F14BB47E41B35F47E973791B2671273F893AA19C0D8BE8866FC6D762716D"
+    },
+    "led_font_runtime_v4_market_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "A74289A6713B6682F10E94510159C5390514C13DC7E2DE74C9217C46FA966919"
+    }
+  },
+  "checks": {
+    "v4_approved_shapes_preserved": true,
+    "approved_baseline_deviation_zero": true,
+    "atlas_is_binary_alpha": true,
+    "all_source_characters_mapped": true,
+    "native_720_truth": true,
+    "native_1080_truth": true,
+    "no_halo_or_antialias": true,
+    "physical_pixel_rounding_only": true,
+    "all_dynamic_label_sites_route_standard": true,
+    "raw_gui_labels_match_allowlist": true,
+    "raw_gui_toggle_matches_allowlist": true,
+    "raw_gui_buttons_are_textless": true,
+    "no_other_text_widget_bypass": true,
+    "no_serialized_text_component_bypass": true,
+    "main_menu_baked_copy_covered": true,
+    "runtime_named_styles_present": true,
+    "runtime_loads_shared_style_contract": true
+  }
+}

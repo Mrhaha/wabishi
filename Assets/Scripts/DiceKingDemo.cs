@@ -155,7 +155,20 @@ public sealed class DiceKingDemo : MonoBehaviour
         ClearancePig,
         SupplyPig,
         SharedFeastDemonTurtle,
-        SafetyNetTurtle
+        SafetyNetTurtle,
+        GuideTurtle,
+        HeavyArmorTurtle,
+        GreatTurtle,
+        SpellApprenticeTurtle,
+        ScribeTurtle,
+        CurseShellTurtle,
+        GrandSpellTurtle,
+        RunawayTurtle,
+        CloneTurtle,
+        ElderTurtle,
+        RotationTurtle,
+        LegacyDemonTurtle,
+        EmptyHoldTurtle
     }
 
     private enum MainFamily
@@ -378,6 +391,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         Empty,
         Die,
+        Spell,
         CraftingItem
     }
 
@@ -385,6 +399,29 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         BuyDie,
         SellDie
+    }
+
+    private enum SpellType
+    {
+        None,
+        PassBoost,
+        ChainDividend,
+        EchoCommand,
+        TargetedRestock,
+        PrecisionCalibration,
+        FeedBag,
+        PeakCashout,
+        DismantlePermit,
+        ShiftVoucher,
+        OverachieverBounty
+    }
+
+    private enum SpellCastStep
+    {
+        None,
+        ChooseDie,
+        ChooseFamily,
+        ChooseShelf
     }
 
     private enum DiceOrderDragSurface
@@ -422,6 +459,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         public int FaceGain;
         public int SellValue;
         public TurtleAttachmentSource Source;
+        public bool UsedThisStage;
+        public int StateValue;
 
         public TurtleAttachment Clone()
         {
@@ -430,7 +469,9 @@ public sealed class DiceKingDemo : MonoBehaviour
                 Type = Type,
                 FaceGain = FaceGain,
                 SellValue = SellValue,
-                Source = Source
+                Source = Source,
+                UsedThisStage = UsedThisStage,
+                StateValue = StateValue
             };
         }
     }
@@ -459,6 +500,9 @@ public sealed class DiceKingDemo : MonoBehaviour
         public int GamblerThreshold;
         public int InvestmentGold;
         public bool CollectionTriggeredThisStage;
+        public bool TurtleStageTriggered;
+        public bool TurtleMarketTriggered;
+        public int TurtleNextSettlementBonus;
         public List<TurtleAttachment> TurtleAttachments = new List<TurtleAttachment>();
         public List<AffixInstance> PrefixAffixes = new List<AffixInstance>();
         public List<AffixInstance> SuffixAffixes = new List<AffixInstance>();
@@ -500,6 +544,9 @@ public sealed class DiceKingDemo : MonoBehaviour
                 GamblerThreshold = 0,
                 InvestmentGold = 0,
                 CollectionTriggeredThisStage = false,
+                TurtleStageTriggered = false,
+                TurtleMarketTriggered = false,
+                TurtleNextSettlementBonus = 0,
                 TurtleAttachments = CloneTurtleAttachments(TurtleAttachments),
                 PrefixAffixes = CloneAffixes(PrefixAffixes),
                 SuffixAffixes = CloneAffixes(SuffixAffixes),
@@ -575,6 +622,40 @@ public sealed class DiceKingDemo : MonoBehaviour
         public int CopiedEventDepth;
     }
 
+    private sealed class GameplayChainResponse
+    {
+        public int EventId;
+        public string EventType;
+        public int SourceDieId;
+        public string SourceLabel;
+        public int ResponderDieId;
+        public string ResponderLabel;
+        public string ResponseType;
+        public int EnqueueOrder;
+        public bool PreserveCopiedDepth;
+        public Func<bool> IsValid;
+        public Func<string> Execute;
+    }
+
+    private sealed class GameplayChainContext
+    {
+        public string ChainId;
+        public string Phase;
+        public int Sequence;
+        public int EventSerial;
+        public int EnqueueSerial;
+        public int ProcessedActions;
+        public int RootDieId = -1;
+        public int RootSlot = -1;
+        public string RootLabel = string.Empty;
+        public string RootStateBefore = string.Empty;
+        public int Wave;
+        public bool ResolvingWave;
+        public readonly List<GameplayChainResponse> PendingResponses = new List<GameplayChainResponse>();
+        public readonly List<GameplayChainResponse> NextResponses = new List<GameplayChainResponse>();
+        public readonly HashSet<string> ResponseKeys = new HashSet<string>(StringComparer.Ordinal);
+    }
+
     private sealed class Encounter
     {
         public string Id;
@@ -620,6 +701,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         public MarketOfferKind Kind;
         public Die Die;
+        public SpellDefinition Spell;
         public CraftingItemDefinition CraftingItem;
         public int Price;
     }
@@ -700,6 +782,21 @@ public sealed class DiceKingDemo : MonoBehaviour
         public int WeightChapter1To2;
         public int WeightChapter3To5;
         public int WeightChapter6To10;
+    }
+
+    private sealed class SpellDefinition
+    {
+        public SpellType Type;
+        public string Id;
+        public string DisplayName;
+        public int Price;
+        public bool AllowMarket;
+        public bool AllowPreRoll;
+        public int WeightChapter1To2;
+        public int WeightChapter3To5;
+        public int WeightChapter6To10;
+        public bool Enabled;
+        public string RuleText;
     }
 
     private sealed class DiceMaterialConfig
@@ -1227,13 +1324,14 @@ public sealed class DiceKingDemo : MonoBehaviour
     private const int DiceRollStopFrameCount = 8;
     private const int DiceRollResultFaceCount = 6;
     private const string SavePrefix = "DiceKingDemo.";
-    private const int CurrentSaveVersion = 12;
+    private const int CurrentSaveVersion = 14;
     private const string EncounterTableResourcePath = "Data/chapter_score_table";
     private const string MarketDieConfigResourcePath = "Data/dice_market_config";
     private const string DiceTypeConfigResourcePath = "Data/dice_type_config";
     private const string KeywordGlossaryConfigResourcePath = "Data/keyword_glossary_config";
     private const string KeywordBindingConfigResourcePath = "Data/keyword_binding_config";
     private const string MarketRuleConfigResourcePath = "Data/market_rule_config";
+    private const string SpellMarketConfigResourcePath = "Data/spell_market_config";
     private const string DiceMaterialConfigResourcePath = "Data/dice_material_config";
     private const string DiceAffixTierConfigResourcePath = "Data/dice_affix_tier_config";
     private const string DiceAffixConfigResourcePath = "Data/dice_affix_config";
@@ -1260,6 +1358,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private const string PhysicalKeyLabelFontResourcePath = MainGameArtResourcePrefix + "Flow/wabish_physical_key_sans_sc_semibold";
     private const string MarketArtResourcePrefix = "Art/Market/";
     private const string MarketCommonBaseResourcePath = MarketArtResourcePrefix + "arcade_market_common_base";
+    private const string SpellCardArtResourcePath = MarketArtResourcePrefix + "spell_card_art_pilot_strip";
     private const int ArcadeRunPhysicalSlotCount = 6;
     private const float ArcadeRunDieSlotSize = 128f;
     private const float ArcadeRunDieSlotGap = 0f;
@@ -1359,8 +1458,12 @@ public sealed class DiceKingDemo : MonoBehaviour
     private readonly List<int> cheatRerollIds = new List<int>();
     private readonly List<Encounter> encounters = new List<Encounter>();
     private readonly List<MarketOffer> marketOffers = new List<MarketOffer>();
+    private readonly List<SpellType> spellBag = new List<SpellType>();
+    private readonly List<int> pendingSpellEchoDieIds = new List<int>();
+    private readonly List<int> marketLeaveRootDieIds = new List<int>();
     private readonly List<string> logLines = new List<string>();
     private readonly Dictionary<DieType, MarketDieConfig> marketDieConfigs = new Dictionary<DieType, MarketDieConfig>();
+    private readonly Dictionary<SpellType, SpellDefinition> spellDefinitions = new Dictionary<SpellType, SpellDefinition>();
     private readonly Dictionary<DiceMaterial, DiceMaterialConfig> diceMaterialConfigs = new Dictionary<DiceMaterial, DiceMaterialConfig>();
     private readonly Dictionary<DieType, DiceTypeTooltipConfig> diceTypeTooltipConfigs = new Dictionary<DieType, DiceTypeTooltipConfig>();
     private readonly Dictionary<string, KeywordGlossaryConfig> keywordGlossaryConfigs = new Dictionary<string, KeywordGlossaryConfig>(StringComparer.OrdinalIgnoreCase);
@@ -1376,6 +1479,8 @@ public sealed class DiceKingDemo : MonoBehaviour
     private readonly Dictionary<DiceMaterial, UnityEngine.Material> diceMaterialRenderMaterials = new Dictionary<DiceMaterial, UnityEngine.Material>();
     private readonly System.Random typeCoreVisualRandom = new System.Random(20260717);
     private FamilySettlementContext activeFamilySettlementContext;
+    private GameplayChainContext activeGameplayChain;
+    private int gameplayChainSerial;
 
     private GameMode mode = GameMode.MainMenu;
     private GameMode settingsReturnMode = GameMode.MainMenu;
@@ -1419,6 +1524,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private Texture2D mainGameDevilShellTexture;
     private Texture2D mainGamePirateShellTexture;
     private Texture2D marketCommonBaseTexture;
+    private Texture2D spellCardArtTexture;
     private AudioSource settlementAudioSource;
     private AudioClip settlementAbsorbClip;
     private AudioClip settlementNegativeClip;
@@ -1492,6 +1598,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private int lastStageIncome;
     private int lastComboBonus;
     private int lastTemporaryScore;
+    private int lastSpellScoreBonus;
     private int previewRollScore;
     private int previewIndividualScore;
     private int previewTemporaryScore;
@@ -1544,6 +1651,43 @@ public sealed class DiceKingDemo : MonoBehaviour
     private int currentMarketPaidRefreshCount;
     private int currentMarketPirateSellCount;
     private int currentMarketBlackMarketRefreshDiscount;
+    private int nextDiePurchaseDiscount;
+    private int nextSpellPurchaseDiscount;
+    private int nextTurtleTransferBonus;
+    private bool spellSystemEnabled = true;
+    private int spellBagCapacity = 3;
+    private int spellMarketMinimumShelves = 1;
+    private int spellMarketMaximumShelves = 2;
+    private int spellMarketExtraShelfChancePercent = 35;
+    private bool spellPanelOpen;
+    private int spellBagPage;
+    private int marketDieShelfPage;
+    private int marketSpellShelfPage;
+    private bool variableMarketUnderlayPass;
+    private readonly List<MarketOfferKind> marketShelfDisplayKinds = new List<MarketOfferKind>();
+    private SpellDefinition spellHoverCandidateDefinition;
+    private string spellHoverCandidateKey = string.Empty;
+    private Rect spellHoverCandidateRect;
+    private SpellDefinition spellHoverDefinition;
+    private string spellHoverKey = string.Empty;
+    private Rect spellHoverRect;
+    private float spellHoverStartedAt = -999f;
+    private float spellHoverDelay = TooltipHoverDelay;
+    private bool spellHoverVisible;
+    private int spellHoverScreenWidth;
+    private int spellHoverScreenHeight;
+    private bool marketLedMetricsLoaded;
+    private readonly Dictionary<char, int> marketLedGlyphWidths = new Dictionary<char, int>();
+    private int marketLedDot = 1;
+    private int marketLedPitch = 2;
+    private int marketLedCharacterGap = 2;
+    private int marketLedLineGap = 4;
+    private int spellCastingRackIndex = -1;
+    private SpellCastStep spellCastStep = SpellCastStep.None;
+    private MainFamily selectedSpellFamily = MainFamily.None;
+    private int pendingSpellScoreBonus;
+    private int pendingSpellDividendCount;
+    private int pendingSpellBountyCount;
     private int tavernBaseMinimumBonus;
     private int marketTemporaryMinimumBonus;
     private int feedQuality = 1;
@@ -1775,6 +1919,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         InitializeSettlementAudio();
         LoadRollFeedbackConfig(false);
         LoadMarketConfigs();
+        LoadSpellConfigs();
         LoadDiceTypeTooltipConfigs();
         LoadKeywordConfigs();
         LoadAffixConfigs();
@@ -1862,6 +2007,14 @@ public sealed class DiceKingDemo : MonoBehaviour
             Debug.Log("DiceKingDemo: DICE KING marquee preview restarted from the Inspector profile.");
         }
 
+        if (spellPanelOpen)
+        {
+            if (!CanOpenSpellPanel() || Input.GetKeyDown(KeyCode.Escape))
+            {
+                CloseSpellPanel();
+            }
+        }
+
         if (mode == GameMode.Settings)
         {
             UpdateSettingsTransition();
@@ -1886,6 +2039,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         if (mode != GameMode.Run)
+        {
+            return;
+        }
+
+        if (spellPanelOpen)
         {
             return;
         }
@@ -1974,6 +2132,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         float offsetY = (Screen.height - DesignHeight * scale) * 0.5f;
         UpdateUiMousePosition(scale, offsetX, offsetY);
         BeginDiceHoverTooltipFrame();
+        BeginSpellHoverFrame();
         if (diceOrderDragSurface != DiceOrderDragSurface.None
             && (!DiceOrderDragActive() || !CanReorderDiceOnSurface(diceOrderDragSurface)))
         {
@@ -2015,8 +2174,22 @@ public sealed class DiceKingDemo : MonoBehaviour
                 break;
         }
 
-        UpdateDiceHoverTooltipState();
-        DrawDiceHoverTooltip();
+        if (spellPanelOpen && CanOpenSpellPanel())
+        {
+            DrawSpellPanel();
+        }
+
+        if (!spellPanelOpen && spellHoverCandidateDefinition == null)
+        {
+            UpdateDiceHoverTooltipState();
+            DrawDiceHoverTooltip();
+        }
+        else if (spellHoverCandidateDefinition != null)
+        {
+            ClearDiceHoverTooltip();
+        }
+        UpdateSpellHoverState();
+        DrawSpellHoverTooltip();
         DrawActionTip();
 
         GUI.matrix = oldMatrix;
@@ -4720,6 +4893,15 @@ public sealed class DiceKingDemo : MonoBehaviour
         DrawRunPlayPanel(new Rect(260f, 112f, 708f, 500f), encounter);
         DrawRunSupportPanel(new Rect(1000f, 112f, 212f, 210f), encounter);
         DrawRunActionBar(new Rect(470f, 650f, 340f, 46f), encounter);
+        if (spellSystemEnabled && rollPhase == RollPhase.Ready)
+        {
+            GUI.enabled = !spellPanelOpen && IsSpellPreRollPhase();
+            if (DrawUiButton(new Rect(830f, 650f, 150f, 46f), "法术袋 " + spellBag.Count + "/" + Mathf.Max(1, spellBagCapacity), UiButtonKind.Secondary))
+            {
+                ToggleSpellPanel();
+            }
+            GUI.enabled = true;
+        }
 
         GUI.enabled = true;
 
@@ -4771,6 +4953,15 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         DrawArcadeRunActionKey(new Rect(458f, 574f, 356f, 72f), encounter);
+        if (spellSystemEnabled && rollPhase == RollPhase.Ready)
+        {
+            GUI.enabled = !spellPanelOpen && IsSpellPreRollPhase();
+            if (DrawArcadeDisplayButton(new Rect(844f, 584f, 184f, 54f), "法术袋 " + spellBag.Count + "/" + Mathf.Max(1, spellBagCapacity), false))
+            {
+                ToggleSpellPanel();
+            }
+            GUI.enabled = true;
+        }
         GUI.matrix = previousMatrix;
         DrawMainGameFlowPresentation();
         GUI.enabled = true;
@@ -7293,7 +7484,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         state.BaseScore = baseScore;
         state.Multiplier = multiplier;
         state.MultipliedScore = Mathf.RoundToInt(baseScore * multiplier);
-        state.BribeScore = Mathf.Max(0, lastBribeScoreBonus);
+        state.BribeScore = LastExtraSettlementScore();
         state.RollScore = rollScore;
         state.ResolvedScore = resolvedScore;
     }
@@ -7329,7 +7520,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         committedCounterBaseScore = baseScore;
         committedCounterMultiplier = multiplier;
         committedCounterMultipliedScore = Mathf.RoundToInt(baseScore * multiplier);
-        committedCounterBribeScore = Mathf.Max(0, lastBribeScoreBonus);
+        committedCounterBribeScore = LastExtraSettlementScore();
         committedCounterRollScore = rollScore;
         committedCounterResolvedScore = resolved;
     }
@@ -7690,16 +7881,17 @@ public sealed class DiceKingDemo : MonoBehaviour
             previousMultipliedScore = multipliedScore;
         }
 
-        bool hasBribe = lastBribeScoreBonus != 0;
-        if (hasBribe)
+        int extraSettlementScore = LastExtraSettlementScore();
+        bool hasExtraSettlementScore = extraSettlementScore != 0;
+        if (hasExtraSettlementScore)
         {
             settlementDisplayEvents.Add(new SettlementDisplayEvent
             {
                 Kind = SettlementEventKind.BribeFinal,
                 ScoreIndex = scoringDice.Count,
                 ScoreIndexEnd = scoringDice.Count,
-                Label = "额外入账",
-                ValueDelta = lastBribeScoreBonus,
+                Label = ExtraSettlementScoreLabel(),
+                ValueDelta = extraSettlementScore,
                 BaseScore = committedCounterBaseScore,
                 Multiplier = committedCounterMultiplier,
                 ProgressScore = committedCounterResolvedScore,
@@ -7708,7 +7900,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 TargetArea = SettlementTargetArea.Target,
                 ApplyFinal = true,
                 UseCommittedSnapshot = true,
-                LocalImpactWeight01 = SettlementLocalImpactWeight(lastBribeScoreBonus, Mathf.Max(1, maxMagnitude))
+                LocalImpactWeight01 = SettlementLocalImpactWeight(extraSettlementScore, Mathf.Max(1, maxMagnitude))
             });
         }
 
@@ -7727,7 +7919,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             Duration = MainGameSettlementFinaleDuration(settlementFinaleTier),
             HighlightLevel = SettlementHighlightLevel.Target,
             TargetArea = SettlementTargetArea.Target,
-            ApplyFinal = !hasBribe,
+            ApplyFinal = !hasExtraSettlementScore,
             Passed = willPass,
             FeedbackTier = settlementFinaleTier
         });
@@ -7846,25 +8038,20 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         Encounter encounter = CurrentEncounter();
         bool willPass = encounter != null && resolvedScore >= encounter.Target;
-        bool bribeEventAppliesFinal = lastBribeScoreBonus > 0;
+        int extraSettlementScore = LastExtraSettlementScore();
+        bool extraEventAppliesFinal = extraSettlementScore > 0;
         SettlementFeedbackTier feedbackTier = SettlementFeedbackTierForResult(encounter, resolvedScore);
         settlementFinaleTier = feedbackTier;
 
-        if (bribeEventAppliesFinal)
+        if (extraEventAppliesFinal)
         {
-            string bribeLabel = "贿赂 +" + lastBribeScoreBonus;
-            if (lastBribeGoldSpent > 0)
-            {
-                bribeLabel += " / -" + lastBribeGoldSpent + " 金";
-            }
-
             settlementDisplayEvents.Add(new SettlementDisplayEvent
             {
                 Kind = SettlementEventKind.BribeFinal,
                 ScoreIndex = scoringDice.Count,
                 ScoreIndexEnd = scoringDice.Count,
-                Label = bribeLabel,
-                ValueDelta = Mathf.Max(0, lastBribeScoreBonus),
+                Label = ExtraSettlementScoreLabel(),
+                ValueDelta = extraSettlementScore,
                 GoldDelta = -Mathf.Max(0, lastBribeGoldSpent),
                 BaseScore = committedCounterBaseScore,
                 Multiplier = committedCounterMultiplier,
@@ -7888,10 +8075,35 @@ public sealed class DiceKingDemo : MonoBehaviour
             Duration = MainGameSettlementFinaleDuration(feedbackTier),
             HighlightLevel = SettlementHighlightLevel.Target,
             TargetArea = SettlementTargetArea.Target,
-            ApplyFinal = !bribeEventAppliesFinal,
+            ApplyFinal = !extraEventAppliesFinal,
             Passed = willPass,
             FeedbackTier = feedbackTier
         });
+    }
+
+    private int LastExtraSettlementScore()
+    {
+        return Mathf.Max(0, lastBribeScoreBonus) + Mathf.Max(0, lastSpellScoreBonus);
+    }
+
+    private string ExtraSettlementScoreLabel()
+    {
+        List<string> parts = new List<string>();
+        if (lastBribeScoreBonus > 0)
+        {
+            string bribeText = "贿赂 +" + lastBribeScoreBonus;
+            if (lastBribeGoldSpent > 0)
+            {
+                bribeText += " / -" + lastBribeGoldSpent + " 金";
+            }
+            parts.Add(bribeText);
+        }
+        if (lastSpellScoreBonus > 0)
+        {
+            parts.Add("冲关增幅 +" + lastSpellScoreBonus);
+        }
+
+        return parts.Count > 0 ? string.Join("；", parts.ToArray()) : "额外入账";
     }
 
     private RunScoreCounterStep SettlementCounterStepAt(int scoreIndex)
@@ -9083,12 +9295,22 @@ public sealed class DiceKingDemo : MonoBehaviour
         AddDiceBagTypeLine(lines, DieType.Demon, "恶魔");
         AddDiceBagTypeLine(lines, DieType.DemonBat, "魔蝠");
         AddDiceBagTypeLine(lines, DieType.AbyssSummon, "深渊");
+        AddDiceBagTypeLine(lines, DieType.GuideTurtle, "领路龟");
         AddDiceBagTypeLine(lines, DieType.MoneyTurtle, "金钱龟");
         AddDiceBagTypeLine(lines, DieType.TinyTurtle, "小小龟");
+        AddDiceBagTypeLine(lines, DieType.SpellApprenticeTurtle, "学徒龟");
+        AddDiceBagTypeLine(lines, DieType.RunawayTurtle, "出走龟");
+        AddDiceBagTypeLine(lines, DieType.CloneTurtle, "克隆龟");
         AddDiceBagTypeLine(lines, DieType.DoubleTurtle, "双倍龟");
         AddDiceBagTypeLine(lines, DieType.LuckyTurtle, "幸运龟");
+        AddDiceBagTypeLine(lines, DieType.HeavyArmorTurtle, "重甲龟");
         AddDiceBagTypeLine(lines, DieType.MagnetTurtle, "磁力龟");
+        AddDiceBagTypeLine(lines, DieType.ScribeTurtle, "抄经龟");
+        AddDiceBagTypeLine(lines, DieType.CurseShellTurtle, "咒壳龟");
+        AddDiceBagTypeLine(lines, DieType.ElderTurtle, "长老龟");
+        AddDiceBagTypeLine(lines, DieType.GreatTurtle, "伟大龟");
         AddDiceBagTypeLine(lines, DieType.RallyTurtle, "呼朋龟");
+        AddDiceBagTypeLine(lines, DieType.GrandSpellTurtle, "大法术龟");
         AddDiceBagTypeLine(lines, DieType.LeaderTurtle, "首领龟");
         AddDiceBagTypeLine(lines, DieType.RefreshPirate, "刷新海盗");
         AddDiceBagTypeLine(lines, DieType.PlunderPirate, "劫掠海盗");
@@ -9099,14 +9321,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         AddDiceBagTypeLine(lines, DieType.RobberyPirate, "抢劫海盗");
         AddDiceBagTypeLine(lines, DieType.PirateKing, "海贼王");
         AddDiceBagTypeLine(lines, DieType.BlackSailBat, "黑帆魔蝠");
-        AddDiceBagTypeLine(lines, DieType.PackTurtle, "驮粮龟");
+        AddDiceBagTypeLine(lines, DieType.RotationTurtle, "轮作龟");
         AddDiceBagTypeLine(lines, DieType.TributePig, "贡猪");
         AddDiceBagTypeLine(lines, DieType.BlackMarketImp, "黑市小鬼");
         AddDiceBagTypeLine(lines, DieType.BloodPactCaptain, "血契船长");
         AddDiceBagTypeLine(lines, DieType.ClearancePig, "清仓猪");
         AddDiceBagTypeLine(lines, DieType.SupplyPig, "补给猪");
-        AddDiceBagTypeLine(lines, DieType.SharedFeastDemonTurtle, "共食魔龟");
-        AddDiceBagTypeLine(lines, DieType.SafetyNetTurtle, "托底龟");
+        AddDiceBagTypeLine(lines, DieType.LegacyDemonTurtle, "遗产魔龟");
+        AddDiceBagTypeLine(lines, DieType.EmptyHoldTurtle, "空舱龟");
         AddDiceBagTypeLine(lines, DieType.Lightfang, "光牙");
         AddDiceBagTypeLine(lines, DieType.Duet, "二重唱");
         AddDiceBagTypeLine(lines, DieType.Trigger, "触发器");
@@ -9468,160 +9690,488 @@ public sealed class DiceKingDemo : MonoBehaviour
             && !affixFeatureEnabled;
     }
 
-    private void DrawArcadeMarket(bool chapterMarket)
+    private void ResetMarketShelfPresentation()
     {
-        Encounter encounter = CurrentEncounter();
-        string title = chapterMarket && encounter != null ? "章节市场" : "关间市场";
-        int refreshCost = CurrentMarketRefreshNetCost(chapterMarket);
-        bool marketLeaveLocked = marketLeaveEffectSequenceActive;
+        marketShelfDisplayKinds.Clear();
+        marketDieShelfPage = 0;
+        marketSpellShelfPage = 0;
+        ClearSpellHover();
+    }
 
-        if (selectedMarketDieIndex >= dice.Count)
+    private void EnsureMarketShelfPresentation()
+    {
+        while (marketShelfDisplayKinds.Count > marketOffers.Count)
         {
-            selectedMarketDieIndex = dice.Count - 1;
+            marketShelfDisplayKinds.RemoveAt(marketShelfDisplayKinds.Count - 1);
         }
-        if (selectedMarketDieIndex < 0 && dice.Count > 0 && !marketLeaveLocked)
+        while (marketShelfDisplayKinds.Count < marketOffers.Count)
         {
-            selectedMarketDieIndex = 0;
+            marketShelfDisplayKinds.Add(MarketOfferKind.Die);
         }
-
-        DrawLedRoleText(new Rect(66f, 17f, 220f, 48f), title, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
-        DrawLedRoleText(new Rect(322f, 17f, 246f, 48f), "金币 " + chapterGold, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
-
-        List<int> marketVisualIndices = DiceOrderVisualIndices(DiceOrderDragSurface.MarketBag);
-        Rect[] marketSlotRects = new Rect[marketVisualIndices.Count];
-        for (int i = 0; i < marketVisualIndices.Count; i++)
+        bool changed = false;
+        for (int i = 0; i < marketOffers.Count; i++)
         {
-            int dieIndex = marketVisualIndices[i];
-            if (dieIndex < 0 || dieIndex >= dice.Count)
+            MarketOffer offer = marketOffers[i];
+            if (offer == null || offer.Kind == MarketOfferKind.Empty)
             {
                 continue;
             }
-
-            Die die = dice[dieIndex];
-            Rect rect = MarketBagSlotRect(i);
-            marketSlotRects[i] = rect;
-            bool draggedGhost = IsDiceOrderDraggedDie(DiceOrderDragSurface.MarketBag, die);
-            if (draggedGhost)
+            MarketOfferKind kind = offer.Kind == MarketOfferKind.Spell ? MarketOfferKind.Spell : MarketOfferKind.Die;
+            if (marketShelfDisplayKinds[i] != kind)
             {
-                DrawDiceOrderInsertMarker(rect, false);
-                DrawDiceOrderGhost(rect);
-            }
-            else
-            {
-                DrawArcadeMarketBagDie(rect, die, dieIndex == selectedMarketDieIndex, "market-bag-" + die.Id, true);
-            }
-
-            if (marketLeaveEffectSequenceActive && die != null && die.Id == marketLeaveEffectVisualHostId)
-            {
-                DrawMarketLeaveAttachmentTarget(rect);
-            }
-
-            DrawArcadeMarketLeaveScan(rect, dieIndex);
-            if (!marketLeaveLocked)
-            {
-                HandleDiceOrderDragMouseDown(DiceOrderDragSurface.MarketBag, dieIndex, rect);
+                marketShelfDisplayKinds[i] = kind;
+                changed = true;
             }
         }
-
-        if (!marketLeaveLocked)
+        if (changed)
         {
-            UpdateDiceOrderDragFromSlots(DiceOrderDragSurface.MarketBag, marketSlotRects, false);
+            ClearSpellHover();
         }
+    }
+
+    private List<int> MarketShelfIndices(bool spells)
+    {
+        EnsureMarketShelfPresentation();
+        List<int> indices = new List<int>();
+        for (int i = 0; i < marketOffers.Count; i++)
+        {
+            if ((marketShelfDisplayKinds[i] == MarketOfferKind.Spell) == spells)
+            {
+                indices.Add(i);
+            }
+        }
+        return indices;
+    }
+
+    private int MarketShelfPageCount(bool spells)
+    {
+        return Mathf.Max(1, Mathf.CeilToInt(MarketShelfIndices(spells).Count / 4f));
+    }
+
+    private void SetMarketShelfPage(bool spells, int page)
+    {
+        int bounded = Mathf.Clamp(page, 0, MarketShelfPageCount(spells) - 1);
+        if (spells) marketSpellShelfPage = bounded;
+        else marketDieShelfPage = bounded;
+        ClearSpellHover();
+        ClearDiceHoverTooltip();
+    }
+
+    private List<int> VisibleMarketShelfIndices(bool spells)
+    {
+        List<int> all = MarketShelfIndices(spells);
+        int page = Mathf.Clamp(spells ? marketSpellShelfPage : marketDieShelfPage, 0, Mathf.Max(0, (all.Count - 1) / 4));
+        if (spells) marketSpellShelfPage = page;
+        else marketDieShelfPage = page;
+        int start = page * 4;
+        return all.GetRange(Mathf.Min(start, all.Count), Mathf.Min(4, Mathf.Max(0, all.Count - start)));
+    }
+
+    private Rect VariableMarketOfferRect(bool spells, int visibleSlot)
+    {
+        const float rowLeft = 236f;
+        const float rowWidth = 1008f;
+        const float cardWidth = 240f;
+        const float minimumGap = 16f;
+        // 已售空位仍占本页原单元，避免交易后其余商品跳位。
+        int count = Mathf.Clamp(VisibleMarketShelfIndices(spells).Count, 1, 4);
+        float cellWidth = (rowWidth - minimumGap * (count - 1)) / count;
+        float x = rowLeft + visibleSlot * (cellWidth + minimumGap) + (cellWidth - cardWidth) * 0.5f;
+        return new Rect(x, spells ? 390f : 128f, cardWidth, spells ? 224f : 204f);
+    }
+
+    private Rect VariableMarketPriceRect(bool spells, Rect offerRect)
+    {
+        return new Rect(offerRect.x + 12f, offerRect.y + (spells ? 140f : 121f), offerRect.width - 24f, 31f);
+    }
+
+    private Rect VariableMarketBuyRect(bool spells, Rect offerRect)
+    {
+        return new Rect(offerRect.x + 12f, offerRect.y + (spells ? 177f : 158f), offerRect.width - 24f, 40f);
+    }
+
+    private void DrawVariableMarketPanel(Rect rect, bool glass)
+    {
+        DrawRect(rect, glass ? new Color(0.026f, 0.052f, 0.067f, 1f) : new Color(0.055f, 0.09f, 0.12f, 1f));
+        DrawBorder(rect, new Color(0.25f, 0.32f, 0.33f, 1f), 1f);
+        DrawBorder(InsetRect(rect, 3f, 3f), new Color(0.065f, 0.10f, 0.12f, 1f), 1f);
+    }
+
+    private void DrawVariableMarketKeyFace(Rect rect, bool light)
+    {
+        if (marketCommonBaseTexture == null)
+        {
+            DrawRect(rect, light ? new Color(0.83f, 0.72f, 0.55f, 1f) : new Color(0.07f, 0.23f, 0.23f, 1f));
+            DrawBorder(rect, new Color(0.42f, 0.39f, 0.31f, 1f), 2f);
+            return;
+        }
+        // 只采样旧无字底板的干净键帽，九宫保留边缘，不拉伸整张旧货柜。
+        Rect source = light ? new Rect(618f, 475f, 215f, 57f) : new Rect(61f, 604f, 238f, 76f);
+        float border = 10f;
+        float[] sx = { source.x, source.x + border, source.xMax - border, source.xMax };
+        float[] sy = { source.y, source.y + border, source.yMax - border, source.yMax };
+        float[] dx = { rect.x, rect.x + border, rect.xMax - border, rect.xMax };
+        float[] dy = { rect.y, rect.y + border, rect.yMax - border, rect.yMax };
+        Color previous = GUI.color;
+        GUI.color = Color.white;
+        for (int y = 0; y < 3; y++)
+        {
+            for (int x = 0; x < 3; x++)
+            {
+                Rect destination = Rect.MinMaxRect(dx[x], dy[y], dx[x + 1], dy[y + 1]);
+                Rect uv = new Rect(sx[x] / VirtualWidth, 1f - sy[y + 1] / VirtualHeight,
+                    (sx[x + 1] - sx[x]) / VirtualWidth, (sy[y + 1] - sy[y]) / VirtualHeight);
+                GUI.DrawTextureWithTexCoords(destination, marketCommonBaseTexture, uv, true);
+            }
+        }
+        GUI.color = previous;
+    }
+
+    private ArcadeMarketButtonResult DrawVariableMarketButton(Rect rect, string label, bool enabled, bool light, string key)
+    {
+        DrawVariableMarketKeyFace(rect, light);
+        return DrawArcadeMarketButton(rect, label, enabled, light, key, !variableMarketUnderlayPass);
+    }
+
+    private void DrawArcadeMarket(bool chapterMarket)
+    {
+        EnsureMarketShelfPresentation();
+        variableMarketUnderlayPass = spellPanelOpen;
+        bool locked = marketLeaveEffectSequenceActive || spellPanelOpen;
+        DrawRect(new Rect(16f, 12f, 1248f, 696f), new Color(0.055f, 0.09f, 0.12f, 1f));
+        DrawVariableMarketPanel(new Rect(14f, 12f, 1252f, 64f), true);
+        DrawVariableMarketPanel(new Rect(18f, 84f, 188f, 540f), true);
+        DrawVariableMarketPanel(new Rect(214f, 84f, 1048f, 250f), true);
+        DrawVariableMarketPanel(new Rect(214f, 342f, 1048f, 282f), true);
+        DrawLedRoleText(new Rect(30f, 20f, 330f, 47f), chapterMarket ? "章节市场" : "关间市场", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
+        Encounter encounter = CurrentEncounter();
+        if (encounter != null)
+        {
+            DrawLedRoleText(new Rect(410f, 26f, 320f, 31f), "第 " + encounter.ChapterIndex + " 章", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        }
+        DrawLedRoleText(new Rect(800f, 26f, 430f, 31f), "金币 " + chapterGold, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleRight);
+        DrawLedRoleText(new Rect(28f, 94f, 170f, 31f), "骰袋 " + dice.Count + " / " + DiceCapacity, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        selectedMarketDieIndex = dice.Count > 0 ? Mathf.Clamp(selectedMarketDieIndex, 0, dice.Count - 1) : -1;
+        List<int> visual = DiceOrderVisualIndices(DiceOrderDragSurface.MarketBag);
+        Rect[] slots = new Rect[visual.Count];
+        for (int i = 0; i < DiceCapacity; i++)
+        {
+            Rect slot = MarketBagSlotRect(i);
+            DrawVariableMarketPanel(slot, true);
+            if (i >= visual.Count) continue;
+            int index = visual[i];
+            if (index < 0 || index >= dice.Count) continue;
+            Die die = dice[index];
+            slots[i] = slot;
+            if (IsDiceOrderDraggedDie(DiceOrderDragSurface.MarketBag, die))
+            {
+                DrawDiceOrderInsertMarker(slot, false);
+                DrawDiceOrderGhost(slot);
+            }
+            else DrawArcadeMarketBagDie(slot, die, index == selectedMarketDieIndex, "market-bag-" + die.Id, !locked);
+            if (marketLeaveEffectSequenceActive && die.Id == marketLeaveEffectVisualHostId) DrawMarketLeaveAttachmentTarget(slot);
+            DrawArcadeMarketLeaveScan(slot, index);
+            if (!locked) HandleDiceOrderDragMouseDown(DiceOrderDragSurface.MarketBag, index, slot);
+        }
+        if (!locked) UpdateDiceOrderDragFromSlots(DiceOrderDragSurface.MarketBag, slots, false);
         DrawDiceOrderFloatingDie(DiceOrderDragSurface.MarketBag);
         DrawMarketLeaveAttachmentFlyVisual();
-
-        Rect sellKey = new Rect(59f, 496f, 172f, 72f);
-        bool hasSelectedDie = selectedMarketDieIndex >= 0 && selectedMarketDieIndex < dice.Count;
-        ArcadeMarketButtonResult sellResult = DrawArcadeMarketButton(
-            sellKey,
-            "卖出",
-            hasSelectedDie && !marketLeaveLocked,
-            true,
-            "market-sell");
-        if (sellResult == ArcadeMarketButtonResult.Activated)
+        bool selected = selectedMarketDieIndex >= 0 && selectedMarketDieIndex < dice.Count;
+        DrawLedRoleText(new Rect(30f, 534f, 164f, 31f), "售价 " + (selected ? SellPrice(dice[selectedMarketDieIndex]) : 0) + " 金", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        ArcadeMarketButtonResult sell = DrawVariableMarketButton(new Rect(34f, 574f, 156f, 44f), "卖出", selected && !locked, true, "market-sell");
+        if (sell == ArcadeMarketButtonResult.Activated)
         {
+            ClearSpellHover();
             SellSelectedMarketDie();
             ShowActionTip("已卖出", ActionTipSemantic.Success, "market-action");
         }
-        else if (sellResult == ArcadeMarketButtonResult.Blocked)
-        {
-            ShowActionTip(MarketSellBlockedReason(hasSelectedDie), ActionTipSemantic.Warning, "market-action");
-        }
+        else if (sell == ArcadeMarketButtonResult.Blocked) ShowActionTip(MarketSellBlockedReason(selected), ActionTipSemantic.Warning, "market-action");
 
-        float[] offerXs = { 292f, 586f, 879f };
-        for (int i = 0; i < offerXs.Length; i++)
-        {
-            MarketOffer offer = i < marketOffers.Count ? marketOffers[i] : null;
-            Rect offerRect = new Rect(offerXs[i], 118f, 277f, 430f);
-            DrawArcadeMarketOffer(offerRect, offer, "market-offer-" + i);
-
-            if (!HasArcadeMarketPurchaseAction(offer))
-            {
-                continue;
-            }
-
-            bool canBuy = !marketLeaveLocked && CanBuyMarketOffer(offer);
-            Rect buyKey = new Rect(offerRect.x + 31f, offerRect.y + 354f, 215f, 57f);
-            ArcadeMarketButtonResult buyResult = DrawArcadeMarketButton(
-                buyKey,
-                "购买",
-                canBuy,
-                true,
-                "market-buy-" + i);
-            if (buyResult == ArcadeMarketButtonResult.Activated)
-            {
-                BuyOffer(i);
-                ShowActionTip("已购买", ActionTipSemantic.Success, "market-action");
-                break;
-            }
-            if (buyResult == ArcadeMarketButtonResult.Blocked)
-            {
-                ShowActionTip(MarketBuyBlockedReason(offer, marketLeaveLocked), ActionTipSemantic.Warning, "market-action");
-            }
-        }
-
-        bool canRefresh = !marketLeaveLocked && (refreshCost <= 0 || chapterGold >= refreshCost);
-        ArcadeMarketButtonResult refreshResult = DrawArcadeMarketButton(
-            new Rect(58f, 601f, 244f, 82f),
-            "刷新",
-            canRefresh,
-            false,
-            "market-refresh");
-        if (refreshResult == ArcadeMarketButtonResult.Activated)
+        DrawVariableMarketShelf(false, locked, false);
+        DrawVariableMarketShelf(true, locked, false);
+        int refreshCost = CurrentMarketRefreshNetCost(chapterMarket);
+        ArcadeMarketButtonResult refresh = DrawVariableMarketButton(new Rect(24f, 642f, 176f, 52f), "刷新", !locked && (refreshCost <= 0 || chapterGold >= refreshCost), false, "market-refresh");
+        if (refresh == ArcadeMarketButtonResult.Activated)
         {
             RefreshMarketOffers(chapterMarket);
             ShowActionTip("已刷新", ActionTipSemantic.Success, "market-action");
         }
-        else if (refreshResult == ArcadeMarketButtonResult.Blocked)
+        else if (refresh == ArcadeMarketButtonResult.Blocked) ShowActionTip(MarketRefreshBlockedReason(refreshCost, locked), ActionTipSemantic.Warning, "market-action");
+        string cost = refreshCost < 0 ? "刷新返利 " + (-refreshCost) + " 金" : refreshCost == 0 ? "整批刷新 免费" : "整批刷新 " + refreshCost + " 金";
+        DrawLedRoleText(new Rect(224f, 653f, 298f, 31f), cost, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
+        if (spellSystemEnabled)
         {
-            ShowActionTip(MarketRefreshBlockedReason(refreshCost, marketLeaveLocked), ActionTipSemantic.Warning, "market-action");
+            string bag = "法术袋 " + spellBag.Count + " / " + Mathf.Max(1, spellBagCapacity);
+            ArcadeMarketButtonResult open = DrawVariableMarketButton(new Rect(530f, 642f, 340f, 52f), bag, !locked && IsSpellMarketPhase(), false, "market-spell-bag");
+            if (open == ArcadeMarketButtonResult.Activated) ToggleSpellPanel();
+            else if (open == ArcadeMarketButtonResult.Blocked) ShowActionTip(locked ? "离场结算中" : "当前不可打开法术袋", ActionTipSemantic.Warning, "market-action");
         }
-
-        string feedback = ArcadeMarketFeedbackText(chapterMarket);
-        DrawLedRoleText(
-            new Rect(334f, 609f, 550f, 64f),
-            TooltipTrim(feedback, 48),
-            marketLeaveLocked ? MainGameLedFont.TextRole.FocusTeal : MainGameLedFont.TextRole.SecondaryAmber,
-            TextAnchor.MiddleCenter);
-
-        bool canLeave = dice.Count > 0 && !marketLeaveLocked;
-        ArcadeMarketButtonResult leaveResult = DrawArcadeMarketButton(
-            new Rect(912f, 601f, 301f, 82f),
-            "离开市场",
-            canLeave,
-            true,
-            "market-leave");
-        if (leaveResult == ArcadeMarketButtonResult.Activated)
+        ArcadeMarketButtonResult leave = DrawVariableMarketButton(new Rect(900f, 642f, 348f, 52f), "离开市场", dice.Count > 0 && !locked, true, "market-leave");
+        if (leave == ArcadeMarketButtonResult.Activated) ActivateMarketLeave();
+        else if (leave == ArcadeMarketButtonResult.Blocked) ShowActionTip(MarketLeaveBlockedReason(locked), ActionTipSemantic.Warning, "market-action");
+        if (marketLeaveEffectSequenceActive)
         {
-            ActivateMarketLeave();
+            DrawVariableMarketPanel(new Rect(224f, 348f, 1020f, 32f), true);
+            string fullFeedback = ArcadeMarketFeedbackText(chapterMarket) ?? string.Empty;
+            string feedback = fullFeedback;
+            int feedbackLimit = fullFeedback.Length;
+            while (feedbackLimit > 0 && MarketLedLineWidth(feedback) > 1004f)
+            {
+                feedback = TooltipTrim(fullFeedback, --feedbackLimit);
+            }
+            DrawLedRoleText(new Rect(232f, 348f, 1004f, 31f), feedback, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
         }
-        else if (leaveResult == ArcadeMarketButtonResult.Blocked)
-        {
-            ShowActionTip(MarketLeaveBlockedReason(marketLeaveLocked), ActionTipSemantic.Warning, "market-action");
-        }
-
         GUI.enabled = true;
+        variableMarketUnderlayPass = false;
     }
+
+    private void DrawVariableMarketShelf(bool spells, bool locked, bool chooseTarget)
+    {
+        List<int> all = MarketShelfIndices(spells);
+        int live = 0;
+        for (int i = 0; i < all.Count; i++)
+        {
+            MarketOffer offer = marketOffers[all[i]];
+            if (offer != null && offer.Kind != MarketOfferKind.Empty) live++;
+        }
+        float headerY = spells ? 348f : 88f;
+        DrawLedRoleText(new Rect(224f, headerY + 3f, 670f, 31f), (spells ? "法术牌 " : "骰子货架 ") + live + " / " + all.Count + (spells ? " 张" : " 件"), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
+        int pages = MarketShelfPageCount(spells);
+        int page = Mathf.Clamp(spells ? marketSpellShelfPage : marketDieShelfPage, 0, pages - 1);
+        if (pages > 1)
+        {
+            ArcadeMarketButtonResult previous = DrawVariableMarketButton(new Rect(1000f, headerY, 48f, 36f), "<", !locked && page > 0, false, (spells ? "spell" : "die") + "-previous");
+            DrawLedRoleText(new Rect(1056f, headerY + 3f, 132f, 31f), (page + 1) + " / " + pages, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+            ArcadeMarketButtonResult next = DrawVariableMarketButton(new Rect(1196f, headerY, 48f, 36f), ">", !locked && page + 1 < pages, false, (spells ? "spell" : "die") + "-next");
+            if (previous == ArcadeMarketButtonResult.Activated) SetMarketShelfPage(spells, page - 1);
+            if (next == ArcadeMarketButtonResult.Activated) SetMarketShelfPage(spells, page + 1);
+        }
+        List<int> visible = VisibleMarketShelfIndices(spells);
+        for (int slot = 0; slot < visible.Count; slot++)
+        {
+            int index = visible[slot];
+            MarketOffer offer = marketOffers[index];
+            Rect rect = VariableMarketOfferRect(spells, slot);
+            DrawVariableMarketPanel(rect, true);
+            if (offer == null || offer.Kind == MarketOfferKind.Empty)
+            {
+                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 76f, rect.width - 24f, 31f), "已售出", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+                continue;
+            }
+            if (spells && offer.Spell != null)
+            {
+                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 8f, rect.width - 24f, 31f), offer.Spell.DisplayName, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+                DrawSpellCardIllustration(new Rect(rect.x + 12f, rect.y + 44f, rect.width - 24f, 92f), offer.Spell);
+                if (!locked) TrySetSpellHover(rect, offer.Spell, "market-spell-" + index + "-" + offer.Spell.Type);
+            }
+            else if (offer.Die != null)
+            {
+                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 8f, rect.width - 24f, 31f), DieDisplayName(offer.Die), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+                DrawArcadeRunDieToken(new Rect(rect.x + (rect.width - 76f) * 0.5f, rect.y + 43f, 76f, 76f), offer.Die, offer.Die.Type, 0, false, 0, 1f);
+                if (!locked) TrySetHoveredTooltip(rect, offer.Die, DiceTooltipContext.MarketOffer, CurrentOfferPrice(offer), "market-offer-" + index + "-" + offer.Die.Id);
+            }
+            else
+            {
+                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 8f, rect.width - 24f, 31f), SpellShelfOfferName(offer), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+            }
+            DrawLedRoleText(VariableMarketPriceRect(spells, rect), CurrentOfferPrice(offer) + " 金", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+            bool canAct = !locked && (chooseTarget || CanBuyMarketOffer(offer));
+            ArcadeMarketButtonResult result = DrawVariableMarketButton(VariableMarketBuyRect(spells, rect), chooseTarget ? "选择" : "购买", canAct, true, (chooseTarget ? "spell-target-" : "market-buy-") + index);
+            if (result == ArcadeMarketButtonResult.Activated)
+            {
+                ClearSpellHover();
+                ClearDiceHoverTooltip();
+                if (chooseTarget) CommitSpellShelf(index);
+                else
+                {
+                    BuyOffer(index);
+                    ShowActionTip("已购买", ActionTipSemantic.Success, "market-action");
+                }
+                return;
+            }
+            if (result == ArcadeMarketButtonResult.Blocked && !chooseTarget) ShowActionTip(MarketBuyBlockedReason(offer, locked), ActionTipSemantic.Warning, "market-action");
+        }
+        if (all.Count == 0)
+        {
+            DrawLedRoleText(new Rect(236f, spells ? 478f : 200f, 1008f, 31f), "本批暂无商品", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        }
+    }
+
+    private int SpellCardIllustrationPanel(SpellType type)
+    {
+        if (type == SpellType.ChainDividend || type == SpellType.FeedBag || type == SpellType.PeakCashout) return 1;
+        if (type == SpellType.EchoCommand || type == SpellType.TargetedRestock || type == SpellType.ShiftVoucher) return 2;
+        return 0;
+    }
+
+    private void DrawSpellCardIllustration(Rect rect, SpellDefinition definition)
+    {
+        if (spellCardArtTexture == null || definition == null)
+        {
+            DrawRect(rect, new Color(0.04f, 0.13f, 0.14f, 1f));
+            return;
+        }
+        float tileWidth = spellCardArtTexture.width / 3f;
+        float sourceHeight = Mathf.Min(spellCardArtTexture.height, tileWidth * rect.height / Mathf.Max(1f, rect.width));
+        float sourceY = (spellCardArtTexture.height - sourceHeight) * 0.5f;
+        Rect uv = new Rect((SpellCardIllustrationPanel(definition.Type) * tileWidth + 2f) / spellCardArtTexture.width,
+            1f - (sourceY + sourceHeight) / spellCardArtTexture.height,
+            (tileWidth - 4f) / spellCardArtTexture.width, sourceHeight / spellCardArtTexture.height);
+        Color old = GUI.color;
+        GUI.color = Color.white;
+        GUI.DrawTextureWithTexCoords(rect, spellCardArtTexture, uv, true);
+        GUI.color = old;
+    }
+
+    private void BeginSpellHoverFrame()
+    {
+        spellHoverCandidateDefinition = null;
+        spellHoverCandidateKey = string.Empty;
+        if (spellHoverScreenWidth != Screen.width || spellHoverScreenHeight != Screen.height)
+        {
+            ClearSpellHover();
+            spellHoverScreenWidth = Screen.width;
+            spellHoverScreenHeight = Screen.height;
+        }
+    }
+
+    private void ClearSpellHover()
+    {
+        spellHoverCandidateDefinition = null;
+        spellHoverCandidateKey = string.Empty;
+        spellHoverDefinition = null;
+        spellHoverKey = string.Empty;
+        spellHoverStartedAt = -999f;
+        spellHoverVisible = false;
+    }
+
+    private void TrySetSpellHover(Rect rect, SpellDefinition definition, string key)
+    {
+        if (definition == null || variableMarketUnderlayPass || marketLeaveEffectSequenceActive || DiceOrderDragActive()
+            || !uiMousePositionValid || !rect.Contains(uiMousePosition)) return;
+        spellHoverCandidateDefinition = definition;
+        spellHoverCandidateKey = key;
+        spellHoverCandidateRect = rect;
+    }
+
+    private void UpdateSpellHoverState()
+    {
+        if (spellHoverCandidateDefinition == null || marketLeaveEffectSequenceActive || DiceOrderDragActive()
+            || (mode != GameMode.InterStageMarket && mode != GameMode.ChapterShop && !(mode == GameMode.Run && rollPhase == RollPhase.Ready)))
+        {
+            ClearSpellHover();
+            return;
+        }
+        if (!string.Equals(spellHoverKey, spellHoverCandidateKey, StringComparison.Ordinal)
+            || spellHoverDefinition != spellHoverCandidateDefinition)
+        {
+            spellHoverDelay = spellHoverVisible ? TooltipContentSwapDuration : TooltipHoverDelay;
+            spellHoverDefinition = spellHoverCandidateDefinition;
+            spellHoverKey = spellHoverCandidateKey;
+            spellHoverRect = spellHoverCandidateRect;
+            spellHoverStartedAt = Time.unscaledTime;
+            spellHoverVisible = false;
+        }
+        spellHoverVisible = Time.unscaledTime - spellHoverStartedAt >= spellHoverDelay;
+    }
+
+    private void LoadMarketLedMetrics()
+    {
+        if (marketLedMetricsLoaded) return;
+        marketLedMetricsLoaded = true;
+        TextAsset map = Resources.Load<TextAsset>("Art/MainGame/Flow/main_game_led_font_map");
+        if (map != null)
+        {
+            string[] lines = map.text.Split('\n');
+            for (int i = 1; i < lines.Length; i++)
+            {
+                string[] fields = lines[i].Trim().Split(',');
+                int code;
+                int width;
+                if (fields.Length > 5 && int.TryParse(fields[0], out code) && int.TryParse(fields[5], out width) && code <= char.MaxValue)
+                    marketLedGlyphWidths[(char)code] = width;
+            }
+        }
+        TextAsset styles = Resources.Load<TextAsset>("Art/MainGame/Flow/main_game_led_font_styles");
+        if (styles == null) return;
+        string[] styleLines = styles.text.Split('\n');
+        for (int i = 1; i < styleLines.Length; i++)
+        {
+            string[] fields = styleLines[i].Trim().Split(',');
+            int dot, pitch, gap, lineGap;
+            if (fields.Length >= 5 && fields[0] == "compact" && int.TryParse(fields[1], out dot)
+                && int.TryParse(fields[2], out pitch) && int.TryParse(fields[3], out gap) && int.TryParse(fields[4], out lineGap))
+            {
+                marketLedDot = dot;
+                marketLedPitch = pitch;
+                marketLedCharacterGap = gap;
+                marketLedLineGap = lineGap;
+            }
+        }
+    }
+
+    private float MarketLedLineWidth(string text)
+    {
+        LoadMarketLedMetrics();
+        int width = 0;
+        for (int i = 0; i < text.Length; i++)
+        {
+            char c = text[i];
+            int active;
+            if (c == '\t') width += marketLedPitch * 6;
+            else if (char.IsWhiteSpace(c)) width += marketLedPitch * 3;
+            else
+            {
+                if (!marketLedGlyphWidths.TryGetValue(c, out active)) active = 8;
+                width += active * marketLedPitch - (marketLedPitch - marketLedDot) + marketLedCharacterGap;
+            }
+        }
+        return Mathf.Max(0, width - marketLedCharacterGap);
+    }
+
+    private float MeasureSpellHoverRuleHeight(string text, float width)
+    {
+        LoadMarketLedMetrics();
+        string[] sources = (text ?? string.Empty).Replace("\r", string.Empty).Split('\n');
+        int count = 0;
+        for (int i = 0; i < sources.Length; i++)
+        {
+            string line = string.Empty;
+            count++;
+            for (int j = 0; j < sources[i].Length; j++)
+            {
+                string next = line + sources[i][j];
+                if (line.Length > 0 && MarketLedLineWidth(next) > width)
+                {
+                    count++;
+                    line = sources[i][j].ToString();
+                }
+                else line = next;
+            }
+        }
+        int cell = 16 * marketLedPitch - (marketLedPitch - marketLedDot);
+        return cell + Mathf.Max(0, count - 1) * (cell + marketLedLineGap);
+    }
+
+    private Rect SpellHoverPanelRect()
+    {
+        float body = MeasureSpellHoverRuleHeight(spellHoverDefinition != null ? spellHoverDefinition.RuleText : string.Empty, 464f);
+        float height = 65f + body;
+        float x = Mathf.Clamp(spellHoverRect.x, 16f, VirtualWidth - 16f - 496f);
+        float y = Mathf.Max(84f, 268f - height);
+        return new Rect(x, y, 496f, height);
+    }
+
+    private void DrawSpellHoverTooltip()
+    {
+        if (!spellHoverVisible || spellHoverDefinition == null) return;
+        Rect rect = SpellHoverPanelRect();
+        DrawVariableMarketPanel(rect, true);
+        DrawBorder(rect, new Color(0.61f, 0.53f, 0.37f, 1f), 2f);
+        DrawLedRoleText(new Rect(rect.x + 16f, rect.y + 12f, 464f, 31f), spellHoverDefinition.DisplayName, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.UpperLeft);
+        DrawLedRoleWrappedText(new Rect(rect.x + 16f, rect.y + 51f, 464f, rect.height - 65f), spellHoverDefinition.RuleText, MainGameLedFont.TextRole.SecondaryWarm, TextAnchor.UpperLeft);
+    }
+
 
     private void DrawArcadeMarketBagDie(Rect rect, Die die, bool selected, string hoverKey, bool acceptHover)
     {
@@ -9666,6 +10216,33 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
+        if (offer.Kind == MarketOfferKind.Spell)
+        {
+            SpellDefinition spell = offer.Spell;
+            if (spell == null)
+            {
+                DrawLedRoleText(new Rect(rect.x + 28f, rect.y + 198f, rect.width - 56f, 38f), "法术配置缺失", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleCenter);
+                return;
+            }
+
+            Rect cardRect = new Rect(rect.x + 24f, rect.y + 42f, rect.width - 48f, 188f);
+            DrawRect(cardRect, new Color(0.025f, 0.08f, 0.09f, 0.92f));
+            DrawBorder(cardRect, new Color(0.24f, 0.26f, 0.23f, 1f), 2f);
+            DrawBorder(InsetRect(cardRect, 9f, 9f), new Color(0.24f, 0.26f, 0.23f, 0.5f), 1f);
+            DrawLedRoleText(new Rect(cardRect.x + 12f, cardRect.y + 18f, cardRect.width - 24f, 52f), spell.DisplayName, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+            DrawLedRoleWrappedText(
+                new Rect(cardRect.x + 14f, cardRect.y + 72f, cardRect.width - 28f, 86f),
+                spell.RuleText,
+                MainGameLedFont.TextRole.SecondaryWarm,
+                TextAnchor.MiddleCenter);
+            DrawLedRoleText(
+                new Rect(rect.x + 18f, rect.y + 289f, rect.width - 36f, 56f),
+                "法术牌 · " + CurrentOfferPrice(offer) + " 金",
+                MainGameLedFont.TextRole.PrimaryAmber,
+                TextAnchor.MiddleCenter);
+            return;
+        }
+
         if (offer.Kind != MarketOfferKind.Die || offer.Die == null)
         {
             DrawLedRoleText(new Rect(rect.x + 28f, rect.y + 198f, rect.width - 56f, 38f), "货架整理中", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleCenter);
@@ -9697,9 +10274,10 @@ public sealed class DiceKingDemo : MonoBehaviour
         string label,
         bool enabled,
         bool lightKey,
-        string interactionKey)
+        string interactionKey,
+        bool acceptInput = true)
     {
-        bool pointerHovered = uiMousePositionValid && rect.Contains(uiMousePosition);
+        bool pointerHovered = acceptInput && uiMousePositionValid && rect.Contains(uiMousePosition);
         bool hovered = enabled && pointerHovered;
         bool pressed = hovered && Input.GetMouseButton(0);
         bool blockedPressed = !enabled && pointerHovered && Input.GetMouseButton(0);
@@ -9707,13 +10285,19 @@ public sealed class DiceKingDemo : MonoBehaviour
         Color focus = lightKey
             ? new Color(1f, 0.67f, 0.2f, 0.94f)
             : new Color(0.2f, 0.88f, 0.8f, 0.94f);
+        if (enabled && lightKey)
+        {
+            // 可执行实体键常亮；悬停只增强焦点，不再承担可用状态的唯一提示。
+            DrawRect(InsetRect(rect, 4f, 4f), new Color(1f, 0.82f, 0.48f, 0.14f));
+            DrawBorder(InsetRect(rect, 2f, 2f), new Color(1f, 0.72f, 0.3f, 0.76f), 2f);
+        }
         if (!enabled)
         {
             Color disabledTint = lightKey
-                ? new Color(0.035f, 0.04f, 0.04f, blockedPressed ? 0.72f : 0.62f)
+                ? new Color(0.06f, 0.065f, 0.065f, blockedPressed ? 0.88f : 0.8f)
                 : new Color(0.006f, 0.012f, 0.014f, blockedPressed ? 0.76f : 0.64f);
             Rect blockedFace = new Rect(rect.x + 3f, rect.y + 3f, rect.width - 6f, rect.height - 6f);
-            DrawRect(blockedFace, disabledTint);
+            DrawRect(lightKey ? rect : blockedFace, disabledTint);
             DrawBorder(blockedFace, new Color(0.05f, 0.055f, 0.052f, 0.9f), 3f);
             DrawRect(
                 new Rect(blockedFace.x + 4f, blockedFace.y + blockedFace.height - 7f, blockedFace.width - 8f, 3f),
@@ -9759,14 +10343,37 @@ public sealed class DiceKingDemo : MonoBehaviour
             DrawLedRoleText(
                 labelRect,
                 label,
-                enabled ? MainGameLedFont.TextRole.FocusTeal : MainGameLedFont.TextRole.Disabled,
+                enabled && hovered ? MainGameLedFont.TextRole.FocusTeal : MainGameLedFont.TextRole.PrimaryAmber,
                 TextAnchor.MiddleCenter);
         }
 
+        if (!acceptInput)
+        {
+            return ArcadeMarketButtonResult.None;
+        }
         bool previousEnabled = GUI.enabled;
-        GUI.enabled = true;
-        bool clicked = GUI.Button(rect, GUIContent.none, GUIStyle.none);
-        GUI.enabled = previousEnabled;
+        Event pointerEvent = Event.current;
+        bool alignPointer = uiMousePositionValid && pointerEvent != null
+            && (pointerEvent.type == EventType.MouseDown
+                || pointerEvent.type == EventType.MouseUp
+                || pointerEvent.type == EventType.MouseDrag
+                || pointerEvent.type == EventType.MouseMove);
+        Vector2 previousMousePosition = alignPointer ? pointerEvent.mousePosition : Vector2.zero;
+        bool clicked;
+        try
+        {
+            GUI.enabled = true;
+            // 本入口仅承载根级虚拟画布按钮；分组、滚动或旋转子空间不得复用此坐标对齐。
+            // GUIClip 重设矩阵后可能更新原始事件坐标，命中与悬停统一读取同一归一化指针。
+            if (alignPointer) pointerEvent.mousePosition = uiMousePosition;
+            clicked = GUI.Button(rect, GUIContent.none, GUIStyle.none);
+        }
+        finally
+        {
+            if (alignPointer) pointerEvent.mousePosition = previousMousePosition;
+            GUI.enabled = previousEnabled;
+            // 只恢复位置；保留 GUI.Button 对事件类型的 Use 消费以及其原生控制捕获。
+        }
         if (!clicked)
         {
             return ArcadeMarketButtonResult.None;
@@ -9841,6 +10448,10 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private Rect ArcadePhysicalKeyLabelRect(Rect keyRect)
     {
+        if (keyRect.height <= 46f)
+        {
+            return new Rect(keyRect.x + 8f, keyRect.y + 4f, keyRect.width - 16f, keyRect.height - 8f);
+        }
         if (keyRect.width < 190f)
         {
             return new Rect(keyRect.x + 12f, keyRect.y + 14f, keyRect.width - 24f, keyRect.height - 28f);
@@ -9889,6 +10500,11 @@ public sealed class DiceKingDemo : MonoBehaviour
             return offer.Die != null;
         }
 
+        if (offer.Kind == MarketOfferKind.Spell)
+        {
+            return offer.Spell != null;
+        }
+
         return offer.Kind == MarketOfferKind.CraftingItem && offer.CraftingItem != null;
     }
 
@@ -9912,7 +10528,18 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             return "商品已售出";
         }
-        if (offer.Kind == MarketOfferKind.CraftingItem)
+        if (offer.Kind == MarketOfferKind.Spell)
+        {
+            if (!spellSystemEnabled || offer.Spell == null || !offer.Spell.Enabled)
+            {
+                return "暂不可购买";
+            }
+            if (spellBag.Count >= Mathf.Max(1, spellBagCapacity))
+            {
+                return "法术袋已满";
+            }
+        }
+        else if (offer.Kind == MarketOfferKind.CraftingItem)
         {
             if (!affixFeatureEnabled || offer.CraftingItem == null)
             {
@@ -10134,9 +10761,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         int sell = SellPrice(selectedDie);
         string soldName = DieDisplayName(selectedDie);
         bool hadCrewPirate = HasCrewPirateSellSource(selectedDie);
+        int diceCountBefore = dice.Count;
         dice.RemoveAt(soldIndex);
         string marketEffectText = ResolvePigMarketActionEffects(MarketActionKind.SellDie, selectedDie, soldIndex);
         marketEffectText += ResolveCrewPirateSellEffect(hadCrewPirate);
+        marketEffectText += ResolveEmptyHoldTransition(diceCountBefore, dice.Count, "主动卖出");
         string treasureText = AddGoldIncome(sell, "卖出" + soldName, true);
         marketEffectText += treasureText;
         if (selectedDie.Type == DieType.TributePig)
@@ -10176,12 +10805,885 @@ public sealed class DiceKingDemo : MonoBehaviour
         SaveRun();
     }
 
+    private bool IsSpellMarketPhase()
+    {
+        return spellSystemEnabled
+            && (mode == GameMode.InterStageMarket || mode == GameMode.ChapterShop)
+            && !marketLeaveEffectSequenceActive;
+    }
+
+    private bool IsSpellPreRollPhase()
+    {
+        return spellSystemEnabled
+            && mode == GameMode.Run
+            && rollPhase == RollPhase.Ready
+            && !stageFailureTransitionActive;
+    }
+
+    private bool CanOpenSpellPanel()
+    {
+        return IsSpellMarketPhase() || IsSpellPreRollPhase();
+    }
+
+    private SpellDefinition SpellDefinitionFor(SpellType type)
+    {
+        SpellDefinition definition;
+        return spellDefinitions.TryGetValue(type, out definition) ? definition : null;
+    }
+
+    private string SpellDisplayName(SpellType type)
+    {
+        SpellDefinition definition = SpellDefinitionFor(type);
+        return definition != null ? definition.DisplayName : type.ToString();
+    }
+
+    private int SpellWeight(SpellDefinition definition, int chapter)
+    {
+        if (definition == null || !definition.Enabled)
+        {
+            return 0;
+        }
+
+        if (chapter <= 2)
+        {
+            return Mathf.Max(0, definition.WeightChapter1To2);
+        }
+
+        return chapter <= 5
+            ? Mathf.Max(0, definition.WeightChapter3To5)
+            : Mathf.Max(0, definition.WeightChapter6To10);
+    }
+
+    private bool HasMarketSpellCandidate()
+    {
+        if (!spellSystemEnabled)
+        {
+            return false;
+        }
+
+        int chapter = CurrentChapterIndex();
+        foreach (SpellDefinition definition in spellDefinitions.Values)
+        {
+            if (SpellWeight(definition, chapter) > 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private int MarketSpellShelfCount(int availableSlotCount)
+    {
+        if (availableSlotCount <= 0 || !HasMarketSpellCandidate())
+        {
+            return 0;
+        }
+
+        int minimum = Mathf.Clamp(spellMarketMinimumShelves, 0, availableSlotCount);
+        int maximum = Mathf.Clamp(spellMarketMaximumShelves, minimum, availableSlotCount);
+        int count = minimum;
+        while (count < maximum
+            && UnityEngine.Random.Range(0, 100) < Mathf.Clamp(spellMarketExtraShelfChancePercent, 0, 100))
+        {
+            count++;
+        }
+
+        return count;
+    }
+
+    private HashSet<int> PickMarketSpellShelfIndices(int tributeSlot)
+    {
+        List<int> availableSlots = new List<int>();
+        for (int i = 0; i < 3; i++)
+        {
+            if (i != tributeSlot)
+            {
+                availableSlots.Add(i);
+            }
+        }
+
+        int count = MarketSpellShelfCount(availableSlots.Count);
+        HashSet<int> result = new HashSet<int>();
+        while (result.Count < count && availableSlots.Count > 0)
+        {
+            int pickedIndex = UnityEngine.Random.Range(0, availableSlots.Count);
+            result.Add(availableSlots[pickedIndex]);
+            availableSlots.RemoveAt(pickedIndex);
+        }
+
+        return result;
+    }
+
+    private SpellDefinition PickMarketSpellDefinition(HashSet<SpellType> excludedTypes)
+    {
+        int chapter = CurrentChapterIndex();
+        int totalWeight = 0;
+        foreach (SpellDefinition definition in spellDefinitions.Values)
+        {
+            if (definition != null
+                && (excludedTypes == null || !excludedTypes.Contains(definition.Type)))
+            {
+                totalWeight += SpellWeight(definition, chapter);
+            }
+        }
+
+        if (totalWeight <= 0)
+        {
+            return null;
+        }
+
+        int roll = UnityEngine.Random.Range(0, totalWeight);
+        foreach (SpellDefinition definition in spellDefinitions.Values)
+        {
+            if (definition == null
+                || excludedTypes != null && excludedTypes.Contains(definition.Type))
+            {
+                continue;
+            }
+
+            int weight = SpellWeight(definition, chapter);
+            if (weight <= 0)
+            {
+                continue;
+            }
+
+            roll -= weight;
+            if (roll < 0)
+            {
+                return definition;
+            }
+        }
+
+        return null;
+    }
+
+    private MarketOffer MakeRandomSpellMarketOffer(HashSet<SpellType> excludedTypes)
+    {
+        SpellDefinition definition = PickMarketSpellDefinition(excludedTypes);
+        if (definition == null && excludedTypes != null && excludedTypes.Count > 0)
+        {
+            definition = PickMarketSpellDefinition(null);
+        }
+        if (definition == null)
+        {
+            return null;
+        }
+
+        return new MarketOffer
+        {
+            Kind = MarketOfferKind.Spell,
+            Spell = definition,
+            Price = Mathf.Max(0, definition.Price)
+        };
+    }
+
+    private string SpellBagStateText()
+    {
+        string discountText = nextSpellPurchaseDiscount > 0 ? " 法券-" + nextSpellPurchaseDiscount : string.Empty;
+        string transferText = nextTurtleTransferBonus > 0 ? " 下壳+" + nextTurtleTransferBonus : string.Empty;
+        return "法术袋 " + spellBag.Count + "/" + Mathf.Max(1, spellBagCapacity) + discountText + transferText;
+    }
+
+    private void BuyMarketSpell(int marketOfferIndex)
+    {
+        EnsureMarketShelfPresentation();
+        ClearSpellHover();
+        if (marketOfferIndex < 0 || marketOfferIndex >= marketOffers.Count)
+        {
+            return;
+        }
+
+        MarketOffer offer = marketOffers[marketOfferIndex];
+        if (!CanBuyMarketOffer(offer)
+            || offer.Kind != MarketOfferKind.Spell
+            || offer.Spell == null)
+        {
+            return;
+        }
+
+        SpellDefinition bought = offer.Spell;
+        int price = CurrentOfferPrice(offer);
+        int consumedDiscount = Mathf.Max(0, nextSpellPurchaseDiscount);
+        chapterGold -= price;
+        nextSpellPurchaseDiscount = 0;
+        spellBag.Add(bought.Type);
+        marketOffers[marketOfferIndex] = EmptyMarketOffer();
+
+        string turtleText = ResolveSpellPurchasedTurtleEffects();
+        string discountText = consumedDiscount > 0 ? "，消耗法券 -" + consumedDiscount : string.Empty;
+        rewardBanner = "购买法术「" + bought.DisplayName + "」，-" + price + " 金" + discountText + turtleText + "。";
+        AddLog(rewardBanner);
+        SaveRun();
+    }
+
+    private string ResolveSpellPurchasedTurtleEffects()
+    {
+        int scribeCount = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die scribe = dice[i];
+            if (scribe == null
+                || scribe.Temporary
+                || scribe.Type != DieType.ScribeTurtle
+                || scribe.TurtleMarketTriggered)
+            {
+                continue;
+            }
+
+            scribe.TurtleMarketTriggered = true;
+            scribe.RoundNote = AppendNote(scribe.RoundNote, "抄经壳序+1");
+            MarkTypeTriggered(scribe);
+            scribeCount++;
+        }
+
+        nextTurtleTransferBonus += scribeCount;
+        return scribeCount > 0
+            ? "；抄经龟x" + scribeCount + "使下一次真壳转移 +" + scribeCount
+            : string.Empty;
+    }
+
+    private void ToggleSpellPanel()
+    {
+        ClearSpellHover();
+        ClearDiceHoverTooltip();
+        if (!CanOpenSpellPanel())
+        {
+            CloseSpellPanel();
+            return;
+        }
+
+        spellPanelOpen = !spellPanelOpen;
+        if (!spellPanelOpen)
+        {
+            CancelSpellCastSelection();
+        }
+    }
+
+    private void CloseSpellPanel()
+    {
+        ClearSpellHover();
+        spellPanelOpen = false;
+        CancelSpellCastSelection();
+    }
+
+    private void CancelSpellCastSelection()
+    {
+        ClearSpellHover();
+        spellCastingRackIndex = -1;
+        spellCastStep = SpellCastStep.None;
+        selectedSpellFamily = MainFamily.None;
+    }
+
+    private bool CanCastSpellNow(SpellDefinition definition)
+    {
+        if (definition == null || !definition.Enabled)
+        {
+            return false;
+        }
+
+        return IsSpellMarketPhase() && definition.AllowMarket
+            || IsSpellPreRollPhase() && definition.AllowPreRoll;
+    }
+
+    private void BeginSpellCast(int rackIndex)
+    {
+        ClearSpellHover();
+        if (rackIndex < 0 || rackIndex >= spellBag.Count)
+        {
+            return;
+        }
+
+        SpellDefinition definition = SpellDefinitionFor(spellBag[rackIndex]);
+        if (!CanCastSpellNow(definition))
+        {
+            ShowActionTip("当前阶段不能使用「" + SpellDisplayName(spellBag[rackIndex]) + "」", ActionTipSemantic.Warning, "spell");
+            return;
+        }
+
+        spellCastingRackIndex = rackIndex;
+        selectedSpellFamily = MainFamily.None;
+        switch (definition.Type)
+        {
+            case SpellType.EchoCommand:
+            case SpellType.PrecisionCalibration:
+            case SpellType.FeedBag:
+                spellCastStep = SpellCastStep.ChooseDie;
+                return;
+            case SpellType.TargetedRestock:
+                spellCastStep = SpellCastStep.ChooseFamily;
+                return;
+        }
+
+        string effectText;
+        if (ResolveImmediateSpell(definition.Type, out effectText))
+        {
+            CompleteSpellCast(definition, effectText);
+        }
+    }
+
+    private bool ResolveImmediateSpell(SpellType type, out string effectText)
+    {
+        effectText = string.Empty;
+        switch (type)
+        {
+            case SpellType.PassBoost:
+                pendingSpellScoreBonus += 5;
+                effectText = "下一次结算 +" + pendingSpellScoreBonus + " 法术分";
+                return true;
+            case SpellType.ChainDividend:
+                pendingSpellDividendCount++;
+                effectText = "下一次结算登记 " + pendingSpellDividendCount + " 份连锁分红";
+                return true;
+            case SpellType.PeakCashout:
+                effectText = ResolvePeakCashoutSpell();
+                return true;
+            case SpellType.OverachieverBounty:
+                pendingSpellBountyCount++;
+                effectText = "下一次结算登记 " + pendingSpellBountyCount + " 份超额悬赏";
+                return true;
+        }
+
+        return false;
+    }
+
+    private string ResolvePeakCashoutSpell()
+    {
+        int processedDice = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die == null || die.Temporary || die.Faces == null || die.Faces.Length == 0)
+            {
+                continue;
+            }
+
+            int snapshotMaximum = die.Faces[0];
+            for (int faceIndex = 1; faceIndex < die.Faces.Length; faceIndex++)
+            {
+                snapshotMaximum = Mathf.Max(snapshotMaximum, die.Faces[faceIndex]);
+            }
+
+            for (int faceIndex = 0; faceIndex < die.Faces.Length; faceIndex++)
+            {
+                if (die.Faces[faceIndex] == snapshotMaximum)
+                {
+                    die.Faces[faceIndex]--;
+                }
+            }
+
+            Array.Sort(die.Faces);
+            die.RoundNote = AppendNote(die.RoundNote, "削峰-1");
+            processedDice++;
+        }
+
+        string treasureText = AddGoldIncome(processedDice, "削峰套现", true);
+        return "处理 " + processedDice + " 颗骰子并获得 " + processedDice + " 金币" + treasureText;
+    }
+
+    private void CommitSpellDieTarget(int dieIndex)
+    {
+        SpellDefinition definition = CurrentCastingSpellDefinition();
+        if (definition == null || spellCastStep != SpellCastStep.ChooseDie || dieIndex < 0 || dieIndex >= dice.Count)
+        {
+            return;
+        }
+
+        Die target = dice[dieIndex];
+        if (target == null || target.Temporary)
+        {
+            return;
+        }
+
+        string effectText;
+        switch (definition.Type)
+        {
+            case SpellType.EchoCommand:
+                pendingSpellEchoDieIds.Add(target.Id);
+                effectText = "已锁定 " + DieDisplayName(target) + " 的下一次首个可复制本体效果";
+                break;
+            case SpellType.PrecisionCalibration:
+                AddValueToAllFaces(target, 1);
+                target.RoundNote = AppendNote(target.RoundNote, "校准+1");
+                effectText = DieDisplayName(target) + " 的全部六面永久 +1";
+                break;
+            case SpellType.FeedBag:
+                GrantFeed(target, 1, "饲料袋", null, true, null, false);
+                GrantFeed(target, 1, "饲料袋", null, true, null, false);
+                effectText = DieDisplayName(target) + " 依次获得 2 次真实喂养";
+                break;
+            default:
+                return;
+        }
+
+        CompleteSpellCast(definition, effectText);
+    }
+
+    private SpellDefinition CurrentCastingSpellDefinition()
+    {
+        if (spellCastingRackIndex < 0 || spellCastingRackIndex >= spellBag.Count)
+        {
+            return null;
+        }
+
+        return SpellDefinitionFor(spellBag[spellCastingRackIndex]);
+    }
+
+    private bool CanRestockFamily(MainFamily family)
+    {
+        if (family == MainFamily.None)
+        {
+            return false;
+        }
+
+        int chapter = CurrentChapterIndex();
+        foreach (MarketDieConfig config in marketDieConfigs.Values)
+        {
+            if (config != null
+                && config.Type != DieType.Tribute
+                && CanPickMarketDie(config, null, false, chapter, MarketRoute.None)
+                && HasMainFamily(config.Type, family))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void CommitSpellFamily(MainFamily family)
+    {
+        ClearSpellHover();
+        SpellDefinition definition = CurrentCastingSpellDefinition();
+        if (definition == null
+            || definition.Type != SpellType.TargetedRestock
+            || spellCastStep != SpellCastStep.ChooseFamily
+            || !CanRestockFamily(family))
+        {
+            return;
+        }
+
+        selectedSpellFamily = family;
+        spellCastStep = SpellCastStep.ChooseShelf;
+    }
+
+    private void CommitSpellShelf(int shelfIndex)
+    {
+        SpellDefinition definition = CurrentCastingSpellDefinition();
+        if (definition == null
+            || definition.Type != SpellType.TargetedRestock
+            || spellCastStep != SpellCastStep.ChooseShelf
+            || shelfIndex < 0
+            || shelfIndex >= marketOffers.Count
+            || marketOffers[shelfIndex] == null
+            || marketOffers[shelfIndex].Kind == MarketOfferKind.Empty)
+        {
+            return;
+        }
+
+        MarketOffer replacement = MakeFamilyRestockOffer(selectedSpellFamily, shelfIndex);
+        if (replacement == null)
+        {
+            ShowActionTip("当前章节没有可用的" + MainFamilyDisplayName(selectedSpellFamily) + "商品", ActionTipSemantic.Warning, "spell");
+            return;
+        }
+
+        marketOffers[shelfIndex] = replacement;
+        EnsureMarketShelfPresentation();
+        ClearSpellHover();
+        string effectText = "第 " + (shelfIndex + 1) + " 格换成 " + MainFamilyDisplayName(selectedSpellFamily) + "的「" + DieDisplayName(replacement.Die) + "」";
+        CompleteSpellCast(definition, effectText);
+    }
+
+    private MarketOffer MakeFamilyRestockOffer(MainFamily family, int shelfIndex)
+    {
+        HashSet<DieType> excludedTypes = CurrentOfferDieTypes(shelfIndex);
+        MarketDieConfig config = PickFamilyRestockConfig(family, excludedTypes);
+        if (config == null)
+        {
+            config = PickFamilyRestockConfig(family, null);
+        }
+        if (config == null)
+        {
+            return null;
+        }
+
+        FaceTemplateConfig faceTemplate = PickFaceTemplate(config.Type);
+        DiceMaterial material = PickDiceMaterial();
+        Die die = NewDie(DefaultName(config.Type), config.Type, FacesForTemplate(faceTemplate, config.Type));
+        die.Material = material;
+        ApplyCurrentTavernMinimum(die);
+        return new MarketOffer
+        {
+            Kind = MarketOfferKind.Die,
+            Die = die,
+            Price = MarketOfferPrice(config.Type, faceTemplate, material)
+        };
+    }
+
+    private MarketDieConfig PickFamilyRestockConfig(MainFamily family, HashSet<DieType> excludedTypes)
+    {
+        int chapter = CurrentChapterIndex();
+        int totalWeight = 0;
+        foreach (MarketDieConfig config in marketDieConfigs.Values)
+        {
+            if (config != null
+                && config.Type != DieType.Tribute
+                && CanPickMarketDie(config, excludedTypes, false, chapter, MarketRoute.None)
+                && HasMainFamily(config.Type, family))
+            {
+                totalWeight += MarketWeight(config, chapter);
+            }
+        }
+
+        if (totalWeight <= 0)
+        {
+            return null;
+        }
+
+        int roll = UnityEngine.Random.Range(0, totalWeight);
+        foreach (MarketDieConfig config in marketDieConfigs.Values)
+        {
+            if (config == null
+                || config.Type == DieType.Tribute
+                || !CanPickMarketDie(config, excludedTypes, false, chapter, MarketRoute.None)
+                || !HasMainFamily(config.Type, family))
+            {
+                continue;
+            }
+
+            roll -= MarketWeight(config, chapter);
+            if (roll < 0)
+            {
+                return config;
+            }
+        }
+
+        return null;
+    }
+
+    private void CompleteSpellCast(SpellDefinition definition, string effectText)
+    {
+        if (definition == null || spellCastingRackIndex < 0 || spellCastingRackIndex >= spellBag.Count)
+        {
+            return;
+        }
+
+        spellBag.RemoveAt(spellCastingRackIndex);
+        string turtleText = ResolveSpellCastTurtleEffects();
+        rewardBanner = "施放「" + definition.DisplayName + "」：" + effectText + turtleText + "。";
+        AddLog(rewardBanner);
+        CancelSpellCastSelection();
+        SaveRun();
+    }
+
+    private string ResolveSpellCastTurtleEffects()
+    {
+        int chargedCurseShells = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die host = dice[i];
+            if (host == null || host.Temporary || host.TurtleAttachments == null)
+            {
+                continue;
+            }
+
+            for (int j = 0; j < host.TurtleAttachments.Count; j++)
+            {
+                TurtleAttachment attachment = host.TurtleAttachments[j];
+                if (attachment == null || attachment.Type != DieType.CurseShellTurtle || attachment.StateValue >= 2)
+                {
+                    continue;
+                }
+
+                attachment.StateValue++;
+                chargedCurseShells++;
+            }
+        }
+
+        int grandSourceCount = 0;
+        int grandTargetApplications = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die grand = dice[i];
+            if (grand == null || grand.Temporary || grand.Type != DieType.GrandSpellTurtle)
+            {
+                continue;
+            }
+
+            grandSourceCount++;
+            MarkTypeTriggered(grand);
+            for (int j = 0; j < dice.Count; j++)
+            {
+                Die target = dice[j];
+                if (target == null
+                    || target.Temporary
+                    || target.Id == grand.Id
+                    || !IsF023GrandSpellTarget(target))
+                {
+                    continue;
+                }
+
+                target.TurtleNextSettlementBonus++;
+                grandTargetApplications++;
+            }
+        }
+
+        string curseText = chargedCurseShells > 0 ? "；咒壳充能x" + chargedCurseShells : string.Empty;
+        string grandText = grandSourceCount > 0
+            ? "；大法术龟x" + grandSourceCount + "分发最终点充能x" + grandTargetApplications
+            : string.Empty;
+        return curseText + grandText;
+    }
+
+    private bool IsF023GrandSpellTarget(Die die)
+    {
+        return die != null
+            && !die.Temporary
+            && (IsF023ResidentTurtleType(die.Type) || RealTurtleAttachmentCount(die) > 0);
+    }
+
+    private void DrawSpellPanel()
+    {
+        if (spellCastStep == SpellCastStep.ChooseShelf && IsSpellMarketPhase())
+        {
+            DrawSpellShelfTargetStep();
+            return;
+        }
+        DrawRect(new Rect(0f, 0f, VirtualWidth, VirtualHeight), new Color(0.01f, 0.015f, 0.02f, 0.78f));
+        Rect panel = new Rect(145f, 58f, 990f, 604f);
+        DrawVariableMarketPanel(panel, true);
+        DrawLedRoleText(new Rect(180f, 86f, 500f, 36f), "法术袋 " + spellBag.Count + " / " + Mathf.Max(1, spellBagCapacity), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleLeft);
+        DrawLedRoleText(new Rect(180f, 126f, 760f, 31f), IsSpellMarketPhase() ? "市场阶段：可连续施放" : "投掷前：开始投掷后自动结算", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleLeft);
+        if (DrawVariableMarketButton(new Rect(974f, 82f, 124f, 46f), "关闭", true, false, "spell-close") == ArcadeMarketButtonResult.Activated)
+        {
+            CloseSpellPanel();
+            return;
+        }
+        if (spellCastStep == SpellCastStep.ChooseDie)
+        {
+            DrawSpellDieTargetStep();
+            return;
+        }
+        if (spellCastStep == SpellCastStep.ChooseFamily)
+        {
+            DrawSpellFamilyTargetStep();
+            return;
+        }
+
+        int pageCount = Mathf.Max(1, Mathf.CeilToInt(spellBag.Count / 3f));
+        spellBagPage = Mathf.Clamp(spellBagPage, 0, pageCount - 1);
+        if (pageCount > 1)
+        {
+            if (DrawVariableMarketButton(new Rect(744f, 82f, 44f, 36f), "<", spellBagPage > 0, false, "spell-bag-previous") == ArcadeMarketButtonResult.Activated)
+            {
+                spellBagPage--;
+                ClearSpellHover();
+            }
+            DrawLedRoleText(new Rect(796f, 84f, 94f, 31f), (spellBagPage + 1) + " / " + pageCount, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+            if (DrawVariableMarketButton(new Rect(902f, 82f, 44f, 36f), ">", spellBagPage + 1 < pageCount, false, "spell-bag-next") == ArcadeMarketButtonResult.Activated)
+            {
+                spellBagPage++;
+                ClearSpellHover();
+            }
+        }
+        if (spellBag.Count == 0)
+        {
+            DrawLedRoleText(new Rect(180f, 270f, 920f, 70f), "法术袋为空", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        }
+        for (int slot = 0; slot < 3; slot++)
+        {
+            int index = spellBagPage * 3 + slot;
+            if (index >= spellBag.Count) break;
+            SpellDefinition definition = SpellDefinitionFor(spellBag[index]);
+            Rect card = new Rect(180f + slot * 308f, 184f, 288f, 340f);
+            DrawVariableMarketPanel(card, true);
+            if (definition == null)
+            {
+                DrawLedRoleText(new Rect(card.x + 16f, card.y + 12f, 256f, 31f), "法术配置缺失", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+                continue;
+            }
+            DrawLedRoleText(new Rect(card.x + 16f, card.y + 12f, 256f, 31f), definition.DisplayName, MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+            DrawSpellCardIllustration(new Rect(card.x + 16f, card.y + 54f, 256f, 170f), definition);
+            string phase = definition.AllowMarket && definition.AllowPreRoll ? "市场 / 投掷前" : SpellAllowedPhaseText(definition);
+            DrawLedRoleText(new Rect(card.x + 16f, card.y + 238f, 256f, 31f), phase, MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleCenter);
+            TrySetSpellHover(card, definition, "spell-bag-" + index + "-" + definition.Type);
+            bool canCast = CanCastSpellNow(definition);
+            ArcadeMarketButtonResult result = DrawVariableMarketButton(new Rect(card.x + 16f, card.y + 286f, 256f, 44f), "施放", canCast, false, "spell-cast-" + index);
+            if (result == ArcadeMarketButtonResult.Activated)
+            {
+                ClearSpellHover();
+                BeginSpellCast(index);
+                return;
+            }
+            if (result == ArcadeMarketButtonResult.Blocked)
+            {
+                ShowActionTip(SpellAllowedPhaseText(definition), ActionTipSemantic.Warning, "spell");
+            }
+        }
+        DrawLedRoleWrappedText(new Rect(180f, 548f, 910f, 68f), PendingSpellStateText(), MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.UpperLeft);
+        DrawLedRoleText(new Rect(180f, 622f, 910f, 31f), "Esc 或关闭返回", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleLeft);
+    }
+
+
+    private string SpellAllowedPhaseText(SpellDefinition definition)
+    {
+        if (definition == null)
+        {
+            return "配置缺失";
+        }
+        if (definition.AllowMarket && !definition.AllowPreRoll)
+        {
+            return "仅限市场";
+        }
+        if (!definition.AllowMarket && definition.AllowPreRoll)
+        {
+            return "仅限投掷前";
+        }
+
+        return "当前不可用";
+    }
+
+    private string PendingSpellStateText()
+    {
+        List<string> states = new List<string>();
+        if (pendingSpellScoreBonus > 0)
+        {
+            states.Add("下次结算 +" + pendingSpellScoreBonus + " 分");
+        }
+        if (pendingSpellDividendCount > 0)
+        {
+            states.Add("连锁分红 x" + pendingSpellDividendCount);
+        }
+        if (pendingSpellEchoDieIds.Count > 0)
+        {
+            states.Add("回声指令 x" + pendingSpellEchoDieIds.Count);
+        }
+        if (pendingSpellBountyCount > 0)
+        {
+            states.Add("超额悬赏 x" + pendingSpellBountyCount);
+        }
+
+        return states.Count > 0
+            ? "待结算：" + string.Join("｜", states.ToArray())
+            : "当前没有等待下一次结算的法术效果。";
+    }
+
+    private void DrawSpellDieTargetStep()
+    {
+        SpellDefinition definition = CurrentCastingSpellDefinition();
+        DrawStandardLabel(
+            new Rect(180f, 164f, 900f, 34f),
+            definition != null ? "为「" + definition.DisplayName + "」选择 1 颗骰子" : "选择骰子",
+            headerStyle);
+
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            int column = i % 3;
+            int row = i / 3;
+            Rect rect = new Rect(180f + column * 300f, 220f + row * 132f, 270f, 104f);
+            DrawUiSmallPanel(rect);
+            DrawStandardLabel(new Rect(rect.x + 14f, rect.y + 10f, rect.width - 28f, 26f), DieDisplayName(die), smallStyle);
+            DrawStandardLabel(new Rect(rect.x + 14f, rect.y + 38f, rect.width - 28f, 22f), FaceText(die.Faces), tinyStyle);
+            if (DrawUiButton(new Rect(rect.x + 48f, rect.y + 66f, 174f, 30f), "选择", UiButtonKind.Primary))
+            {
+                CommitSpellDieTarget(i);
+                return;
+            }
+        }
+
+        if (dice.Count <= 0)
+        {
+            DrawStandardLabel(new Rect(180f, 250f, 900f, 40f), "骰袋为空，无法选择目标。", bodyStyle);
+        }
+
+        if (DrawUiButton(new Rect(180f, 586f, 150f, 42f), "取消选择", UiButtonKind.Secondary))
+        {
+            CancelSpellCastSelection();
+        }
+    }
+
+    private void DrawSpellFamilyTargetStep()
+    {
+        DrawStandardLabel(new Rect(180f, 164f, 900f, 34f), "为「定向换货」选择目标家族", headerStyle);
+        MainFamily[] families = { MainFamily.Pig, MainFamily.Devil, MainFamily.Turtle, MainFamily.Pirate };
+        for (int i = 0; i < families.Length; i++)
+        {
+            MainFamily family = families[i];
+            Rect rect = new Rect(192f + i * 222f, 250f, 198f, 84f);
+            bool enabled = CanRestockFamily(family);
+            GUI.enabled = enabled;
+            if (DrawUiButton(rect, enabled ? MainFamilyDisplayName(family) : MainFamilyDisplayName(family) + "\n无可用骰", UiButtonKind.Primary))
+            {
+                CommitSpellFamily(family);
+                GUI.enabled = true;
+                return;
+            }
+            GUI.enabled = true;
+        }
+
+        DrawStandardLabel(new Rect(192f, 366f, 888f, 70f), "只会抽取当前章节已解锁且符合当前测试池限制的家族骰；若原货架是法术或道具，也会被新骰子替换。", smallStyle);
+        if (DrawUiButton(new Rect(180f, 586f, 150f, 42f), "取消选择", UiButtonKind.Secondary))
+        {
+            CancelSpellCastSelection();
+        }
+    }
+
+    private void DrawSpellShelfTargetStep()
+    {
+        EnsureMarketShelfPresentation();
+        DrawVariableMarketPanel(new Rect(214f, 84f, 1048f, 250f), true);
+        DrawVariableMarketPanel(new Rect(214f, 342f, 1048f, 282f), true);
+        DrawVariableMarketPanel(new Rect(360f, 14f, 430f, 58f), true);
+        DrawLedRoleText(new Rect(370f, 26f, 410f, 31f), "定向换货 · " + MainFamilyDisplayName(selectedSpellFamily), MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        DrawVariableMarketShelf(false, false, true);
+        DrawVariableMarketShelf(true, false, true);
+        DrawRect(new Rect(16f, 632f, 1248f, 70f), new Color(0.055f, 0.09f, 0.12f, 1f));
+        if (DrawVariableMarketButton(new Rect(224f, 642f, 340f, 52f), "返回选家族", true, false, "spell-shelf-back") == ArcadeMarketButtonResult.Activated)
+        {
+            ClearSpellHover();
+            spellCastStep = SpellCastStep.ChooseFamily;
+            selectedSpellFamily = MainFamily.None;
+        }
+        if (DrawVariableMarketButton(new Rect(900f, 642f, 348f, 52f), "取消选择", true, false, "spell-shelf-cancel") == ArcadeMarketButtonResult.Activated)
+        {
+            CancelSpellCastSelection();
+        }
+    }
+
+
+    private string SpellShelfOfferName(MarketOffer offer)
+    {
+        if (offer == null || offer.Kind == MarketOfferKind.Empty)
+        {
+            return "已售空";
+        }
+        if (offer.Kind == MarketOfferKind.Die && offer.Die != null)
+        {
+            return DieDisplayName(offer.Die);
+        }
+        if (offer.Kind == MarketOfferKind.CraftingItem && offer.CraftingItem != null)
+        {
+            return offer.CraftingItem.DisplayName;
+        }
+        if (offer.Kind == MarketOfferKind.Spell && offer.Spell != null)
+        {
+            return "法术·" + offer.Spell.DisplayName;
+        }
+
+        return "未知商品";
+    }
+
     private void ActivateMarketLeave()
     {
+        ClearSpellHover();
         if (dice.Count <= 0 || marketLeaveEffectSequenceActive)
         {
             return;
         }
+
+        CloseSpellPanel();
 
         if (ShouldStageMarketLeaveEffects())
         {
@@ -10248,7 +11750,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         DrawHudBar(title, "金币 " + chapterGold, feedHud);
 
-        bool marketLeaveLocked = marketLeaveEffectSequenceActive;
+        bool marketLeaveLocked = marketLeaveEffectSequenceActive || spellPanelOpen;
         if (selectedMarketDieIndex >= dice.Count)
         {
             selectedMarketDieIndex = dice.Count - 1;
@@ -10335,7 +11837,13 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             string fullBagHint = HasDiceOfType(DieType.BloodPactCaptain)
                 ? "骰袋已满：血契可买骰吞噬"
-                : v02DevilFamilyMarketOnly ? "骰袋已满：贡品仍可奉献" : affixFeatureEnabled ? "骰袋已满：仍可买改造道具" : "骰袋已满：卖一颗再买";
+                : v02DevilFamilyMarketOnly
+                ? "骰袋已满：贡品仍可奉献"
+                : affixFeatureEnabled
+                ? "骰袋已满：仍可买改造道具"
+                : spellSystemEnabled
+                ? "骰袋已满：骰子受阻，法术仍可购买"
+                : "骰袋已满：卖一颗再买";
             DrawStandardLabel(new Rect(832f, 162f, 360f, 24f), fullBagHint, smallStyle);
         }
 
@@ -10357,6 +11865,13 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             DrawCraftingInventoryPanel(new Rect(528f, 526f, 666f, 52f));
         }
+        else if (spellSystemEnabled)
+        {
+            DrawStandardLabel(
+                new Rect(528f, 526f, 666f, 52f),
+                "三格混合货架：每次进店或付费刷新保证出现 1 张法术牌，并按配置概率出现第 2 张。",
+                tinyStyle);
+        }
 
         MarketRuleConfig marketRule = CurrentMarketRule();
         int refreshCost = CurrentMarketRefreshNetCost(chapterMarket);
@@ -10370,7 +11885,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         string refreshHint = UsesV02CoreFamiliesMarketPool()
             ? "正式池：四族核心 + 中立 + 双阵营；贡品仅由深渊生成"
             : v02TurtleAttachmentMarketOnly
-            ? "龟龟测试：只刷化壳龟和首领龟"
+            ? "龟龟测试：法术混合货架 + 20 骰专池"
             : v02DualFamilyMarketOnly
             ? "双阵营测试：九颗融合骰"
             : v02PigFamilyMarketOnly
@@ -10382,7 +11897,20 @@ public sealed class DiceKingDemo : MonoBehaviour
             : marketTestRandomRefresh
             ? "测试随机：全池骰子"
             : (marketRule.HighTierPityRefreshes > 0 ? "高阶保底 " + marketRefreshesWithoutHighTier + " / " + marketRule.HighTierPityRefreshes : "刷新后替换全部货架");
-        DrawIconLabel(new Rect(714f, 600f, 240f, 34f), uiIconRefreshTexture, refreshHint, smallStyle);
+        if (spellSystemEnabled)
+        {
+            GUI.enabled = !spellPanelOpen && IsSpellMarketPhase();
+            if (DrawUiButton(new Rect(714f, 594f, 142f, 46f), "法术袋", UiButtonKind.Primary))
+            {
+                ToggleSpellPanel();
+            }
+            GUI.enabled = true;
+            DrawStandardLabel(new Rect(866f, 600f, 134f, 34f), SpellBagStateText(), tinyStyle);
+        }
+        else
+        {
+            DrawIconLabel(new Rect(714f, 600f, 240f, 34f), uiIconRefreshTexture, refreshHint, smallStyle);
+        }
 
         GUI.enabled = dice.Count > 0 && !marketLeaveLocked;
         if (DrawUiButton(new Rect(1010f, 594f, 184f, 50f), MarketLeaveButtonText(), UiButtonKind.Primary))
@@ -10406,7 +11934,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (!string.IsNullOrEmpty(rewardBanner))
         {
-            DrawStandardLabel(new Rect(528f, 654f, 420f, 24f), rewardBanner, smallStyle);
+            DrawStandardLabel(new Rect(528f, spellSystemEnabled ? 672f : 654f, 420f, 24f), rewardBanner, smallStyle);
         }
     }
 
@@ -10478,7 +12006,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         if (UseArcadeMarketVisuals())
         {
-            return new Rect(86f, 95f + visualIndex * 61f, 126f, 52f);
+            return new Rect(44f, 136f + visualIndex * 64f, 136f, 58f);
         }
 
         return new Rect(64f, 204f + visualIndex * 58f, 350f, 52f);
@@ -10565,16 +12093,27 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void BeginMarketLeaveEffects()
     {
+        ClearSpellHover();
+        ClearDiceHoverTooltip();
         CancelDiceOrderDrag();
         activeCraftingItemKey = string.Empty;
         selectedMarketDieIndex = -1;
         marketLeaveEffectSequenceActive = true;
         marketLeaveEffectIndex = 0;
         marketLeaveEffectResolvedCount = 0;
+        marketLeaveRootDieIds.Clear();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            if (dice[i] != null)
+            {
+                marketLeaveRootDieIds.Add(dice[i].Id);
+            }
+        }
         marketLeaveEffectTotalCount = CountMarketLeaveEffectDice();
         marketLeaveEffectTimer = 0f;
         marketLeaveEffectFeedback = string.Empty;
         ClearMarketLeaveEffectVisual();
+        BeginGameplayChain("market_leave");
         rewardBanner = "离开市场：按骰袋顺序触发离场效果。";
         AddLog(rewardBanner);
 
@@ -10612,26 +12151,35 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private bool ProcessNextMarketLeaveEffect()
     {
-        while (marketLeaveEffectIndex < dice.Count)
+        while (marketLeaveEffectIndex < marketLeaveRootDieIds.Count)
         {
-            int dieIndex = marketLeaveEffectIndex;
+            int rootSlot = marketLeaveEffectIndex;
+            int dieId = marketLeaveRootDieIds[marketLeaveEffectIndex];
             marketLeaveEffectIndex++;
-            Die die = dice[dieIndex];
-            int dieId = die != null ? die.Id : -1;
-            int diceCountBefore = dice.Count;
+            Die die = FindDieById(dieId);
+            if (die == null)
+            {
+                BeginGameplayChainRoot(null, rootSlot, "missing_die_" + dieId, dieId);
+                EndGameplayChainRoot("skipped_missing_root");
+                continue;
+            }
+
+            int dieIndex = DiceIndexById(die.Id);
+            BeginGameplayChainRoot(die, rootSlot, DieDisplayName(die));
             ClearMarketLeaveEffectVisual();
             string effectText = ResolveMarketLeaveEffectForDie(die, dieIndex);
+            string responseText = EndGameplayChainRoot(
+                string.IsNullOrEmpty(effectText) ? "skipped_no_leave_effect" : "completed");
             if (string.IsNullOrEmpty(effectText))
             {
                 continue;
             }
-
-            marketLeaveEffectResolvedCount++;
-            if (dieId >= 0 && DiceIndexById(dieId) < 0 && dice.Count < diceCountBefore)
+            if (!string.IsNullOrEmpty(responseText))
             {
-                marketLeaveEffectIndex = Mathf.Clamp(dieIndex, 0, dice.Count);
+                effectText = AppendMarketLeaveEffectFeedback(effectText, responseText);
             }
 
+            marketLeaveEffectResolvedCount++;
             marketLeaveEffectTotalCount = Mathf.Max(marketLeaveEffectTotalCount, marketLeaveEffectResolvedCount + CountPendingMarketLeaveEffectDice(marketLeaveEffectIndex));
 
             int visualHostIndex = DiceIndexById(marketLeaveEffectVisualHostId);
@@ -10655,9 +12203,10 @@ public sealed class DiceKingDemo : MonoBehaviour
     private int CountPendingMarketLeaveEffectDice(int startIndex)
     {
         int count = 0;
-        for (int i = Mathf.Max(0, startIndex); i < dice.Count; i++)
+        for (int i = Mathf.Max(0, startIndex); i < marketLeaveRootDieIds.Count; i++)
         {
-            if (HasMarketLeaveEffect(dice[i]))
+            Die pendingRoot = FindDieById(marketLeaveRootDieIds[i]);
+            if (HasMarketLeaveEffect(pendingRoot))
             {
                 count++;
             }
@@ -10686,15 +12235,78 @@ public sealed class DiceKingDemo : MonoBehaviour
         return existing + " " + effectText;
     }
 
+    private string ResolveRunawayTurtleLeaveGeneration()
+    {
+        int generatedCount = 0;
+        int blockedCount = 0;
+        int diceCountAtStart = dice.Count;
+        for (int i = 0; i < diceCountAtStart; i++)
+        {
+            Die runaway = dice[i];
+            if (runaway == null
+                || runaway.Temporary
+                || runaway.Type != DieType.RunawayTurtle
+                || runaway.TurtleMarketTriggered)
+            {
+                continue;
+            }
+
+            if (dice.Count >= DiceCapacity)
+            {
+                blockedCount++;
+                continue;
+            }
+
+            runaway.TurtleMarketTriggered = true;
+            runaway.RoundNote = AppendNote(runaway.RoundNote, "出走得领路龟");
+            MarkTypeTriggered(runaway);
+            Die guide = NewDie(DefaultName(DieType.GuideTurtle), DieType.GuideTurtle, DefaultFaces(DieType.GuideTurtle));
+            ApplyCurrentTavernMinimum(guide);
+            ResetRoundState(guide);
+            dice.Add(guide);
+            generatedCount++;
+        }
+
+        if (generatedCount <= 0 && blockedCount <= 0)
+        {
+            return string.Empty;
+        }
+
+        string generatedText = generatedCount > 0 ? "离家出走龟生成领路龟x" + generatedCount + "；新骰本次不再化壳。" : string.Empty;
+        string blockedText = blockedCount > 0 ? " 骰袋已满，另有出走龟x" + blockedCount + "未生成。" : string.Empty;
+        string result = generatedText + blockedText;
+        AddLog(result.Trim());
+        return result;
+    }
+
     private void CompleteMarketLeave()
     {
+        ClearSpellHover();
+        ClearDiceHoverTooltip();
         string leaveFeedback = marketLeaveEffectFeedback;
+        if (activeGameplayChain != null
+            && string.Equals(activeGameplayChain.Phase, "market_leave", StringComparison.Ordinal))
+        {
+            BeginGameplayChainRoot(null, -1, "phase_runaway_turtle");
+        }
+        string runawayText = ResolveRunawayTurtleLeaveGeneration();
+        if (activeGameplayChain != null
+            && string.Equals(activeGameplayChain.Phase, "market_leave", StringComparison.Ordinal))
+        {
+            EndGameplayChainRoot("completed");
+            EndGameplayChain("completed");
+        }
+        if (!string.IsNullOrEmpty(runawayText))
+        {
+            leaveFeedback = AppendMarketLeaveEffectFeedback(leaveFeedback, runawayText);
+        }
         marketLeaveEffectSequenceActive = false;
         marketLeaveEffectIndex = 0;
         marketLeaveEffectTotalCount = 0;
         marketLeaveEffectResolvedCount = 0;
         marketLeaveEffectTimer = 0f;
         marketLeaveEffectFeedback = string.Empty;
+        marketLeaveRootDieIds.Clear();
         ClearMarketLeaveEffectVisual();
         marketTemporaryMinimumBonus = 0;
         activeCraftingItemKey = string.Empty;
@@ -12119,6 +13731,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         DieType type = die.Temporary ? DieType.MoneyTurtle : die.Type;
+        if (IsAnyTurtleFamilyType(type))
+        {
+            return DiceVisualProfile.Turtle;
+        }
+
         switch (type)
         {
             case DieType.MoneyTurtle:
@@ -12127,7 +13744,6 @@ public sealed class DiceKingDemo : MonoBehaviour
             case DieType.LuckyTurtle:
             case DieType.MagnetTurtle:
             case DieType.RallyTurtle:
-            case DieType.LeaderTurtle:
             case DieType.PackTurtle:
             case DieType.SharedFeastDemonTurtle:
             case DieType.SafetyNetTurtle:
@@ -13345,6 +14961,21 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (hasShellState)
         {
             model.StateRows.Add(TooltipFirstLine(turtleAttachmentText));
+            int guideCharge = TurtleAttachmentStateValue(die, DieType.GuideTurtle);
+            int curseCharge = TurtleAttachmentStateValue(die, DieType.CurseShellTurtle);
+            if (guideCharge > 0)
+            {
+                model.StateRows.Add("领路待转移 +" + guideCharge);
+            }
+            if (curseCharge > 0)
+            {
+                int curseCapacity = CountTurtleAttachmentsOfType(die, DieType.CurseShellTurtle) * 2;
+                model.StateRows.Add("咒壳充能 " + curseCharge + " / " + curseCapacity);
+            }
+        }
+        if (die.TurtleNextSettlementBonus > 0)
+        {
+            model.StateRows.Add("待结算最终点 +" + die.TurtleNextSettlementBonus);
         }
 
         PopulateTooltipKeywords(model, die.Type, hasFeedState, hasDevourState, hasShellState);
@@ -13375,7 +15006,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         int feedMinimum = die.FeedValue > 0
             ? MinimumFaceValue(die) + Mathf.Max(0, die.FeedValue)
             : int.MinValue;
-        bool hasLuckyTurtle = CountTurtleAttachmentsOfType(die, DieType.LuckyTurtle) > 0;
+        bool hasLuckyTurtle = HasUnusedTurtleAttachmentOfType(die, DieType.LuckyTurtle);
         int highestFace = HighestFaceValue(die);
         long maximumMagnitude = 0L;
         int highestValue = int.MinValue;
@@ -13457,7 +15088,10 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         foreach (KeyValuePair<string, TooltipKeywordViewModel> pair in selected)
         {
-            pair.Value.LineCount = EstimateTooltipWrappedLineCount(pair.Value.Explanation, 36f, 4);
+            // The keyword body is rendered with the Micro LED geometry in a 400 px row.
+            // Roughly 23 full-width glyphs fit there; using the old 36-unit estimate
+            // under-allocated the 化壳 explanation and clipped its third line.
+            pair.Value.LineCount = EstimateTooltipWrappedLineCount(pair.Value.Explanation, 23f, 6);
             model.Keywords.Add(pair.Value);
         }
 
@@ -13579,8 +15213,30 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string TooltipTriggerLabel(DieType type)
     {
+        if (IsF018AbsorbableTurtleType(type))
+        {
+            return "离场化壳";
+        }
+
         switch (type)
         {
+            case DieType.SpellApprenticeTurtle:
+            case DieType.CloneTurtle:
+            case DieType.ElderTurtle:
+            case DieType.RotationTurtle:
+                return "结算时";
+            case DieType.ScribeTurtle:
+                return "购买法术";
+            case DieType.GrandSpellTurtle:
+                return "施放法术";
+            case DieType.RunawayTurtle:
+                return "离场后";
+            case DieType.LeaderTurtle:
+                return "吸附时";
+            case DieType.LegacyDemonTurtle:
+                return "实体离袋";
+            case DieType.EmptyHoldTurtle:
+                return "腾空时";
             case DieType.Basic:
             case DieType.Odd:
             case DieType.Even:
@@ -13642,7 +15298,6 @@ public sealed class DiceKingDemo : MonoBehaviour
             case DieType.LuckyTurtle:
             case DieType.MagnetTurtle:
             case DieType.RallyTurtle:
-            case DieType.LeaderTurtle:
             case DieType.PackTurtle:
             case DieType.SharedFeastDemonTurtle:
             case DieType.SafetyNetTurtle:
@@ -14003,6 +15658,18 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
+        if (offer.Kind == MarketOfferKind.Spell)
+        {
+            DrawSpellMarketOffer(rect, offer);
+            return;
+        }
+
+        if (offer.Kind != MarketOfferKind.Die || offer.Die == null)
+        {
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), "商品配置缺失", cardTitleStyle);
+            return;
+        }
+
         DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), offer.Die.Name, cardTitleStyle);
         Rect iconBack = new Rect(rect.x + 52f, rect.y + 58f, 100f, 96f);
         DiceMaterial material = ActiveDiceMaterial(offer.Die);
@@ -14023,6 +15690,25 @@ public sealed class DiceKingDemo : MonoBehaviour
             DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 184f, rect.width - 44f, 20f), MarketOfferHint(offer.Die), tinyStyle);
         }
         TrySetHoveredTooltip(rect, offer.Die, DiceTooltipContext.MarketOffer, CurrentOfferPrice(offer), hoverKey + "-" + offer.Die.Id);
+    }
+
+    private void DrawSpellMarketOffer(Rect rect, MarketOffer offer)
+    {
+        SpellDefinition spell = offer != null ? offer.Spell : null;
+        if (spell == null)
+        {
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), "法术配置缺失", cardTitleStyle);
+            return;
+        }
+
+        DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 24f, rect.width - 44f, 30f), spell.DisplayName, cardTitleStyle);
+        Rect cardBack = new Rect(rect.x + 48f, rect.y + 62f, 108f, 92f);
+        DrawPanel(cardBack, new Color(0.08f, 0.25f, 0.25f, 0.92f));
+        DrawBorder(cardBack, new Color(0.22f, 0.78f, 0.68f, 0.92f), 4f);
+        DrawBorder(InsetRect(cardBack, 12f, 12f), new Color(0.88f, 0.58f, 0.18f, 0.72f), 2f);
+        DrawStandardLabel(new Rect(cardBack.x + 12f, cardBack.y + 24f, cardBack.width - 24f, 42f), "法术牌", headerStyle);
+        DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 164f, rect.width - 44f, 58f), spell.RuleText, tinyStyle);
+        DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 224f, rect.width - 44f, 18f), "售价 " + CurrentOfferPrice(offer) + " 金", smallStyle);
     }
 
     private void DrawCraftingMarketOffer(Rect rect, MarketOffer offer)
@@ -14068,6 +15754,18 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (offer.Kind == MarketOfferKind.CraftingItem && !affixFeatureEnabled)
         {
             return "不可购买";
+        }
+
+        if (offer.Kind == MarketOfferKind.Spell)
+        {
+            if (!spellSystemEnabled || offer.Spell == null || !offer.Spell.Enabled)
+            {
+                return "不可购买";
+            }
+            if (spellBag.Count >= Mathf.Max(1, spellBagCapacity))
+            {
+                return "法术袋已满";
+            }
         }
 
         if (offer.Kind == MarketOfferKind.Die && offer.Die != null && offer.Die.Type == DieType.Tribute && dice.Count <= 0)
@@ -14206,20 +15904,46 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "压左侧分换金币";
             case DieType.Turtle:
                 return "高点启动壳链";
+            case DieType.GuideTurtle:
+                return "为同宿主下一壳 +1";
             case DieType.MoneyTurtle:
-                return "化壳后结算 +1 金";
+                return "首结 +1 金";
             case DieType.TinyTurtle:
-                return "化壳后结算时全部六面+1";
+                return "首结获得基础壳";
             case DieType.DoubleTurtle:
                 return "化壳时最低面翻倍";
             case DieType.LuckyTurtle:
-                return "化壳后始终最大面";
+                return "每关首结按最大面";
+            case DieType.HeavyArmorTurtle:
+                return "按同宿主真壳临时加分";
+            case DieType.GreatTurtle:
+                return "首结复唱宿主本体";
             case DieType.MagnetTurtle:
-                return "化壳后给其它骰加壳";
+                return "首结给其它非龟基础壳";
             case DieType.RallyTurtle:
-                return "按其它龟化壳数加面";
+                return "按其它真壳宿主加分";
+            case DieType.SpellApprenticeTurtle:
+                return "首结积下一法术折扣";
+            case DieType.ScribeTurtle:
+                return "首买法术强化下一壳";
+            case DieType.CurseShellTurtle:
+                return "施法储存下次最终点";
+            case DieType.GrandSpellTurtle:
+                return "施法为龟群充能";
+            case DieType.RunawayTurtle:
+                return "离店后生成领路龟";
+            case DieType.CloneTurtle:
+                return "每关首结自身六面+1";
+            case DieType.ElderTurtle:
+                return "按其它驻场龟加分";
             case DieType.LeaderTurtle:
                 return "其它龟化壳时复制效果";
+            case DieType.RotationTurtle:
+                return "最终点被抬高后成长";
+            case DieType.LegacyDemonTurtle:
+                return "非出售离袋强化最低面";
+            case DieType.EmptyHoldTurtle:
+                return "满袋腾位积购买折扣";
             case DieType.Shellsmith:
                 return "小骰越多越加分";
             case DieType.Nest:
@@ -15930,6 +17654,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawUiPanel(Rect rect)
     {
+        if (spellPanelOpen)
+        {
+            DrawArcadeDisplayPanel(rect);
+            return;
+        }
         DrawParchmentFrame(rect, true, true);
     }
 
@@ -15945,11 +17674,52 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawUiSmallPanel(Rect rect)
     {
+        if (spellPanelOpen)
+        {
+            DrawArcadeDisplayPanel(rect);
+            return;
+        }
         DrawParchmentFrame(rect, false, false);
+    }
+
+    private void DrawArcadeDisplayPanel(Rect rect)
+    {
+        DrawRect(rect, new Color(0.043f, 0.071f, 0.082f, 1f));
+        DrawBorder(rect, new Color(0.24f, 0.26f, 0.23f, 1f), 1f);
+        DrawRect(InsetRect(rect, 4f, 4f), new Color(0.016f, 0.035f, 0.043f, 1f));
+    }
+
+    private bool DrawArcadeDisplayButton(Rect rect, string label, bool primary)
+    {
+        bool enabled = GUI.enabled;
+        bool hovered = enabled && uiMousePositionValid && rect.Contains(uiMousePosition);
+        bool pressed = hovered && Input.GetMouseButton(0);
+        bool clicked = enabled && GUI.Button(rect, GUIContent.none, GUIStyle.none);
+        // Keep the ordinary text core opaque even when the action is blocked.
+        GUI.enabled = true;
+        DrawArcadeDisplayPanel(rect);
+        if (hovered)
+        {
+            DrawBorder(InsetRect(rect, 1f, 1f), new Color(1f, 0.75f, 0.29f, 0.7f), 1f);
+        }
+        Rect labelRect = InsetRect(rect, 8f, 2f);
+        if (pressed)
+        {
+            labelRect.y += 1f;
+        }
+        DrawLedRoleText(labelRect, label, enabled && (primary || hovered)
+            ? MainGameLedFont.TextRole.FocusAmber
+            : MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+        GUI.enabled = enabled;
+        return clicked;
     }
 
     private bool DrawUiButton(Rect rect, string label, UiButtonKind kind)
     {
+        if (spellPanelOpen)
+        {
+            return DrawArcadeDisplayButton(rect, label, kind == UiButtonKind.Primary);
+        }
         bool enabled = GUI.enabled;
         DrawScalableButtonFrame(rect, kind, enabled);
 
@@ -16069,7 +17839,9 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (mainGameLedFont != null && mainGameLedFont.IsReady)
         {
             int requestedSize = effectiveStyle.fontSize > 0 ? effectiveStyle.fontSize : 14;
-            Color textColor = MultiplyColor(effectiveStyle.normal.textColor, GUI.contentColor);
+            Color textColor = spellPanelOpen
+                ? mainGameLedFont.RoleColor(MainGameLedFont.TextRole.PrimaryAmber)
+                : MultiplyColor(effectiveStyle.normal.textColor, GUI.contentColor);
             if (effectiveStyle.wordWrap)
             {
                 mainGameLedFont.DrawWrapped(rect, text, requestedSize, textColor, effectiveStyle.alignment, 0f);
@@ -16321,6 +18093,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         bool savedStageContinuation = PlayerPrefs.GetInt(SavePrefix + "StageContinuationPending", 0) == 1;
         int savedFeedQuality = PlayerPrefs.GetInt(SavePrefix + "FeedQuality", feedQualityStart);
         int savedTavernBaseMinimumBonus = PlayerPrefs.GetInt(SavePrefix + "TavernBaseMinimumBonus", 0);
+        int savedNextDiePurchaseDiscount = PlayerPrefs.GetInt(SavePrefix + "NextDiePurchaseDiscount", 0);
+        int savedNextSpellPurchaseDiscount = PlayerPrefs.GetInt(SavePrefix + "NextSpellPurchaseDiscount", 0);
+        int savedNextTurtleTransferBonus = PlayerPrefs.GetInt(SavePrefix + "NextTurtleTransferBonus", 0);
+        string savedSpellBagData = PlayerPrefs.GetString(SavePrefix + "SpellBagData", string.Empty);
+        int savedPendingSpellScoreBonus = PlayerPrefs.GetInt(SavePrefix + "PendingSpellScoreBonus", 0);
+        int savedPendingSpellDividendCount = PlayerPrefs.GetInt(SavePrefix + "PendingSpellDividendCount", 0);
+        string savedPendingSpellEchoDieIds = PlayerPrefs.GetString(SavePrefix + "PendingSpellEchoDieIds", string.Empty);
+        int savedPendingSpellBountyCount = PlayerPrefs.GetInt(SavePrefix + "PendingSpellBountyCount", 0);
 
         suppressSave = true;
         ResetRun("王室骰袋", "当前骰袋容量上限 6，关间市场负责买卖调整。");
@@ -16335,6 +18115,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         remainingLives = savedLives;
         feedQuality = Mathf.Max(1, savedFeedQuality);
         tavernBaseMinimumBonus = Mathf.Max(0, savedTavernBaseMinimumBonus);
+        nextDiePurchaseDiscount = Mathf.Max(0, savedNextDiePurchaseDiscount);
+        nextSpellPurchaseDiscount = Mathf.Max(0, savedNextSpellPurchaseDiscount);
+        nextTurtleTransferBonus = Mathf.Max(0, savedNextTurtleTransferBonus);
+        LoadSpellBag(savedSpellBagData);
+        pendingSpellScoreBonus = Mathf.Max(0, savedPendingSpellScoreBonus);
+        pendingSpellDividendCount = Mathf.Max(0, savedPendingSpellDividendCount);
+        LoadPendingSpellEchoDieIds(savedPendingSpellEchoDieIds);
+        pendingSpellBountyCount = Mathf.Max(0, savedPendingSpellBountyCount);
         marketTemporaryMinimumBonus = 0;
         suppressSave = false;
         if (savedStageContinuation)
@@ -16434,6 +18222,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         PlayerPrefs.SetInt(SavePrefix + "StageContinuationPending", stageContinuationPending ? 1 : 0);
         PlayerPrefs.SetInt(SavePrefix + "FeedQuality", feedQuality);
         PlayerPrefs.SetInt(SavePrefix + "TavernBaseMinimumBonus", tavernBaseMinimumBonus);
+        PlayerPrefs.SetInt(SavePrefix + "NextDiePurchaseDiscount", Mathf.Max(0, nextDiePurchaseDiscount));
+        PlayerPrefs.SetInt(SavePrefix + "NextSpellPurchaseDiscount", Mathf.Max(0, nextSpellPurchaseDiscount));
+        PlayerPrefs.SetInt(SavePrefix + "NextTurtleTransferBonus", Mathf.Max(0, nextTurtleTransferBonus));
+        PlayerPrefs.SetString(SavePrefix + "SpellBagData", SerializeSpellBag());
+        PlayerPrefs.SetInt(SavePrefix + "PendingSpellScoreBonus", Mathf.Max(0, pendingSpellScoreBonus));
+        PlayerPrefs.SetInt(SavePrefix + "PendingSpellDividendCount", Mathf.Max(0, pendingSpellDividendCount));
+        PlayerPrefs.SetString(SavePrefix + "PendingSpellEchoDieIds", SerializePendingSpellEchoDieIds());
+        PlayerPrefs.SetInt(SavePrefix + "PendingSpellBountyCount", Mathf.Max(0, pendingSpellBountyCount));
         PlayerPrefs.SetInt(SavePrefix + "SeenOpening", seenOpening ? 1 : 0);
         PlayerPrefs.SetString(SavePrefix + "DiceData", SerializeDice());
         PlayerPrefs.SetInt(SavePrefix + "AffixAddStone", affixAddStoneCount);
@@ -16445,6 +18241,11 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void ClearSave()
     {
         hasSave = false;
+        if (suppressSave)
+        {
+            return;
+        }
+
         PlayerPrefs.SetInt(SavePrefix + "HasSave", 0);
         PlayerPrefs.DeleteKey(SavePrefix + "SaveVersion");
         PlayerPrefs.DeleteKey(SavePrefix + "DiceData");
@@ -16457,6 +18258,15 @@ public sealed class DiceKingDemo : MonoBehaviour
         PlayerPrefs.DeleteKey(SavePrefix + "StageContinuationPending");
         PlayerPrefs.DeleteKey(SavePrefix + "FeedQuality");
         PlayerPrefs.DeleteKey(SavePrefix + "TavernBaseMinimumBonus");
+        PlayerPrefs.DeleteKey(SavePrefix + "NextDiePurchaseDiscount");
+        PlayerPrefs.DeleteKey(SavePrefix + "NextSpellPurchaseDiscount");
+        PlayerPrefs.DeleteKey(SavePrefix + "NextTurtleTransferBonus");
+        PlayerPrefs.DeleteKey(SavePrefix + "TurtleTestSpellCount");
+        PlayerPrefs.DeleteKey(SavePrefix + "SpellBagData");
+        PlayerPrefs.DeleteKey(SavePrefix + "PendingSpellScoreBonus");
+        PlayerPrefs.DeleteKey(SavePrefix + "PendingSpellDividendCount");
+        PlayerPrefs.DeleteKey(SavePrefix + "PendingSpellEchoDieIds");
+        PlayerPrefs.DeleteKey(SavePrefix + "PendingSpellBountyCount");
         PlayerPrefs.DeleteKey(SavePrefix + "AffixAddStone");
         PlayerPrefs.DeleteKey(SavePrefix + "AffixRemoveStone");
         PlayerPrefs.DeleteKey(SavePrefix + "AffixReplaceStone");
@@ -16468,6 +18278,74 @@ public sealed class DiceKingDemo : MonoBehaviour
         affixAddStoneCount = Mathf.Max(0, PlayerPrefs.GetInt(SavePrefix + "AffixAddStone", 0));
         affixRemoveStoneCount = Mathf.Max(0, PlayerPrefs.GetInt(SavePrefix + "AffixRemoveStone", 0));
         affixReplaceStoneCount = Mathf.Max(0, PlayerPrefs.GetInt(SavePrefix + "AffixReplaceStone", 0));
+    }
+
+    private string SerializeSpellBag()
+    {
+        List<string> ids = new List<string>();
+        for (int i = 0; i < spellBag.Count; i++)
+        {
+            SpellDefinition definition = SpellDefinitionFor(spellBag[i]);
+            ids.Add(definition != null && !string.IsNullOrEmpty(definition.Id)
+                ? definition.Id
+                : spellBag[i].ToString());
+        }
+
+        return string.Join(",", ids.ToArray());
+    }
+
+    private void LoadSpellBag(string data)
+    {
+        spellBag.Clear();
+        if (string.IsNullOrEmpty(data))
+        {
+            return;
+        }
+
+        string[] ids = data.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < ids.Length && spellBag.Count < Mathf.Max(1, spellBagCapacity); i++)
+        {
+            SpellType type;
+            SpellDefinition definition;
+            if (TryParseSpellType(ids[i], out type)
+                && spellDefinitions.TryGetValue(type, out definition)
+                && definition != null
+                && definition.Enabled)
+            {
+                spellBag.Add(type);
+            }
+        }
+    }
+
+    private string SerializePendingSpellEchoDieIds()
+    {
+        List<string> ids = new List<string>();
+        for (int i = 0; i < pendingSpellEchoDieIds.Count; i++)
+        {
+            ids.Add(pendingSpellEchoDieIds[i].ToString(CultureInfo.InvariantCulture));
+        }
+
+        return string.Join(",", ids.ToArray());
+    }
+
+    private void LoadPendingSpellEchoDieIds(string data)
+    {
+        pendingSpellEchoDieIds.Clear();
+        if (string.IsNullOrEmpty(data))
+        {
+            return;
+        }
+
+        string[] ids = data.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < ids.Length; i++)
+        {
+            int dieId;
+            if (int.TryParse(ids[i], NumberStyles.Integer, CultureInfo.InvariantCulture, out dieId)
+                && FindDieById(dieId) != null)
+            {
+                pendingSpellEchoDieIds.Add(dieId);
+            }
+        }
     }
 
     private string SerializeDice()
@@ -16512,6 +18390,12 @@ public sealed class DiceKingDemo : MonoBehaviour
             data.Append(Mathf.Max(0, die.InvestmentGold));
             data.Append("~");
             data.Append(die.CollectionTriggeredThisStage ? 1 : 0);
+            data.Append("~");
+            data.Append(die.TurtleStageTriggered ? 1 : 0);
+            data.Append("~");
+            data.Append(die.TurtleMarketTriggered ? 1 : 0);
+            data.Append("~");
+            data.Append(Mathf.Max(0, die.TurtleNextSettlementBonus));
         }
 
         return data.ToString();
@@ -16581,10 +18465,19 @@ public sealed class DiceKingDemo : MonoBehaviour
             die.InstanceSellValue = instanceSellValue >= 0 ? instanceSellValue : -1;
             int investmentGold = 0;
             int collectionTriggered = 0;
+            int turtleStageTriggered = 0;
+            int turtleMarketTriggered = 0;
+            int turtleNextSettlementBonus = 0;
             int.TryParse(fields.Length > 14 ? fields[14] : "0", out investmentGold);
             int.TryParse(fields.Length > 15 ? fields[15] : "0", out collectionTriggered);
+            int.TryParse(fields.Length > 16 ? fields[16] : "0", out turtleStageTriggered);
+            int.TryParse(fields.Length > 17 ? fields[17] : "0", out turtleMarketTriggered);
+            int.TryParse(fields.Length > 18 ? fields[18] : "0", out turtleNextSettlementBonus);
             die.InvestmentGold = Mathf.Max(0, investmentGold);
             die.CollectionTriggeredThisStage = collectionTriggered == 1;
+            die.TurtleStageTriggered = turtleStageTriggered == 1;
+            die.TurtleMarketTriggered = turtleMarketTriggered == 1;
+            die.TurtleNextSettlementBonus = Mathf.Max(0, turtleNextSettlementBonus);
             die.PrefixAffixes = fields.Length > 5 ? ParseAffixes(fields[5], AffixSlot.Prefix) : new List<AffixInstance>();
             die.SuffixAffixes = fields.Length > 6 ? ParseAffixes(fields[6], AffixSlot.Suffix) : new List<AffixInstance>();
             dice.Add(die);
@@ -16704,6 +18597,10 @@ public sealed class DiceKingDemo : MonoBehaviour
             data.Append(Mathf.Max(0, attachment.SellValue));
             data.Append(":");
             data.Append(TurtleAttachmentSourceKey(attachment.Source));
+            data.Append(":");
+            data.Append(attachment.UsedThisStage ? 1 : 0);
+            data.Append(":");
+            data.Append(Mathf.Max(0, attachment.StateValue));
         }
 
         return data.ToString();
@@ -16735,6 +18632,8 @@ public sealed class DiceKingDemo : MonoBehaviour
 
             int faceGain = 0;
             int sellValue = 0;
+            int usedThisStage = 0;
+            int stateValue = 0;
             TurtleAttachmentSource source = TurtleAttachmentSource.RealTurtle;
             if (fields.Length > 1)
             {
@@ -16750,13 +18649,23 @@ public sealed class DiceKingDemo : MonoBehaviour
             {
                 TryParseTurtleAttachmentSource(fields[3], out source);
             }
+            if (fields.Length > 4)
+            {
+                int.TryParse(fields[4], out usedThisStage);
+            }
+            if (fields.Length > 5)
+            {
+                int.TryParse(fields[5], out stateValue);
+            }
 
             result.Add(new TurtleAttachment
             {
                 Type = type,
                 FaceGain = Mathf.Max(0, faceGain),
                 SellValue = Mathf.Max(0, sellValue),
-                Source = source
+                Source = source,
+                UsedThisStage = usedThisStage == 1,
+                StateValue = Mathf.Max(0, stateValue)
             });
         }
 
@@ -16981,14 +18890,20 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void ResetRun(string newBuildName, string newBuildSummary)
     {
+        ResetMarketShelfPresentation();
+        spellBagPage = 0;
         dice.Clear();
         marketOffers.Clear();
+        spellBag.Clear();
+        pendingSpellEchoDieIds.Clear();
         logLines.Clear();
         scoringDice.Clear();
         ClearDiceVisualStates();
         pendingTreeGrowth.Clear();
         activeCraftingItemKey = string.Empty;
         marketLeaveEffectSequenceActive = false;
+        marketLeaveRootDieIds.Clear();
+        activeGameplayChain = null;
         marketLeaveEffectIndex = 0;
         marketLeaveEffectTotalCount = 0;
         marketLeaveEffectResolvedCount = 0;
@@ -17002,6 +18917,16 @@ public sealed class DiceKingDemo : MonoBehaviour
         feedQuality = Mathf.Max(1, feedQualityStart);
         tavernBaseMinimumBonus = 0;
         marketTemporaryMinimumBonus = 0;
+        nextDiePurchaseDiscount = 0;
+        nextSpellPurchaseDiscount = 0;
+        nextTurtleTransferBonus = 0;
+        spellPanelOpen = false;
+        spellCastingRackIndex = -1;
+        spellCastStep = SpellCastStep.None;
+        selectedSpellFamily = MainFamily.None;
+        pendingSpellScoreBonus = 0;
+        pendingSpellDividendCount = 0;
+        pendingSpellBountyCount = 0;
         nextDieId = 1;
         stageIndex = 0;
         chapterGold = startingGold;
@@ -17011,6 +18936,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         stageContinuationPending = false;
         lastBribeGoldSpent = 0;
         lastBribeScoreBonus = 0;
+        lastSpellScoreBonus = 0;
         lastAffixScoreBonus = 0;
         lastWalletIncome = 0;
         currentScore = 0;
@@ -17083,6 +19009,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             ResetRoundState(dice[i]);
             dice[i].CollectionTriggeredThisStage = false;
+            dice[i].TurtleStageTriggered = false;
+            ResetTurtleAttachmentStageState(dice[i]);
         }
 
         EnsureDiceLimit();
@@ -17216,6 +19144,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
+        CloseSpellPanel();
         rolledThisEncounter = true;
         rollResultsLocked = false;
         resolvedScore = currentScore;
@@ -17581,7 +19510,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private bool CanReorderDiceOnSurface(DiceOrderDragSurface surface)
     {
-        if (dice.Count <= 1)
+        if (spellPanelOpen || dice.Count <= 1)
         {
             return false;
         }
@@ -18414,6 +20343,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         previewAffixScoreBonus = 0;
         previewWalletIncome = 0;
         previewHasTurtleRandomness = false;
+        lastSpellScoreBonus = 0;
         lastTurtleTemporaryDieCount = 0;
         lastNestBonusDieCount = 0;
         lastShellsmithScoreBonus = 0;
@@ -18467,7 +20397,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         lastTemporaryScore = previewTemporaryScore;
         int baseRollScore = Mathf.RoundToInt((previewIndividualScore + previewTemporaryScore + previewRuleBonus) * lastMultiplier);
         UpdateBribePreview(baseRollScore, hand, previewTurtleTemporaryDieCount, previewDieScores);
-        previewRollScore = baseRollScore + previewBribeScoreBonus;
+        previewRollScore = baseRollScore + previewBribeScoreBonus + Mathf.Max(0, pendingSpellScoreBonus);
     }
 
     private List<int> PreviewDieScores(Encounter encounter, int turtleTemporaryDieCount, bool straightTriggered)
@@ -19199,6 +21129,513 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
     }
 
+    private const int GameplayChainActionLimit = 256;
+
+    private void BeginGameplayChain(string phase)
+    {
+        if (activeGameplayChain != null)
+        {
+            AbortGameplayChain("attempted_to_begin_" + phase + "_while_chain_active");
+        }
+
+        gameplayChainSerial++;
+        string prefix = string.Equals(phase, "market_leave", StringComparison.Ordinal)
+            ? "LEAVE"
+            : "SCORE";
+        activeGameplayChain = new GameplayChainContext
+        {
+            ChainId = prefix + "-" + gameplayChainSerial.ToString("D4", CultureInfo.InvariantCulture),
+            Phase = phase
+        };
+        LogGameplayChain("chain_begin", result: "started");
+    }
+
+    private void EndGameplayChain(string result)
+    {
+        GameplayChainContext context = activeGameplayChain;
+        if (context == null)
+        {
+            return;
+        }
+
+        if (context.PendingResponses.Count > 0 || context.NextResponses.Count > 0)
+        {
+            DrainGameplayChainResponseWaves();
+        }
+
+        LogGameplayChain("chain_end", result: string.IsNullOrEmpty(result) ? "completed" : result);
+        activeGameplayChain = null;
+    }
+
+    private void AbortGameplayChain(string reason)
+    {
+        GameplayChainContext context = activeGameplayChain;
+        if (context == null)
+        {
+            return;
+        }
+
+        context.PendingResponses.Clear();
+        context.NextResponses.Clear();
+        context.ResolvingWave = false;
+        LogGameplayChain("guard_abort", result: "aborted", reason: reason);
+        LogGameplayChain("chain_end", result: "aborted", reason: reason);
+        activeGameplayChain = null;
+    }
+
+    private void BeginGameplayChainRoot(Die root, int lockedSlot, string rootLabel, int lockedRootId = -1)
+    {
+        GameplayChainContext context = activeGameplayChain;
+        if (context == null)
+        {
+            return;
+        }
+
+        if (context.PendingResponses.Count > 0 || context.NextResponses.Count > 0)
+        {
+            DrainGameplayChainResponseWaves();
+        }
+
+        context.RootDieId = root != null ? root.Id : lockedRootId;
+        context.RootSlot = lockedSlot;
+        context.RootLabel = !string.IsNullOrEmpty(rootLabel)
+            ? rootLabel
+            : root != null ? DieDisplayName(root) : "phase";
+        context.RootStateBefore = CaptureGameplayChainState(root);
+        context.Wave = 0;
+        LogGameplayChain(
+            "root_begin",
+            sourceDieId: context.RootDieId,
+            sourceLabel: context.RootLabel,
+            result: root != null ? "started" : "synthetic");
+    }
+
+    private string EndGameplayChainRoot(string result)
+    {
+        GameplayChainContext context = activeGameplayChain;
+        if (context == null)
+        {
+            return string.Empty;
+        }
+
+        string responseText = DrainGameplayChainResponseWaves();
+        Die root = FindDieById(context.RootDieId);
+        string afterState = CaptureGameplayChainState(root);
+        LogGameplayChain(
+            "state_delta",
+            sourceDieId: context.RootDieId,
+            sourceLabel: context.RootLabel,
+            result: "root_complete",
+            delta: context.RootStateBefore + " -> " + afterState);
+        LogGameplayChain(
+            "root_end",
+            sourceDieId: context.RootDieId,
+            sourceLabel: context.RootLabel,
+            result: string.IsNullOrEmpty(result) ? "completed" : result);
+        return responseText;
+    }
+
+    private int EmitGameplayChainEvent(string eventType, Die source, string sourceLabel)
+    {
+        GameplayChainContext context = activeGameplayChain;
+        if (context == null)
+        {
+            return 0;
+        }
+
+        context.EventSerial++;
+        int eventId = context.EventSerial;
+        LogGameplayChain(
+            "event_emit",
+            eventId,
+            eventType,
+            source != null ? source.Id : -1,
+            GameplayChainSourceLabel(source, sourceLabel),
+            result: "emitted");
+        return eventId;
+    }
+
+    private void EnqueueGameplayChainResponse(
+        int eventId,
+        string eventType,
+        Die source,
+        string sourceLabel,
+        Die responder,
+        string responseType,
+        Func<bool> isValid,
+        Func<string> execute)
+    {
+        GameplayChainContext context = activeGameplayChain;
+        if (context == null || responder == null || execute == null)
+        {
+            return;
+        }
+
+        string responseKey = eventId.ToString(CultureInfo.InvariantCulture)
+            + ":" + responder.Id.ToString(CultureInfo.InvariantCulture)
+            + ":" + responseType;
+        if (!context.ResponseKeys.Add(responseKey))
+        {
+            LogGameplayChain(
+                "response_skip",
+                eventId,
+                eventType,
+                source != null ? source.Id : -1,
+                sourceLabel,
+                responder.Id,
+                DieDisplayName(responder),
+                "skipped",
+                reason: "duplicate_same_event");
+            return;
+        }
+
+        GameplayChainResponse response = new GameplayChainResponse
+        {
+            EventId = eventId,
+            EventType = eventType,
+            SourceDieId = source != null ? source.Id : -1,
+            SourceLabel = GameplayChainSourceLabel(source, sourceLabel),
+            ResponderDieId = responder.Id,
+            ResponderLabel = DieDisplayName(responder),
+            ResponseType = responseType,
+            EnqueueOrder = ++context.EnqueueSerial,
+            PreserveCopiedDepth = activeFamilySettlementContext != null
+                && activeFamilySettlementContext.CopiedEventDepth > 0,
+            IsValid = isValid,
+            Execute = execute
+        };
+        List<GameplayChainResponse> queue = context.ResolvingWave
+            ? context.NextResponses
+            : context.PendingResponses;
+        queue.Add(response);
+        int targetWave = context.Wave + 1;
+        LogGameplayChain(
+            "response_enqueue",
+            response.EventId,
+            response.EventType,
+            response.SourceDieId,
+            response.SourceLabel,
+            response.ResponderDieId,
+            response.ResponderLabel,
+            "queued",
+            delta: response.ResponseType,
+            waveOverride: targetWave);
+    }
+
+    private string DrainGameplayChainResponseWaves()
+    {
+        GameplayChainContext context = activeGameplayChain;
+        if (context == null)
+        {
+            return string.Empty;
+        }
+
+        List<string> effectTexts = new List<string>();
+        bool guardAborted = false;
+        while (context.PendingResponses.Count > 0 && !guardAborted)
+        {
+            context.Wave++;
+            context.PendingResponses.Sort(CompareGameplayChainResponses);
+            List<GameplayChainResponse> currentWave = new List<GameplayChainResponse>(context.PendingResponses);
+            context.PendingResponses.Clear();
+
+            List<string> order = new List<string>();
+            for (int i = 0; i < currentWave.Count; i++)
+            {
+                GameplayChainResponse queued = currentWave[i];
+                int slot = DiceIndexById(queued.ResponderDieId);
+                order.Add((slot >= 0 ? (slot + 1).ToString(CultureInfo.InvariantCulture) : "-")
+                    + ":" + queued.ResponderLabel + "/" + queued.ResponseType);
+            }
+            LogGameplayChain(
+                "wave_scan",
+                result: "count=" + currentWave.Count,
+                delta: string.Join(">", order.ToArray()));
+
+            context.ResolvingWave = true;
+            for (int i = 0; i < currentWave.Count; i++)
+            {
+                GameplayChainResponse response = currentWave[i];
+                if (context.ProcessedActions >= GameplayChainActionLimit)
+                {
+                    LogGameplayChain(
+                        "guard_abort",
+                        response.EventId,
+                        response.EventType,
+                        response.SourceDieId,
+                        response.SourceLabel,
+                        response.ResponderDieId,
+                        response.ResponderLabel,
+                        "aborted",
+                        delta: GameplayChainQueueSnapshot(currentWave, i, context.NextResponses),
+                        reason: "action_limit_" + GameplayChainActionLimit);
+                    context.PendingResponses.Clear();
+                    context.NextResponses.Clear();
+                    guardAborted = true;
+                    break;
+                }
+
+                bool valid;
+                try
+                {
+                    valid = response.IsValid == null || response.IsValid();
+                }
+                catch (Exception exception)
+                {
+                    context.ResolvingWave = false;
+                    LogGameplayChain(
+                        "guard_abort",
+                        response.EventId,
+                        response.EventType,
+                        response.SourceDieId,
+                        response.SourceLabel,
+                        response.ResponderDieId,
+                        response.ResponderLabel,
+                        "exception",
+                        delta: GameplayChainQueueSnapshot(currentWave, i, context.NextResponses),
+                        reason: exception.GetType().Name + ":" + exception.Message);
+                    throw;
+                }
+
+                if (!valid)
+                {
+                    LogGameplayChain(
+                        "response_skip",
+                        response.EventId,
+                        response.EventType,
+                        response.SourceDieId,
+                        response.SourceLabel,
+                        response.ResponderDieId,
+                        response.ResponderLabel,
+                        "skipped",
+                        reason: "responder_or_target_invalidated");
+                    continue;
+                }
+
+                context.ProcessedActions++;
+                LogGameplayChain(
+                    "response_execute",
+                    response.EventId,
+                    response.EventType,
+                    response.SourceDieId,
+                    response.SourceLabel,
+                    response.ResponderDieId,
+                    response.ResponderLabel,
+                    "executing",
+                    delta: response.ResponseType);
+                string effectText;
+                FamilySettlementContext copiedDepthContext = response.PreserveCopiedDepth
+                    ? activeFamilySettlementContext
+                    : null;
+                if (copiedDepthContext != null)
+                {
+                    copiedDepthContext.CopiedEventDepth++;
+                }
+                try
+                {
+                    effectText = response.Execute() ?? string.Empty;
+                }
+                catch (Exception exception)
+                {
+                    context.ResolvingWave = false;
+                    LogGameplayChain(
+                        "guard_abort",
+                        response.EventId,
+                        response.EventType,
+                        response.SourceDieId,
+                        response.SourceLabel,
+                        response.ResponderDieId,
+                        response.ResponderLabel,
+                        "exception",
+                        delta: GameplayChainQueueSnapshot(currentWave, i, context.NextResponses),
+                        reason: exception.GetType().Name + ":" + exception.Message);
+                    throw;
+                }
+                finally
+                {
+                    if (copiedDepthContext != null)
+                    {
+                        copiedDepthContext.CopiedEventDepth--;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(effectText))
+                {
+                    effectTexts.Add(effectText);
+                }
+                LogGameplayChain(
+                    "state_delta",
+                    response.EventId,
+                    response.EventType,
+                    response.SourceDieId,
+                    response.SourceLabel,
+                    response.ResponderDieId,
+                    response.ResponderLabel,
+                    "applied",
+                    delta: string.IsNullOrEmpty(effectText) ? response.ResponseType : effectText);
+            }
+
+            context.ResolvingWave = false;
+            LogGameplayChain(
+                "wave_end",
+                result: guardAborted ? "guard_aborted" : "completed",
+                delta: "next_count=" + context.NextResponses.Count);
+            if (!guardAborted && context.NextResponses.Count > 0)
+            {
+                context.PendingResponses.AddRange(context.NextResponses);
+                context.NextResponses.Clear();
+            }
+        }
+
+        return CombineMarketEffectTexts(effectTexts);
+    }
+
+    private string GameplayChainQueueSnapshot(
+        List<GameplayChainResponse> currentWave,
+        int currentIndex,
+        List<GameplayChainResponse> nextWave)
+    {
+        List<string> currentItems = new List<string>();
+        if (currentWave != null)
+        {
+            for (int i = Mathf.Max(0, currentIndex); i < currentWave.Count; i++)
+            {
+                GameplayChainResponse response = currentWave[i];
+                if (response != null)
+                {
+                    currentItems.Add(response.ResponderDieId + ":" + response.ResponseType);
+                }
+            }
+        }
+
+        List<string> nextItems = new List<string>();
+        if (nextWave != null)
+        {
+            for (int i = 0; i < nextWave.Count; i++)
+            {
+                GameplayChainResponse response = nextWave[i];
+                if (response != null)
+                {
+                    nextItems.Add(response.ResponderDieId + ":" + response.ResponseType);
+                }
+            }
+        }
+
+        return "current=[" + string.Join(",", currentItems.ToArray())
+            + "];next=[" + string.Join(",", nextItems.ToArray()) + "]";
+    }
+
+    private int CompareGameplayChainResponses(GameplayChainResponse left, GameplayChainResponse right)
+    {
+        int leftIndex = left != null ? DiceIndexById(left.ResponderDieId) : -1;
+        int rightIndex = right != null ? DiceIndexById(right.ResponderDieId) : -1;
+        leftIndex = leftIndex >= 0 ? leftIndex : int.MaxValue;
+        rightIndex = rightIndex >= 0 ? rightIndex : int.MaxValue;
+        int indexComparison = leftIndex.CompareTo(rightIndex);
+        if (indexComparison != 0)
+        {
+            return indexComparison;
+        }
+
+        int leftOrder = left != null ? left.EnqueueOrder : int.MaxValue;
+        int rightOrder = right != null ? right.EnqueueOrder : int.MaxValue;
+        return leftOrder.CompareTo(rightOrder);
+    }
+
+    private string CaptureGameplayChainState(Die die)
+    {
+        string global = "gold=" + chapterGold
+            + ",bag=" + dice.Count
+            + ",next_die_discount=" + nextDiePurchaseDiscount
+            + ",refresh_discount=" + currentMarketBlackMarketRefreshDiscount;
+        if (die == null)
+        {
+            return global;
+        }
+
+        return global
+            + ",die=" + DieDisplayName(die)
+            + ",effective=" + die.EffectiveValue
+            + ",score=" + die.Score
+            + ",feed_count=" + die.FeedCount
+            + ",feed_value=" + die.FeedValue
+            + ",faces=" + FaceText(die.Faces);
+    }
+
+    private string GameplayChainSourceLabel(Die source, string eventLabel)
+    {
+        string sourceName = source != null ? DieDisplayName(source) : string.Empty;
+        if (string.IsNullOrEmpty(sourceName))
+        {
+            return eventLabel ?? string.Empty;
+        }
+        if (string.IsNullOrEmpty(eventLabel) || string.Equals(sourceName, eventLabel, StringComparison.Ordinal))
+        {
+            return sourceName;
+        }
+
+        return sourceName + "[" + eventLabel + "]";
+    }
+
+    private void LogGameplayChain(
+        string eventName,
+        int eventId = 0,
+        string eventType = "",
+        int sourceDieId = -1,
+        string sourceLabel = "",
+        int targetDieId = -1,
+        string targetLabel = "",
+        string result = "",
+        string delta = "",
+        string reason = "",
+        int waveOverride = -1)
+    {
+        GameplayChainContext context = activeGameplayChain;
+        if (context == null)
+        {
+            return;
+        }
+
+        context.Sequence++;
+        int wave = waveOverride >= 0 ? waveOverride : context.Wave;
+        string rootSlot = context.RootSlot >= 0
+            ? (context.RootSlot + 1).ToString(CultureInfo.InvariantCulture)
+            : "-";
+        StringBuilder builder = new StringBuilder(320);
+        builder.Append("[CHAIN]");
+        builder.Append("|chain=").Append(SanitizeGameplayChainLogValue(context.ChainId));
+        builder.Append("|seq=").Append(context.Sequence.ToString("D4", CultureInfo.InvariantCulture));
+        builder.Append("|event=").Append(SanitizeGameplayChainLogValue(eventName));
+        builder.Append("|phase=").Append(SanitizeGameplayChainLogValue(context.Phase));
+        builder.Append("|root_slot=").Append(rootSlot);
+        builder.Append("|root_id=").Append(context.RootDieId);
+        builder.Append("|root=").Append(SanitizeGameplayChainLogValue(context.RootLabel));
+        builder.Append("|wave=").Append(wave);
+        builder.Append("|event_id=").Append(eventId);
+        builder.Append("|event_type=").Append(SanitizeGameplayChainLogValue(eventType));
+        builder.Append("|source_id=").Append(sourceDieId);
+        builder.Append("|source=").Append(SanitizeGameplayChainLogValue(sourceLabel));
+        builder.Append("|target_id=").Append(targetDieId);
+        builder.Append("|target=").Append(SanitizeGameplayChainLogValue(targetLabel));
+        builder.Append("|result=").Append(SanitizeGameplayChainLogValue(result));
+        builder.Append("|delta=").Append(SanitizeGameplayChainLogValue(delta));
+        builder.Append("|reason=").Append(SanitizeGameplayChainLogValue(reason));
+        Debug.Log(builder.ToString());
+    }
+
+    private string SanitizeGameplayChainLogValue(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return "-";
+        }
+
+        return value
+            .Replace("|", "/")
+            .Replace("\r", " ")
+            .Replace("\n", " ");
+    }
+
     private void EmitMainFamilySettlementEvent(Die source, FamilySettlementEffectKind kind, string label, bool copied, bool copyable)
     {
         FamilySettlementContext context = activeFamilySettlementContext;
@@ -19218,13 +21655,70 @@ public sealed class DiceKingDemo : MonoBehaviour
             Copyable = copyable && !isCopied,
             Label = label
         };
+        int gameplayEventId = activeGameplayChain != null
+            ? EmitGameplayChainEvent("family_effect", source, label)
+            : 0;
 
         if (settlementEvent.Copyable)
         {
             context.LatestCopyableBySourceId[source.Id] = settlementEvent;
+            ResolveSpellEchoEvents(source, settlementEvent, context, gameplayEventId);
         }
 
-        if (isCopied || context.TriggerDiceCount <= 0)
+        if (isCopied)
+        {
+            return;
+        }
+
+        if (activeGameplayChain != null)
+        {
+            int sourceId = source.Id;
+            string eventLabel = label;
+            for (int i = 0; i < dice.Count; i++)
+            {
+                Die trigger = dice[i];
+                if (trigger == null || trigger.Temporary || trigger.Type != DieType.Trigger)
+                {
+                    continue;
+                }
+
+                int triggerId = trigger.Id;
+                EnqueueGameplayChainResponse(
+                    gameplayEventId,
+                    "family_effect",
+                    source,
+                    label,
+                    trigger,
+                    "trigger_score_bonus",
+                    delegate
+                    {
+                        Die currentSource = FindDieById(sourceId);
+                        Die currentTrigger = FindDieById(triggerId);
+                        return currentSource != null
+                            && currentTrigger != null
+                            && !currentTrigger.Temporary
+                            && currentTrigger.Type == DieType.Trigger;
+                    },
+                    delegate
+                    {
+                        Die currentSource = FindDieById(sourceId);
+                        Die currentTrigger = FindDieById(triggerId);
+                        if (currentSource == null || currentTrigger == null)
+                        {
+                            return string.Empty;
+                        }
+
+                        ApplyTemporaryScoreBonus(currentSource, 2, "触发器");
+                        string text = DieDisplayName(currentTrigger) + "读取 "
+                            + DieDisplayName(currentSource) + " 的" + eventLabel + "事件，单骰分 +2。";
+                        AddLog(text);
+                        return text;
+                    });
+            }
+            return;
+        }
+
+        if (context.TriggerDiceCount <= 0)
         {
             return;
         }
@@ -19232,6 +21726,119 @@ public sealed class DiceKingDemo : MonoBehaviour
         int triggerBonus = context.TriggerDiceCount * 2;
         ApplyTemporaryScoreBonus(source, triggerBonus, "触发器");
         AddLog("触发器读取 " + DieDisplayName(source) + " 的" + label + "事件，单骰分 +" + triggerBonus + "。");
+    }
+
+    private void ResolveSpellEchoEvents(
+        Die source,
+        FamilySettlementEffectEvent sourceEvent,
+        FamilySettlementContext context,
+        int gameplayEventId)
+    {
+        if (source == null
+            || sourceEvent == null
+            || context == null
+            || context.CopiedEventDepth > 0
+            || pendingSpellEchoDieIds.Count <= 0)
+        {
+            return;
+        }
+
+        int echoCount = 0;
+        for (int i = pendingSpellEchoDieIds.Count - 1; i >= 0; i--)
+        {
+            if (pendingSpellEchoDieIds[i] != source.Id)
+            {
+                continue;
+            }
+
+            pendingSpellEchoDieIds.RemoveAt(i);
+            echoCount++;
+        }
+
+        if (echoCount <= 0)
+        {
+            return;
+        }
+
+        if (activeGameplayChain != null)
+        {
+            int sourceId = source.Id;
+            for (int echoIndex = 0; echoIndex < echoCount; echoIndex++)
+            {
+                int capturedEchoIndex = echoIndex;
+                EnqueueGameplayChainResponse(
+                    gameplayEventId,
+                    "family_effect",
+                    source,
+                    sourceEvent.Label,
+                    source,
+                    "spell_echo_" + (capturedEchoIndex + 1),
+                    delegate
+                    {
+                        return FindDieById(sourceId) != null && activeFamilySettlementContext == context;
+                    },
+                    delegate
+                    {
+                        Die currentSource = FindDieById(sourceId);
+                        if (currentSource == null)
+                        {
+                            return string.Empty;
+                        }
+
+                        ExecuteSpellEchoEvent(currentSource, sourceEvent, context);
+                        currentSource.RoundNote = AppendNote(currentSource.RoundNote, "回声");
+                        string text = "回声指令令 " + DieDisplayName(currentSource)
+                            + " 的" + sourceEvent.Label + "本体效果额外执行 1 次；派生响应进入下一波。";
+                        AddLog(text);
+                        return text;
+                    });
+            }
+            return;
+        }
+
+        for (int echoIndex = 0; echoIndex < echoCount; echoIndex++)
+        {
+            ExecuteSpellEchoEvent(source, sourceEvent, context);
+        }
+
+        source.RoundNote = AppendNote(source.RoundNote, "回声x" + echoCount);
+        AddLog("回声指令令 " + DieDisplayName(source) + " 的" + sourceEvent.Label + "本体效果额外执行 " + echoCount + " 次；回声不再开启复制或额外触发。");
+    }
+
+    private void ExecuteSpellEchoEvent(
+        Die source,
+        FamilySettlementEffectEvent sourceEvent,
+        FamilySettlementContext context)
+    {
+        if (source == null || sourceEvent == null || context == null)
+        {
+            return;
+        }
+
+        int sourceIndex = dice.IndexOf(source);
+        context.CopiedEventDepth++;
+        try
+        {
+            switch (sourceEvent.Kind)
+            {
+                case FamilySettlementEffectKind.PigFarmer:
+                case FamilySettlementEffectKind.SowPig:
+                case FamilySettlementEffectKind.ThreeLittlePigs:
+                    ApplyPigFamilySettlementEffect(source, sourceIndex, context.SettledIds, true);
+                    break;
+                case FamilySettlementEffectKind.PlunderPirate:
+                case FamilySettlementEffectKind.PirateKing:
+                    ApplyF019PirateSettlementEffects(source, sourceIndex, context.SettledIds, true);
+                    break;
+                case FamilySettlementEffectKind.TreasurePirate:
+                    ApplyTreasurePirateSettlementEffect(source, "回声指令", true);
+                    break;
+            }
+        }
+        finally
+        {
+            context.CopiedEventDepth--;
+        }
     }
 
     private void ApplyTemporaryScoreBonus(Die target, int amount, string sourceLabel)
@@ -19389,6 +21996,59 @@ public sealed class DiceKingDemo : MonoBehaviour
             return;
         }
 
+        if (activeGameplayChain != null)
+        {
+            int eventId = EmitGameplayChainEvent("feed_received", fedDie, "获得喂养");
+            int fedDieId = fedDie.Id;
+            for (int i = 0; i < dice.Count; i++)
+            {
+                Die greedy = dice[i];
+                if (greedy == null || greedy.Temporary || greedy.Type != DieType.GreedyPig || greedy.Id == fedDie.Id)
+                {
+                    continue;
+                }
+
+                int greedyId = greedy.Id;
+                EnqueueGameplayChainResponse(
+                    eventId,
+                    "feed_received",
+                    fedDie,
+                    "获得喂养",
+                    greedy,
+                    "greedy_feed_copy",
+                    delegate
+                    {
+                        Die currentFedDie = FindDieById(fedDieId);
+                        Die currentGreedy = FindDieById(greedyId);
+                        return currentFedDie != null
+                            && currentGreedy != null
+                            && !currentGreedy.Temporary
+                            && currentGreedy.Type == DieType.GreedyPig;
+                    },
+                    delegate
+                    {
+                        Die currentFedDie = FindDieById(fedDieId);
+                        Die currentGreedy = FindDieById(greedyId);
+                        if (currentFedDie == null || currentGreedy == null)
+                        {
+                            return string.Empty;
+                        }
+
+                        int gained = GrantFeed(currentGreedy, originalUnits, "贪吃", currentFedDie, false, closedSlots, copied);
+                        if (gained <= 0)
+                        {
+                            return DieDisplayName(currentGreedy) + "贪吃响应未获得喂养。";
+                        }
+
+                        MarkTypeTriggered(currentGreedy);
+                        EmitMainFamilySettlementEvent(currentGreedy, FamilySettlementEffectKind.GreedyPig, "贪吃猪", copied, false);
+                        return DieDisplayName(currentGreedy) + "响应 "
+                            + DieDisplayName(currentFedDie) + " 的喂养，获得 " + gained + " 份喂养。";
+                    });
+            }
+            return;
+        }
+
         for (int i = 0; i < dice.Count; i++)
         {
             Die greedy = dice[i];
@@ -19514,16 +22174,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         EnsureTurtleAttachments(die);
-        if (die.TurtleAttachments.Count == 0)
-        {
-            return;
-        }
-
         int attachmentCountAtStart = die.TurtleAttachments.Count;
-        int feedMinimum = MinimumFaceValue(die) + Mathf.Max(0, die.FeedValue);
-        bool feedActuallyRaisedNaturalRoll = die.FeedValue > 0
-            && die.LastValue < feedMinimum
-            && die.EffectiveValue >= feedMinimum;
+        int heavyArmorBonus = 0;
+        int rallyBonus = 0;
+        int curseChargeCount = 0;
+        int realAttachmentCount = RealTurtleAttachmentCount(die);
+        int otherRealShellHosts = CountOtherRealTurtleShellHosts(die);
         for (int i = 0; i < attachmentCountAtStart; i++)
         {
             TurtleAttachment attachment = die.TurtleAttachments[i];
@@ -19535,31 +22191,75 @@ public sealed class DiceKingDemo : MonoBehaviour
             switch (attachment.Type)
             {
                 case DieType.TinyTurtle:
+                    if (attachment.UsedThisStage)
+                    {
+                        break;
+                    }
+                    attachment.UsedThisStage = true;
                     GrantBasicTurtleShell(die, 1, "小小龟", die, settledIds);
                     die.RoundNote = AppendNote(die.RoundNote, "小小龟 基壳+1");
                     MarkTypeTriggered(die);
                     AddLog(DieDisplayName(die) + " 的小小龟使全部六面 +1，面组 " + FaceText(die.Faces) + "。");
                     break;
                 case DieType.LuckyTurtle:
+                    if (attachment.UsedThisStage)
+                    {
+                        break;
+                    }
+                    attachment.UsedThisStage = true;
                     ApplyLuckyTurtleAttachment(die);
                     break;
                 case DieType.MagnetTurtle:
+                    if (attachment.UsedThisStage)
+                    {
+                        break;
+                    }
+                    attachment.UsedThisStage = true;
                     ApplyMagnetTurtleAttachment(die, dieIndex, settledIds);
                     break;
                 case DieType.RallyTurtle:
-                    ApplyRallyTurtleAttachment(die, settledIds);
+                    rallyBonus += otherRealShellHosts * 2;
                     break;
-                case DieType.SafetyNetTurtle:
-                    if (feedActuallyRaisedNaturalRoll)
+                case DieType.HeavyArmorTurtle:
+                    int otherRealShells = realAttachmentCount
+                        - (attachment.Source == TurtleAttachmentSource.RealTurtle ? 1 : 0);
+                    heavyArmorBonus += Mathf.Max(0, otherRealShells) * 2;
+                    break;
+                case DieType.GreatTurtle:
+                    if (attachment.UsedThisStage)
                     {
-                        HashSet<int> futureOnly = new HashSet<int> { die.Id };
-                        GrantBasicTurtleShell(die, 1, "托底龟", die, futureOnly);
-                        die.RoundNote = AppendNote(die.RoundNote, "托底生壳");
-                        MarkTypeTriggered(die);
-                        AddLog(DieDisplayName(die) + " 的自然点 " + die.LastValue + " 被喂养抬到 " + die.EffectiveValue + "，托底龟使全部六面 +1；本次锁定点数不变。");
+                        break;
                     }
+                    attachment.UsedThisStage = true;
+                    ReplayGreatTurtleHostEffect(die, dieIndex, settledIds);
+                    break;
+                case DieType.CurseShellTurtle:
+                    curseChargeCount += Mathf.Max(0, attachment.StateValue);
+                    attachment.StateValue = 0;
                     break;
             }
+        }
+
+        if (heavyArmorBonus > 0)
+        {
+            ApplyTemporaryScoreBonus(die, heavyArmorBonus, "重甲龟");
+            AddLog(DieDisplayName(die) + " 的重甲龟按同宿主其它真实龟壳，本次单骰分 +" + heavyArmorBonus + "。");
+        }
+
+        if (rallyBonus > 0)
+        {
+            ApplyTemporaryScoreBonus(die, rallyBonus, "呼朋龟");
+            AddLog(DieDisplayName(die) + " 的呼朋唤友龟读取 " + otherRealShellHosts + " 个其它真实龟壳宿主，本次单骰分 +" + rallyBonus + "。");
+        }
+
+        int finalPointBonus = curseChargeCount * 2 + Mathf.Max(0, die.TurtleNextSettlementBonus);
+        die.TurtleNextSettlementBonus = 0;
+        if (finalPointBonus > 0)
+        {
+            die.EffectiveValue += finalPointBonus;
+            die.RoundNote = AppendNote(die.RoundNote, "龟法最终点+" + finalPointBonus);
+            MarkTypeTriggered(die);
+            AddLog(DieDisplayName(die) + " 消耗龟龟法术充能，最终有效点 +" + finalPointBonus + "。");
         }
     }
 
@@ -19607,15 +22307,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         AddLog(DieDisplayName(source) + " 的磁力龟使 " + targetCount + " 颗其它非龟骰全部六面 +1。");
     }
 
-    private void ApplyRallyTurtleAttachment(Die source, HashSet<int> settledIds)
+    private int CountOtherRealTurtleShellHosts(Die source)
     {
         if (source == null)
         {
-            return;
+            return 0;
         }
 
         int targetCount = 0;
-        int totalGain = 0;
         for (int i = 0; i < dice.Count; i++)
         {
             Die target = dice[i];
@@ -19630,21 +22329,57 @@ public sealed class DiceKingDemo : MonoBehaviour
                 continue;
             }
 
-            int gain = realTurtleCount * 2;
-            AddValueToAllFacesAndCurrentRoll(target, gain, settledIds);
-            target.RoundNote = AppendNote(target.RoundNote, "呼朋面+" + gain);
             targetCount++;
-            totalGain += gain;
         }
 
-        if (targetCount <= 0)
+        return targetCount;
+    }
+
+    private bool ReplayGreatTurtleHostEffect(Die host, int hostIndex, HashSet<int> settledIds)
+    {
+        FamilySettlementContext context = activeFamilySettlementContext;
+        FamilySettlementEffectEvent sourceEvent;
+        if (context == null
+            || host == null
+            || !context.LatestCopyableBySourceId.TryGetValue(host.Id, out sourceEvent)
+            || sourceEvent == null
+            || !sourceEvent.Copyable)
         {
-            return;
+            host.RoundNote = AppendNote(host.RoundNote, "伟大龟 无可复唱");
+            return false;
         }
 
-        source.RoundNote = AppendNote(source.RoundNote, "呼朋 +" + totalGain);
-        MarkTypeTriggered(source);
-        AddLog(DieDisplayName(source) + " 的呼朋唤友龟读取其它龟龟的实际化壳数量，使 " + targetCount + " 颗骰累计全部六面 +" + totalGain + "。");
+        context.CopiedEventDepth++;
+        try
+        {
+            switch (sourceEvent.Kind)
+            {
+                case FamilySettlementEffectKind.PigFarmer:
+                case FamilySettlementEffectKind.SowPig:
+                case FamilySettlementEffectKind.ThreeLittlePigs:
+                    ApplyPigFamilySettlementEffect(host, hostIndex, settledIds, true);
+                    break;
+                case FamilySettlementEffectKind.PlunderPirate:
+                case FamilySettlementEffectKind.PirateKing:
+                    ApplyF019PirateSettlementEffects(host, hostIndex, settledIds, true);
+                    break;
+                case FamilySettlementEffectKind.TreasurePirate:
+                    ApplyTreasurePirateSettlementEffect(host, "伟大龟", true);
+                    break;
+                default:
+                    host.RoundNote = AppendNote(host.RoundNote, "伟大龟 不可复唱");
+                    return false;
+            }
+        }
+        finally
+        {
+            context.CopiedEventDepth--;
+        }
+
+        host.RoundNote = AppendNote(host.RoundNote, "伟大复唱 " + sourceEvent.Label);
+        MarkTypeTriggered(host);
+        AddLog(DieDisplayName(host) + " 的伟大龟额外执行一次宿主本体的" + sourceEvent.Label + "效果；未重放龟壳。");
+        return true;
     }
 
     private void GrantBasicTurtleShell(Die target, int faceGain, string sourceLabel, Die source, HashSet<int> settledIds)
@@ -19698,6 +22433,184 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         return count;
+    }
+
+    private bool HasUnusedTurtleAttachmentOfType(Die die, DieType type)
+    {
+        if (die == null || die.TurtleAttachments == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < die.TurtleAttachments.Count; i++)
+        {
+            TurtleAttachment attachment = die.TurtleAttachments[i];
+            if (attachment != null && attachment.Type == type && !attachment.UsedThisStage)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private int CountOtherF023ResidentTurtles(Die source)
+    {
+        int count = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die candidate = dice[i];
+            if (candidate == null
+                || candidate.Temporary
+                || source != null && candidate.Id == source.Id
+                || !IsF023ResidentTurtleType(candidate.Type))
+            {
+                continue;
+            }
+
+            count++;
+        }
+
+        return count;
+    }
+
+    private void ApplyF023ResidentPreSettlementEffects(Die die)
+    {
+        if (die == null || die.Temporary || die.Type != DieType.ElderTurtle)
+        {
+            return;
+        }
+
+        int residentCount = CountOtherF023ResidentTurtles(die);
+        int bonus = residentCount * 3;
+        if (bonus <= 0)
+        {
+            die.RoundNote = AppendNote(die.RoundNote, "长老 无同伴");
+            return;
+        }
+
+        ApplyTemporaryScoreBonus(die, bonus, "长老龟");
+        MarkTypeTriggered(die);
+        AddLog(DieDisplayName(die) + " 读取 " + residentCount + " 颗其它驻场龟，本次单骰分 +" + bonus + "。");
+    }
+
+    private void ResolveF023RotationGrowth(Die target)
+    {
+        if (target == null || target.Temporary || target.EffectiveValue <= target.LastValue)
+        {
+            return;
+        }
+
+        if (activeGameplayChain != null)
+        {
+            int eventId = EmitGameplayChainEvent("effective_value_increased", target, "最终有效点提升");
+            int targetId = target.Id;
+            for (int i = 0; i < dice.Count; i++)
+            {
+                Die rotation = dice[i];
+                if (rotation == null
+                    || rotation.Temporary
+                    || rotation.Type != DieType.RotationTurtle
+                    || rotation.TurtleStageTriggered)
+                {
+                    continue;
+                }
+
+                int rotationId = rotation.Id;
+                EnqueueGameplayChainResponse(
+                    eventId,
+                    "effective_value_increased",
+                    target,
+                    "最终有效点提升",
+                    rotation,
+                    "rotation_growth",
+                    delegate
+                    {
+                        Die currentTarget = FindDieById(targetId);
+                        Die currentRotation = FindDieById(rotationId);
+                        return currentTarget != null
+                            && currentRotation != null
+                            && !currentRotation.Temporary
+                            && currentRotation.Type == DieType.RotationTurtle
+                            && !currentRotation.TurtleStageTriggered;
+                    },
+                    delegate
+                    {
+                        Die currentTarget = FindDieById(targetId);
+                        Die currentRotation = FindDieById(rotationId);
+                        if (currentTarget == null || currentRotation == null)
+                        {
+                            return string.Empty;
+                        }
+
+                        currentRotation.TurtleStageTriggered = true;
+                        currentRotation.RoundNote = AppendNote(currentRotation.RoundNote, "轮作触发");
+                        MarkTypeTriggered(currentRotation);
+                        AddValueToAllFaces(currentTarget, 1);
+                        currentTarget.RoundNote = AppendNote(currentTarget.RoundNote, "轮作面+1");
+                        string text = DieDisplayName(currentRotation) + "读取到 "
+                            + DieDisplayName(currentTarget) + " 最终有效点 " + currentTarget.EffectiveValue
+                            + " > 原始投点 " + currentTarget.LastValue + "，其六面 +1；本次点数不变。";
+                        AddLog(text);
+                        return text;
+                    });
+            }
+            return;
+        }
+
+        int triggerCount = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die rotation = dice[i];
+            if (rotation == null
+                || rotation.Temporary
+                || rotation.Type != DieType.RotationTurtle
+                || rotation.TurtleStageTriggered)
+            {
+                continue;
+            }
+
+            rotation.TurtleStageTriggered = true;
+            rotation.RoundNote = AppendNote(rotation.RoundNote, "轮作触发");
+            MarkTypeTriggered(rotation);
+            triggerCount++;
+        }
+
+        if (triggerCount <= 0)
+        {
+            return;
+        }
+
+        AddValueToAllFaces(target, triggerCount);
+        target.RoundNote = AppendNote(target.RoundNote, "轮作面+" + triggerCount);
+        AddLog("轮作龟x" + triggerCount + "读取到 " + DieDisplayName(target) + " 最终有效点 "
+            + target.EffectiveValue + " > 原始投点 " + target.LastValue + "，其六面 +" + triggerCount + "；本次点数不变。");
+    }
+
+    private void ResolveF023ResidentPostSettlementEffects(Die die)
+    {
+        if (die == null || die.Temporary || die.TurtleStageTriggered)
+        {
+            return;
+        }
+
+        switch (die.Type)
+        {
+            case DieType.SpellApprenticeTurtle:
+                die.TurtleStageTriggered = true;
+                nextSpellPurchaseDiscount++;
+                die.RoundNote = AppendNote(die.RoundNote, "学徒法券+1");
+                MarkTypeTriggered(die);
+                AddLog(DieDisplayName(die) + " 本关首次结算，下一次购买法术 -1。");
+                break;
+            case DieType.CloneTurtle:
+                die.TurtleStageTriggered = true;
+                AddValueToAllFaces(die, 1);
+                die.RoundNote = AppendNote(die.RoundNote, "克隆面+1");
+                MarkTypeTriggered(die);
+                AddLog(DieDisplayName(die) + " 本关首次结算后六面永久 +1；本次锁定点数不变。");
+                break;
+        }
     }
 
     private void ApplyF019PirateSettlementEffects(Die die, int dieIndex, HashSet<int> settledIds, bool copied = false)
@@ -19991,6 +22904,13 @@ public sealed class DiceKingDemo : MonoBehaviour
             return 0;
         }
 
+        int consumedSpellScoreBonus = Mathf.Max(0, pendingSpellScoreBonus);
+        int consumedSpellDividendCount = Mathf.Max(0, pendingSpellDividendCount);
+        int consumedSpellBountyCount = Mathf.Max(0, pendingSpellBountyCount);
+        pendingSpellScoreBonus = 0;
+        pendingSpellDividendCount = 0;
+        pendingSpellBountyCount = 0;
+        lastSpellScoreBonus = consumedSpellScoreBonus;
         ClearCommittedSettlementContributions();
         ResetSettlementTemporaryScoreBonuses();
         FamilySettlementContext settlementContext = new FamilySettlementContext
@@ -19998,6 +22918,14 @@ public sealed class DiceKingDemo : MonoBehaviour
             TriggerDiceCount = CountDiceOfType(DieType.Trigger)
         };
         activeFamilySettlementContext = settlementContext;
+        List<int> settlementRootDieIds = new List<int>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            if (dice[i] != null)
+            {
+                settlementRootDieIds.Add(dice[i].Id);
+            }
+        }
 
         int tempCount;
         int nestBonusCount;
@@ -20010,14 +22938,27 @@ public sealed class DiceKingDemo : MonoBehaviour
         lastWalletIncome = 0;
         try
         {
-            for (int i = 0; i < dice.Count; i++)
+            BeginGameplayChain("settlement");
+            for (int rootSlot = 0; rootSlot < settlementRootDieIds.Count; rootSlot++)
             {
-                settlementScoringCursorIndex = i;
-                Die die = dice[i];
-                ApplyPigFamilySettlementEffect(die, i, settlementContext.SettledIds, false);
-                ApplyF018TurtleAttachmentSettlementEffects(die, i, settlementContext.SettledIds);
-                ApplyF019PirateSettlementEffects(die, i, settlementContext.SettledIds);
-                ApplyF020NeutralSettlementEffect(die, i);
+                int rootDieId = settlementRootDieIds[rootSlot];
+                Die die = FindDieById(rootDieId);
+                if (die == null)
+                {
+                    BeginGameplayChainRoot(null, rootSlot, "missing_die_" + rootDieId, rootDieId);
+                    EndGameplayChainRoot("skipped_missing_root");
+                    continue;
+                }
+
+                int dieIndex = DiceIndexById(die.Id);
+                BeginGameplayChainRoot(die, rootSlot, DieDisplayName(die));
+                settlementScoringCursorIndex = rootSlot;
+                ApplyPigFamilySettlementEffect(die, dieIndex, settlementContext.SettledIds, false);
+                ApplyF019PirateSettlementEffects(die, dieIndex, settlementContext.SettledIds);
+                ApplyF020NeutralSettlementEffect(die, dieIndex);
+                ApplyF023ResidentPreSettlementEffects(die);
+                ApplyF018TurtleAttachmentSettlementEffects(die, dieIndex, settlementContext.SettledIds);
+                ResolveF023RotationGrowth(die);
                 HandResult slotHand = CurrentDiceHandResult();
                 bool slotStraightTriggered = slotHand.LongestRun >= 5;
                 die.Score = ScoreOneDieValue(die, encounter, true, tempCount, slotStraightTriggered);
@@ -20027,11 +22968,13 @@ public sealed class DiceKingDemo : MonoBehaviour
                 RecordSettlementContribution(
                     die,
                     die.Score + foldedTemporaryScore,
-                    i,
+                    rootSlot,
                     false,
                     foldedTemporaryScore != 0,
                     SettlementSemanticLabelForDie(die, foldedTemporaryScore != 0));
                 settlementContext.SettledIds.Add(die.Id);
+                ResolveF023ResidentPostSettlementEffects(die);
+                EndGameplayChainRoot("completed");
             }
 
             settlementPhysicalContributionCaptureComplete = true;
@@ -20039,21 +22982,25 @@ public sealed class DiceKingDemo : MonoBehaviour
             HandResult hand = CurrentDiceHandResult();
             int bribeGoldCapacity = BribeGoldCapacityInCurrentOrder(hand, chapterGold, tempCount);
             int walletAdjustedIndividualScore = settlementContext.IndividualScore;
+            BeginGameplayChainRoot(null, -1, "phase_wallet");
             lastWalletIncome = WalletIncomeForCurrentRoll(hand, tempCount, null, true, ref walletAdjustedIndividualScore);
             settlementContext.IndividualScore = walletAdjustedIndividualScore;
             if (lastWalletIncome > 0)
             {
                 AddGoldIncome(lastWalletIncome, "结算钱包收入", true);
             }
+            EndGameplayChainRoot("completed");
 
+            BeginGameplayChainRoot(null, -1, "phase_crown");
             ApplyCrownSettlementBonuses();
+            EndGameplayChainRoot("completed");
             int individual = settlementContext.IndividualScore;
             int ruleBonus = RuleComboBonus(hand, encounter);
             float parityMultiplier = ParityMultiplier(hand, encounter);
             float multiplier = Mathf.Max(hand.Multiplier, parityMultiplier);
             int baseRollScore = Mathf.RoundToInt((individual + tempScore + ruleBonus) * multiplier);
             int bribeScore = ApplyBribeIfNeeded(baseRollScore, bribeGoldCapacity);
-            int rollScore = baseRollScore + bribeScore;
+            int rollScore = baseRollScore + bribeScore + lastSpellScoreBonus;
             ReconcileCommittedSettlementContributions(individual + tempScore + ruleBonus);
             QueueTreeGrowths(hand, rollScore);
             previewIndividualScore = individual;
@@ -20071,11 +23018,22 @@ public sealed class DiceKingDemo : MonoBehaviour
             lastMultiplier = multiplier;
             lastHandName = FinalHandName(hand, parityMultiplier);
 
+            int triggeredPhysicalDice = CountTriggeredPhysicalDiceForSpell();
+            BeginGameplayChainRoot(null, -1, "phase_post_spell_gold");
+            ResolvePostSettlementSpellGold(
+                encounter,
+                rollScore,
+                triggeredPhysicalDice,
+                consumedSpellDividendCount,
+                consumedSpellBountyCount);
+            EndGameplayChainRoot("completed");
+
             string shellsmithText = lastShellsmithScoreBonus > 0 ? "，壳匠 +" + lastShellsmithScoreBonus : string.Empty;
             if (V02HandScoringEnabled)
             {
                 string bribeText = bribeScore > 0 ? " + 贿赂 " + bribeScore : string.Empty;
-                AddLog("本次 " + rollScore + " = (" + individual + " + 小骰 " + tempScore + " + 规则 " + ruleBonus + ") x " + MultiplierText(multiplier) + bribeText + shellsmithText + "。");
+                string spellText = lastSpellScoreBonus > 0 ? " + 冲关增幅 " + lastSpellScoreBonus : string.Empty;
+                AddLog("本次 " + rollScore + " = (" + individual + " + 小骰 " + tempScore + " + 规则 " + ruleBonus + ") x " + MultiplierText(multiplier) + bribeText + spellText + shellsmithText + "。");
             }
             else
             {
@@ -20090,6 +23048,10 @@ public sealed class DiceKingDemo : MonoBehaviour
                 {
                     scoreParts.Add("贿赂 " + bribeScore);
                 }
+                if (lastSpellScoreBonus > 0)
+                {
+                    scoreParts.Add("冲关增幅 " + lastSpellScoreBonus);
+                }
 
                 AddLog("本次 " + rollScore + " = " + string.Join(" + ", scoreParts.ToArray()) + shellsmithText + "。");
             }
@@ -20097,13 +23059,65 @@ public sealed class DiceKingDemo : MonoBehaviour
             {
                 AddLog("本次金币收入直接入钱包 +" + lastWalletIncome + "。");
             }
+            EndGameplayChain("completed");
             return rollScore;
         }
         finally
         {
+            if (activeGameplayChain != null
+                && string.Equals(activeGameplayChain.Phase, "settlement", StringComparison.Ordinal))
+            {
+                AbortGameplayChain("settlement_unwound_before_chain_end");
+            }
+            pendingSpellEchoDieIds.Clear();
             settlementScoringCursorIndex = -1;
             settlementPhysicalContributionCaptureComplete = false;
             activeFamilySettlementContext = null;
+        }
+    }
+
+    private int CountTriggeredPhysicalDiceForSpell()
+    {
+        int count = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die != null && !die.Temporary && die.TypeTriggeredThisSettle)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private void ResolvePostSettlementSpellGold(
+        Encounter encounter,
+        int rollScore,
+        int triggeredPhysicalDice,
+        int dividendCardCount,
+        int bountyCardCount)
+    {
+        int dividendPerCard = Mathf.Min(4, Mathf.Max(0, triggeredPhysicalDice));
+        for (int i = 0; i < dividendCardCount; i++)
+        {
+            string treasureText = AddGoldIncome(dividendPerCard, "连锁分红", true);
+            AddLog("连锁分红读取 " + triggeredPhysicalDice + " 颗触发自身效果的实体骰，获得 " + dividendPerCard + " 金币。" + treasureText);
+        }
+
+        bool bountyReached = encounter != null && rollScore >= Mathf.Max(0, encounter.Target) * 3;
+        for (int i = 0; i < bountyCardCount; i++)
+        {
+            if (bountyReached)
+            {
+                string treasureText = AddGoldIncome(8, "超额悬赏", true);
+                AddLog("超额悬赏达成：" + rollScore + " ≥ " + encounter.Target * 3 + "，获得 8 金币。" + treasureText);
+            }
+            else
+            {
+                int threshold = encounter != null ? encounter.Target * 3 : 0;
+                AddLog("超额悬赏未达成：" + rollScore + " / " + threshold + "。");
+            }
         }
     }
 
@@ -20581,7 +23595,27 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private int TurtleMoneyIncome(Die die, bool updateNote)
     {
-        int count = CountTurtleAttachmentsOfType(die, DieType.MoneyTurtle);
+        if (die == null || die.TurtleAttachments == null)
+        {
+            return 0;
+        }
+
+        int count = 0;
+        for (int i = 0; i < die.TurtleAttachments.Count; i++)
+        {
+            TurtleAttachment attachment = die.TurtleAttachments[i];
+            if (attachment == null || attachment.Type != DieType.MoneyTurtle || attachment.UsedThisStage)
+            {
+                continue;
+            }
+
+            count++;
+            if (updateNote)
+            {
+                attachment.UsedThisStage = true;
+            }
+        }
+
         if (count <= 0)
         {
             return 0;
@@ -20589,9 +23623,9 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (updateNote)
         {
-            die.RoundNote = AppendNote(die.RoundNote, "金钱龟 +" + count + " 金");
+            die.RoundNote = AppendNote(die.RoundNote, "金钱龟首结 +" + count + " 金");
             MarkTypeTriggered(die);
-            AddLog(DieDisplayName(die) + " 的金钱龟结算，金币 +" + count + "。");
+            AddLog(DieDisplayName(die) + " 的金钱龟本关首次结算，金币 +" + count + "。");
         }
 
         return count;
@@ -21100,6 +24134,13 @@ public sealed class DiceKingDemo : MonoBehaviour
     private void EnterMarket(bool chapterMarket)
     {
         ClearActionTip();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            if (dice[i] != null)
+            {
+                dice[i].TurtleMarketTriggered = false;
+            }
+        }
         currentMarketIsChapter = chapterMarket;
         marketRefreshesWithoutHighTier = 0;
         currentMarketPaidRefreshCount = 0;
@@ -21108,6 +24149,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         marketRecentPurchaseRoute = MarketRoute.None;
         activeCraftingItemKey = string.Empty;
         marketLeaveEffectSequenceActive = false;
+        marketLeaveRootDieIds.Clear();
         marketLeaveEffectIndex = 0;
         marketLeaveEffectTotalCount = 0;
         marketLeaveEffectResolvedCount = 0;
@@ -21119,22 +24161,66 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void BuildMarketOffers(bool paidRefresh)
     {
+        ResetMarketShelfPresentation();
         HashSet<DieType> previousRefreshTypes = paidRefresh ? CurrentOfferDieTypes(-1) : null;
         marketOffers.Clear();
         bool explicitFamilyTestMarket = HasExplicitV02MarketTestPool();
         bool suppressLegacyTendency = explicitFamilyTestMarket || UsesV02CoreFamiliesMarketPool();
-        marketTendencySlotIndex = marketTestRandomRefresh || suppressLegacyTendency ? -1 : UnityEngine.Random.Range(0, 3);
         MarketRuleConfig rule = CurrentMarketRule();
         bool forceHighTier = !marketTestRandomRefresh && !explicitFamilyTestMarket && paidRefresh && rule.HighTierPityRefreshes > 0 && marketRefreshesWithoutHighTier >= rule.HighTierPityRefreshes;
         bool hasHighTier = false;
         int tributeSlot = HasDiceOfType(DieType.AbyssSummon) ? 0 : -1;
+        HashSet<int> spellShelfIndices = PickMarketSpellShelfIndices(tributeSlot);
+        List<int> regularDieShelfIndices = new List<int>();
+        for (int i = 0; i < 3; i++)
+        {
+            if (i != tributeSlot && !spellShelfIndices.Contains(i))
+            {
+                regularDieShelfIndices.Add(i);
+            }
+        }
+
+        marketTendencySlotIndex = marketTestRandomRefresh
+            || suppressLegacyTendency
+            || regularDieShelfIndices.Count <= 0
+            ? -1
+            : regularDieShelfIndices[UnityEngine.Random.Range(0, regularDieShelfIndices.Count)];
+        int highTierShelfIndex = regularDieShelfIndices.Count > 0
+            ? regularDieShelfIndices[regularDieShelfIndices.Count - 1]
+            : -1;
         HashSet<DieType> usedTypes = new HashSet<DieType>();
+        HashSet<SpellType> usedSpellTypes = new HashSet<SpellType>();
         HashSet<string> usedCraftingItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         for (int i = 0; i < 3; i++)
         {
-            MarketOffer offer = i == tributeSlot
-                ? MakeTributeMarketOffer()
-                : MakeRandomMarketOffer(usedTypes, usedCraftingItems, forceHighTier && i == 2, !marketTestRandomRefresh && i == marketTendencySlotIndex, previousRefreshTypes);
+            MarketOffer offer;
+            if (i == tributeSlot)
+            {
+                offer = MakeTributeMarketOffer();
+            }
+            else if (spellShelfIndices.Contains(i))
+            {
+                offer = MakeRandomSpellMarketOffer(usedSpellTypes);
+                if (offer == null)
+                {
+                    offer = MakeRandomMarketOffer(
+                        usedTypes,
+                        usedCraftingItems,
+                        forceHighTier && i == highTierShelfIndex,
+                        !marketTestRandomRefresh && i == marketTendencySlotIndex,
+                        previousRefreshTypes);
+                }
+            }
+            else
+            {
+                offer = MakeRandomMarketOffer(
+                    usedTypes,
+                    usedCraftingItems,
+                    forceHighTier && i == highTierShelfIndex,
+                    !marketTestRandomRefresh && i == marketTendencySlotIndex,
+                    previousRefreshTypes);
+            }
+
             if (offer.Kind == MarketOfferKind.Die && offer.Die != null)
             {
                 usedTypes.Add(offer.Die.Type);
@@ -21147,6 +24233,10 @@ public sealed class DiceKingDemo : MonoBehaviour
             {
                 usedCraftingItems.Add(offer.CraftingItem.Key);
             }
+            else if (offer.Kind == MarketOfferKind.Spell && offer.Spell != null)
+            {
+                usedSpellTypes.Add(offer.Spell.Type);
+            }
 
             marketOffers.Add(offer);
         }
@@ -21154,10 +24244,13 @@ public sealed class DiceKingDemo : MonoBehaviour
         ApplyCurrentTavernMinimumToMarketOffers();
         ApplySupplyPigMarketFeed();
 
+        EnsureMarketShelfPresentation();
+
         if (paidRefresh)
         {
             marketRefreshesWithoutHighTier = marketTestRandomRefresh || explicitFamilyTestMarket ? 0 : (hasHighTier ? 0 : marketRefreshesWithoutHighTier + 1);
         }
+
     }
 
     private void ApplySupplyPigMarketFeed()
@@ -21289,6 +24382,8 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void BuyOffer(int index)
     {
+        EnsureMarketShelfPresentation();
+        ClearSpellHover();
         if (index < 0 || index >= marketOffers.Count)
         {
             return;
@@ -21297,6 +24392,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         MarketOffer offer = marketOffers[index];
         if (!CanBuyMarketOffer(offer))
         {
+            return;
+        }
+
+        if (offer.Kind == MarketOfferKind.Spell)
+        {
+            BuyMarketSpell(index);
             return;
         }
 
@@ -21322,13 +24423,16 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         int buyPrice = CurrentOfferPrice(offer);
         chapterGold -= buyPrice;
+        int consumedDieDiscount = Mathf.Max(0, nextDiePurchaseDiscount);
+        nextDiePurchaseDiscount = 0;
+        string dieDiscountText = consumedDieDiscount > 0 ? " 空舱折扣-" + consumedDieDiscount + "。" : string.Empty;
         if (offer.Die != null && offer.Die.Type == DieType.Tribute)
         {
             string devourText = ResolveDevour(offer.Die, "贡品奉献");
             marketOffers[index] = EmptyMarketOffer();
             string devilPurchaseText = ResolveDevilPurchaseEffects();
-            rewardBanner = "购买 " + DieDisplayName(offer.Die) + "，未进入骰袋。" + devourText + devilPurchaseText;
-            AddLog("买入 " + DieDisplayName(offer.Die) + "，-" + buyPrice + " 金币。" + devourText + devilPurchaseText);
+            rewardBanner = "购买 " + DieDisplayName(offer.Die) + "，未进入骰袋。" + dieDiscountText + devourText + devilPurchaseText;
+            AddLog("买入 " + DieDisplayName(offer.Die) + "，-" + buyPrice + " 金币。" + dieDiscountText + devourText + devilPurchaseText);
             SaveRun();
             return;
         }
@@ -21357,14 +24461,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             purchaseEffectText += ResolveDevour(bought, "血契吞噬");
             MarkAllDiceOfTypeTriggered(DieType.BloodPactCaptain, "满袋血契");
-            rewardBanner = "购买 " + DieDisplayName(bought) + "，血契未入袋并直接吞噬。货架已空。" + buyEffectText + purchaseEffectText;
-            AddLog("血契买入 " + DieDisplayName(bought) + "，-" + buyPrice + " 金币；未入袋并直接吞噬。" + buyEffectText + purchaseEffectText);
+            rewardBanner = "购买 " + DieDisplayName(bought) + "，血契未入袋并直接吞噬。货架已空。" + dieDiscountText + buyEffectText + purchaseEffectText;
+            AddLog("血契买入 " + DieDisplayName(bought) + "，-" + buyPrice + " 金币；未入袋并直接吞噬。" + dieDiscountText + buyEffectText + purchaseEffectText);
             SaveRun();
             return;
         }
 
-        rewardBanner = "购买 " + DieDisplayName(bought) + "，骰袋 " + dice.Count + " / " + DiceCapacity + "。货架已空。" + buyEffectText + purchaseEffectText;
-        AddLog("买入 " + DieDisplayName(bought) + "，-" + buyPrice + " 金币。货架已空。" + buyEffectText + purchaseEffectText);
+        rewardBanner = "购买 " + DieDisplayName(bought) + "，骰袋 " + dice.Count + " / " + DiceCapacity + "。货架已空。" + dieDiscountText + buyEffectText + purchaseEffectText;
+        AddLog("买入 " + DieDisplayName(bought) + "，-" + buyPrice + " 金币。货架已空。" + dieDiscountText + buyEffectText + purchaseEffectText);
         SaveRun();
     }
 
@@ -21388,6 +24492,14 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
 
             return dice.Count < DiceCapacity || dice.Count > 0 && HasDiceOfType(DieType.BloodPactCaptain);
+        }
+
+        if (offer.Kind == MarketOfferKind.Spell)
+        {
+            return IsSpellMarketPhase()
+                && offer.Spell != null
+                && offer.Spell.Enabled
+                && spellBag.Count < Mathf.Max(1, spellBagCapacity);
         }
 
         return affixFeatureEnabled && offer.Kind == MarketOfferKind.CraftingItem && offer.CraftingItem != null;
@@ -22163,7 +25275,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (v02TurtleAttachmentMarketOnly)
         {
-            return IsV02TurtleCoreMarketType(type);
+            return IsV02TurtleAttachmentMarketType(type);
         }
 
         if (v02PirateFamilyMarketOnly)
@@ -22227,6 +25339,16 @@ public sealed class DiceKingDemo : MonoBehaviour
             case DieType.MagnetTurtle:
             case DieType.RallyTurtle:
             case DieType.LeaderTurtle:
+            case DieType.GuideTurtle:
+            case DieType.HeavyArmorTurtle:
+            case DieType.GreatTurtle:
+            case DieType.SpellApprenticeTurtle:
+            case DieType.ScribeTurtle:
+            case DieType.CurseShellTurtle:
+            case DieType.GrandSpellTurtle:
+            case DieType.RunawayTurtle:
+            case DieType.CloneTurtle:
+            case DieType.ElderTurtle:
                 return true;
         }
 
@@ -22279,11 +25401,10 @@ public sealed class DiceKingDemo : MonoBehaviour
             case DieType.ThreeLittlePigs:
             case DieType.GreedyPig:
             case DieType.FeedWholesaler:
-            case DieType.PackTurtle:
             case DieType.TributePig:
             case DieType.ClearancePig:
             case DieType.SupplyPig:
-            case DieType.SafetyNetTurtle:
+            case DieType.RotationTurtle:
                 return true;
         }
 
@@ -22303,7 +25424,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             case DieType.TributePig:
             case DieType.BlackMarketImp:
             case DieType.BloodPactCaptain:
-            case DieType.SharedFeastDemonTurtle:
+            case DieType.LegacyDemonTurtle:
                 return true;
         }
 
@@ -22312,7 +25433,10 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private static bool IsV02TurtleAttachmentMarketType(DieType type)
     {
-        return IsV02TurtleCoreMarketType(type);
+        return IsV02TurtleCoreMarketType(type)
+            || type == DieType.RotationTurtle
+            || type == DieType.LegacyDemonTurtle
+            || type == DieType.EmptyHoldTurtle;
     }
 
     private static bool IsV02PirateFamilyMarketType(DieType type)
@@ -22332,6 +25456,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             case DieType.BloodPactCaptain:
             case DieType.ClearancePig:
             case DieType.SupplyPig:
+            case DieType.EmptyHoldTurtle:
                 return true;
         }
 
@@ -22343,14 +25468,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         switch (type)
         {
             case DieType.BlackSailBat:
-            case DieType.PackTurtle:
             case DieType.TributePig:
             case DieType.BlackMarketImp:
             case DieType.BloodPactCaptain:
             case DieType.ClearancePig:
             case DieType.SupplyPig:
-            case DieType.SharedFeastDemonTurtle:
-            case DieType.SafetyNetTurtle:
+            case DieType.RotationTurtle:
+            case DieType.LegacyDemonTurtle:
+            case DieType.EmptyHoldTurtle:
                 return true;
         }
 
@@ -22512,6 +25637,14 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (offer.Kind == MarketOfferKind.Die && offer.Die != null && IsV02PirateFamilyMarketType(offer.Die.Type) && CountDiceOfType(DieType.PirateCaptain) > 0)
         {
             price = Mathf.FloorToInt(price * 0.5f);
+        }
+        if (offer.Kind == MarketOfferKind.Die && offer.Die != null)
+        {
+            price -= Mathf.Max(0, nextDiePurchaseDiscount);
+        }
+        else if (offer.Kind == MarketOfferKind.Spell && offer.Spell != null)
+        {
+            price -= Mathf.Max(0, nextSpellPurchaseDiscount);
         }
 
         return Mathf.Max(0, price);
@@ -22749,12 +25882,23 @@ public sealed class DiceKingDemo : MonoBehaviour
             .Append("｜全部六面 +").Append(totalFaceGain)
             .Append("｜卖价 +").Append(TurtleAttachmentSellValue(die));
 
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.MoneyTurtle, "金钱", "结算金币");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.TinyTurtle, "小小", "结算时全部六面 +1");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.DoubleTurtle, "双倍", "已翻倍最低面");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.LuckyTurtle, "幸运", "按最大面");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.MagnetTurtle, "磁力", "结算分发");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.RallyTurtle, "呼朋", "读取化壳数量");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.GuideTurtle, "领路", "同宿主下一次真壳转移 +1");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.MoneyTurtle, "金钱", "每关首结 +1 金/层");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.TinyTurtle, "小小", "每关首结获得 1 层基础壳/层");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.DoubleTurtle, "双倍", "化壳时最低面翻倍");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.LuckyTurtle, "幸运", "每关首结按最大面");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.HeavyArmorTurtle, "重甲", "同宿主其它真壳各 +2 单骰分");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.GreatTurtle, "伟大", "每关首结复唱本体");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.MagnetTurtle, "磁力", "每关首结向其它非龟分发基础壳");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.RallyTurtle, "呼朋", "其它真壳宿主各 +2 单骰分");
+        AppendTurtleAttachmentEffectSummary(text, die, DieType.CurseShellTurtle, "咒壳", "下一次结算每层充能 +2 最终点");
+
+        int guideCharge = TurtleAttachmentStateValue(die, DieType.GuideTurtle);
+        int curseCharge = TurtleAttachmentStateValue(die, DieType.CurseShellTurtle);
+        if (guideCharge > 0 || curseCharge > 0)
+        {
+            text.Append("\n待用：领路 +").Append(guideCharge).Append("｜咒壳充能 ").Append(curseCharge);
+        }
 
         return text.ToString();
     }
@@ -22768,6 +25912,26 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         text.Append("\n").Append(label).Append("x").Append(count).Append("：").Append(effect);
+    }
+
+    private int TurtleAttachmentStateValue(Die die, DieType type)
+    {
+        if (die == null || die.TurtleAttachments == null)
+        {
+            return 0;
+        }
+
+        int total = 0;
+        for (int i = 0; i < die.TurtleAttachments.Count; i++)
+        {
+            TurtleAttachment attachment = die.TurtleAttachments[i];
+            if (attachment != null && attachment.Type == type)
+            {
+                total += Mathf.Max(0, attachment.StateValue);
+            }
+        }
+
+        return total;
     }
 
     private string TurtleAttachmentShortText(Die die)
@@ -22903,6 +26067,42 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string ResolveTreasurePirateGoldEvent(string sourceLabel)
     {
+        if (activeGameplayChain != null)
+        {
+            Die eventSource = FindDieById(activeGameplayChain.RootDieId);
+            int eventId = EmitGameplayChainEvent("gold_gained", eventSource, sourceLabel);
+            for (int i = 0; i < dice.Count; i++)
+            {
+                Die treasure = dice[i];
+                if (treasure == null || treasure.Temporary || treasure.Type != DieType.TreasurePirate)
+                {
+                    continue;
+                }
+
+                int treasureId = treasure.Id;
+                EnqueueGameplayChainResponse(
+                    eventId,
+                    "gold_gained",
+                    eventSource,
+                    sourceLabel,
+                    treasure,
+                    "treasure_pirate_growth",
+                    delegate
+                    {
+                        Die currentTreasure = FindDieById(treasureId);
+                        return currentTreasure != null
+                            && !currentTreasure.Temporary
+                            && currentTreasure.Type == DieType.TreasurePirate;
+                    },
+                    delegate
+                    {
+                        Die currentTreasure = FindDieById(treasureId);
+                        return ApplyTreasurePirateSettlementEffect(currentTreasure, sourceLabel, false);
+                    });
+            }
+            return string.Empty;
+        }
+
         List<string> effectTexts = new List<string>();
         for (int i = 0; i < dice.Count; i++)
         {
@@ -23236,6 +26436,22 @@ public sealed class DiceKingDemo : MonoBehaviour
         Die stolen = source.Clone(nextDieId++);
         ResetRoundState(stolen);
         dice.Add(stolen);
+        if (marketLeaveEffectSequenceActive)
+        {
+            marketLeaveRootDieIds.Add(stolen.Id);
+            if (HasMarketLeaveEffect(stolen))
+            {
+                marketLeaveEffectTotalCount++;
+            }
+            LogGameplayChain(
+                "state_delta",
+                sourceDieId: robber.Id,
+                sourceLabel: DieDisplayName(robber),
+                targetDieId: stolen.Id,
+                targetLabel: DieDisplayName(stolen),
+                result: "root_appended",
+                delta: "robbery_exception_appended_to_leave_queue");
+        }
         marketOffers[offerIndex] = EmptyMarketOffer();
         robber.RoundNote = AppendNote(robber.RoundNote, "抢第" + (offerIndex + 1) + "格");
         string text = DieDisplayName(robber) + "抢走第 " + (offerIndex + 1) + " 格 " + DieDisplayName(stolen) + "，加入骰袋末尾。";
@@ -23429,10 +26645,103 @@ public sealed class DiceKingDemo : MonoBehaviour
         target.RoundNote = AppendNote(target.RoundNote, "吞+" + transfer);
         RecordDevourState(target, source, transfer, triggerLabel);
         string sharedFeastText = ResolveSharedFeastDevourSplit(target, transfer);
-        string goldText = ResolveDevourerGold();
-        string blackMarketText = tavernSource ? ResolveBlackMarketImpDiscount() : string.Empty;
+        string goldText = string.Empty;
+        string blackMarketText = string.Empty;
+        if (activeGameplayChain != null)
+        {
+            QueueDevourResponses(source, triggerLabel, tavernSource);
+        }
+        else
+        {
+            goldText = ResolveDevourerGold();
+            blackMarketText = tavernSource ? ResolveBlackMarketImpDiscount() : string.Empty;
+        }
         AddLog(triggerLabel + "：" + DieDisplayName(source) + " 期望+" + transfer + " 给 " + DieDisplayName(target) + "，面组 " + FaceText(target.Faces) + "。" + sharedFeastText + goldText + blackMarketText);
         return " " + triggerLabel + " +" + transfer + " 给 " + DieDisplayName(target) + "。" + sharedFeastText + goldText + blackMarketText;
+    }
+
+    private void QueueDevourResponses(Die source, string triggerLabel, bool tavernSource)
+    {
+        if (activeGameplayChain == null)
+        {
+            return;
+        }
+
+        int eventId = EmitGameplayChainEvent("devour_completed", source, triggerLabel);
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die responder = dice[i];
+            if (responder == null || responder.Temporary)
+            {
+                continue;
+            }
+
+            if (responder.Type == DieType.Devourer)
+            {
+                int devourerId = responder.Id;
+                EnqueueGameplayChainResponse(
+                    eventId,
+                    "devour_completed",
+                    source,
+                    triggerLabel,
+                    responder,
+                    "devourer_gold",
+                    delegate
+                    {
+                        Die current = FindDieById(devourerId);
+                        return current != null && !current.Temporary && current.Type == DieType.Devourer;
+                    },
+                    delegate
+                    {
+                        Die current = FindDieById(devourerId);
+                        if (current == null)
+                        {
+                            return string.Empty;
+                        }
+
+                        MarkTypeTriggered(current);
+                        current.RoundNote = AppendNote(current.RoundNote, "吞金+1");
+                        string treasureText = AddGoldIncome(1, "吞噬骰子", true);
+                        string text = DieDisplayName(current) + "响应吞噬，金币 +1。";
+                        AddLog(text + treasureText);
+                        return text + treasureText;
+                    });
+            }
+            else if (tavernSource && responder.Type == DieType.BlackMarketImp)
+            {
+                int impId = responder.Id;
+                EnqueueGameplayChainResponse(
+                    eventId,
+                    "devour_completed",
+                    source,
+                    triggerLabel,
+                    responder,
+                    "black_market_discount",
+                    delegate
+                    {
+                        Die current = FindDieById(impId);
+                        return current != null && !current.Temporary && current.Type == DieType.BlackMarketImp;
+                    },
+                    delegate
+                    {
+                        Die current = FindDieById(impId);
+                        if (current == null)
+                        {
+                            return string.Empty;
+                        }
+
+                        currentMarketBlackMarketRefreshDiscount++;
+                        MarkTypeTriggered(current);
+                        current.RoundNote = AppendNote(
+                            current.RoundNote,
+                            "下刷-" + currentMarketBlackMarketRefreshDiscount);
+                        string text = DieDisplayName(current) + "响应吞噬，黑市下次刷新 -1（累计 -"
+                            + currentMarketBlackMarketRefreshDiscount + "）。";
+                        AddLog(text);
+                        return text;
+                    });
+            }
+        }
     }
 
     private string ResolveSharedFeastDevourSplit(Die host, int devourGain)
@@ -23586,15 +26895,16 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         switch (type)
         {
+            case DieType.GuideTurtle:
             case DieType.MoneyTurtle:
             case DieType.TinyTurtle:
             case DieType.DoubleTurtle:
             case DieType.LuckyTurtle:
+            case DieType.HeavyArmorTurtle:
+            case DieType.GreatTurtle:
             case DieType.MagnetTurtle:
             case DieType.RallyTurtle:
-            case DieType.PackTurtle:
-            case DieType.SharedFeastDemonTurtle:
-            case DieType.SafetyNetTurtle:
+            case DieType.CurseShellTurtle:
                 return true;
         }
 
@@ -23603,12 +26913,32 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private static bool IsF018TurtleFamilyType(DieType type)
     {
-        return IsF018AbsorbableTurtleType(type) || type == DieType.LeaderTurtle;
+        return IsV02TurtleAttachmentMarketType(type);
     }
 
     private static bool IsAnyTurtleFamilyType(DieType type)
     {
         return IsF018TurtleFamilyType(type);
+    }
+
+    private static bool IsF023ResidentTurtleType(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.SpellApprenticeTurtle:
+            case DieType.ScribeTurtle:
+            case DieType.GrandSpellTurtle:
+            case DieType.RunawayTurtle:
+            case DieType.CloneTurtle:
+            case DieType.ElderTurtle:
+            case DieType.LeaderTurtle:
+            case DieType.RotationTurtle:
+            case DieType.LegacyDemonTurtle:
+            case DieType.EmptyHoldTurtle:
+                return true;
+        }
+
+        return false;
     }
 
     private Die NextPositionTurtleAttachmentHost(int sourceIndex)
@@ -23646,29 +26976,172 @@ public sealed class DiceKingDemo : MonoBehaviour
             return TypeName(turtle.Type) + "后一格没有可化壳目标，仍留在骰袋。";
         }
 
-        int transfer = DevourTransferValue(turtle);
+        int guideBonus = ConsumeGuideTurtleTransferBonus(host);
+        int queuedBonus = Mathf.Max(0, nextTurtleTransferBonus);
+        nextTurtleTransferBonus = 0;
+        int transferBonus = guideBonus + queuedBonus;
+        int transfer = DevourTransferValue(turtle) + transferBonus;
         int sellValue = BaseSellPrice(turtle.Type);
         string applyText = AddTurtleAttachment(host, turtle.Type, transfer, sellValue, TurtleAttachmentSource.RealTurtle, null);
-        int packShellCount = turtle.Type == DieType.PackTurtle ? Mathf.Max(0, turtle.FeedValue) / 2 : 0;
-        for (int shellIndex = 0; shellIndex < packShellCount; shellIndex++)
-        {
-            GrantBasicTurtleShell(host, 1, "驮粮龟", turtle, null);
-        }
-        if (packShellCount > 0)
-        {
-            applyText += "，按喂养额外全部六面+" + packShellCount;
-        }
         string sourceName = DieDisplayName(turtle);
         string hostName = DieDisplayName(host);
         int hostId = host.Id;
         int targetIndex = turtleIndex + 1;
+        int diceCountBefore = dice.Count;
         dice.RemoveAt(turtleIndex);
         host.RoundNote = AppendNote(host.RoundNote, TypeName(turtle.Type) + "化壳+" + transfer);
         SetMarketLeaveAttachmentVisual(turtle.Type, hostId, turtleIndex, targetIndex);
-        string leaderText = ResolveLeaderTurtleCopies(turtle.Type, transfer);
-        string result = TypeName(turtle.Type) + "完成化壳，附着到 " + hostName + "，全部六面 +" + transfer + applyText + leaderText;
-        AddLog(sourceName + " 完成化壳并离开骰袋，" + hostName + " 全部六面 +" + transfer + "，面组 " + FaceText(host.Faces) + "。" + leaderText);
+        string leaveText = string.Empty;
+        string leaderText = string.Empty;
+        if (activeGameplayChain != null)
+        {
+            QueueTurtleAbsorptionResponses(turtle, diceCountBefore, dice.Count, turtle.Type);
+        }
+        else
+        {
+            leaveText = ResolveResidentPermanentLeaveEffects(turtle, "真实吸附");
+            leaveText += ResolveEmptyHoldTransition(diceCountBefore, dice.Count, "真实吸附");
+            leaderText = ResolveLeaderTurtleCopies(turtle.Type, transfer);
+        }
+        string bonusText = transferBonus > 0 ? "（顺序加值 +" + transferBonus + "）" : string.Empty;
+        string result = TypeName(turtle.Type) + "完成化壳，附着到 " + hostName + "，全部六面 +" + transfer + bonusText + applyText + leaveText + leaderText;
+        AddLog(sourceName + " 完成化壳并离开骰袋，" + hostName + " 全部六面 +" + transfer + bonusText + "，面组 " + FaceText(host.Faces) + "。" + leaveText + leaderText);
         return result;
+    }
+
+    private void QueueTurtleAbsorptionResponses(
+        Die absorbedTurtle,
+        int diceCountBefore,
+        int diceCountAfter,
+        DieType absorbedType)
+    {
+        if (activeGameplayChain == null || absorbedTurtle == null)
+        {
+            return;
+        }
+
+        int eventId = EmitGameplayChainEvent("turtle_absorbed", absorbedTurtle, "真实吸附");
+        bool openedCapacity = diceCountBefore >= DiceCapacity && diceCountAfter < DiceCapacity;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die responder = dice[i];
+            if (responder == null || responder.Temporary)
+            {
+                continue;
+            }
+
+            if (responder.Type == DieType.LegacyDemonTurtle && !responder.TurtleMarketTriggered)
+            {
+                int legacyId = responder.Id;
+                EnqueueGameplayChainResponse(
+                    eventId,
+                    "turtle_absorbed",
+                    absorbedTurtle,
+                    "真实吸附",
+                    responder,
+                    "legacy_growth",
+                    delegate
+                    {
+                        Die current = FindDieById(legacyId);
+                        return current != null
+                            && !current.Temporary
+                            && current.Type == DieType.LegacyDemonTurtle
+                            && !current.TurtleMarketTriggered
+                            && LowestMinimumFaceDie() != null;
+                    },
+                    delegate
+                    {
+                        Die current = FindDieById(legacyId);
+                        Die target = LowestMinimumFaceDie();
+                        if (current == null || target == null)
+                        {
+                            return string.Empty;
+                        }
+
+                        current.TurtleMarketTriggered = true;
+                        MarkTypeTriggered(current);
+                        AddValueToAllFaces(target, 1);
+                        target.RoundNote = AppendNote(target.RoundNote, "遗产面+1");
+                        string text = DieDisplayName(current) + "因真实吸附使 "
+                            + DieDisplayName(target) + " 全部六面 +1。";
+                        AddLog(text);
+                        return text;
+                    });
+            }
+            else if (openedCapacity
+                && responder.Type == DieType.EmptyHoldTurtle
+                && !responder.TurtleMarketTriggered)
+            {
+                int emptyHoldId = responder.Id;
+                EnqueueGameplayChainResponse(
+                    eventId,
+                    "turtle_absorbed",
+                    absorbedTurtle,
+                    "真实吸附",
+                    responder,
+                    "empty_hold_discount",
+                    delegate
+                    {
+                        Die current = FindDieById(emptyHoldId);
+                        return current != null
+                            && !current.Temporary
+                            && current.Type == DieType.EmptyHoldTurtle
+                            && !current.TurtleMarketTriggered;
+                    },
+                    delegate
+                    {
+                        Die current = FindDieById(emptyHoldId);
+                        if (current == null)
+                        {
+                            return string.Empty;
+                        }
+
+                        current.TurtleMarketTriggered = true;
+                        MarkTypeTriggered(current);
+                        nextDiePurchaseDiscount += 2;
+                        string text = DieDisplayName(current)
+                            + "因真实吸附使下一次购买骰子 -2（累计 -" + nextDiePurchaseDiscount + "）。";
+                        AddLog(text);
+                        return text;
+                    });
+            }
+            else if (absorbedType != DieType.GreatTurtle && responder.Type == DieType.LeaderTurtle)
+            {
+                int leaderId = responder.Id;
+                EnqueueGameplayChainResponse(
+                    eventId,
+                    "turtle_absorbed",
+                    absorbedTurtle,
+                    "真实吸附",
+                    responder,
+                    "leader_copy_shell",
+                    delegate
+                    {
+                        Die current = FindDieById(leaderId);
+                        return current != null && !current.Temporary && current.Type == DieType.LeaderTurtle;
+                    },
+                    delegate
+                    {
+                        Die current = FindDieById(leaderId);
+                        if (current == null)
+                        {
+                            return string.Empty;
+                        }
+
+                        string applyText = AddTurtleAttachment(
+                            current,
+                            absorbedType,
+                            0,
+                            0,
+                            TurtleAttachmentSource.LeaderCopy,
+                            null);
+                        current.RoundNote = AppendNote(current.RoundNote, "首领复制 " + TypeName(absorbedType));
+                        string text = DieDisplayName(current) + "复制 " + TypeName(absorbedType) + "壳" + applyText + "。";
+                        AddLog(text);
+                        return text;
+                    });
+            }
+        }
     }
 
     private void SetMarketLeaveAttachmentVisual(DieType type, int hostId, int sourceIndex, int targetIndex)
@@ -23689,6 +27162,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string ResolveLeaderTurtleCopies(DieType absorbedType, int transfer)
     {
+        if (absorbedType == DieType.GreatTurtle)
+        {
+            return string.Empty;
+        }
+
         int copyCount = 0;
         for (int i = 0; i < dice.Count; i++)
         {
@@ -23698,7 +27176,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 continue;
             }
 
-            AddTurtleAttachment(leader, absorbedType, transfer, 0, TurtleAttachmentSource.LeaderCopy, null);
+            AddTurtleAttachment(leader, absorbedType, 0, 0, TurtleAttachmentSource.LeaderCopy, null);
             leader.RoundNote = AppendNote(leader.RoundNote, "首领复制 " + TypeName(absorbedType));
             copyCount++;
         }
@@ -23724,7 +27202,9 @@ public sealed class DiceKingDemo : MonoBehaviour
             Type = type,
             FaceGain = Mathf.Max(0, faceGain),
             SellValue = Mathf.Max(0, sellValue),
-            Source = source
+            Source = source,
+            UsedThisStage = false,
+            StateValue = type == DieType.GuideTurtle ? 1 : 0
         });
 
         if (faceGain > 0)
@@ -23783,6 +27263,119 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             die.TurtleAttachments = new List<TurtleAttachment>();
         }
+    }
+
+    private void ResetTurtleAttachmentStageState(Die die)
+    {
+        if (die == null || die.TurtleAttachments == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < die.TurtleAttachments.Count; i++)
+        {
+            TurtleAttachment attachment = die.TurtleAttachments[i];
+            if (attachment != null)
+            {
+                attachment.UsedThisStage = false;
+            }
+        }
+    }
+
+    private int ConsumeGuideTurtleTransferBonus(Die host)
+    {
+        if (host == null || host.TurtleAttachments == null)
+        {
+            return 0;
+        }
+
+        int bonus = 0;
+        for (int i = 0; i < host.TurtleAttachments.Count; i++)
+        {
+            TurtleAttachment attachment = host.TurtleAttachments[i];
+            if (attachment == null || attachment.Type != DieType.GuideTurtle || attachment.StateValue <= 0)
+            {
+                continue;
+            }
+
+            bonus += attachment.StateValue;
+            attachment.StateValue = 0;
+        }
+
+        return bonus;
+    }
+
+    private string ResolveResidentPermanentLeaveEffects(Die removed, string sourceLabel)
+    {
+        Die target = LowestMinimumFaceDie();
+        if (removed == null || target == null)
+        {
+            return string.Empty;
+        }
+
+        int triggerCount = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die legacy = dice[i];
+            if (legacy == null
+                || legacy.Temporary
+                || legacy.Type != DieType.LegacyDemonTurtle
+                || legacy.TurtleMarketTriggered)
+            {
+                continue;
+            }
+
+            legacy.TurtleMarketTriggered = true;
+            MarkTypeTriggered(legacy);
+            triggerCount++;
+        }
+
+        if (triggerCount <= 0)
+        {
+            return string.Empty;
+        }
+
+        AddValueToAllFaces(target, triggerCount);
+        target.RoundNote = AppendNote(target.RoundNote, "遗产面+" + triggerCount);
+        string text = " 遗产魔龟x" + triggerCount + "因" + sourceLabel + "使" + DieDisplayName(target) + "六面+" + triggerCount + "。";
+        AddLog(text.Trim());
+        return text;
+    }
+
+    private string ResolveEmptyHoldTransition(int countBefore, int countAfter, string sourceLabel)
+    {
+        if (countBefore < DiceCapacity || countAfter >= DiceCapacity)
+        {
+            return string.Empty;
+        }
+
+        int triggerCount = 0;
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die emptyHold = dice[i];
+            if (emptyHold == null
+                || emptyHold.Temporary
+                || emptyHold.Type != DieType.EmptyHoldTurtle
+                || emptyHold.TurtleMarketTriggered)
+            {
+                continue;
+            }
+
+            emptyHold.TurtleMarketTriggered = true;
+            MarkTypeTriggered(emptyHold);
+            triggerCount++;
+        }
+
+        if (triggerCount <= 0)
+        {
+            return string.Empty;
+        }
+
+        int discount = triggerCount * 2;
+        nextDiePurchaseDiscount += discount;
+        string text = " 空舱龟x" + triggerCount + "因" + sourceLabel + "使下一次购骰-" + discount + "。";
+        AddLog(text.Trim());
+        return text;
     }
 
     private string TributeOfferHint(Die die)
@@ -24231,17 +27824,26 @@ public sealed class DiceKingDemo : MonoBehaviour
             return 0;
         }
 
+        int weight;
         if (chapter <= 2)
         {
-            return Mathf.Max(0, config.WeightChapter1To2);
+            weight = Mathf.Max(0, config.WeightChapter1To2);
         }
-
-        if (chapter <= 5)
+        else if (chapter <= 5)
         {
-            return Mathf.Max(0, config.WeightChapter3To5);
+            weight = Mathf.Max(0, config.WeightChapter3To5);
+        }
+        else
+        {
+            weight = Mathf.Max(0, config.WeightChapter6To10);
         }
 
-        return Mathf.Max(0, config.WeightChapter6To10);
+        if (v02TurtleAttachmentMarketOnly && IsV02TurtleAttachmentMarketType(config.Type))
+        {
+            return Mathf.Max(1, weight);
+        }
+
+        return weight;
     }
 
     private bool IsMarketDieUnlocked(DieType type, int chapter)
@@ -24803,6 +28405,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         tavernBaseMinimumBonus = 0;
         marketTemporaryMinimumBonus = 0;
         affixFeatureEnabled = false;
+        spellSystemEnabled = true;
+        spellBagCapacity = 3;
+        spellMarketMinimumShelves = 1;
+        spellMarketMaximumShelves = 2;
+        spellMarketExtraShelfChancePercent = 35;
         treasuryGoldStep = 10;
         treasuryScoreCap = 0;
         bribeScorePerGold = 4;
@@ -24969,6 +28576,21 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return true;
             case "affix_feature_enabled":
                 affixFeatureEnabled = value > 0;
+                return true;
+            case "spell_system_enabled":
+                spellSystemEnabled = value > 0;
+                return true;
+            case "spell_bag_capacity":
+                spellBagCapacity = Mathf.Max(1, value);
+                return true;
+            case "spell_market_min_shelves":
+                spellMarketMinimumShelves = Mathf.Clamp(value, 0, 3);
+                return true;
+            case "spell_market_max_shelves":
+                spellMarketMaximumShelves = Mathf.Clamp(value, 0, 3);
+                return true;
+            case "spell_market_extra_shelf_chance":
+                spellMarketExtraShelfChancePercent = Mathf.Clamp(value, 0, 100);
                 return true;
             case "treasury_gold_step":
                 treasuryGoldStep = Mathf.Max(0, value);
@@ -25633,6 +29255,187 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             return left.ChapterFrom.CompareTo(right.ChapterFrom);
         });
+    }
+
+    private void LoadSpellConfigs()
+    {
+        spellDefinitions.Clear();
+        if (!TryLoadSpellConfigsFromCsv())
+        {
+            BuildFallbackSpellConfigs();
+        }
+    }
+
+    private bool TryLoadSpellConfigsFromCsv()
+    {
+        TextAsset table = Resources.Load<TextAsset>(SpellMarketConfigResourcePath);
+        if (table == null || string.IsNullOrEmpty(table.text))
+        {
+            Debug.LogWarning("DiceKingDemo: spell market config not found at Resources/" + SpellMarketConfigResourcePath + ". Using fallback spell config.");
+            return false;
+        }
+
+        string[] lines = table.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length <= 1)
+        {
+            Debug.LogWarning("DiceKingDemo: spell market config is empty. Using fallback spell config.");
+            return false;
+        }
+
+        Dictionary<string, int> columns = CsvColumns(SplitCsvLine(lines[0]));
+        Dictionary<SpellType, SpellDefinition> loaded = new Dictionary<SpellType, SpellDefinition>();
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string line = lines[i].Trim();
+            if (line.Length == 0 || line.StartsWith("#", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            List<string> fields = SplitCsvLine(lines[i]);
+            string id = CsvValue(fields, columns, "id", string.Empty).Trim();
+            SpellType type;
+            if (!TryParseSpellType(id, out type) || type == SpellType.None || loaded.ContainsKey(type))
+            {
+                Debug.LogError("DiceKingDemo: invalid or duplicate spell row " + (i + 1).ToString(CultureInfo.InvariantCulture) + ".");
+                return false;
+            }
+
+            string displayName = CsvValue(fields, columns, "display_name", string.Empty).Trim();
+            string ruleText = CsvValue(fields, columns, "rule_text", string.Empty).Trim();
+            if (string.IsNullOrEmpty(displayName) || string.IsNullOrEmpty(ruleText))
+            {
+                Debug.LogError("DiceKingDemo: spell row " + (i + 1).ToString(CultureInfo.InvariantCulture) + " is missing player-facing text.");
+                return false;
+            }
+
+            loaded[type] = new SpellDefinition
+            {
+                Type = type,
+                Id = id,
+                DisplayName = displayName,
+                Price = Mathf.Max(0, CsvInt(fields, columns, "price", 0)),
+                AllowMarket = CsvBool(fields, columns, "allow_market", false),
+                AllowPreRoll = CsvBool(fields, columns, "allow_preroll", false),
+                WeightChapter1To2 = Mathf.Max(0, CsvInt(fields, columns, "weight_ch1_2", 0)),
+                WeightChapter3To5 = Mathf.Max(0, CsvInt(fields, columns, "weight_ch3_5", 0)),
+                WeightChapter6To10 = Mathf.Max(0, CsvInt(fields, columns, "weight_ch6_10", 0)),
+                Enabled = CsvBool(fields, columns, "enabled", true),
+                RuleText = ruleText
+            };
+        }
+
+        if (loaded.Count != 10)
+        {
+            Debug.LogError("DiceKingDemo: spell market config must contain exactly 10 unique spell rows. Using fallback spell config.");
+            return false;
+        }
+
+        foreach (KeyValuePair<SpellType, SpellDefinition> pair in loaded)
+        {
+            spellDefinitions[pair.Key] = pair.Value;
+        }
+
+        return true;
+    }
+
+    private void BuildFallbackSpellConfigs()
+    {
+        spellDefinitions.Clear();
+        AddFallbackSpell(SpellType.PassBoost, "spell_pass_boost", "冲关增幅", 2, true, true, 16, 12, 8, true, "下一次结算结束、达标判定前，额外获得 5 分。");
+        AddFallbackSpell(SpellType.ChainDividend, "spell_chain_dividend", "连锁分红", 2, true, true, 14, 12, 10, true, "下一次结算中，每有一颗不同的骰子触发自身效果，结算后获得 1 金币，最多 4 金币。");
+        AddFallbackSpell(SpellType.EchoCommand, "spell_echo_command", "回声指令", 4, true, true, 0, 10, 12, true, "选择 1 颗骰子；下一次结算中，它首次触发自身效果时，该效果额外执行 1 次。");
+        AddFallbackSpell(SpellType.TargetedRestock, "spell_targeted_restock", "定向换货", 3, true, false, 14, 12, 8, true, "选择 1 个家族和 1 个非空货架位，将该商品替换为当前章节该家族的随机骰子。新商品仍需正常购买。");
+        AddFallbackSpell(SpellType.PrecisionCalibration, "spell_precision_calibration", "精密校准", 5, true, true, 10, 12, 12, true, "选择 1 颗骰子，使其六个长期面永久各 +1。");
+        AddFallbackSpell(SpellType.FeedBag, "spell_feed_bag", "饲料袋", 3, true, true, 0, 10, 10, true, "选择 1 颗骰子，使其依次获得 2 次当前品质的真实喂养。");
+        AddFallbackSpell(SpellType.PeakCashout, "spell_peak_cashout", "削峰套现", 2, true, false, 0, 8, 10, true, "所有骰子的并列最高长期面永久 -1；每处理一颗骰子，获得 1 金币。");
+        AddFallbackSpell(SpellType.DismantlePermit, "spell_dismantle_permit", "拆解许可", 4, true, false, 0, 0, 0, false, "销毁交易托盘中的 1 颗骰子且不获得卖价；选择另一颗骰子，按普通规则吞吃该材料。");
+        AddFallbackSpell(SpellType.ShiftVoucher, "spell_shift_voucher", "换班凭证", 6, true, false, 0, 0, 0, false, "选择交易托盘中的 1 颗骰子与骰袋中的 1 颗骰子交换。此次交换不算购买或出售。");
+        AddFallbackSpell(SpellType.OverachieverBounty, "spell_overachiever_bounty", "超额悬赏", 2, true, true, 0, 8, 10, true, "若下一次结算新增分达到本关目标的 3 倍，结算后获得 8 金币。");
+    }
+
+    private void AddFallbackSpell(
+        SpellType type,
+        string id,
+        string displayName,
+        int price,
+        bool allowMarket,
+        bool allowPreRoll,
+        int earlyWeight,
+        int midWeight,
+        int lateWeight,
+        bool enabled,
+        string ruleText)
+    {
+        spellDefinitions[type] = new SpellDefinition
+        {
+            Type = type,
+            Id = id,
+            DisplayName = displayName,
+            Price = Mathf.Max(0, price),
+            AllowMarket = allowMarket,
+            AllowPreRoll = allowPreRoll,
+            WeightChapter1To2 = Mathf.Max(0, earlyWeight),
+            WeightChapter3To5 = Mathf.Max(0, midWeight),
+            WeightChapter6To10 = Mathf.Max(0, lateWeight),
+            Enabled = enabled,
+            RuleText = ruleText
+        };
+    }
+
+    private static bool TryParseSpellType(string value, out SpellType type)
+    {
+        type = SpellType.None;
+        if (string.IsNullOrEmpty(value))
+        {
+            return false;
+        }
+
+        switch (value.Trim().ToLowerInvariant())
+        {
+            case "spell_pass_boost":
+            case "passboost":
+                type = SpellType.PassBoost;
+                return true;
+            case "spell_chain_dividend":
+            case "chaindividend":
+                type = SpellType.ChainDividend;
+                return true;
+            case "spell_echo_command":
+            case "echocommand":
+                type = SpellType.EchoCommand;
+                return true;
+            case "spell_targeted_restock":
+            case "targetedrestock":
+                type = SpellType.TargetedRestock;
+                return true;
+            case "spell_precision_calibration":
+            case "precisioncalibration":
+                type = SpellType.PrecisionCalibration;
+                return true;
+            case "spell_feed_bag":
+            case "feedbag":
+                type = SpellType.FeedBag;
+                return true;
+            case "spell_peak_cashout":
+            case "peakcashout":
+                type = SpellType.PeakCashout;
+                return true;
+            case "spell_dismantle_permit":
+            case "dismantlepermit":
+                type = SpellType.DismantlePermit;
+                return true;
+            case "spell_shift_voucher":
+            case "shiftvoucher":
+                type = SpellType.ShiftVoucher;
+                return true;
+            case "spell_overachiever_bounty":
+            case "overachieverbounty":
+                type = SpellType.OverachieverBounty;
+                return true;
+        }
+
+        return false;
     }
 
     private void LoadDiceTypeTooltipConfigs()
@@ -26764,7 +30567,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return new MarketDieConfig { Type = type, BuyPrice = 13, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 8 };
             case DieType.BlackSailBat:
                 return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
-            case DieType.PackTurtle:
+            case DieType.RotationTurtle:
                 return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
             case DieType.TributePig:
                 return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
@@ -26776,24 +30579,42 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
             case DieType.SupplyPig:
                 return new MarketDieConfig { Type = type, BuyPrice = 7, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 12, WeightChapter3To5 = 11, WeightChapter6To10 = 8 };
-            case DieType.SharedFeastDemonTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
-            case DieType.SafetyNetTurtle:
+            case DieType.LegacyDemonTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.EmptyHoldTurtle:
                 return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
             case DieType.Tribute:
                 return new MarketDieConfig { Type = type, BuyPrice = 1, SellPrice = 0, Tier = "T0", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
+            case DieType.GuideTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
             case DieType.MoneyTurtle:
                 return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
             case DieType.TinyTurtle:
                 return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.SpellApprenticeTurtle:
+            case DieType.RunawayTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+            case DieType.CloneTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 7, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 12, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
             case DieType.DoubleTurtle:
                 return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
             case DieType.LuckyTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 11, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.HeavyArmorTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
             case DieType.MagnetTurtle:
                 return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+            case DieType.ScribeTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.CurseShellTurtle:
+            case DieType.ElderTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+            case DieType.GreatTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
             case DieType.RallyTurtle:
                 return new MarketDieConfig { Type = type, BuyPrice = 11, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
+            case DieType.GrandSpellTurtle:
+                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
             case DieType.LeaderTurtle:
                 return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 8 };
             case DieType.Lightfang:
@@ -27421,6 +31242,8 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "贡品骰";
             case DieType.Turtle:
                 return "龟龟骰";
+            case DieType.GuideTurtle:
+                return "领路龟骰";
             case DieType.MoneyTurtle:
                 return "金钱龟骰";
             case DieType.TinyTurtle:
@@ -27429,12 +31252,36 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "双倍龟骰";
             case DieType.LuckyTurtle:
                 return "幸运龟骰";
+            case DieType.HeavyArmorTurtle:
+                return "重甲龟骰";
+            case DieType.GreatTurtle:
+                return "伟大龟骰";
             case DieType.MagnetTurtle:
                 return "磁力龟骰";
             case DieType.RallyTurtle:
                 return "呼朋唤友龟骰";
+            case DieType.SpellApprenticeTurtle:
+                return "法术学徒龟骰";
+            case DieType.ScribeTurtle:
+                return "抄经龟骰";
+            case DieType.CurseShellTurtle:
+                return "咒壳龟骰";
+            case DieType.GrandSpellTurtle:
+                return "大法术龟骰";
+            case DieType.RunawayTurtle:
+                return "离家出走龟骰";
+            case DieType.CloneTurtle:
+                return "克隆龟骰";
+            case DieType.ElderTurtle:
+                return "长老龟骰";
             case DieType.LeaderTurtle:
                 return "首领龟骰";
+            case DieType.RotationTurtle:
+                return "轮作龟骰";
+            case DieType.LegacyDemonTurtle:
+                return "遗产魔龟骰";
+            case DieType.EmptyHoldTurtle:
+                return "空舱龟骰";
             case DieType.RefreshPirate:
                 return "刷新海盗骰";
             case DieType.PlunderPirate:
@@ -27678,6 +31525,8 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "贡品";
             case DieType.Turtle:
                 return "龟龟";
+            case DieType.GuideTurtle:
+                return "领路龟";
             case DieType.MoneyTurtle:
                 return "金钱龟";
             case DieType.TinyTurtle:
@@ -27686,12 +31535,36 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "双倍龟";
             case DieType.LuckyTurtle:
                 return "幸运龟";
+            case DieType.HeavyArmorTurtle:
+                return "重甲龟";
+            case DieType.GreatTurtle:
+                return "伟大龟";
             case DieType.MagnetTurtle:
                 return "磁力龟";
             case DieType.RallyTurtle:
                 return "呼朋龟";
+            case DieType.SpellApprenticeTurtle:
+                return "法术学徒龟";
+            case DieType.ScribeTurtle:
+                return "抄经龟";
+            case DieType.CurseShellTurtle:
+                return "咒壳龟";
+            case DieType.GrandSpellTurtle:
+                return "大法术龟";
+            case DieType.RunawayTurtle:
+                return "离家出走龟";
+            case DieType.CloneTurtle:
+                return "克隆龟";
+            case DieType.ElderTurtle:
+                return "长老龟";
             case DieType.LeaderTurtle:
                 return "首领龟";
+            case DieType.RotationTurtle:
+                return "轮作龟";
+            case DieType.LegacyDemonTurtle:
+                return "遗产魔龟";
+            case DieType.EmptyHoldTurtle:
+                return "空舱龟";
             case DieType.RefreshPirate:
                 return "刷新海盗";
             case DieType.PlunderPirate:
@@ -27936,6 +31809,32 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         switch (die.Type)
         {
+            case DieType.GuideTurtle:
+                return "下枚真壳+1";
+            case DieType.HeavyArmorTurtle:
+                return "同宿主真壳+2";
+            case DieType.GreatTurtle:
+                return "首结复唱";
+            case DieType.SpellApprenticeTurtle:
+                return die.TurtleStageTriggered ? "本关已产券" : "首结法术-1";
+            case DieType.ScribeTurtle:
+                return die.TurtleMarketTriggered ? "本市已抄经" : "首买法术";
+            case DieType.CurseShellTurtle:
+                return "施法储能";
+            case DieType.GrandSpellTurtle:
+                return "施法群体充能";
+            case DieType.RunawayTurtle:
+                return die.TurtleMarketTriggered ? "本市已出走" : "离店生领路";
+            case DieType.CloneTurtle:
+                return die.TurtleStageTriggered ? "本关已克隆" : "首结面+1";
+            case DieType.ElderTurtle:
+                return "驻场龟+3";
+            case DieType.RotationTurtle:
+                return die.TurtleStageTriggered ? "本关已轮作" : "等待抬点";
+            case DieType.LegacyDemonTurtle:
+                return die.TurtleMarketTriggered ? "本市已继承" : "等待离袋";
+            case DieType.EmptyHoldTurtle:
+                return die.TurtleMarketTriggered ? "本市已腾舱" : "等待腾位";
             case DieType.BlackSailBat:
                 return "刷新吞旧货";
             case DieType.PackTurtle:
@@ -28307,6 +32206,8 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return new Color(0.76f, 0.58f, 0.34f);
             case DieType.Turtle:
                 return new Color(0.38f, 0.62f, 0.46f);
+            case DieType.GuideTurtle:
+                return new Color(0.46f, 0.72f, 0.48f);
             case DieType.MoneyTurtle:
                 return new Color(0.72f, 0.62f, 0.24f);
             case DieType.TinyTurtle:
@@ -28315,12 +32216,36 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return new Color(0.58f, 0.68f, 0.32f);
             case DieType.LuckyTurtle:
                 return new Color(0.36f, 0.66f, 0.62f);
+            case DieType.HeavyArmorTurtle:
+                return new Color(0.42f, 0.54f, 0.34f);
+            case DieType.GreatTurtle:
+                return new Color(0.7f, 0.66f, 0.32f);
             case DieType.MagnetTurtle:
                 return new Color(0.32f, 0.58f, 0.7f);
             case DieType.RallyTurtle:
                 return new Color(0.48f, 0.64f, 0.36f);
+            case DieType.SpellApprenticeTurtle:
+                return new Color(0.42f, 0.66f, 0.7f);
+            case DieType.ScribeTurtle:
+                return new Color(0.48f, 0.58f, 0.72f);
+            case DieType.CurseShellTurtle:
+                return new Color(0.46f, 0.42f, 0.64f);
+            case DieType.GrandSpellTurtle:
+                return new Color(0.58f, 0.48f, 0.72f);
+            case DieType.RunawayTurtle:
+                return new Color(0.56f, 0.72f, 0.38f);
+            case DieType.CloneTurtle:
+                return new Color(0.34f, 0.7f, 0.56f);
+            case DieType.ElderTurtle:
+                return new Color(0.62f, 0.62f, 0.4f);
             case DieType.LeaderTurtle:
                 return new Color(0.64f, 0.56f, 0.28f);
+            case DieType.RotationTurtle:
+                return new Color(0.66f, 0.62f, 0.34f);
+            case DieType.LegacyDemonTurtle:
+                return new Color(0.42f, 0.5f, 0.56f);
+            case DieType.EmptyHoldTurtle:
+                return new Color(0.34f, 0.6f, 0.62f);
             case DieType.RefreshPirate:
                 return new Color(0.28f, 0.62f, 0.64f);
             case DieType.PlunderPirate:
@@ -28650,6 +32575,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private static string FallbackDieTypeIconFileName(DieType type)
     {
+        if (IsAnyTurtleFamilyType(type))
+        {
+            return "turtle_die_icon";
+        }
+
         switch (type)
         {
             case DieType.Piggy:
@@ -28897,6 +32827,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         mainGameDevilShellTexture = Resources.Load<Texture2D>(MainGameDevilShellResourcePath);
         mainGamePirateShellTexture = Resources.Load<Texture2D>(MainGamePirateShellResourcePath);
         marketCommonBaseTexture = Resources.Load<Texture2D>(MarketCommonBaseResourcePath);
+        spellCardArtTexture = Resources.Load<Texture2D>(SpellCardArtResourcePath);
         mainGameLedFont = MainGameLedFont.LoadFromResources();
         physicalKeyLabelFont = Resources.Load<Font>(PhysicalKeyLabelFontResourcePath);
 

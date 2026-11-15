@@ -1,0 +1,159 @@
+{
+  "native": {
+    "20261106_ui_brightness_clear_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ]
+    },
+    "20261106_ui_brightness_clear_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "20261106_ui_brightness_failed_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ]
+    },
+    "20261106_ui_brightness_failed_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "20261106_ui_brightness_market_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ]
+    },
+    "20261106_ui_brightness_market_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "20261106_ui_brightness_ready_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ]
+    },
+    "20261106_ui_brightness_ready_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "20261106_ui_brightness_shaking_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ]
+    },
+    "20261106_ui_brightness_shaking_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "20261106_ui_brightness_spell_bag_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ]
+    },
+    "20261106_ui_brightness_spell_bag_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "20261106_ui_brightness_spell_bag_empty_1280x720.png": {
+      "size": [
+        1280,
+        720
+      ]
+    },
+    "20261106_ui_brightness_spell_bag_empty_1920x1080.png": {
+      "size": [
+        1920,
+        1080
+      ]
+    }
+  },
+  "ready_core_regions": {
+    "hud": {
+      "most_common_amber": [
+        [
+          [
+            255,
+            192,
+            74
+          ],
+          2020
+        ]
+      ],
+      "normal_exact_pixels": 2020
+    },
+    "rules_title": {
+      "most_common_amber": [
+        [
+          [
+            255,
+            192,
+            74
+          ],
+          454
+        ]
+      ],
+      "normal_exact_pixels": 454
+    },
+    "rules_body": {
+      "most_common_amber": [
+        [
+          [
+            255,
+            192,
+            74
+          ],
+          1357
+        ]
+      ],
+      "normal_exact_pixels": 1357
+    },
+    "bag": {
+      "most_common_amber": [
+        [
+          [
+            255,
+            192,
+            74
+          ],
+          429
+        ]
+      ],
+      "normal_exact_pixels": 429
+    }
+  },
+  "stress": [
+    "20261106_ui_brightness_clear_0606.png",
+    "20261106_ui_brightness_failed_0606.png",
+    "20261106_ui_brightness_market_0606.png",
+    "20261106_ui_brightness_ready_0606.png",
+    "20261106_ui_brightness_shaking_0606.png",
+    "20261106_ui_brightness_spell_bag_0606.png",
+    "20261106_ui_brightness_spell_bag_empty_0606.png"
+  ],
+  "verification_scope": {
+    "已覆盖": "主游戏常驻文字合同、法术袋暗底入口、袋内暗底按钮，七态双分辨率展示截帧及实际像素颜色。",
+    "独立编译": "最终运行代码与截帧助手编译通过，0 错误，9 个既有 CS0162 警告。",
+    "截图版本限制": "市场截图早于 lightKey 从 true 改为 false 的最后一行修正，不能证明最终市场法术袋按钮的实机效果。",
+    "字库门禁": "MainGameLedFont.IsReady 显式截帧门禁已加入助手并编译通过，但未在最后一轮刷新后执行。",
+    "未覆盖": "真实鼠标点击、拖拽、交易、施法和完整投掷流程；未进行最终用户视觉验收。",
+    "停止原因": "编辑器检测到用户正在操作，停止自动控制，未再触发截图。"
+  }
+}

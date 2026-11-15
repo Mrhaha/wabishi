@@ -1,0 +1,11 @@
+id,display_name,price,allow_market,allow_preroll,weight_ch1_2,weight_ch3_5,weight_ch6_10,enabled,rule_text
+spell_pass_boost,冲关增幅,2,1,1,16,12,8,1,下一次结算结束、达标判定前，额外获得 5 分。
+spell_chain_dividend,连锁分红,2,1,1,14,12,10,1,下一次结算中，每有一颗不同的骰子触发自身效果，结算后获得 1 金币，最多 4 金币。
+spell_echo_command,回声指令,4,1,1,0,10,12,1,选择 1 颗骰子；下一次结算中，它首次触发自身效果时，该效果额外执行 1 次。
+spell_targeted_restock,定向换货,3,1,0,14,12,8,1,选择 1 个家族和 1 个非空货架位，将该商品替换为当前章节该家族的随机骰子。新商品仍需正常购买。
+spell_precision_calibration,精密校准,5,1,1,10,12,12,1,选择 1 颗骰子，使其六个长期面永久各 +1。
+spell_feed_bag,饲料袋,3,1,1,0,10,10,1,选择 1 颗骰子，使其依次获得 2 次当前品质的真实喂养。
+spell_peak_cashout,削峰套现,2,1,0,0,8,10,1,所有骰子的并列最高长期面永久 -1；每处理一颗骰子，获得 1 金币。
+spell_dismantle_permit,拆解许可,4,1,0,0,0,0,0,销毁交易托盘中的 1 颗骰子且不获得卖价；选择另一颗骰子，按普通规则吞吃该材料。
+spell_shift_voucher,换班凭证,6,1,0,0,0,0,0,选择交易托盘中的 1 颗骰子与骰袋中的 1 颗骰子交换。此次交换不算购买或出售。
+spell_overachiever_bounty,超额悬赏,2,1,1,0,8,10,1,若下一次结算新增分达到本关目标的 3 倍，结算后获得 8 金币。

@@ -1,0 +1,759 @@
+{
+  "status": "offline-source-review-only",
+  "generated_date": "2026-11-06",
+  "notes": [
+    "未启动 Unity Play Mode，本报告不宣告 UI 运行验收通过。",
+    "原生板文字由实际 atlas/map/style/role 与运行坐标直接绘制；未对文字做二次缩放。",
+    "0.606 压力图仅检查非整数显示可识别性，不替代原生锐度验收。",
+    "前图采用修改前源色与旧按钮配色重现，不是历史运行截图。"
+  ],
+  "contract": {
+    "non_material_brightness_grade_count": 2,
+    "two_grades_only": true,
+    "ordinary_exact_color_and_alpha": true,
+    "highlight_alpha_one": true,
+    "all_grade_targets_pass": true,
+    "roles": [
+      {
+        "role": "focus_amber",
+        "grade": "Highlight",
+        "core_hex": "#FFD36A",
+        "alpha": 1.0,
+        "oklab_l": 0.88462513,
+        "target": 0.884625,
+        "pass": true
+      },
+      {
+        "role": "focus_teal",
+        "grade": "Highlight",
+        "core_hex": "#78F1E4",
+        "alpha": 1.0,
+        "oklab_l": 0.88464121,
+        "target": 0.884625,
+        "pass": true
+      },
+      {
+        "role": "primary_amber",
+        "grade": "Normal",
+        "core_hex": "#FFC04A",
+        "alpha": 1.0,
+        "oklab_l": 0.84516636,
+        "target": 0.845166,
+        "pass": true
+      },
+      {
+        "role": "secondary_amber",
+        "grade": "Normal",
+        "core_hex": "#FFC04A",
+        "alpha": 1.0,
+        "oklab_l": 0.84516636,
+        "target": 0.845166,
+        "pass": true
+      },
+      {
+        "role": "secondary_warm",
+        "grade": "Normal",
+        "core_hex": "#FFC04A",
+        "alpha": 1.0,
+        "oklab_l": 0.84516636,
+        "target": 0.845166,
+        "pass": true
+      },
+      {
+        "role": "ambient",
+        "grade": "Normal",
+        "core_hex": "#FFC04A",
+        "alpha": 1.0,
+        "oklab_l": 0.84516636,
+        "target": 0.845166,
+        "pass": true
+      },
+      {
+        "role": "disabled",
+        "grade": "Normal",
+        "core_hex": "#FFC04A",
+        "alpha": 1.0,
+        "oklab_l": 0.84516636,
+        "target": 0.845166,
+        "pass": true
+      },
+      {
+        "role": "ink_on_light",
+        "grade": "InkOnLight",
+        "core_hex": "#180E08",
+        "alpha": 1.0,
+        "oklab_l": 0.17549934,
+        "target": 0.175499,
+        "pass": true
+      },
+      {
+        "role": "warning",
+        "grade": "Highlight",
+        "core_hex": "#FCCDBC",
+        "alpha": 1.0,
+        "oklab_l": 0.88467026,
+        "target": 0.884625,
+        "pass": true
+      },
+      {
+        "role": "success",
+        "grade": "Highlight",
+        "core_hex": "#91EDDF",
+        "alpha": 1.0,
+        "oklab_l": 0.88460314,
+        "target": 0.884625,
+        "pass": true
+      }
+    ],
+    "ink_on_light_material_exception": "原市场浅色实体键帽保留深墨字；不计入 LED 两档亮度。"
+  },
+  "font": {
+    "atlas": "Assets\\Resources\\Art\\MainGame\\Flow\\main_game_led_font_atlas.png",
+    "atlas_sha256": "b73cadc4fc0553d4ba17f80d04b5b3af5df8568859766c88ec0188aa34172b93",
+    "map_sha256": "ba3aae4cd74c9750f56982079a4674fabeddb5027a0527605274d9111ecd8f50",
+    "styles_sha256": "5a81193e067f7bfeedcdc721399c97d912a593726b36b58649690d889057ba0e",
+    "roles_sha256": "54dab6cb641bc0d8c16b7cc912284a792799d15361fb89e0e0ff1d1d3a51d2ad",
+    "groups_sha256": "e0fd1762ea93ae45edcdc34b291ba665f265782e9dd73358f66dbb4cd897198f",
+    "glyph_count": 961
+  },
+  "layout_checks": {
+    "native_resolutions": [
+      [
+        1280,
+        720
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "sample_missing_glyph_count": 0,
+    "after_clipped_count": 0,
+    "after_contrast_failure_count": 0
+  },
+  "elements": [
+    {
+      "screen": "after",
+      "element": "chapter",
+      "text": "第 1 章 · 第 1 关",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "display",
+      "rect": [
+        50,
+        23,
+        760,
+        50
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 10.554,
+      "contrast_p05": 11.703,
+      "contrast_median": 12.585,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        0,
+        1,
+        464,
+        5
+      ],
+      "touches_clip_edge": true,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "lives",
+      "text": "生命 3",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "display",
+      "rect": [
+        854,
+        23,
+        158,
+        50
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 11.498,
+      "contrast_p05": 11.934,
+      "contrast_median": 12.569,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        16,
+        1,
+        16,
+        5
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "gold",
+      "text": "金币 8",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "display",
+      "rect": [
+        1052,
+        23,
+        174,
+        50
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 11.504,
+      "contrast_p05": 11.963,
+      "contrast_median": 12.58,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        26,
+        1,
+        26,
+        5
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "target",
+      "text": "目标 14",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "compact",
+      "rect": [
+        40,
+        191,
+        104,
+        31
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 11.445,
+      "contrast_p05": 11.811,
+      "contrast_median": 12.58,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        4,
+        0,
+        4,
+        2
+      ],
+      "touches_clip_edge": true,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "score",
+      "text": "当前 0",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "compact",
+      "rect": [
+        40,
+        222,
+        104,
+        31
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 11.136,
+      "contrast_p05": 11.628,
+      "contrast_median": 12.506,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        14,
+        0,
+        13,
+        2
+      ],
+      "touches_clip_edge": true,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "terminal_title",
+      "text": "本关规则",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "compact",
+      "rect": [
+        1062,
+        174,
+        162,
+        44
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 11.12,
+      "contrast_p05": 11.784,
+      "contrast_median": 12.585,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        22,
+        6,
+        22,
+        8
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "terminal_detail",
+      "text": "无额外规则，检查基础输出",
+      "role": "secondary_warm",
+      "level": "L1",
+      "geometry": "compact",
+      "rect": [
+        1072,
+        230,
+        142,
+        174
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 11.23,
+      "contrast_p05": 11.866,
+      "contrast_median": 12.591,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        8,
+        36,
+        8,
+        38
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "sort_hint",
+      "text": "拖动骰子调整结算顺序",
+      "role": "secondary_amber",
+      "level": "L1",
+      "geometry": "micro",
+      "rect": [
+        320,
+        492,
+        570,
+        28
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 8.184,
+      "contrast_p05": 10.747,
+      "contrast_median": 11.572,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        206,
+        6,
+        205,
+        7
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "main_action",
+      "text": "SPACE  投掷",
+      "role": "focus_amber",
+      "level": "L3",
+      "geometry": "display",
+      "rect": [
+        458,
+        574,
+        356,
+        72
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 13.211,
+      "contrast_p05": 13.759,
+      "contrast_median": 14.434,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        52,
+        12,
+        52,
+        16
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "spell_bag",
+      "text": "法术袋 0/3",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "compact",
+      "rect": [
+        852,
+        586,
+        168,
+        50
+      ],
+      "scale": 1.0,
+      "halo": false,
+      "contrast_min": 12.288,
+      "contrast_p05": 12.288,
+      "contrast_median": 12.288,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        16,
+        10,
+        16,
+        9
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "chapter",
+      "text": "第 1 章 · 第 1 关",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "display",
+      "rect": [
+        50,
+        23,
+        760,
+        50
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 10.64,
+      "contrast_p05": 11.518,
+      "contrast_median": 12.596,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        0,
+        3,
+        696,
+        7
+      ],
+      "touches_clip_edge": true,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "lives",
+      "text": "生命 3",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "display",
+      "rect": [
+        854,
+        23,
+        158,
+        50
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 11.113,
+      "contrast_p05": 11.784,
+      "contrast_median": 12.575,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        25,
+        3,
+        25,
+        7
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "gold",
+      "text": "金币 8",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "display",
+      "rect": [
+        1052,
+        23,
+        174,
+        50
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 11.151,
+      "contrast_p05": 11.849,
+      "contrast_median": 12.606,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        39,
+        3,
+        39,
+        7
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "target",
+      "text": "目标 14",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "compact",
+      "rect": [
+        40,
+        191,
+        104,
+        31
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 10.642,
+      "contrast_p05": 11.679,
+      "contrast_median": 12.604,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        6,
+        0,
+        6,
+        3
+      ],
+      "touches_clip_edge": true,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "score",
+      "text": "当前 0",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "compact",
+      "rect": [
+        40,
+        222,
+        104,
+        31
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 10.921,
+      "contrast_p05": 11.498,
+      "contrast_median": 12.516,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        20,
+        0,
+        20,
+        4
+      ],
+      "touches_clip_edge": true,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "terminal_title",
+      "text": "本关规则",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "compact",
+      "rect": [
+        1062,
+        174,
+        162,
+        44
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 11.129,
+      "contrast_p05": 11.703,
+      "contrast_median": 12.591,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        33,
+        10,
+        33,
+        13
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "terminal_detail",
+      "text": "无额外规则，检查基础输出",
+      "role": "secondary_warm",
+      "level": "L1",
+      "geometry": "compact",
+      "rect": [
+        1072,
+        230,
+        142,
+        174
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 11.107,
+      "contrast_p05": 11.698,
+      "contrast_median": 12.596,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        13,
+        55,
+        13,
+        58
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "sort_hint",
+      "text": "拖动骰子调整结算顺序",
+      "role": "secondary_amber",
+      "level": "L1",
+      "geometry": "micro",
+      "rect": [
+        320,
+        492,
+        570,
+        28
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 8.267,
+      "contrast_p05": 10.762,
+      "contrast_median": 11.601,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        308,
+        9,
+        308,
+        10
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "main_action",
+      "text": "SPACE  投掷",
+      "role": "focus_amber",
+      "level": "L3",
+      "geometry": "display",
+      "rect": [
+        458,
+        574,
+        356,
+        72
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 12.905,
+      "contrast_p05": 13.695,
+      "contrast_median": 14.44,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        79,
+        19,
+        79,
+        23
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    },
+    {
+      "screen": "after",
+      "element": "spell_bag",
+      "text": "法术袋 0/3",
+      "role": "primary_amber",
+      "level": "L2",
+      "geometry": "compact",
+      "rect": [
+        852,
+        586,
+        168,
+        50
+      ],
+      "scale": 1.5,
+      "halo": false,
+      "contrast_min": 12.288,
+      "contrast_p05": 12.288,
+      "contrast_median": 12.288,
+      "required_contrast": 7.0,
+      "p05_pass": true,
+      "clip_margins_physical_pixels": [
+        24,
+        14,
+        24,
+        14
+      ],
+      "touches_clip_edge": false,
+      "clipped_outside_rect": false
+    }
+  ],
+  "outputs": [
+    {
+      "path": "Docs\\QA\\20261106_ui_two_level_brightness_after_1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "sha256": "70a64d21555046ac6422eb208824c3116d2e6cd8f982239dff4eaaf3c26dc4f3"
+    },
+    {
+      "path": "Docs\\QA\\20261106_ui_two_level_brightness_comparison_1280x720.png",
+      "size": [
+        504,
+        488
+      ],
+      "sha256": "b27e2ee9d8e72b70e7bc7fda3ba93ffe8988c8bede413de0a08269749d699c9b"
+    },
+    {
+      "path": "Docs\\QA\\20261106_ui_two_level_brightness_after_1920x1080.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "af1e7f18cf7c39662e851ab8450f7926e529bccf7e2eb893b3cb6990f0c12152"
+    },
+    {
+      "path": "Docs\\QA\\20261106_ui_two_level_brightness_comparison_1920x1080.png",
+      "size": [
+        756,
+        733
+      ],
+      "sha256": "04423e427f4aaba02ce2c8ff2babd07f28196e1fd18e8e3318a0392f29a45097"
+    },
+    {
+      "path": "Docs\\QA\\20261106_ui_two_level_brightness_pressure_0606.png",
+      "size": [
+        1164,
+        654
+      ],
+      "sha256": "4f4d4ae713af3412836d272abb5ae573c66fbc0b629a70282bd2ae870502f310"
+    }
+  ],
+  "generator_sha256": "21c0cd9a3dd182757e7e0f5d689c3dfb715a9b5f309841bd69a9e1353eac86c5"
+}

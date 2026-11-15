@@ -1,0 +1,11 @@
+{
+  "tool": "image_gen.imagegen",
+  "mode": "edit",
+  "transparent_background": false,
+  "referenced_image_paths": [
+    "market_separated_shelves_pilot_v1_20261109.png",
+    "Assets/Resources/Art/MainGame/arcade_main_game_die_shell_turtle.png",
+    "Assets/Resources/Art/DiceTypes/arcade_type_core_money_turtle.png",
+    "Assets/Resources/Art/DiceTypes/arcade_type_core_double_turtle.png"
+  ]
+}

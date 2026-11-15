@@ -1,0 +1,2129 @@
+{
+  "date": "2026-11-09",
+  "scope": "离线可变数量布局与分页原型；未做 Unity Play Mode",
+  "sourceHashes": {
+    "Assets/Resources/Art/MainGame/Flow/main_game_led_font_map.csv": "ba3aae4cd74c9750f56982079a4674fabeddb5027a0527605274d9111ecd8f50",
+    "Assets/Resources/Art/MainGame/Flow/main_game_led_font_styles.csv": "5a81193e067f7bfeedcdc721399c97d912a593726b36b58649690d889057ba0e",
+    "Assets/Resources/Data/spell_market_config.csv": "b03bda85f1027f6c8bd38964e6cd80ecf2eb6c32d4b715d58a9d2a90934663de",
+    "Assets/Resources/Data/dice_type_config.csv": "579cebc3c839025d19931eaa9b96f971201c131e305c098d616c5a9b3cd5875d"
+  },
+  "geometry": {
+    "width": 1280,
+    "height": 720,
+    "dicePerPage": 4,
+    "spellsPerPage": 4,
+    "gap": 16,
+    "contentX": 236,
+    "contentWidth": 1008,
+    "dieY": 128,
+    "dieWidth": 240,
+    "dieHeight": 204,
+    "spellY": 390,
+    "spellWidth": 240,
+    "spellHeight": 224,
+    "compact": {
+      "dot": 1,
+      "pitch": 2,
+      "character_gap": 2,
+      "line_gap": 4,
+      "cell": 31,
+      "line": 35
+    }
+  },
+  "fontAnalysis": [
+    {
+      "id": "spell_pass_boost",
+      "name": "冲关增幅",
+      "characters": 23,
+      "candidateThree": {
+        "lines": [
+          "下一次结算结束、达标",
+          "判定前，额外获得 5 分。"
+        ],
+        "width": 287,
+        "height": 66
+      },
+      "revisedTwo": {
+        "lines": [
+          "下一次结算结束、达标判定前，额外获",
+          "得 5 分。"
+        ],
+        "width": 471,
+        "height": 66
+      }
+    },
+    {
+      "id": "spell_chain_dividend",
+      "name": "连锁分红",
+      "characters": 42,
+      "candidateThree": {
+        "lines": [
+          "下一次结算中，每有一",
+          "颗不同的骰子触发自身",
+          "效果，结算后获得 1 金",
+          "币，最多 4 金币。"
+        ],
+        "width": 292,
+        "height": 136
+      },
+      "revisedTwo": {
+        "lines": [
+          "下一次结算中，每有一颗不同的骰子",
+          "触发自身效果，结算后获得 1 金币，最",
+          "多 4 金币。"
+        ],
+        "width": 461,
+        "height": 101
+      }
+    },
+    {
+      "id": "spell_echo_command",
+      "name": "回声指令",
+      "characters": 39,
+      "candidateThree": {
+        "lines": [
+          "选择 1 颗骰子；下一次",
+          "结算中，它首次触发自",
+          "身效果时，该效果额外",
+          "执行 1 次。"
+        ],
+        "width": 280,
+        "height": 136
+      },
+      "revisedTwo": {
+        "lines": [
+          "选择 1 颗骰子；下一次结算中，它首次",
+          "触发自身效果时，该效果额外执行 1",
+          "次。"
+        ],
+        "width": 463,
+        "height": 101
+      }
+    },
+    {
+      "id": "spell_targeted_restock",
+      "name": "定向换货",
+      "characters": 49,
+      "candidateThree": {
+        "lines": [
+          "选择 1 个家族和 1 个",
+          "非空货架位，将该商品",
+          "替换为当前章节该家族",
+          "的随机骰子。新商品仍",
+          "需正常购买。"
+        ],
+        "width": 294,
+        "height": 171
+      },
+      "revisedTwo": {
+        "lines": [
+          "选择 1 个家族和 1 个非空货架位，将",
+          "该商品替换为当前章节该家族的随机",
+          "骰子。新商品仍需正常购买。"
+        ],
+        "width": 472,
+        "height": 101
+      }
+    },
+    {
+      "id": "spell_precision_calibration",
+      "name": "精密校准",
+      "characters": 23,
+      "candidateThree": {
+        "lines": [
+          "选择 1 颗骰子，使其六",
+          "个长期面永久各 +1。"
+        ],
+        "width": 280,
+        "height": 66
+      },
+      "revisedTwo": {
+        "lines": [
+          "选择 1 颗骰子，使其六个长期面永久",
+          "各 +1。"
+        ],
+        "width": 460,
+        "height": 66
+      }
+    },
+    {
+      "id": "spell_feed_bag",
+      "name": "饲料袋",
+      "characters": 29,
+      "candidateThree": {
+        "lines": [
+          "选择 1 颗骰子，使其依",
+          "次获得 2 次当前品质的",
+          "真实喂养。"
+        ],
+        "width": 294,
+        "height": 101
+      },
+      "revisedTwo": {
+        "lines": [
+          "选择 1 颗骰子，使其依次获得 2 次当",
+          "前品质的真实喂养。"
+        ],
+        "width": 458,
+        "height": 66
+      }
+    },
+    {
+      "id": "spell_peak_cashout",
+      "name": "削峰套现",
+      "characters": 34,
+      "candidateThree": {
+        "lines": [
+          "所有骰子的并列最高长",
+          "期面永久 -1；每处理一",
+          "颗骰子，获得 1 金币。"
+        ],
+        "width": 296,
+        "height": 101
+      },
+      "revisedTwo": {
+        "lines": [
+          "所有骰子的并列最高长期面永久 -1；",
+          "每处理一颗骰子，获得 1 金币。"
+        ],
+        "width": 451,
+        "height": 66
+      }
+    },
+    {
+      "id": "spell_overachiever_bounty",
+      "name": "超额悬赏",
+      "characters": 32,
+      "candidateThree": {
+        "lines": [
+          "若下一次结算新增分",
+          "达到本关目标的 3 倍，",
+          "结算后获得 8 金币。"
+        ],
+        "width": 270,
+        "height": 101
+      },
+      "revisedTwo": {
+        "lines": [
+          "若下一次结算新增分达到本关目标",
+          "的 3 倍，结算后获得 8 金币。"
+        ],
+        "width": 447,
+        "height": 66
+      }
+    }
+  ],
+  "longestRule": {
+    "id": "spell_targeted_restock",
+    "name": "定向换货",
+    "characters": 49,
+    "candidateThree": {
+      "lines": [
+        "选择 1 个家族和 1 个",
+        "非空货架位，将该商品",
+        "替换为当前章节该家族",
+        "的随机骰子。新商品仍",
+        "需正常购买。"
+      ],
+      "width": 294,
+      "height": 171
+    },
+    "revisedTwo": {
+      "lines": [
+        "选择 1 个家族和 1 个非空货架位，将",
+        "该商品替换为当前章节该家族的随机",
+        "骰子。新商品仍需正常购买。"
+      ],
+      "width": 472,
+      "height": 101
+    }
+  },
+  "widestDieName": {
+    "name": "呼朋唤友龟",
+    "width": 153
+  },
+  "missingGlyphs": [],
+  "candidateFailures": [
+    "连锁分红",
+    "回声指令",
+    "定向换货"
+  ],
+  "cases": [
+    {
+      "resolution": 1280,
+      "dice": 0,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 0,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 0,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 0,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 0,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 0,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 0,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 0,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 0,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 1,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 1,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 1,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 1,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 1,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 1,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 1,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 1,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 1,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 2,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 2,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 2,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 2,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 2,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 2,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 2,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 2,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 2,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 3,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 3,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 3,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 3,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 3,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 3,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 3,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 3,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 3,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 4,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 4,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 4,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 4,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 4,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 4,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 4,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 4,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 4,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 6,
+      "spells": 0,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 6,
+      "spells": 1,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 6,
+      "spells": 2,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 6,
+      "spells": 3,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 6,
+      "spells": 4,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 6,
+      "spells": 6,
+      "pageCounts": {
+        "die": 2,
+        "spell": 2
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 6,
+      "spells": 8,
+      "pageCounts": {
+        "die": 2,
+        "spell": 2
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 6,
+      "spells": 12,
+      "pageCounts": {
+        "die": 2,
+        "spell": 3
+      },
+      "checkedStates": 6,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 6,
+      "spells": 32,
+      "pageCounts": {
+        "die": 2,
+        "spell": 8
+      },
+      "checkedStates": 11,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 8,
+      "spells": 0,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 8,
+      "spells": 1,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 8,
+      "spells": 2,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 8,
+      "spells": 3,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 8,
+      "spells": 4,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 8,
+      "spells": 6,
+      "pageCounts": {
+        "die": 2,
+        "spell": 2
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 8,
+      "spells": 8,
+      "pageCounts": {
+        "die": 2,
+        "spell": 2
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 8,
+      "spells": 12,
+      "pageCounts": {
+        "die": 2,
+        "spell": 3
+      },
+      "checkedStates": 6,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 8,
+      "spells": 32,
+      "pageCounts": {
+        "die": 2,
+        "spell": 8
+      },
+      "checkedStates": 11,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 12,
+      "spells": 0,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 12,
+      "spells": 1,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 12,
+      "spells": 2,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 12,
+      "spells": 3,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 12,
+      "spells": 4,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 12,
+      "spells": 6,
+      "pageCounts": {
+        "die": 3,
+        "spell": 2
+      },
+      "checkedStates": 6,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 12,
+      "spells": 8,
+      "pageCounts": {
+        "die": 3,
+        "spell": 2
+      },
+      "checkedStates": 6,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 12,
+      "spells": 12,
+      "pageCounts": {
+        "die": 3,
+        "spell": 3
+      },
+      "checkedStates": 7,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 12,
+      "spells": 32,
+      "pageCounts": {
+        "die": 3,
+        "spell": 8
+      },
+      "checkedStates": 12,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 32,
+      "spells": 0,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 32,
+      "spells": 1,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 32,
+      "spells": 2,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 32,
+      "spells": 3,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 32,
+      "spells": 4,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 32,
+      "spells": 6,
+      "pageCounts": {
+        "die": 8,
+        "spell": 2
+      },
+      "checkedStates": 11,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 32,
+      "spells": 8,
+      "pageCounts": {
+        "die": 8,
+        "spell": 2
+      },
+      "checkedStates": 11,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 32,
+      "spells": 12,
+      "pageCounts": {
+        "die": 8,
+        "spell": 3
+      },
+      "checkedStates": 12,
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "dice": 32,
+      "spells": 32,
+      "pageCounts": {
+        "die": 8,
+        "spell": 8
+      },
+      "checkedStates": 17,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 0,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 0,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 0,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 0,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 0,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 0,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 0,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 0,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 0,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 1,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 1,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 1,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 1,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 1,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 1,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 1,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 1,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 1,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 2,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 2,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 2,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 2,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 2,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 2,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 2,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 2,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 2,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 3,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 3,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 3,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 3,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 3,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 3,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 3,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 3,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 3,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 4,
+      "spells": 0,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 4,
+      "spells": 1,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 4,
+      "spells": 2,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 4,
+      "spells": 3,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 4,
+      "spells": 4,
+      "pageCounts": {
+        "die": 1,
+        "spell": 1
+      },
+      "checkedStates": 3,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 4,
+      "spells": 6,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 4,
+      "spells": 8,
+      "pageCounts": {
+        "die": 1,
+        "spell": 2
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 4,
+      "spells": 12,
+      "pageCounts": {
+        "die": 1,
+        "spell": 3
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 4,
+      "spells": 32,
+      "pageCounts": {
+        "die": 1,
+        "spell": 8
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 6,
+      "spells": 0,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 6,
+      "spells": 1,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 6,
+      "spells": 2,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 6,
+      "spells": 3,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 6,
+      "spells": 4,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 6,
+      "spells": 6,
+      "pageCounts": {
+        "die": 2,
+        "spell": 2
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 6,
+      "spells": 8,
+      "pageCounts": {
+        "die": 2,
+        "spell": 2
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 6,
+      "spells": 12,
+      "pageCounts": {
+        "die": 2,
+        "spell": 3
+      },
+      "checkedStates": 6,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 6,
+      "spells": 32,
+      "pageCounts": {
+        "die": 2,
+        "spell": 8
+      },
+      "checkedStates": 11,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 8,
+      "spells": 0,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 8,
+      "spells": 1,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 8,
+      "spells": 2,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 8,
+      "spells": 3,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 8,
+      "spells": 4,
+      "pageCounts": {
+        "die": 2,
+        "spell": 1
+      },
+      "checkedStates": 4,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 8,
+      "spells": 6,
+      "pageCounts": {
+        "die": 2,
+        "spell": 2
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 8,
+      "spells": 8,
+      "pageCounts": {
+        "die": 2,
+        "spell": 2
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 8,
+      "spells": 12,
+      "pageCounts": {
+        "die": 2,
+        "spell": 3
+      },
+      "checkedStates": 6,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 8,
+      "spells": 32,
+      "pageCounts": {
+        "die": 2,
+        "spell": 8
+      },
+      "checkedStates": 11,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 12,
+      "spells": 0,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 12,
+      "spells": 1,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 12,
+      "spells": 2,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 12,
+      "spells": 3,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 12,
+      "spells": 4,
+      "pageCounts": {
+        "die": 3,
+        "spell": 1
+      },
+      "checkedStates": 5,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 12,
+      "spells": 6,
+      "pageCounts": {
+        "die": 3,
+        "spell": 2
+      },
+      "checkedStates": 6,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 12,
+      "spells": 8,
+      "pageCounts": {
+        "die": 3,
+        "spell": 2
+      },
+      "checkedStates": 6,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 12,
+      "spells": 12,
+      "pageCounts": {
+        "die": 3,
+        "spell": 3
+      },
+      "checkedStates": 7,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 12,
+      "spells": 32,
+      "pageCounts": {
+        "die": 3,
+        "spell": 8
+      },
+      "checkedStates": 12,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 32,
+      "spells": 0,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 32,
+      "spells": 1,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 32,
+      "spells": 2,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 32,
+      "spells": 3,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 32,
+      "spells": 4,
+      "pageCounts": {
+        "die": 8,
+        "spell": 1
+      },
+      "checkedStates": 10,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 32,
+      "spells": 6,
+      "pageCounts": {
+        "die": 8,
+        "spell": 2
+      },
+      "checkedStates": 11,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 32,
+      "spells": 8,
+      "pageCounts": {
+        "die": 8,
+        "spell": 2
+      },
+      "checkedStates": 11,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 32,
+      "spells": 12,
+      "pageCounts": {
+        "die": 8,
+        "spell": 3
+      },
+      "checkedStates": 12,
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "dice": 32,
+      "spells": 32,
+      "pageCounts": {
+        "die": 8,
+        "spell": 8
+      },
+      "checkedStates": 17,
+      "passed": true
+    }
+  ],
+  "interactions": [
+    {
+      "resolution": 1280,
+      "name": "四位价格与六位钱包装入",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "name": "末页真实按钮命中原索引、购买留空且页码不变",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "name": "末页目标选择保持原货架索引",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "name": "锁定时交易按钮受阻且不会留空新货位",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "name": "法术换骰保留真实索引、不新增假货架",
+      "passed": true
+    },
+    {
+      "resolution": 1280,
+      "name": "整批重建后页码复位",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "name": "四位价格与六位钱包装入",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "name": "末页真实按钮命中原索引、购买留空且页码不变",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "name": "末页目标选择保持原货架索引",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "name": "锁定时交易按钮受阻且不会留空新货位",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "name": "法术换骰保留真实索引、不新增假货架",
+      "passed": true
+    },
+    {
+      "resolution": 1920,
+      "name": "整批重建后页码复位",
+      "passed": true
+    }
+  ],
+  "captures": [
+    "captures-illustrated/4dice-4spells_1280x720.png",
+    "captures-illustrated/6dice-6spells_1280x720.png",
+    "captures-illustrated/8dice-8spells-first_1280x720.png",
+    "captures-illustrated/8dice-8spells-last_1280x720.png",
+    "captures-illustrated/8dice-8spells-sold_1280x720.png",
+    "captures-illustrated/1die-8spells_1280x720.png",
+    "captures-illustrated/0dice-8spells_1280x720.png",
+    "captures-illustrated/empty_1280x720.png",
+    "captures-illustrated/4dice-4spells_1920x1080.png",
+    "captures-illustrated/6dice-6spells_1920x1080.png",
+    "captures-illustrated/8dice-8spells-first_1920x1080.png",
+    "captures-illustrated/8dice-8spells-last_1920x1080.png",
+    "captures-illustrated/8dice-8spells-sold_1920x1080.png",
+    "captures-illustrated/1die-8spells_1920x1080.png",
+    "captures-illustrated/0dice-8spells_1920x1080.png",
+    "captures-illustrated/empty_1920x1080.png",
+    "captures-illustrated/8dice-8spells-first_pressure_1164x654.png",
+    "captures-illustrated/8dice-8spells-last_pressure_1164x654.png"
+  ],
+  "limitations": [
+    "未将新布局接入 Unity。",
+    "原生 Compact 核心为1物理像素（720p），属于现有已登记样式；本轮不重新宣称全部字体质量通过。",
+    "不模拟正式经济、真实骰子效果或存档。"
+  ],
+  "browserErrors": [],
+  "totals": {
+    "caseCombinations": 162,
+    "renderedStates": 882,
+    "interactionChecks": 12,
+    "failedRevisedChecks": 0
+  }
+}
