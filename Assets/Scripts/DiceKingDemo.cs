@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-public sealed class DiceKingDemo : MonoBehaviour
+public sealed partial class DiceKingDemo : MonoBehaviour
 {
     private enum GameMode
     {
@@ -168,7 +168,13 @@ public sealed class DiceKingDemo : MonoBehaviour
         ElderTurtle,
         RotationTurtle,
         LegacyDemonTurtle,
-        EmptyHoldTurtle
+        EmptyHoldTurtle,
+        CaravanTurtle,
+        BasicTurtle,
+        ProgenitorDemon,
+        Enchanter,
+        TaxCollector,
+        Rewind
     }
 
     private enum MainFamily
@@ -493,6 +499,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         public string LastDevourSource;
         public string LastDevourTrigger;
         public int InstanceSellValue = -1;
+        public int CrewSaleProgress;
+        public int[] MarketPurchaseFaces;
         public int PigTemporaryScoreBonus;
         public int NeutralTemporaryScoreBonus;
         public int TargetFace;
@@ -537,6 +545,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 LastDevourSource = LastDevourSource,
                 LastDevourTrigger = LastDevourTrigger,
                 InstanceSellValue = InstanceSellValue,
+                CrewSaleProgress = CrewSaleProgress,
                 PigTemporaryScoreBonus = 0,
                 NeutralTemporaryScoreBonus = 0,
                 TargetFace = 0,
@@ -735,7 +744,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         public bool ShowSellPrice
         {
-            get { return Context == DiceTooltipContext.MarketOffer || Context == DiceTooltipContext.MarketBag; }
+            get { return Die != null && Die.Type != DieType.Tribute && (Context == DiceTooltipContext.MarketOffer || Context == DiceTooltipContext.MarketBag); }
         }
 
         public bool ShowEconomy
@@ -1323,8 +1332,9 @@ public sealed class DiceKingDemo : MonoBehaviour
     private const int DiceRollLoopFrameCount = 24;
     private const int DiceRollStopFrameCount = 8;
     private const int DiceRollResultFaceCount = 6;
-    private const string SavePrefix = "DiceKingDemo.";
-    private const int CurrentSaveVersion = 14;
+    private const string SettingsPrefix = "DiceKingDemo.";
+    private const string SavePrefix = "DiceKingDemo.F024.";
+    private const int CurrentSaveVersion = 15;
     private const string EncounterTableResourcePath = "Data/chapter_score_table";
     private const string MarketDieConfigResourcePath = "Data/dice_market_config";
     private const string DiceTypeConfigResourcePath = "Data/dice_type_config";
@@ -1642,14 +1652,13 @@ public sealed class DiceKingDemo : MonoBehaviour
     private bool v02TurtleAttachmentMarketOnly;
     private bool v02PirateFamilyMarketOnly;
     private bool v02NeutralFamilyMarketOnly;
-    private bool v02DualFamilyMarketOnly;
     private bool affixFeatureEnabled;
     private string activeCraftingItemKey = string.Empty;
     private int affixAddStoneCount;
     private int affixRemoveStoneCount;
     private int affixReplaceStoneCount;
     private int currentMarketPaidRefreshCount;
-    private int currentMarketPirateSellCount;
+    private bool pirateDiscountUsed;
     private int currentMarketBlackMarketRefreshDiscount;
     private int nextDiePurchaseDiscount;
     private int nextSpellPurchaseDiscount;
@@ -1778,6 +1787,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     private bool finalScoreApplied;
     private bool confirmNewGame;
     private bool hasSave;
+    private bool hasLegacyRun;
     private bool seenOpening;
     private DisplayModeSetting displayMode = DisplayModeSetting.BorderlessFullscreen;
     private DisplayModeSetting settingsSnapshotDisplayMode = DisplayModeSetting.BorderlessFullscreen;
@@ -2228,7 +2238,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         GUI.enabled = hasSave;
-        if (DrawUiButton(new Rect(menu.x + 58f, menu.y + 224f, 388f, 52f), hasSave ? "继续游戏" : "继续游戏（无存档）", UiButtonKind.Secondary))
+        if (DrawUiButton(new Rect(menu.x + 58f, menu.y + 224f, 388f, 52f), hasSave ? "继续游戏" : (hasLegacyRun ? "旧局保留，请开始新游戏" : "继续游戏（无存档）"), UiButtonKind.Secondary))
         {
             ContinueGameFlow();
         }
@@ -2325,7 +2335,8 @@ public sealed class DiceKingDemo : MonoBehaviour
             DrawRect(new Rect(continueRect.x + 3f, continueRect.y + 3f, continueRect.width - 6f, continueRect.height - 6f), new Color(0.008f, 0.025f, 0.029f, 1f));
             DrawBorder(new Rect(continueRect.x + 49f, continueRect.y + 18f, 54f, 54f), new Color(teal.r, teal.g, teal.b, 0.42f), 2f);
             DrawLedRoleText(new Rect(continueRect.x + 142f, continueRect.y + 4f, 250f, 47f), "继续游戏", MainGameLedFont.TextRole.Disabled, TextAnchor.MiddleLeft);
-            DrawLedRoleText(new Rect(continueRect.x + 142f, continueRect.y + 51f, 250f, 31f), "暂无运行记录", MainGameLedFont.TextRole.Disabled, TextAnchor.MiddleLeft);
+            string saveHint = hasLegacyRun ? "旧局保留，请开新局" : "暂无运行记录";
+            DrawLedRoleText(new Rect(continueRect.x + 142f, continueRect.y + 51f, 250f, 31f), saveHint, MainGameLedFont.TextRole.Disabled, TextAnchor.MiddleLeft);
         }
 
         DrawArcadeMainMenuFooterCopy(settingsRect, "设置", mainMenuSelection == MainMenuSelection.Settings);
@@ -4622,9 +4633,9 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void SaveWindowPlacementState()
     {
-        PlayerPrefs.SetInt(SavePrefix + "WindowWidth", Mathf.Max(1, windowWidth));
-        PlayerPrefs.SetInt(SavePrefix + "WindowHeight", Mathf.Max(1, windowHeight));
-        PlayerPrefs.SetInt(SavePrefix + "WindowMaximized", windowMaximized ? 1 : 0);
+        PlayerPrefs.SetInt(SettingsPrefix + "WindowWidth", Mathf.Max(1, windowWidth));
+        PlayerPrefs.SetInt(SettingsPrefix + "WindowHeight", Mathf.Max(1, windowHeight));
+        PlayerPrefs.SetInt(SettingsPrefix + "WindowMaximized", windowMaximized ? 1 : 0);
         PlayerPrefs.Save();
     }
 
@@ -7418,7 +7429,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             state.MultipliedScore = 0;
             state.BribeScore = bribeScore;
             state.RollScore = rollScore;
-            state.ResolvedScore = currentScore + rollScore;
+            state.ResolvedScore = SaturatingRoundInt((long)currentScore + rollScore);
             state.ProgressScore = currentScore;
             return state;
         }
@@ -7483,7 +7494,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         state.ScoreBeforeRoll = resolvedScore - rollScore;
         state.BaseScore = baseScore;
         state.Multiplier = multiplier;
-        state.MultipliedScore = Mathf.RoundToInt(baseScore * multiplier);
+        state.MultipliedScore = RoundScoreWithMultiplier(baseScore, multiplier);
         state.BribeScore = LastExtraSettlementScore();
         state.RollScore = rollScore;
         state.ResolvedScore = resolvedScore;
@@ -7491,7 +7502,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private int CurrentCounterBaseScore()
     {
-        return previewIndividualScore + previewTemporaryScore + previewRuleBonus;
+        return SaturatingRoundInt((long)previewIndividualScore + previewTemporaryScore + previewRuleBonus);
     }
 
     private void ClearCommittedRunScoreCounter()
@@ -7519,7 +7530,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         committedCounterScoreBeforeRoll = Mathf.Max(0, scoreBeforeRoll);
         committedCounterBaseScore = baseScore;
         committedCounterMultiplier = multiplier;
-        committedCounterMultipliedScore = Mathf.RoundToInt(baseScore * multiplier);
+        committedCounterMultipliedScore = RoundScoreWithMultiplier(baseScore, multiplier);
         committedCounterBribeScore = LastExtraSettlementScore();
         committedCounterRollScore = rollScore;
         committedCounterResolvedScore = resolved;
@@ -7663,7 +7674,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
         }
 
-        int capturedBaseScore = 0;
+        long capturedBaseScore = 0;
         int strongestIndex = -1;
         int strongestMagnitude = -1;
         for (int i = 0; i < committedSettlementContributions.Count; i++)
@@ -7675,7 +7686,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
 
             capturedBaseScore += record.SignedBaseDelta;
-            int magnitude = Mathf.Abs(record.SignedBaseDelta);
+            int magnitude = SaturatingRoundInt(Math.Abs((long)record.SignedBaseDelta));
             if (magnitude > strongestMagnitude)
             {
                 strongestMagnitude = magnitude;
@@ -7683,7 +7694,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
         }
 
-        int residual = committedBaseScore - capturedBaseScore;
+        int residual = SaturatingRoundInt((long)committedBaseScore - capturedBaseScore);
         if (residual == 0)
         {
             return;
@@ -7692,7 +7703,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (strongestIndex >= 0)
         {
             SettlementContributionRecord strongest = committedSettlementContributions[strongestIndex];
-            strongest.SignedBaseDelta += residual;
+            strongest.SignedBaseDelta = SaturatingRoundInt((long)strongest.SignedBaseDelta + residual);
             strongest.IncludesTemporaryScore = true;
             return;
         }
@@ -7739,7 +7750,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             Die die = scoringDice[i];
             if (die != null)
             {
-                runningBaseScore += die.Score;
+                runningBaseScore = SaturatingRoundInt((long)runningBaseScore + die.Score);
             }
 
             if (i == scoringDice.Count - 1)
@@ -7748,7 +7759,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
 
             float multiplier = DisplayMultiplierForScorePrefix(i);
-            int multipliedScore = Mathf.RoundToInt(runningBaseScore * multiplier);
+            int multipliedScore = RoundScoreWithMultiplier(runningBaseScore, multiplier);
             runScoreCounterSteps.Add(new RunScoreCounterStep
             {
                 BaseScore = runningBaseScore,
@@ -7756,7 +7767,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 MultipliedScore = multipliedScore,
                 BribeScore = 0,
                 RollScore = multipliedScore,
-                ProgressScore = scoreBeforeRoll + multipliedScore
+                ProgressScore = SaturatingRoundInt((long)scoreBeforeRoll + multipliedScore)
             });
         }
     }
@@ -7839,7 +7850,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             SettlementContributionRecord record = committedSettlementContributions[i];
             if (record != null)
             {
-                maxMagnitude = Mathf.Max(maxMagnitude, Mathf.Abs(record.SignedBaseDelta));
+                maxMagnitude = Mathf.Max(maxMagnitude, SaturatingRoundInt(Math.Abs((long)record.SignedBaseDelta)));
             }
         }
 
@@ -7854,9 +7865,9 @@ public sealed class DiceKingDemo : MonoBehaviour
                 continue;
             }
 
-            runningBaseScore += record.SignedBaseDelta;
-            int multipliedScore = Mathf.RoundToInt(runningBaseScore * multiplier);
-            int signedFinalDelta = multipliedScore - previousMultipliedScore;
+            runningBaseScore = SaturatingRoundInt((long)runningBaseScore + record.SignedBaseDelta);
+            int multipliedScore = RoundScoreWithMultiplier(runningBaseScore, multiplier);
+            int signedFinalDelta = SaturatingRoundInt((long)multipliedScore - previousMultipliedScore);
             settlementDisplayEvents.Add(new SettlementDisplayEvent
             {
                 Kind = SettlementEventKind.SlotScore,
@@ -7869,7 +7880,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 ValueDelta = signedFinalDelta,
                 BaseScore = runningBaseScore,
                 Multiplier = multiplier,
-                ProgressScore = scoreBeforeRoll + multipliedScore,
+                ProgressScore = SaturatingRoundInt((long)scoreBeforeRoll + multipliedScore),
                 Duration = MainGameSettlementSlotDuration(),
                 HighlightLevel = record.LocalChain ? SettlementHighlightLevel.Route : SettlementHighlightLevel.Normal,
                 TargetArea = SettlementTargetArea.Target,
@@ -8861,12 +8872,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (HasNextEncounter())
         {
-            string impMarketText = ResolveImpStageEndTavernGrowth();
             EnterMarket(encounter.Boss);
-            if (!string.IsNullOrEmpty(impMarketText))
-            {
-                rewardBanner = impMarketText;
-            }
 
             mode = encounter.Boss ? GameMode.ChapterShop : GameMode.InterStageMarket;
             SaveRun();
@@ -9142,7 +9148,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 return "结果锁定，自动结算";
             }
 
-            int afterScore = currentScore + previewRollScore;
+            int afterScore = SaturatingRoundInt((long)currentScore + previewRollScore);
             if (encounter != null && afterScore >= encounter.Target)
             {
                 if (previewBribeGoldCost > 0)
@@ -9259,21 +9265,6 @@ public sealed class DiceKingDemo : MonoBehaviour
         return count;
     }
 
-    private int DualFamilyDiceCount()
-    {
-        int count = 0;
-        for (int i = 0; i < dice.Count; i++)
-        {
-            Die die = dice[i];
-            if (die != null && !die.Temporary && IsV02DualFamilyMarketType(die.Type))
-            {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
     private string RunHudResourceText()
     {
         return "金 " + chapterGold + "   生命 " + remainingLives + "   直计";
@@ -9282,67 +9273,20 @@ public sealed class DiceKingDemo : MonoBehaviour
     private string[] DiceBagTypeLines()
     {
         List<string> lines = new List<string>();
-        AddDiceBagTypeLine(lines, DieType.Basic, "基础");
-        AddDiceBagTypeLine(lines, DieType.PigFarmer, "养猪");
-        AddDiceBagTypeLine(lines, DieType.MeatPig, "肉猪");
-        AddDiceBagTypeLine(lines, DieType.TradePig, "贸易猪");
-        AddDiceBagTypeLine(lines, DieType.SowPig, "母猪");
-        AddDiceBagTypeLine(lines, DieType.ThreeLittlePigs, "三猪");
-        AddDiceBagTypeLine(lines, DieType.GreedyPig, "贪吃");
-        AddDiceBagTypeLine(lines, DieType.FeedWholesaler, "批发");
-        AddDiceBagTypeLine(lines, DieType.Imp, "小鬼");
-        AddDiceBagTypeLine(lines, DieType.Devourer, "吞噬");
-        AddDiceBagTypeLine(lines, DieType.Demon, "恶魔");
-        AddDiceBagTypeLine(lines, DieType.DemonBat, "魔蝠");
-        AddDiceBagTypeLine(lines, DieType.AbyssSummon, "深渊");
-        AddDiceBagTypeLine(lines, DieType.GuideTurtle, "领路龟");
-        AddDiceBagTypeLine(lines, DieType.MoneyTurtle, "金钱龟");
-        AddDiceBagTypeLine(lines, DieType.TinyTurtle, "小小龟");
-        AddDiceBagTypeLine(lines, DieType.SpellApprenticeTurtle, "学徒龟");
-        AddDiceBagTypeLine(lines, DieType.RunawayTurtle, "出走龟");
-        AddDiceBagTypeLine(lines, DieType.CloneTurtle, "克隆龟");
-        AddDiceBagTypeLine(lines, DieType.DoubleTurtle, "双倍龟");
-        AddDiceBagTypeLine(lines, DieType.LuckyTurtle, "幸运龟");
-        AddDiceBagTypeLine(lines, DieType.HeavyArmorTurtle, "重甲龟");
-        AddDiceBagTypeLine(lines, DieType.MagnetTurtle, "磁力龟");
-        AddDiceBagTypeLine(lines, DieType.ScribeTurtle, "抄经龟");
-        AddDiceBagTypeLine(lines, DieType.CurseShellTurtle, "咒壳龟");
-        AddDiceBagTypeLine(lines, DieType.ElderTurtle, "长老龟");
-        AddDiceBagTypeLine(lines, DieType.GreatTurtle, "伟大龟");
-        AddDiceBagTypeLine(lines, DieType.RallyTurtle, "呼朋龟");
-        AddDiceBagTypeLine(lines, DieType.GrandSpellTurtle, "大法术龟");
-        AddDiceBagTypeLine(lines, DieType.LeaderTurtle, "首领龟");
-        AddDiceBagTypeLine(lines, DieType.RefreshPirate, "刷新海盗");
-        AddDiceBagTypeLine(lines, DieType.PlunderPirate, "劫掠海盗");
-        AddDiceBagTypeLine(lines, DieType.CrewPirate, "人口海盗");
-        AddDiceBagTypeLine(lines, DieType.PirateCaptain, "海盗头领");
-        AddDiceBagTypeLine(lines, DieType.TrainingPirate, "练腿海盗");
-        AddDiceBagTypeLine(lines, DieType.TreasurePirate, "财宝海盗");
-        AddDiceBagTypeLine(lines, DieType.RobberyPirate, "抢劫海盗");
-        AddDiceBagTypeLine(lines, DieType.PirateKing, "海贼王");
-        AddDiceBagTypeLine(lines, DieType.BlackSailBat, "黑帆魔蝠");
-        AddDiceBagTypeLine(lines, DieType.RotationTurtle, "轮作龟");
-        AddDiceBagTypeLine(lines, DieType.TributePig, "贡猪");
-        AddDiceBagTypeLine(lines, DieType.BlackMarketImp, "黑市小鬼");
-        AddDiceBagTypeLine(lines, DieType.BloodPactCaptain, "血契船长");
-        AddDiceBagTypeLine(lines, DieType.ClearancePig, "清仓猪");
-        AddDiceBagTypeLine(lines, DieType.SupplyPig, "补给猪");
-        AddDiceBagTypeLine(lines, DieType.LegacyDemonTurtle, "遗产魔龟");
-        AddDiceBagTypeLine(lines, DieType.EmptyHoldTurtle, "空舱龟");
-        AddDiceBagTypeLine(lines, DieType.Lightfang, "光牙");
-        AddDiceBagTypeLine(lines, DieType.Duet, "二重唱");
-        AddDiceBagTypeLine(lines, DieType.Trigger, "触发器");
-        AddDiceBagTypeLine(lines, DieType.Crown, "王冠");
-        AddDiceBagTypeLine(lines, DieType.Relief, "接济");
-        AddDiceBagTypeLine(lines, DieType.Airstrike, "空袭");
-        AddDiceBagTypeLine(lines, DieType.Pact, "盟约");
-        AddDiceBagTypeLine(lines, DieType.Stitch, "缝合");
+        HashSet<DieType> seen = new HashSet<DieType>();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            Die die = dice[i];
+            if (die != null && !die.Temporary && IsCurrentRosterOrSystemType(die.Type) && seen.Add(die.Type))
+            {
+                AddDiceBagTypeLine(lines, die.Type, TypeName(die.Type));
+            }
+        }
 
         if (lines.Count == 0)
         {
             lines.Add("暂无骰子");
         }
-
         return lines.ToArray();
     }
 
@@ -9357,14 +9301,9 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string DiceBagFocusText()
     {
-        if (DualFamilyDiceCount() > 0)
-        {
-            return "双阵营连接两套家族效果";
-        }
-
         if (MainFamilyDiceCount(MainFamily.Pig) > 0)
         {
-            return "猪猪用喂养抬高最低点";
+            return "猪用饲料提高六面点数";
         }
 
         if (MainFamilyDiceCount(MainFamily.Devil) > 0)
@@ -9374,17 +9313,17 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (MainFamilyDiceCount(MainFamily.Turtle) > 0)
         {
-            return "龟龟离场化壳形成壳层";
+            return "龟吸附到右邻，转移六面与卖价";
         }
 
         if (MainFamilyDiceCount(MainFamily.Pirate) > 0)
         {
-            return "海盗用买卖和金币换成长";
+            return "海盗买卖同价";
         }
 
         if (NeutralDiceCount() > 0)
         {
-            return "中立骰连接现有家族";
+            return "中立骰强化投点、结算和交易";
         }
 
         return "基础骰过渡，优先构筑当前阵容";
@@ -9392,11 +9331,6 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string DiceBagRouteText()
     {
-        if (DualFamilyDiceCount() >= 2)
-        {
-            return "双阵营桥接";
-        }
-
         int pig = MainFamilyDiceCount(MainFamily.Pig);
         int devil = MainFamilyDiceCount(MainFamily.Devil);
         int turtle = MainFamilyDiceCount(MainFamily.Turtle);
@@ -9404,7 +9338,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         int presentFamilies = (pig > 0 ? 1 : 0) + (devil > 0 ? 1 : 0) + (turtle > 0 ? 1 : 0) + (pirate > 0 ? 1 : 0);
         if (presentFamilies >= 3)
         {
-            return "多家族议会";
+            return presentFamilies + " 个家族";
         }
 
         int best = Mathf.Max(Mathf.Max(pig, devil), Mathf.Max(turtle, pirate));
@@ -9412,7 +9346,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             if (best == pig) return "猪猪喂养";
             if (best == devil) return "恶魔吞噬";
-            if (best == turtle) return "龟龟化壳";
+            if (best == turtle) return "龟的吸附";
             return "海盗市场";
         }
 
@@ -9571,7 +9505,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return "进入市场";
         }
 
-        int afterScore = currentScore + previewRollScore;
+        int afterScore = SaturatingRoundInt((long)currentScore + previewRollScore);
         if (afterScore >= encounter.Target)
         {
             if (previewBribeGoldCost > 0)
@@ -9955,7 +9889,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             DrawVariableMarketPanel(rect, true);
             if (offer == null || offer.Kind == MarketOfferKind.Empty)
             {
-                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 76f, rect.width - 24f, 31f), "已售出", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
+                DrawLedRoleText(new Rect(rect.x + 12f, rect.y + 76f, rect.width - 24f, 31f), "空货架", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
                 continue;
             }
             if (spells && offer.Spell != null)
@@ -9976,7 +9910,9 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
             DrawLedRoleText(VariableMarketPriceRect(spells, rect), CurrentOfferPrice(offer) + " 金", MainGameLedFont.TextRole.PrimaryAmber, TextAnchor.MiddleCenter);
             bool canAct = !locked && (chooseTarget || CanBuyMarketOffer(offer));
-            ArcadeMarketButtonResult result = DrawVariableMarketButton(VariableMarketBuyRect(spells, rect), chooseTarget ? "选择" : "购买", canAct, true, (chooseTarget ? "spell-target-" : "market-buy-") + index);
+            bool tribute = offer.Kind == MarketOfferKind.Die && offer.Die != null && offer.Die.Type == DieType.Tribute;
+            string action = chooseTarget ? "选择" : tribute ? "奉献" : "购买";
+            ArcadeMarketButtonResult result = DrawVariableMarketButton(VariableMarketBuyRect(spells, rect), action, canAct, true, (chooseTarget ? "spell-target-" : "market-buy-") + index);
             if (result == ArcadeMarketButtonResult.Activated)
             {
                 ClearSpellHover();
@@ -10211,7 +10147,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             Rect emptyRing = new Rect(rect.x + 86f, rect.y + 82f, 105f, 105f);
             DrawBorder(emptyRing, new Color(0.72f, 0.43f, 0.12f, 0.32f), 3f);
             DrawBorder(InsetRect(emptyRing, 18f, 18f), new Color(0.72f, 0.43f, 0.12f, 0.2f), 2f);
-            DrawLedRoleText(new Rect(rect.x + 28f, rect.y + 201f, rect.width - 56f, 34f), "已售出", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleCenter);
+            DrawLedRoleText(new Rect(rect.x + 28f, rect.y + 201f, rect.width - 56f, 34f), "空货架", MainGameLedFont.TextRole.SecondaryAmber, TextAnchor.MiddleCenter);
             DrawLedRoleText(new Rect(rect.x + 28f, rect.y + 286f, rect.width - 56f, 48f), "付费刷新补货", MainGameLedFont.TextRole.SecondaryWarm, TextAnchor.MiddleCenter);
             return;
         }
@@ -10526,7 +10462,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
         if (offer == null || offer.Kind == MarketOfferKind.Empty)
         {
-            return "商品已售出";
+            return "货架已空";
         }
         if (offer.Kind == MarketOfferKind.Spell)
         {
@@ -10550,9 +10486,9 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             return "暂不可购买";
         }
-        else if (offer.Die.Type == DieType.Tribute && dice.Count <= 0)
+        else if (offer.Die.Type == DieType.Tribute && FirstOfferingDemon() == null)
         {
-            return "请先选择骰子";
+            return "需要一颗恶魔";
         }
 
         if (chapterGold < CurrentOfferPrice(offer))
@@ -10561,8 +10497,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
         if (offer.Kind == MarketOfferKind.Die
             && offer.Die.Type != DieType.Tribute
-            && dice.Count >= DiceCapacity
-            && !HasDiceOfType(DieType.BloodPactCaptain))
+            && dice.Count >= DiceCapacity)
         {
             return "骰袋已满";
         }
@@ -10760,18 +10695,13 @@ public sealed class DiceKingDemo : MonoBehaviour
         Die selectedDie = dice[soldIndex];
         int sell = SellPrice(selectedDie);
         string soldName = DieDisplayName(selectedDie);
-        bool hadCrewPirate = HasCrewPirateSellSource(selectedDie);
         int diceCountBefore = dice.Count;
         dice.RemoveAt(soldIndex);
         string marketEffectText = ResolvePigMarketActionEffects(MarketActionKind.SellDie, selectedDie, soldIndex);
-        marketEffectText += ResolveCrewPirateSellEffect(hadCrewPirate);
+        marketEffectText += ResolvePopulationSale(selectedDie);
         marketEffectText += ResolveEmptyHoldTransition(diceCountBefore, dice.Count, "主动卖出");
         string treasureText = AddGoldIncome(sell, "卖出" + soldName, true);
         marketEffectText += treasureText;
-        if (selectedDie.Type == DieType.TributePig)
-        {
-            marketEffectText += ResolveDevour(selectedDie, "贡猪奉献", false);
-        }
         AddLog("卖出 " + soldName + "，+" + sell + " 金币。" + marketEffectText);
         selectedMarketDieIndex = dice.Count > 0 ? Mathf.Clamp(soldIndex, 0, dice.Count - 1) : -1;
         rewardBanner = "卖出骰子，骰袋 " + dice.Count + " / " + DiceCapacity + "。" + marketEffectText;
@@ -10797,11 +10727,10 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         currentMarketBlackMarketRefreshDiscount = 0;
-        string blackSailText = ResolveBlackSailRefreshDevours();
         currentMarketPaidRefreshCount++;
         BuildMarketOffers(true);
         string refreshDeltaText = refreshCost > 0 ? "-" + refreshCost + " 金币" : refreshCost < 0 ? "+" + (-refreshCost) + " 金币" : "免费";
-        rewardBanner = "刷新货架，" + refreshDeltaText + "。下次刷新 " + CurrentMarketRefreshNetCost(chapterMarket) + " 金。" + blackSailText + refreshGoldText;
+        rewardBanner = "刷新货架，" + refreshDeltaText + "。下次刷新 " + CurrentMarketRefreshNetCost(chapterMarket) + " 金。" + refreshGoldText;
         SaveRun();
     }
 
@@ -10892,12 +10821,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         return count;
     }
 
-    private HashSet<int> PickMarketSpellShelfIndices(int tributeSlot)
+    private HashSet<int> PickMarketSpellShelfIndices(int tributeCount)
     {
         List<int> availableSlots = new List<int>();
         for (int i = 0; i < 3; i++)
         {
-            if (i != tributeSlot)
+            if (i >= tributeCount)
             {
                 availableSlots.Add(i);
             }
@@ -11168,11 +11097,10 @@ public sealed class DiceKingDemo : MonoBehaviour
             {
                 if (die.Faces[faceIndex] == snapshotMaximum)
                 {
-                    die.Faces[faceIndex]--;
+                    die.Faces[faceIndex] = SaturatingRoundInt((long)die.Faces[faceIndex] - 1);
                 }
             }
 
-            Array.Sort(die.Faces);
             die.RoundNote = AppendNote(die.RoundNote, "削峰-1");
             processedDice++;
         }
@@ -11713,7 +11641,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         string feedHud = "骰袋 " + dice.Count + " / " + DiceCapacity + "   刷新 " + CurrentMarketRefreshNetCost(chapterMarket) + " 金";
         if (UsesV02CoreFamiliesMarketPool())
         {
-            feedHud += "   四族 + 中立 + 双阵营正式池";
+            feedHud += "   四家族与中立 · 三十骰";
         }
         if (v02PigFamilyMarketOnly)
         {
@@ -11731,17 +11659,13 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             feedHud += "   中立测试池";
         }
-        if (v02DualFamilyMarketOnly)
-        {
-            feedHud += "   双阵营测试池";
-        }
         if (currentMarketBlackMarketRefreshDiscount > 0)
         {
             feedHud += "   黑市折扣 -" + currentMarketBlackMarketRefreshDiscount;
         }
-        if (v02DevilFamilyMarketOnly || TavernMinimumValue() > 1)
+        if (v02DevilFamilyMarketOnly || tavernBaseMinimumBonus > 0 || marketTemporaryMinimumBonus > 0)
         {
-            feedHud += "   市场最低点 " + TavernMinimumValue() + " 本轮+" + Mathf.Max(0, tavernBaseMinimumBonus) + "/本市场+" + Mathf.Max(0, marketTemporaryMinimumBonus);
+            feedHud += "   货架六面 整局+" + Mathf.Max(0, tavernBaseMinimumBonus) + "/本店+" + Mathf.Max(0, marketTemporaryMinimumBonus);
             if (v02DevilFamilyMarketOnly)
             {
                 feedHud += "   恶魔测试池";
@@ -11835,13 +11759,11 @@ public sealed class DiceKingDemo : MonoBehaviour
         DrawStandardLabel(new Rect(528f, 158f, 300f, 30f), "本次货架", headerStyle);
         if (dice.Count >= DiceCapacity)
         {
-            string fullBagHint = HasDiceOfType(DieType.BloodPactCaptain)
-                ? "骰袋已满：血契可买骰吞噬"
-                : v02DevilFamilyMarketOnly
-                ? "骰袋已满：贡品仍可奉献"
-                : affixFeatureEnabled
+            string fullBagHint = marketOffers.Exists(o => o != null && o.Die != null && o.Die.Type == DieType.Tribute && CanBuyMarketOffer(o))
+                ? "骰袋已满：祭品仍可奉献"
+                : marketOffers.Exists(o => o != null && o.Kind == MarketOfferKind.CraftingItem && CanBuyMarketOffer(o))
                 ? "骰袋已满：仍可买改造道具"
-                : spellSystemEnabled
+                : marketOffers.Exists(o => o != null && o.Kind == MarketOfferKind.Spell && CanBuyMarketOffer(o))
                 ? "骰袋已满：骰子受阻，法术仍可购买"
                 : "骰袋已满：卖一颗再买";
             DrawStandardLabel(new Rect(832f, 162f, 360f, 24f), fullBagHint, smallStyle);
@@ -11869,7 +11791,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             DrawStandardLabel(
                 new Rect(528f, 526f, 666f, 52f),
-                "三格混合货架：每次进店或付费刷新保证出现 1 张法术牌，并按配置概率出现第 2 张。",
+                spellMarketMaximumShelves == 0 ? "当前暂停法术上架，已持有的法术仍可使用。" : "骰子与法术共用货架，法术装入独立法术袋。",
                 tinyStyle);
         }
 
@@ -11883,17 +11805,15 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
         GUI.enabled = true;
         string refreshHint = UsesV02CoreFamiliesMarketPool()
-            ? "正式池：四族核心 + 中立 + 双阵营；贡品仅由深渊生成"
+            ? "四家族与中立共三十骰。祭品仅由深渊生成"
             : v02TurtleAttachmentMarketOnly
-            ? "龟龟测试：法术混合货架 + 20 骰专池"
-            : v02DualFamilyMarketOnly
-            ? "双阵营测试：九颗融合骰"
+            ? "龟专池 · 六颗吸附龟"
             : v02PigFamilyMarketOnly
             ? "猪猪测试：刷新递增 +" + marketRefreshCostStep
             : v02DevilFamilyMarketOnly
-            ? (HasDiceOfType(DieType.AbyssSummon) ? "恶魔测试：深渊固定 1 贡品，购买留空" : "恶魔测试：五骰池，购买留空")
+            ? "恶魔专池 · 深渊进店生成 1–3 颗祭品"
             : v02PirateFamilyMarketOnly
-            ? "海盗测试：刷新海盗每颗 -1，可返利"
+            ? "海盗测试：每颗哨兵使刷新费 -1，可返金"
             : marketTestRandomRefresh
             ? "测试随机：全池骰子"
             : (marketRule.HighTierPityRefreshes > 0 ? "高阶保底 " + marketRefreshesWithoutHighTier + " / " + marketRule.HighTierPityRefreshes : "刷新后替换全部货架");
@@ -12053,11 +11973,6 @@ public sealed class DiceKingDemo : MonoBehaviour
             return true;
         }
 
-        if (die.Type == DieType.RobberyPirate)
-        {
-            return true;
-        }
-
         if (die.Type == DieType.ClearancePig)
         {
             return true;
@@ -12077,8 +11992,6 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             case DieType.DemonBat:
                 return "第 " + (dieIndex + 1) + " 位 " + ResolveDemonBatLeaveDevour(die);
-            case DieType.RobberyPirate:
-                return "第 " + (dieIndex + 1) + " 位 " + ResolveRobberyPirateLeaveSteal(die);
             case DieType.ClearancePig:
                 return "第 " + (dieIndex + 1) + " 位 " + ResolveClearancePigLeaveFeed(die);
         }
@@ -12261,7 +12174,6 @@ public sealed class DiceKingDemo : MonoBehaviour
             runaway.RoundNote = AppendNote(runaway.RoundNote, "出走得领路龟");
             MarkTypeTriggered(runaway);
             Die guide = NewDie(DefaultName(DieType.GuideTurtle), DieType.GuideTurtle, DefaultFaces(DieType.GuideTurtle));
-            ApplyCurrentTavernMinimum(guide);
             ResetRoundState(guide);
             dice.Add(guide);
             generatedCount++;
@@ -12316,7 +12228,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             stageIndex++;
             rewardBanner = string.Empty;
-            SaveRun();
+            mode = GameMode.Run;
             StartEncounter();
             if (!string.IsNullOrEmpty(leaveFeedback))
             {
@@ -13729,56 +13641,23 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             return DiceVisualProfile.Balanced;
         }
-
-        DieType type = die.Temporary ? DieType.MoneyTurtle : die.Type;
-        if (IsAnyTurtleFamilyType(type))
+        if (die.Temporary)
         {
             return DiceVisualProfile.Turtle;
         }
 
-        switch (type)
+        switch (MainFamilyForType(die.Type))
         {
-            case DieType.MoneyTurtle:
-            case DieType.TinyTurtle:
-            case DieType.DoubleTurtle:
-            case DieType.LuckyTurtle:
-            case DieType.MagnetTurtle:
-            case DieType.RallyTurtle:
-            case DieType.PackTurtle:
-            case DieType.SharedFeastDemonTurtle:
-            case DieType.SafetyNetTurtle:
+            case MainFamily.Turtle:
                 return DiceVisualProfile.Turtle;
-            case DieType.PigFarmer:
-            case DieType.MeatPig:
-            case DieType.TradePig:
-            case DieType.SowPig:
-            case DieType.ThreeLittlePigs:
-            case DieType.GreedyPig:
-            case DieType.FeedWholesaler:
-            case DieType.RefreshPirate:
-            case DieType.PlunderPirate:
-            case DieType.CrewPirate:
-            case DieType.PirateCaptain:
-            case DieType.TrainingPirate:
-            case DieType.TreasurePirate:
-            case DieType.RobberyPirate:
-            case DieType.PirateKing:
-            case DieType.ClearancePig:
-            case DieType.SupplyPig:
+            case MainFamily.Pig:
+            case MainFamily.Pirate:
                 return DiceVisualProfile.Gold;
-            case DieType.Imp:
-            case DieType.Devourer:
-            case DieType.Demon:
-            case DieType.DemonBat:
-            case DieType.AbyssSummon:
-            case DieType.BlackSailBat:
-            case DieType.TributePig:
-            case DieType.BlackMarketImp:
-            case DieType.BloodPactCaptain:
+            case MainFamily.Devil:
                 return DiceVisualProfile.Burst;
+            default:
+                return DiceVisualProfile.Balanced;
         }
-
-        return DiceVisualProfile.Balanced;
     }
 
     private float DiceVisualProfileSpeed(DiceVisualProfile profile)
@@ -14339,14 +14218,15 @@ public sealed class DiceKingDemo : MonoBehaviour
         DrawTooltipTypeCore(typeCoreRect, model.Die, alpha);
 
         DrawLedRoleText(
-            new Rect(panelRect.x + 84f, panelRect.y + 4f, panelRect.width - 104f, 44f),
+            new Rect(panelRect.x + 84f, panelRect.y + 12f, panelRect.width - 104f, 34f),
             model.DisplayName,
             MainGameLedFont.TextRole.PrimaryAmber,
             TextAnchor.MiddleLeft,
             alpha);
 
-        Rect triggerRect = new Rect(panelRect.x + panelRect.width - 88f, panelRect.y + 51f, 66f, 21f);
         bool showTrigger = !string.IsNullOrEmpty(model.TriggerLabel);
+        float triggerWidth = showTrigger ? Mathf.Max(66f, model.TriggerLabel.Length * 18f + 10f) : 0f;
+        Rect triggerRect = new Rect(panelRect.xMax - 22f - triggerWidth, panelRect.y + 51f, triggerWidth, 21f);
         if (showTrigger)
         {
             DrawTooltipChip(triggerRect, model.TriggerLabel, new Color(0.76f, 0.34f, 0.22f), alpha);
@@ -14752,6 +14632,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         style.fontStyle = FontStyle.Bold;
         style.normal.textColor = new Color(0.9f, 0.84f, 0.68f, alpha);
         style.alignment = TextAnchor.MiddleCenter;
+        style.wordWrap = false;
         style.clipping = TextClipping.Clip;
         DrawStandardLabel(InsetRect(rect, 3f, 1f), text, style);
     }
@@ -14796,9 +14677,13 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void DrawTooltipEconomyRow(Rect rect, DiceTooltipViewModel model, float alpha)
     {
-        string text = model.ShowBuyPrice
-            ? "买 " + model.BuyPrice.ToString(CultureInfo.InvariantCulture) + "    预计卖 " + model.SellPrice.ToString(CultureInfo.InvariantCulture)
-            : "当前卖出 " + model.SellPrice.ToString(CultureInfo.InvariantCulture);
+        string text = "当前卖出 " + model.SellPrice.ToString(CultureInfo.InvariantCulture);
+        if (model.ShowBuyPrice)
+        {
+            text = model.ShowSellPrice
+                ? "买 " + model.BuyPrice + "    预计卖 " + model.SellPrice
+                : "奉献 " + model.BuyPrice + " 金";
+        }
         DrawRect(rect, new Color(0.07f, 0.105f, 0.115f, alpha * 0.92f));
         DrawBorder(rect, new Color(0.88f, 0.56f, 0.18f, alpha * 0.88f), 1f);
         DrawTooltipArcadeText(
@@ -14908,7 +14793,8 @@ public sealed class DiceKingDemo : MonoBehaviour
             Die = die,
             Context = context,
             BuyPrice = Mathf.Max(0, buyPrice),
-            SellPrice = die != null ? SellPrice(die) : 0,
+            SellPrice = die != null && context == DiceTooltipContext.MarketOffer && IsV02PirateFamilyMarketType(die.Type)
+                ? Mathf.Max(0, buyPrice) : die != null ? SellPrice(die) : 0,
             DisplayName = TooltipDisplayName(die),
             TriggerLabel = die != null ? TooltipTriggerLabel(die.Type) : string.Empty
         };
@@ -14932,7 +14818,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (model.FamilyLabels.Count == 0)
         {
-            model.FamilyLabels.Add("中立");
+            model.FamilyLabels.Add(IsV02NeutralFamilyMarketType(die.Type) ? "中立" : "无家族");
         }
 
         PopulateTooltipEffectiveFaces(model, die);
@@ -14949,6 +14835,12 @@ public sealed class DiceKingDemo : MonoBehaviour
             model.StateRows.Add(feedText);
         }
 
+        if (context == DiceTooltipContext.MarketOffer && marketTemporaryMinimumBonus > 0)
+        {
+            string effect = die.Type == DieType.Tribute ? "奉献时计入" : "吞噬计入，购入移除";
+            model.StateRows.Add("本店各面 +" + marketTemporaryMinimumBonus + "（" + effect + "）");
+        }
+        if (die.Type == DieType.CrewPirate) model.StateRows.Add("售出进度 " + die.CrewSaleProgress + "/2");
         string devourText = DevourStateText(die);
         bool hasDevourState = !string.IsNullOrEmpty(devourText);
         if (hasDevourState)
@@ -14960,18 +14852,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         bool hasShellState = !string.IsNullOrEmpty(turtleAttachmentText);
         if (hasShellState)
         {
-            model.StateRows.Add(TooltipFirstLine(turtleAttachmentText));
-            int guideCharge = TurtleAttachmentStateValue(die, DieType.GuideTurtle);
-            int curseCharge = TurtleAttachmentStateValue(die, DieType.CurseShellTurtle);
-            if (guideCharge > 0)
-            {
-                model.StateRows.Add("领路待转移 +" + guideCharge);
-            }
-            if (curseCharge > 0)
-            {
-                int curseCapacity = CountTurtleAttachmentsOfType(die, DieType.CurseShellTurtle) * 2;
-                model.StateRows.Add("咒壳充能 " + curseCharge + " / " + curseCapacity);
-            }
+            model.StateRows.Add(turtleAttachmentText);
         }
         if (die.TurtleNextSettlementBonus > 0)
         {
@@ -15003,26 +14884,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         int[] sourceFaces = die.Faces ?? new int[0];
-        int feedMinimum = die.FeedValue > 0
-            ? MinimumFaceValue(die) + Mathf.Max(0, die.FeedValue)
-            : int.MinValue;
-        bool hasLuckyTurtle = HasUnusedTurtleAttachmentOfType(die, DieType.LuckyTurtle);
-        int highestFace = HighestFaceValue(die);
         long maximumMagnitude = 0L;
         int highestValue = int.MinValue;
         int highestCount = 0;
         for (int i = 0; i < model.EffectiveFaces.Length; i++)
         {
             int value = i < sourceFaces.Length ? sourceFaces[i] : 0;
-            if (die.FeedValue > 0)
-            {
-                value = Mathf.Max(value, feedMinimum);
-            }
-            if (hasLuckyTurtle)
-            {
-                value = Mathf.Max(value, highestFace);
-            }
-
             model.EffectiveFaces[i] = value;
             maximumMagnitude = Math.Max(maximumMagnitude, Math.Abs((long)value));
             if (value > highestValue)
@@ -15213,138 +15080,63 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string TooltipTriggerLabel(DieType type)
     {
-        if (IsF018AbsorbableTurtleType(type))
-        {
-            return "离场化壳";
-        }
-
         switch (type)
         {
-            case DieType.SpellApprenticeTurtle:
-            case DieType.CloneTurtle:
-            case DieType.ElderTurtle:
-            case DieType.RotationTurtle:
-                return "结算时";
-            case DieType.ScribeTurtle:
-                return "购买法术";
-            case DieType.GrandSpellTurtle:
-                return "施放法术";
-            case DieType.RunawayTurtle:
-                return "离场后";
-            case DieType.LeaderTurtle:
-                return "吸附时";
-            case DieType.LegacyDemonTurtle:
-                return "实体离袋";
-            case DieType.EmptyHoldTurtle:
-                return "腾空时";
             case DieType.Basic:
-            case DieType.Odd:
-            case DieType.Even:
                 return "常驻";
-
-            case DieType.Piggy:
-            case DieType.Tree:
-            case DieType.Gambler:
-            case DieType.BountyGold:
-            case DieType.TopGold:
-            case DieType.LoneWitness:
-            case DieType.ParityReview:
-            case DieType.Irrigation:
-            case DieType.PointSeedTree:
-            case DieType.PatternTree:
-            case DieType.CanopyTree:
-                return "投掷时";
-
-            case DieType.MeatPig:
-            case DieType.GreedyPig:
-                return "喂养时";
-
-            case DieType.TradePig:
-            case DieType.CrewPirate:
-            case DieType.TributePig:
-                return "卖出时";
-
-            case DieType.FeedWholesaler:
-            case DieType.Demon:
             case DieType.Tribute:
-            case DieType.PirateCaptain:
-            case DieType.TrainingPirate:
-            case DieType.BloodPactCaptain:
-                return "买入时";
-
-            case DieType.Imp:
-                return "进市场";
-
-            case DieType.Devourer:
-            case DieType.BlackMarketImp:
-                return "吞噬时";
-
-            case DieType.DemonBat:
+                return "货架专用";
+            case DieType.PigFarmer:
             case DieType.RobberyPirate:
-            case DieType.ClearancePig:
-                return "离场时";
-
-            case DieType.AbyssSummon:
-            case DieType.SupplyPig:
-                return "货架生成";
-
-            case DieType.RefreshPirate:
-            case DieType.BlackSailBat:
-                return "刷新时";
-
+            case DieType.PirateKing:
+            case DieType.Duet:
+                return "结算时";
+            case DieType.MeatPig:
+                return "获得饲料";
+            case DieType.TradePig:
+            case DieType.FeedWholesaler:
+            case DieType.CrewPirate:
+                return "卖出时";
+            case DieType.SowPig:
+            case DieType.Lightfang:
+            case DieType.Enchanter:
+                return "回合结束";
+            case DieType.GreedyPig:
+                return "其他猪受喂";
             case DieType.MoneyTurtle:
             case DieType.TinyTurtle:
             case DieType.DoubleTurtle:
-            case DieType.LuckyTurtle:
-            case DieType.MagnetTurtle:
-            case DieType.RallyTurtle:
-            case DieType.PackTurtle:
-            case DieType.SharedFeastDemonTurtle:
-            case DieType.SafetyNetTurtle:
-                return string.Empty;
-
+            case DieType.Rewind:
+                return "回合开始";
+            case DieType.LeaderTurtle:
+            case DieType.CaravanTurtle:
+                return "宿主结算";
+            case DieType.BasicTurtle:
+                return "吸附时";
+            case DieType.Imp:
+            case DieType.AbyssSummon:
+                return "进入市场";
+            case DieType.DemonBat:
+                return "离开市场";
+            case DieType.Demon:
+                return "买骰时";
+            case DieType.Devourer:
+                return "吞噬完成";
+            case DieType.ProgenitorDemon:
+                return "购买恶魔";
+            case DieType.RefreshPirate:
+                return "刷新时";
             case DieType.TreasurePirate:
-            case DieType.CounterGold:
-                return "金币时";
-
-            case DieType.ParityFlipScore:
-            case DieType.ParityHoldScore:
-            case DieType.ParityTurner:
-            case DieType.PruningTree:
-            case DieType.LeadTicket:
-                return "出千时";
-
-            case DieType.Treasury:
-            case DieType.Investment:
-                return "小关始";
-
-            case DieType.CompoundInterest:
-                return "通关时";
-
+                return "获得金币";
+            case DieType.PirateCaptain:
+                return "购买海盗";
             case DieType.Crown:
-                return "回合末";
-
-            case DieType.Trigger:
-            case DieType.RootTree:
-                return "触发时";
-
-            case DieType.HandTax:
-            case DieType.HalfStep:
-            case DieType.ParityComplete:
-                return "牌型时";
-
-            case DieType.Gardener:
-                return "命中时";
-
-            case DieType.Bribe:
-            case DieType.RingTree:
-                return "结算后";
-
-            case DieType.Nest:
-                return "壳链时";
+                return "投出后";
+            case DieType.TaxCollector:
+                return "市场报价";
+            default:
+                return "";
         }
-
-        return "结算时";
     }
 
     private int EstimateTooltipRuleLineCount(string text)
@@ -15480,16 +15272,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         return keys;
     }
 
-    private string TooltipFirstLine(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
 
-        int lineBreak = text.IndexOf('\n');
-        return lineBreak >= 0 ? text.Substring(0, lineBreak) : text;
-    }
 
     private string TooltipTypeName(DieType type)
     {
@@ -15636,7 +15419,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (offer.Kind == MarketOfferKind.Empty)
         {
-            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), "已售出", cardTitleStyle);
+            DrawStandardLabel(new Rect(rect.x + 22f, rect.y + 26f, rect.width - 44f, 28f), "空货架", cardTitleStyle);
             Rect emptyIconBack = new Rect(rect.x + 52f, rect.y + 62f, 100f, 88f);
             DrawPanel(emptyIconBack, new Color(0.68f, 0.62f, 0.54f, 0.34f));
             DrawBorder(emptyIconBack, new Color(0.46f, 0.36f, 0.28f, 0.56f), 3f);
@@ -15748,7 +15531,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         if (offer.Kind == MarketOfferKind.Empty)
         {
-            return "已售出";
+            return "货架已空";
         }
 
         if (offer.Kind == MarketOfferKind.CraftingItem && !affixFeatureEnabled)
@@ -15768,21 +15551,14 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
         }
 
-        if (offer.Kind == MarketOfferKind.Die && offer.Die != null && offer.Die.Type == DieType.Tribute && dice.Count <= 0)
+        if (offer.Kind == MarketOfferKind.Die && offer.Die != null && offer.Die.Type == DieType.Tribute && FirstOfferingDemon() == null)
         {
             return "无奉献目标";
         }
 
         if (offer.Kind == MarketOfferKind.Die && offer.Die != null && offer.Die.Type != DieType.Tribute && dice.Count >= DiceCapacity)
         {
-            if (!HasDiceOfType(DieType.BloodPactCaptain))
-            {
-                return "骰袋已满";
-            }
-
-            int bloodPactPrice = CurrentOfferPrice(offer);
-            int bloodPactMissingGold = bloodPactPrice - chapterGold;
-            return bloodPactMissingGold > 0 ? "差 " + bloodPactMissingGold + " 金" : "血契吞噬 " + bloodPactPrice + " 金";
+            return "骰袋已满";
         }
 
         int price = CurrentOfferPrice(offer);
@@ -15814,195 +15590,80 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string MarketOfferBaseHint(Die die)
     {
-        switch (die.Type)
-        {
-            case DieType.Piggy:
-                return CountDiceOfType(DieType.Piggy) > 0 ? "强化经济循环" : "早买更会赚钱";
-            case DieType.PigFarmer:
-                return "结算喂左右 +2";
-            case DieType.MeatPig:
-                return "自己被喂养时翻倍";
-            case DieType.TradePig:
-                return "卖出转移喂养";
-            case DieType.SowPig:
-                return "结算全体 +1 饲";
-            case DieType.ThreeLittlePigs:
-                return "读取全队喂养得分";
-            case DieType.GreedyPig:
-                return "别人吃时自己也吃";
-            case DieType.FeedWholesaler:
-                return "买入提高喂养质量";
-            case DieType.Imp:
-                return "过关后市场最低点 +1";
-            case DieType.Devourer:
-                return "吞噬时钱包 +1 金";
-            case DieType.Demon:
-                return "购买让本市底 +1";
-            case DieType.DemonBat:
-                return "离市吞 1 个货架";
-            case DieType.AbyssSummon:
-                return "刷新固定刷贡品";
-            case DieType.Tribute:
-                return TributeOfferHint(die);
-            case DieType.RefreshPirate:
-                return "刷新净费用 -1";
-            case DieType.PlunderPirate:
-                return "结算劫左右换金币";
-            case DieType.CrewPirate:
-                return "卖 2 次招募基础骰";
-            case DieType.PirateCaptain:
-                return "海盗买价半价";
-            case DieType.TrainingPirate:
-                return "买入后练其它骰";
-            case DieType.TreasurePirate:
-                return "金币入账后成长";
-            case DieType.RobberyPirate:
-                return "离市抢 1 个货架";
-            case DieType.PirateKing:
-                return "每 3 金全部六面+1";
-            case DieType.BlackSailBat:
-                return "刷新前吞旧货架";
-            case DieType.PackTurtle:
-                return "化壳时按喂养额外加面";
-            case DieType.TributePig:
-                return "卖出后奉献自身";
-            case DieType.BlackMarketImp:
-                return "市场吞噬积刷新折扣";
-            case DieType.BloodPactCaptain:
-                return "袋满买骰直接吞噬";
-            case DieType.ClearancePig:
-                return "离市按空货架获得喂养";
-            case DieType.SupplyPig:
-                return "刷新后喂最低价货架";
-            case DieType.SharedFeastDemonTurtle:
-                return "宿主吞噬时分给右邻";
-            case DieType.SafetyNetTurtle:
-                return "喂养抬高点数时加面";
-            case DieType.Treasury:
-                return "本金越厚越稳";
-            case DieType.Bribe:
-                return "差点过关可补分";
-            case DieType.Investment:
-                return "每关自动投预算";
-            case DieType.BountyGold:
-                return "高风险目标给大钱";
-            case DieType.TopGold:
-                return "最大面稳定回金";
-            case DieType.HandTax:
-                return "牌型越好越会收";
-            case DieType.Collection:
-                return "每关先收一笔";
-            case DieType.CompoundInterest:
-                return "过关利息再放大";
-            case DieType.LeadTicket:
-                return "接出千确认收益";
-            case DieType.ShellTax:
-                return "小骰数量达标收税";
-            case DieType.CounterGold:
-                return "贴左侧收益位";
-            case DieType.LumberGold:
-                return "压左侧分换金币";
-            case DieType.Turtle:
-                return "高点启动壳链";
-            case DieType.GuideTurtle:
-                return "为同宿主下一壳 +1";
-            case DieType.MoneyTurtle:
-                return "首结 +1 金";
-            case DieType.TinyTurtle:
-                return "首结获得基础壳";
-            case DieType.DoubleTurtle:
-                return "化壳时最低面翻倍";
-            case DieType.LuckyTurtle:
-                return "每关首结按最大面";
-            case DieType.HeavyArmorTurtle:
-                return "按同宿主真壳临时加分";
-            case DieType.GreatTurtle:
-                return "首结复唱宿主本体";
-            case DieType.MagnetTurtle:
-                return "首结给其它非龟基础壳";
-            case DieType.RallyTurtle:
-                return "按其它真壳宿主加分";
-            case DieType.SpellApprenticeTurtle:
-                return "首结积下一法术折扣";
-            case DieType.ScribeTurtle:
-                return "首买法术强化下一壳";
-            case DieType.CurseShellTurtle:
-                return "施法储存下次最终点";
-            case DieType.GrandSpellTurtle:
-                return "施法为龟群充能";
-            case DieType.RunawayTurtle:
-                return "离店后生成领路龟";
-            case DieType.CloneTurtle:
-                return "每关首结自身六面+1";
-            case DieType.ElderTurtle:
-                return "按其它驻场龟加分";
-            case DieType.LeaderTurtle:
-                return "其它龟化壳时复制效果";
-            case DieType.RotationTurtle:
-                return "最终点被抬高后成长";
-            case DieType.LegacyDemonTurtle:
-                return "非出售离袋强化最低面";
-            case DieType.EmptyHoldTurtle:
-                return "满袋腾位积购买折扣";
-            case DieType.Shellsmith:
-                return "小骰越多越加分";
-            case DieType.Nest:
-                return "有龟链就补 d1";
-            case DieType.SlowTurtle:
-                return "慢壳链更长";
-            case DieType.Double:
-                return "直接提高单骰分";
-            case DieType.Odd:
-                return CountDiceOfType(DieType.Odd) >= 2 ? "补强全奇路线" : "开启奇数组合";
-            case DieType.Even:
-                return CountDiceOfType(DieType.Even) >= 2 ? "补强全偶路线" : "开启偶数组合";
-            case DieType.LoneWitness:
-                return "落单时自己重摇";
-            case DieType.Stamp:
-                return "同点伙伴给 6 分";
-            case DieType.HalfStep:
-                return "低一格补顺子";
-            case DieType.Track:
-                return "2/4/6 齐备给 8 分";
-            case DieType.ParityNeighborDiff:
-                return "左邻不同给 6 分";
-            case DieType.ParityNeighborSame:
-                return "左邻相同给 6 分";
-            case DieType.ParityComplete:
-                return "补全全奇全偶";
-            case DieType.ParityReview:
-                return "破坏全奇全偶会重摇";
-            case DieType.ParityFlipScore:
-                return "出千变号给 8 分";
-            case DieType.ParityHoldScore:
-                return "出千守号给 6 分";
-            case DieType.ParityTurner:
-                return "出千改点变号";
-            case DieType.Tree:
-                return "长期成长，早买更赚";
-            case DieType.Gardener:
-                return "大树命中额外成长";
-            case DieType.Irrigation:
-                return "掷中目标也能浇树";
-            case DieType.PointSeedTree:
-                return "命中指定点成长";
-            case DieType.PatternTree:
-                return "成指定牌型成长";
-            case DieType.CanopyTree:
-                return "掷最高面成长";
-            case DieType.RingTree:
-                return "每次出手慢养";
-            case DieType.FertilizerTree:
-                return "金币越多长越快";
-            case DieType.PruningTree:
-                return "出千变好成长";
-            case DieType.RootTree:
-                return "贴触发骰旁成长";
-            case DieType.Gambler:
-                return "高波动爆发骰";
-        }
+        return MarketDieEffectHint(die.Type);
+    }
 
-        return dice.Count < DiceCapacity ? "便宜补位" : "低价替换材料";
+    private static string MarketDieEffectHint(DieType type)
+    {
+        switch (type)
+        {
+            case DieType.Basic:
+                return "按本手点数计分";
+            case DieType.Tribute:
+                return "专供恶魔吞噬";
+            case DieType.PigFarmer:
+                return "左右邻骰各喂 1 份";
+            case DieType.MeatPig:
+                return "自身所得饲料翻倍";
+            case DieType.TradePig:
+                return "卖出转移全部饲料";
+            case DieType.SowPig:
+                return "回合末喂养其它骰";
+            case DieType.GreedyPig:
+                return "其他猪受喂时跟 1 份";
+            case DieType.FeedWholesaler:
+                return "卖出提高饲料强度";
+            case DieType.MoneyTurtle:
+                return "宿主每回合赚 1 金";
+            case DieType.TinyTurtle:
+                return "宿主每回合六面 +1";
+            case DieType.DoubleTurtle:
+                return "宿主每回合所有最高面翻倍";
+            case DieType.LeaderTurtle:
+                return "其他宿主每只壳加 1 分";
+            case DieType.CaravanTurtle:
+                return "宿主结算再挂 1 只基础龟";
+            case DieType.BasicTurtle:
+                return "初始六面全 1，卖价 1";
+            case DieType.Imp:
+                return "进店让货架六面永久 +1";
+            case DieType.DemonBat:
+                return "离店让其它恶魔吞噬";
+            case DieType.Demon:
+                return "每买骰本店货架六面 +2";
+            case DieType.AbyssSummon:
+                return "进店生成 1–3 颗祭品";
+            case DieType.Devourer:
+                return "每次吞噬赚 1 金";
+            case DieType.ProgenitorDemon:
+                return "买恶魔时吞噬货架骰";
+            case DieType.RefreshPirate:
+                return "刷新费 −1，可返金";
+            case DieType.RobberyPirate:
+                return "夺左右本手点数，抢到邻骰时获 3 金";
+            case DieType.TreasurePirate:
+                return "金币入账随机骰六面 +1";
+            case DieType.PirateKing:
+                return "每 3 金自身六面 +1";
+            case DieType.PirateCaptain:
+                return "每次进店可半价买 1 颗海盗，刷新不会恢复半价";
+            case DieType.CrewPirate:
+                return "每卖 2 颗骰得 1 金";
+            case DieType.Lightfang:
+                return "回合末每种家族全袋六面 +2";
+            case DieType.Crown:
+                return "随机两骰取各自最高面";
+            case DieType.Enchanter:
+                return "回合结束效果触发两次";
+            case DieType.TaxCollector:
+                return "每件骰商品减 1 金";
+            case DieType.Rewind:
+                return "回合开始效果触发两次";
+            case DieType.Duet:
+                return "所有己方骰的结算效果共触发两次，基础分只记一次。";
+            default:
+                return "";
+        }
     }
 
     private bool DrawDieCard(Rect rect, Die die)
@@ -18106,7 +17767,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         ResetRun("王室骰袋", "当前骰袋容量上限 6，关间市场负责买卖调整。");
         LoadRunCollection();
         LoadCraftingItemInventory();
-        if (dice.Count == 0)
+        bool savedMarket = PlayerPrefs.HasKey(SavePrefix + "Market");
+        if (dice.Count == 0 && !savedMarket)
         {
             AddStarterDiceBag();
         }
@@ -18125,6 +17787,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         pendingSpellBountyCount = Mathf.Max(0, savedPendingSpellBountyCount);
         marketTemporaryMinimumBonus = 0;
         suppressSave = false;
+        if (savedMarket && RestoreMarketCheckpoint()) return;
+        if (dice.Count == 0) AddStarterDiceBag();
         if (savedStageContinuation)
         {
             ResumeEncounterContinuation(savedCurrentScore, savedStageStartGold, savedStageInvestmentGold);
@@ -18138,25 +17802,21 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void LoadMenuState()
     {
-        hasSave = PlayerPrefs.GetInt(SavePrefix + "HasSave", 0) == 1;
-        if (hasSave && !HasCurrentRunSaveVersion())
-        {
-            ClearSave();
-            hasSave = false;
-        }
+        hasSave = HasCurrentRunSaveVersion();
+        hasLegacyRun = PlayerPrefs.GetInt(SettingsPrefix + "HasSave", 0) == 1;
 
-        seenOpening = PlayerPrefs.GetInt(SavePrefix + "SeenOpening", 0) == 1;
-        settingsVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(SavePrefix + "Volume", 1f));
-        settlementPlaybackSpeed = NormalizeSettlementPlaybackSpeed(PlayerPrefs.GetFloat(SavePrefix + "SettlementPlaybackSpeed", 1f));
+        seenOpening = PlayerPrefs.GetInt(SettingsPrefix + "SeenOpening", 0) == 1;
+        settingsVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(SettingsPrefix + "Volume", 1f));
+        settlementPlaybackSpeed = NormalizeSettlementPlaybackSpeed(PlayerPrefs.GetFloat(SettingsPrefix + "SettlementPlaybackSpeed", 1f));
         CaptureDesktopResolution();
-        if (PlayerPrefs.HasKey(SavePrefix + "DisplayMode"))
+        if (PlayerPrefs.HasKey(SettingsPrefix + "DisplayMode"))
         {
-            int savedDisplayMode = PlayerPrefs.GetInt(SavePrefix + "DisplayMode", (int)DisplayModeSetting.BorderlessFullscreen);
+            int savedDisplayMode = PlayerPrefs.GetInt(SettingsPrefix + "DisplayMode", (int)DisplayModeSetting.BorderlessFullscreen);
             displayMode = (DisplayModeSetting)Mathf.Clamp(savedDisplayMode, (int)DisplayModeSetting.Windowed, (int)DisplayModeSetting.ExclusiveFullscreen);
         }
-        else if (PlayerPrefs.HasKey(SavePrefix + "Windowed"))
+        else if (PlayerPrefs.HasKey(SettingsPrefix + "Windowed"))
         {
-            displayMode = PlayerPrefs.GetInt(SavePrefix + "Windowed", 0) == 1
+            displayMode = PlayerPrefs.GetInt(SettingsPrefix + "Windowed", 0) == 1
                 ? DisplayModeSetting.Windowed
                 : DisplayModeSetting.BorderlessFullscreen;
         }
@@ -18165,14 +17825,14 @@ public sealed class DiceKingDemo : MonoBehaviour
             displayMode = DisplayModeSetting.BorderlessFullscreen;
         }
 
-        windowWidth = Mathf.Max(640, PlayerPrefs.GetInt(SavePrefix + "WindowWidth", DefaultWindowWidth));
-        windowHeight = Mathf.Max(360, PlayerPrefs.GetInt(SavePrefix + "WindowHeight", DefaultWindowHeight));
-        exclusiveFullscreenWidth = Mathf.Max(1, PlayerPrefs.GetInt(SavePrefix + "ExclusiveFullscreenWidth", desktopWidth));
-        exclusiveFullscreenHeight = Mathf.Max(1, PlayerPrefs.GetInt(SavePrefix + "ExclusiveFullscreenHeight", desktopHeight));
-        windowMaximized = PlayerPrefs.GetInt(SavePrefix + "WindowMaximized", 0) == 1;
-        menuLampFlickerUserEnabled = PlayerPrefs.HasKey(SavePrefix + "ReducedFlashing")
-            ? PlayerPrefs.GetInt(SavePrefix + "ReducedFlashing", 0) == 0
-            : PlayerPrefs.GetInt(SavePrefix + "MenuLampFlickerEnabled", 1) == 1;
+        windowWidth = Mathf.Max(640, PlayerPrefs.GetInt(SettingsPrefix + "WindowWidth", DefaultWindowWidth));
+        windowHeight = Mathf.Max(360, PlayerPrefs.GetInt(SettingsPrefix + "WindowHeight", DefaultWindowHeight));
+        exclusiveFullscreenWidth = Mathf.Max(1, PlayerPrefs.GetInt(SettingsPrefix + "ExclusiveFullscreenWidth", desktopWidth));
+        exclusiveFullscreenHeight = Mathf.Max(1, PlayerPrefs.GetInt(SettingsPrefix + "ExclusiveFullscreenHeight", desktopHeight));
+        windowMaximized = PlayerPrefs.GetInt(SettingsPrefix + "WindowMaximized", 0) == 1;
+        menuLampFlickerUserEnabled = PlayerPrefs.HasKey(SettingsPrefix + "ReducedFlashing")
+            ? PlayerPrefs.GetInt(SettingsPrefix + "ReducedFlashing", 0) == 0
+            : PlayerPrefs.GetInt(SettingsPrefix + "MenuLampFlickerEnabled", 1) == 1;
         AudioListener.volume = settingsVolume;
         RefreshDisplayResolutionOptions();
         ApplyDisplaySettings();
@@ -18181,24 +17841,24 @@ public sealed class DiceKingDemo : MonoBehaviour
     private bool HasCurrentRunSaveVersion()
     {
         return PlayerPrefs.GetInt(SavePrefix + "HasSave", 0) == 1
-            && PlayerPrefs.GetInt(SavePrefix + "SaveVersion", 0) >= CurrentSaveVersion;
+            && PlayerPrefs.GetInt(SavePrefix + "SaveVersion", 0) == CurrentSaveVersion;
     }
 
     private void SaveMenuState()
     {
         CaptureNativeWindowedState();
-        PlayerPrefs.SetInt(SavePrefix + "SeenOpening", seenOpening ? 1 : 0);
-        PlayerPrefs.SetFloat(SavePrefix + "Volume", settingsVolume);
-        PlayerPrefs.SetFloat(SavePrefix + "SettlementPlaybackSpeed", NormalizeSettlementPlaybackSpeed(settlementPlaybackSpeed));
-        PlayerPrefs.SetInt(SavePrefix + "DisplayMode", (int)displayMode);
-        PlayerPrefs.SetInt(SavePrefix + "WindowWidth", Mathf.Max(1, windowWidth));
-        PlayerPrefs.SetInt(SavePrefix + "WindowHeight", Mathf.Max(1, windowHeight));
-        PlayerPrefs.SetInt(SavePrefix + "ExclusiveFullscreenWidth", Mathf.Max(1, exclusiveFullscreenWidth));
-        PlayerPrefs.SetInt(SavePrefix + "ExclusiveFullscreenHeight", Mathf.Max(1, exclusiveFullscreenHeight));
-        PlayerPrefs.SetInt(SavePrefix + "WindowMaximized", windowMaximized ? 1 : 0);
-        PlayerPrefs.SetInt(SavePrefix + "Windowed", displayMode == DisplayModeSetting.Windowed ? 1 : 0);
-        PlayerPrefs.SetInt(SavePrefix + "MenuLampFlickerEnabled", menuLampFlickerUserEnabled ? 1 : 0);
-        PlayerPrefs.SetInt(SavePrefix + "ReducedFlashing", menuLampFlickerUserEnabled ? 0 : 1);
+        PlayerPrefs.SetInt(SettingsPrefix + "SeenOpening", seenOpening ? 1 : 0);
+        PlayerPrefs.SetFloat(SettingsPrefix + "Volume", settingsVolume);
+        PlayerPrefs.SetFloat(SettingsPrefix + "SettlementPlaybackSpeed", NormalizeSettlementPlaybackSpeed(settlementPlaybackSpeed));
+        PlayerPrefs.SetInt(SettingsPrefix + "DisplayMode", (int)displayMode);
+        PlayerPrefs.SetInt(SettingsPrefix + "WindowWidth", Mathf.Max(1, windowWidth));
+        PlayerPrefs.SetInt(SettingsPrefix + "WindowHeight", Mathf.Max(1, windowHeight));
+        PlayerPrefs.SetInt(SettingsPrefix + "ExclusiveFullscreenWidth", Mathf.Max(1, exclusiveFullscreenWidth));
+        PlayerPrefs.SetInt(SettingsPrefix + "ExclusiveFullscreenHeight", Mathf.Max(1, exclusiveFullscreenHeight));
+        PlayerPrefs.SetInt(SettingsPrefix + "WindowMaximized", windowMaximized ? 1 : 0);
+        PlayerPrefs.SetInt(SettingsPrefix + "Windowed", displayMode == DisplayModeSetting.Windowed ? 1 : 0);
+        PlayerPrefs.SetInt(SettingsPrefix + "MenuLampFlickerEnabled", menuLampFlickerUserEnabled ? 1 : 0);
+        PlayerPrefs.SetInt(SettingsPrefix + "ReducedFlashing", menuLampFlickerUserEnabled ? 0 : 1);
         AudioListener.volume = settingsVolume;
         PlayerPrefs.Save();
     }
@@ -18230,11 +17890,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         PlayerPrefs.SetInt(SavePrefix + "PendingSpellDividendCount", Mathf.Max(0, pendingSpellDividendCount));
         PlayerPrefs.SetString(SavePrefix + "PendingSpellEchoDieIds", SerializePendingSpellEchoDieIds());
         PlayerPrefs.SetInt(SavePrefix + "PendingSpellBountyCount", Mathf.Max(0, pendingSpellBountyCount));
-        PlayerPrefs.SetInt(SavePrefix + "SeenOpening", seenOpening ? 1 : 0);
+        PlayerPrefs.SetInt(SettingsPrefix + "SeenOpening", seenOpening ? 1 : 0);
         PlayerPrefs.SetString(SavePrefix + "DiceData", SerializeDice());
         PlayerPrefs.SetInt(SavePrefix + "AffixAddStone", affixAddStoneCount);
         PlayerPrefs.SetInt(SavePrefix + "AffixRemoveStone", affixRemoveStoneCount);
         PlayerPrefs.SetInt(SavePrefix + "AffixReplaceStone", affixReplaceStoneCount);
+        SaveMarketCheckpoint();
         PlayerPrefs.Save();
     }
 
@@ -18249,6 +17910,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         PlayerPrefs.SetInt(SavePrefix + "HasSave", 0);
         PlayerPrefs.DeleteKey(SavePrefix + "SaveVersion");
         PlayerPrefs.DeleteKey(SavePrefix + "DiceData");
+        PlayerPrefs.DeleteKey(SavePrefix + "Market");
         PlayerPrefs.DeleteKey(SavePrefix + "StageIndex");
         PlayerPrefs.DeleteKey(SavePrefix + "Gold");
         PlayerPrefs.DeleteKey(SavePrefix + "RemainingLives");
@@ -18396,6 +18058,8 @@ public sealed class DiceKingDemo : MonoBehaviour
             data.Append(die.TurtleMarketTriggered ? 1 : 0);
             data.Append("~");
             data.Append(Mathf.Max(0, die.TurtleNextSettlementBonus));
+            data.Append("~").Append(die.CrewSaleProgress);
+            data.Append("~").Append(die.Id);
         }
 
         return data.ToString();
@@ -18478,6 +18142,14 @@ public sealed class DiceKingDemo : MonoBehaviour
             die.TurtleStageTriggered = turtleStageTriggered == 1;
             die.TurtleMarketTriggered = turtleMarketTriggered == 1;
             die.TurtleNextSettlementBonus = Mathf.Max(0, turtleNextSettlementBonus);
+            int savedProgress, savedId;
+            if (fields.Length > 19 && int.TryParse(fields[19], out savedProgress))
+                die.CrewSaleProgress = Mathf.Clamp(savedProgress, 0, 1);
+            if (fields.Length > 20 && int.TryParse(fields[20], out savedId) && savedId > 0 && FindDieById(savedId) == null)
+            {
+                die.Id = savedId;
+                nextDieId = Mathf.Max(nextDieId, savedId + 1);
+            }
             die.PrefixAffixes = fields.Length > 5 ? ParseAffixes(fields[5], AffixSlot.Prefix) : new List<AffixInstance>();
             die.SuffixAffixes = fields.Length > 6 ? ParseAffixes(fields[6], AffixSlot.Suffix) : new List<AffixInstance>();
             dice.Add(die);
@@ -18857,7 +18529,6 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
         }
 
-        Array.Sort(faces);
         return faces;
     }
 
@@ -18884,7 +18555,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         for (int i = 0; i < DiceCapacity; i++)
         {
-            AddDie(NewDie("基础骰", DieType.Basic, new int[] { 1, 2, 3, 4, 5, 6 }));
+            AddDie(NewDie(DefaultName(DieType.Basic), DieType.Basic, DefaultFaces(DieType.Basic)));
         }
     }
 
@@ -18913,7 +18584,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         affixRemoveStoneCount = 0;
         affixReplaceStoneCount = 0;
         currentMarketPaidRefreshCount = 0;
-        currentMarketPirateSellCount = 0;
+        pirateDiscountUsed = false;
         feedQuality = Mathf.Max(1, feedQualityStart);
         tavernBaseMinimumBonus = 0;
         marketTemporaryMinimumBonus = 0;
@@ -19185,6 +18856,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             AssignRoundTarget(dice[i]);
         }
 
+        ApplyRoundStartEffects();
         BeginDiceVisualRoll();
         rollPhase = RollPhase.Shaking;
         AddLog(activeRollFeedbackConfig.InputWindowDuration > 0f
@@ -19324,6 +18996,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         ApplyLoneWitnessRerolls();
         ApplyParityReviewRerolls();
+        ApplyCrownRollResults();
         scoringDice.Clear();
         scoringDice.AddRange(dice);
         RefreshHandPreview();
@@ -19904,7 +19577,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         pendingTreeGrowth.Clear();
         int scoreBeforeSettle = currentScore;
         int rollScore = ScoreDice();
-        resolvedScore = scoreBeforeSettle + rollScore;
+        resolvedScore = SaturatingRoundInt((long)scoreBeforeSettle + rollScore);
         CaptureCommittedRunScoreCounter(scoreBeforeSettle, rollScore, resolvedScore);
         PrepareRunScoreCounterAnimation(scoreBeforeSettle);
         settlementImpactPresentationActive = ShouldUseSettlementImpactPresentation();
@@ -20250,7 +19923,6 @@ public sealed class DiceKingDemo : MonoBehaviour
             : die.Faces[UnityEngine.Random.Range(0, die.Faces.Length)];
         die.LastValue = raw;
         die.EffectiveValue = raw;
-        ApplyFeedMinimum(die);
         die.RoundNote = RoundTag(die);
     }
 
@@ -20385,27 +20057,38 @@ public sealed class DiceKingDemo : MonoBehaviour
         previewAffixScoreBonus = 0;
         for (int i = 0; i < dice.Count; i++)
         {
-            previewIndividualScore += ScoreOneDieValue(dice[i], encounter, false, previewTurtleTemporaryDieCount, straightTriggered);
             previewAffixScoreBonus += AffixScoreBonusForDie(dice[i], straightTriggered, false);
         }
 
         List<int> previewDieScores = PreviewDieScores(encounter, previewTurtleTemporaryDieCount, straightTriggered);
+        long previewTotal = 0;
+        for (int i = 0; i < previewDieScores.Count; i++)
+        {
+            previewTotal += previewDieScores[i];
+        }
+        previewIndividualScore = SaturatingRoundInt(previewTotal);
         List<int> walletScoreSnapshot = new List<int>(previewDieScores);
         previewWalletIncome = WalletIncomeForCurrentRoll(hand, previewTurtleTemporaryDieCount, walletScoreSnapshot, false, ref previewIndividualScore);
         previewRuleBonus = RuleComboBonus(hand, encounter);
         lastComboBonus = previewRuleBonus;
         lastTemporaryScore = previewTemporaryScore;
-        int baseRollScore = Mathf.RoundToInt((previewIndividualScore + previewTemporaryScore + previewRuleBonus) * lastMultiplier);
+        int baseRollScore = RoundScoreWithMultiplier((long)previewIndividualScore + previewTemporaryScore + previewRuleBonus, lastMultiplier);
         UpdateBribePreview(baseRollScore, hand, previewTurtleTemporaryDieCount, previewDieScores);
-        previewRollScore = baseRollScore + previewBribeScoreBonus + Mathf.Max(0, pendingSpellScoreBonus);
+        previewRollScore = SaturatingRoundInt((long)baseRollScore + previewBribeScoreBonus + Mathf.Max(0, pendingSpellScoreBonus));
     }
 
     private List<int> PreviewDieScores(Encounter encounter, int turtleTemporaryDieCount, bool straightTriggered)
     {
+        RoundScores roundScores = PrepareRoundScores();
+        for (int i = 0; i < dice.Count; i++)
+        {
+            ResolveRoundSlot(i, roundScores, false);
+        }
         List<int> result = new List<int>();
         for (int i = 0; i < dice.Count; i++)
         {
-            result.Add(ScoreOneDieValue(dice[i], encounter, false, turtleTemporaryDieCount, straightTriggered));
+            int baseScore = ScoreOneDieValue(dice[i], encounter, false, turtleTemporaryDieCount, straightTriggered);
+            result.Add(roundScores.Robbed[i] ? 0 : SaturatingRoundInt((long)baseScore + roundScores.ShellBonuses[i]));
         }
 
         return result;
@@ -21014,7 +20697,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         int previousRollScore = EstimateSimpleRollScore(previousValues, previousHand, encounter);
-        return currentScore + rollScore >= encounter.Target && currentScore + previousRollScore < encounter.Target;
+        return (long)currentScore + rollScore >= encounter.Target && (long)currentScore + previousRollScore < encounter.Target;
     }
 
     private List<int> CurrentHandValuesWithPreviousValue(Die changedDie)
@@ -21879,55 +21562,18 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void ApplyPigFamilySettlementEffect(Die die, int dieIndex, HashSet<int> closedSlots, bool copied)
     {
-        if (die == null || die.Temporary)
+        if (die == null || die.Temporary || die.Type != DieType.PigFarmer)
         {
             return;
         }
 
-        switch (die.Type)
+        int fed = FeedNeighbor(dieIndex - 1, 1, "喂养者", die, closedSlots, copied)
+            + FeedNeighbor(dieIndex + 1, 1, "喂养者", die, closedSlots, copied);
+        if (fed > 0)
         {
-            case DieType.PigFarmer:
-                int fed = FeedNeighbor(dieIndex - 1, 2, "养猪", die, closedSlots, copied)
-                    + FeedNeighbor(dieIndex + 1, 2, "养猪", die, closedSlots, copied);
-                if (fed > 0)
-                {
-                    die.RoundNote = AppendNote(die.RoundNote, copied ? "二重邻饲+" + fed : "邻饲+" + fed);
-                    MarkTypeTriggered(die);
-                    EmitMainFamilySettlementEvent(die, FamilySettlementEffectKind.PigFarmer, "养猪", copied, true);
-                }
-                break;
-            case DieType.SowPig:
-                int sowFed = 0;
-                for (int targetIndex = 0; targetIndex < dice.Count; targetIndex++)
-                {
-                    sowFed += GrantFeed(dice[targetIndex], 1, "母猪", die, true, closedSlots, copied);
-                }
-
-                if (sowFed > 0)
-                {
-                    die.RoundNote = AppendNote(die.RoundNote, copied ? "二重全饲+" + sowFed : "全体饲+" + sowFed);
-                    MarkTypeTriggered(die);
-                    EmitMainFamilySettlementEvent(die, FamilySettlementEffectKind.SowPig, "母猪", copied, true);
-                }
-                break;
-            case DieType.ThreeLittlePigs:
-                int bonus = TotalOtherFeedValue(die);
-                if (copied)
-                {
-                    ApplyTemporaryScoreBonus(die, bonus, "二重三猪");
-                }
-                else
-                {
-                    die.PigTemporaryScoreBonus = bonus;
-                }
-
-                if (bonus > 0)
-                {
-                    die.RoundNote = AppendNote(die.RoundNote, copied ? "二重三猪 +" + bonus : "三猪 +" + bonus);
-                    MarkTypeTriggered(die);
-                    EmitMainFamilySettlementEvent(die, FamilySettlementEffectKind.ThreeLittlePigs, "三只小猪", copied, true);
-                }
-                break;
+            die.RoundNote = AppendNote(die.RoundNote, "邻饲+" + fed);
+            MarkTypeTriggered(die);
+            EmitMainFamilySettlementEvent(die, FamilySettlementEffectKind.PigFarmer, "喂养者", copied, true);
         }
     }
 
@@ -21941,7 +21587,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         return GrantFeed(dice[index], units, sourceLabel, source, true, closedSlots, copied);
     }
 
-    private int GrantFeed(Die target, int units, string sourceLabel, Die source, bool notifyGreedyPigs, HashSet<int> closedSlots, bool copied)
+    private int GrantFeed(Die target, int units, string sourceLabel, Die source, bool notifyGreedyPigs, HashSet<int> closedSlots, bool copied, int transferredValue = -1)
     {
         if (target == null || target.Temporary || units <= 0)
         {
@@ -21953,7 +21599,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         bool doubled = target.Type == DieType.MeatPig;
         if (doubled)
         {
-            effectiveUnits *= 2;
+            effectiveUnits = SaturatingRoundInt((long)effectiveUnits * 2);
         }
 
         if (effectiveUnits <= 0)
@@ -21962,10 +21608,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         int quality = Mathf.Max(1, feedQuality);
-        int valueGain = effectiveUnits * quality;
-        target.FeedCount += effectiveUnits;
-        target.FeedValue += valueGain;
-        ApplyFeedMinimumIfOpen(target, closedSlots);
+        int valueGain = transferredValue >= 0
+            ? SaturatingRoundInt((long)transferredValue * (doubled ? 2 : 1))
+            : SaturatingRoundInt((long)effectiveUnits * quality);
+        target.FeedCount = SaturatingRoundInt((long)target.FeedCount + effectiveUnits);
+        target.FeedValue = SaturatingRoundInt((long)target.FeedValue + valueGain);
+        AddValueToAllFaces(target, valueGain);
 
         string note = FeedGainNote(sourceLabel, effectiveUnits, valueGain, doubled);
         if (doubled)
@@ -21991,7 +21639,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private void TriggerGreedyPigResponses(Die fedDie, int originalUnits, HashSet<int> closedSlots, bool copied)
     {
-        if (fedDie == null || originalUnits <= 0)
+        if (fedDie == null || !IsMainPigFamilyType(fedDie.Type) || originalUnits <= 0)
         {
             return;
         }
@@ -22034,7 +21682,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                             return string.Empty;
                         }
 
-                        int gained = GrantFeed(currentGreedy, originalUnits, "贪吃", currentFedDie, false, closedSlots, copied);
+                        int gained = GrantFeed(currentGreedy, 1, "贪吃", currentFedDie, false, closedSlots, copied);
                         if (gained <= 0)
                         {
                             return DieDisplayName(currentGreedy) + "贪吃响应未获得喂养。";
@@ -22057,7 +21705,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 continue;
             }
 
-            int gained = GrantFeed(greedy, originalUnits, "贪吃", fedDie, false, closedSlots, copied);
+            int gained = GrantFeed(greedy, 1, "贪吃", fedDie, false, closedSlots, copied);
             if (gained > 0)
             {
                 MarkTypeTriggered(greedy);
@@ -22068,7 +21716,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string FeedGainNote(string sourceLabel, int effectiveUnits, int valueGain, bool doubled)
     {
-        string note = "饲+" + effectiveUnits + " 底+" + valueGain;
+        string note = "饲+" + effectiveUnits + " 六面+" + valueGain;
         if (doubled)
         {
             note = "肉x2 " + note;
@@ -22087,7 +21735,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         string sourceText = FeedSourceText(sourceLabel, source, target);
         string qualityText = quality > 1 ? "，质量 " + quality : string.Empty;
         string doubleText = doubled ? "，肉猪把 " + originalUnits + " 份计为 " + effectiveUnits + " 份" : string.Empty;
-        AddLog(sourceText + " -> " + DieDisplayName(target) + "：喂养 +" + effectiveUnits + "，底+" + valueGain + qualityText + doubleText + "。");
+        AddLog(sourceText + " -> " + DieDisplayName(target) + "：喂养 +" + effectiveUnits + "，六面+" + valueGain + qualityText + doubleText + "。");
     }
 
     private string FeedSourceText(string sourceLabel, Die source, Die target)
@@ -22106,29 +21754,9 @@ public sealed class DiceKingDemo : MonoBehaviour
         return label + " " + DieDisplayName(source);
     }
 
-    private void ApplyFeedMinimumIfOpen(Die die, HashSet<int> closedSlots)
-    {
-        if (die == null || closedSlots != null && closedSlots.Contains(die.Id))
-        {
-            return;
-        }
 
-        ApplyFeedMinimum(die);
-    }
 
-    private void ApplyFeedMinimum(Die die)
-    {
-        if (die == null || die.FeedValue <= 0)
-        {
-            return;
-        }
 
-        int minimum = MinimumFaceValue(die) + Mathf.Max(0, die.FeedValue);
-        if (die.EffectiveValue < minimum)
-        {
-            die.EffectiveValue = minimum;
-        }
-    }
 
     private int MinimumFaceValue(Die die)
     {
@@ -22918,6 +22546,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             TriggerDiceCount = CountDiceOfType(DieType.Trigger)
         };
         activeFamilySettlementContext = settlementContext;
+        RoundScores roundScores = PrepareRoundScores();
         List<int> settlementRootDieIds = new List<int>();
         for (int i = 0; i < dice.Count; i++)
         {
@@ -22953,16 +22582,11 @@ public sealed class DiceKingDemo : MonoBehaviour
                 int dieIndex = DiceIndexById(die.Id);
                 BeginGameplayChainRoot(die, rootSlot, DieDisplayName(die));
                 settlementScoringCursorIndex = rootSlot;
-                ApplyPigFamilySettlementEffect(die, dieIndex, settlementContext.SettledIds, false);
-                ApplyF019PirateSettlementEffects(die, dieIndex, settlementContext.SettledIds);
-                ApplyF020NeutralSettlementEffect(die, dieIndex);
-                ApplyF023ResidentPreSettlementEffects(die);
-                ApplyF018TurtleAttachmentSettlementEffects(die, dieIndex, settlementContext.SettledIds);
-                ResolveF023RotationGrowth(die);
+                ResolveRoundSlot(dieIndex, roundScores, true);
                 HandResult slotHand = CurrentDiceHandResult();
                 bool slotStraightTriggered = slotHand.LongestRun >= 5;
-                die.Score = ScoreOneDieValue(die, encounter, true, tempCount, slotStraightTriggered);
-                settlementContext.IndividualScore += die.Score;
+                die.Score = roundScores.Robbed[dieIndex] ? 0 : SaturatingRoundInt((long)ScoreOneDieValue(die, encounter, true, tempCount, slotStraightTriggered) + roundScores.ShellBonuses[dieIndex]);
+                settlementContext.IndividualScore = SaturatingRoundInt((long)settlementContext.IndividualScore + die.Score);
                 lastAffixScoreBonus += AffixScoreBonusForDie(die, slotStraightTriggered, false);
                 int foldedTemporaryScore = TakePendingSettlementTemporaryScore(die);
                 RecordSettlementContribution(
@@ -22973,7 +22597,6 @@ public sealed class DiceKingDemo : MonoBehaviour
                     foldedTemporaryScore != 0,
                     SettlementSemanticLabelForDie(die, foldedTemporaryScore != 0));
                 settlementContext.SettledIds.Add(die.Id);
-                ResolveF023ResidentPostSettlementEffects(die);
                 EndGameplayChainRoot("completed");
             }
 
@@ -22981,7 +22604,12 @@ public sealed class DiceKingDemo : MonoBehaviour
             settlementScoringCursorIndex = -1;
             HandResult hand = CurrentDiceHandResult();
             int bribeGoldCapacity = BribeGoldCapacityInCurrentOrder(hand, chapterGold, tempCount);
-            int walletAdjustedIndividualScore = settlementContext.IndividualScore;
+            long finalIndividualScore = 0;
+            foreach (Die scored in dice)
+            {
+                finalIndividualScore += scored.Score;
+            }
+            int walletAdjustedIndividualScore = SaturatingRoundInt(finalIndividualScore);
             BeginGameplayChainRoot(null, -1, "phase_wallet");
             lastWalletIncome = WalletIncomeForCurrentRoll(hand, tempCount, null, true, ref walletAdjustedIndividualScore);
             settlementContext.IndividualScore = walletAdjustedIndividualScore;
@@ -22991,17 +22619,17 @@ public sealed class DiceKingDemo : MonoBehaviour
             }
             EndGameplayChainRoot("completed");
 
-            BeginGameplayChainRoot(null, -1, "phase_crown");
-            ApplyCrownSettlementBonuses();
+            BeginGameplayChainRoot(null, -1, "round_end");
+            ApplyRoundEndEffects(settlementContext.SettledIds);
             EndGameplayChainRoot("completed");
             int individual = settlementContext.IndividualScore;
             int ruleBonus = RuleComboBonus(hand, encounter);
             float parityMultiplier = ParityMultiplier(hand, encounter);
             float multiplier = Mathf.Max(hand.Multiplier, parityMultiplier);
-            int baseRollScore = Mathf.RoundToInt((individual + tempScore + ruleBonus) * multiplier);
+            int baseRollScore = RoundScoreWithMultiplier((long)individual + tempScore + ruleBonus, multiplier);
             int bribeScore = ApplyBribeIfNeeded(baseRollScore, bribeGoldCapacity);
-            int rollScore = baseRollScore + bribeScore + lastSpellScoreBonus;
-            ReconcileCommittedSettlementContributions(individual + tempScore + ruleBonus);
+            int rollScore = SaturatingRoundInt((long)baseRollScore + bribeScore + lastSpellScoreBonus);
+            ReconcileCommittedSettlementContributions(SaturatingRoundInt((long)individual + tempScore + ruleBonus));
             QueueTreeGrowths(hand, rollScore);
             previewIndividualScore = individual;
             previewTemporaryScore = tempScore;
@@ -23289,9 +22917,9 @@ public sealed class DiceKingDemo : MonoBehaviour
         score = ApplyMaterialScore(die, score, updateNote);
         score = ApplyAffixScoreBonuses(die, score, straightTriggered, updateNote);
 
-        if (encounter.Rule == RuleKind.OddLedger && Mathf.Abs(value) % 2 == 1)
+        if (encounter.Rule == RuleKind.OddLedger && value % 2 != 0)
         {
-            score += 1;
+            score = SaturatingRoundInt((long)score + 1);
         }
         else if (encounter.Rule == RuleKind.LowFog && (value == 1 || value == 2))
         {
@@ -23299,12 +22927,10 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
         else if (encounter.Rule == RuleKind.DoubleJudge)
         {
-            score = value % 2 == 0 ? score + 1 : score - 1;
+            score = SaturatingRoundInt((long)score + (value % 2 == 0 ? 1 : -1));
         }
 
-        score += Mathf.Max(0, die.NeutralTemporaryScoreBonus);
-
-        return score;
+        return SaturatingRoundInt((long)score + Mathf.Max(0, die.NeutralTemporaryScoreBonus));
     }
 
     private int ApplyMaterialScore(Die die, int score, bool updateNote)
@@ -23430,12 +23056,6 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         bool straightTriggered = hand != null && hand.LongestRun >= 5;
         int income = 0;
-        int turtleMoney = TurtleMoneyIncome(die, updateNote);
-        if (turtleMoney > 0)
-        {
-            income += turtleMoney;
-        }
-
         if (die.Type == DieType.Piggy && die.EffectiveValue == die.TargetFace)
         {
             int piggyGold = Mathf.Max(0, piggyGoldPerHit);
@@ -23593,43 +23213,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         return income;
     }
 
-    private int TurtleMoneyIncome(Die die, bool updateNote)
-    {
-        if (die == null || die.TurtleAttachments == null)
-        {
-            return 0;
-        }
 
-        int count = 0;
-        for (int i = 0; i < die.TurtleAttachments.Count; i++)
-        {
-            TurtleAttachment attachment = die.TurtleAttachments[i];
-            if (attachment == null || attachment.Type != DieType.MoneyTurtle || attachment.UsedThisStage)
-            {
-                continue;
-            }
-
-            count++;
-            if (updateNote)
-            {
-                attachment.UsedThisStage = true;
-            }
-        }
-
-        if (count <= 0)
-        {
-            return 0;
-        }
-
-        if (updateNote)
-        {
-            die.RoundNote = AppendNote(die.RoundNote, "金钱龟首结 +" + count + " 金");
-            MarkTypeTriggered(die);
-            AddLog(DieDisplayName(die) + " 的金钱龟本关首次结算，金币 +" + count + "。");
-        }
-
-        return count;
-    }
 
     private int HandTaxGold(HandResult hand)
     {
@@ -24155,7 +23739,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         marketLeaveEffectResolvedCount = 0;
         marketLeaveEffectTimer = 0f;
         marketLeaveEffectFeedback = string.Empty;
-        rewardBanner = string.Empty;
+        pirateDiscountUsed = false;
+        rewardBanner = ResolveImpStageEndTavernGrowth();
         BuildMarketOffers(false);
     }
 
@@ -24169,12 +23754,12 @@ public sealed class DiceKingDemo : MonoBehaviour
         MarketRuleConfig rule = CurrentMarketRule();
         bool forceHighTier = !marketTestRandomRefresh && !explicitFamilyTestMarket && paidRefresh && rule.HighTierPityRefreshes > 0 && marketRefreshesWithoutHighTier >= rule.HighTierPityRefreshes;
         bool hasHighTier = false;
-        int tributeSlot = HasDiceOfType(DieType.AbyssSummon) ? 0 : -1;
-        HashSet<int> spellShelfIndices = PickMarketSpellShelfIndices(tributeSlot);
+        int tributeCount = !paidRefresh && HasDiceOfType(DieType.AbyssSummon) ? UnityEngine.Random.Range(1, 4) : 0;
+        HashSet<int> spellShelfIndices = PickMarketSpellShelfIndices(tributeCount);
         List<int> regularDieShelfIndices = new List<int>();
         for (int i = 0; i < 3; i++)
         {
-            if (i != tributeSlot && !spellShelfIndices.Contains(i))
+            if (i >= tributeCount && !spellShelfIndices.Contains(i))
             {
                 regularDieShelfIndices.Add(i);
             }
@@ -24194,7 +23779,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             MarketOffer offer;
-            if (i == tributeSlot)
+            if (i < tributeCount)
             {
                 offer = MakeTributeMarketOffer();
             }
@@ -24240,9 +23825,6 @@ public sealed class DiceKingDemo : MonoBehaviour
 
             marketOffers.Add(offer);
         }
-
-        ApplyCurrentTavernMinimumToMarketOffers();
-        ApplySupplyPigMarketFeed();
 
         EnsureMarketShelfPresentation();
 
@@ -24296,35 +23878,6 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
     }
 
-    private string ResolveBlackSailRefreshDevours()
-    {
-        List<string> effects = new List<string>();
-        for (int i = 0; i < dice.Count; i++)
-        {
-            Die blackSail = dice[i];
-            if (blackSail == null || blackSail.Temporary || blackSail.Type != DieType.BlackSailBat)
-            {
-                continue;
-            }
-
-            int offerIndex = NextDevourableMarketOfferIndex();
-            MarkTypeTriggered(blackSail);
-            if (offerIndex < 0)
-            {
-                blackSail.RoundNote = AppendNote(blackSail.RoundNote, "刷新无货");
-                continue;
-            }
-
-            Die source = marketOffers[offerIndex].Die;
-            string sourceName = DieDisplayName(source);
-            string devourText = ResolveDevour(source, "黑帆吞噬");
-            marketOffers[offerIndex] = EmptyMarketOffer();
-            blackSail.RoundNote = AppendNote(blackSail.RoundNote, "吞第" + (offerIndex + 1) + "格");
-            effects.Add("黑帆吞掉第 " + (offerIndex + 1) + " 格 " + sourceName + "。" + devourText);
-        }
-
-        return CombineMarketEffectTexts(effects);
-    }
 
     private MarketOffer MakeRandomMarketOffer(HashSet<DieType> excludedTypes, HashSet<string> excludedCraftingItems, bool forceHighTier, bool tendencySlot, HashSet<DieType> previousRefreshTypes = null)
     {
@@ -24384,97 +23937,79 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         EnsureMarketShelfPresentation();
         ClearSpellHover();
-        if (index < 0 || index >= marketOffers.Count)
+        if (index < 0 || index >= marketOffers.Count || !CanBuyMarketOffer(marketOffers[index]))
         {
             return;
         }
-
         MarketOffer offer = marketOffers[index];
-        if (!CanBuyMarketOffer(offer))
-        {
-            return;
-        }
-
         if (offer.Kind == MarketOfferKind.Spell)
         {
             BuyMarketSpell(index);
             return;
         }
 
+        int price = CurrentOfferPrice(offer);
+        chapterGold -= price;
+        marketOffers[index] = EmptyMarketOffer();
+        string effect = string.Empty;
+        string name;
         if (offer.Kind == MarketOfferKind.CraftingItem)
         {
-            CraftingItemDefinition item = offer.CraftingItem;
-            if (item == null)
-            {
-                return;
-            }
-
-            int price = CurrentOfferPrice(offer);
-            chapterGold -= price;
-            AddCraftingItem(item.Key, 1);
+            name = offer.CraftingItem.DisplayName;
+            AddCraftingItem(offer.CraftingItem.Key, 1);
             activeCraftingItemKey = string.Empty;
-            marketOffers[index] = EmptyMarketOffer();
-            string devilPurchaseText = ResolveDevilPurchaseEffects();
-            rewardBanner = "购买 " + item.DisplayName + "，持有 " + CraftingItemCount(item.Key) + "。货架已空。" + devilPurchaseText;
-            AddLog("买入 " + item.DisplayName + "，-" + price + " 金币。货架已空。" + devilPurchaseText);
-            SaveRun();
-            return;
         }
-
-        int buyPrice = CurrentOfferPrice(offer);
-        chapterGold -= buyPrice;
-        int consumedDieDiscount = Mathf.Max(0, nextDiePurchaseDiscount);
-        nextDiePurchaseDiscount = 0;
-        string dieDiscountText = consumedDieDiscount > 0 ? " 空舱折扣-" + consumedDieDiscount + "。" : string.Empty;
-        if (offer.Die != null && offer.Die.Type == DieType.Tribute)
+        else
         {
-            string devourText = ResolveDevour(offer.Die, "贡品奉献");
-            marketOffers[index] = EmptyMarketOffer();
-            string devilPurchaseText = ResolveDevilPurchaseEffects();
-            rewardBanner = "购买 " + DieDisplayName(offer.Die) + "，未进入骰袋。" + dieDiscountText + devourText + devilPurchaseText;
-            AddLog("买入 " + DieDisplayName(offer.Die) + "，-" + buyPrice + " 金币。" + dieDiscountText + devourText + devilPurchaseText);
-            SaveRun();
-            return;
+            Die item = offer.Die;
+            name = DieDisplayName(item);
+            nextDiePurchaseDiscount = 0;
+            if (item.Type == DieType.Tribute)
+            {
+                effect = DevourInto(FirstOfferingDemon(), item, "祭品奉献");
+                effect += ResolveDevilPurchaseEffects();
+            }
+            else
+            {
+                bool halfPrice = HasPirateDiscount(item.Type);
+                Die bought = item.Clone(nextDieId++);
+                if (item.MarketPurchaseFaces != null)
+                {
+                    bought.Faces = (int[])item.MarketPurchaseFaces.Clone();
+                }
+                bought.MarketPurchaseFaces = null;
+                if (IsV02PirateCoreMarketType(bought.Type))
+                {
+                    bought.InstanceSellValue = price;
+                }
+                if (halfPrice)
+                {
+                    pirateDiscountUsed = true;
+                }
+                ResetRoundState(bought);
+                dice.Add(bought);
+                effect = ResolvePigMarketActionEffects(MarketActionKind.BuyDie, bought, dice.Count - 1);
+                MarketRoute route = MarketRouteForType(bought.Type);
+                if (route != MarketRoute.None)
+                {
+                    marketRecentPurchaseRoute = route;
+                    marketTendencySlotIndex = index;
+                }
+                effect += ResolveDevilPurchaseEffects();
+                if (IsV02DevilCoreMarketType(bought.Type))
+                {
+                    effect += ResolveProgenitorPurchases();
+                }
+            }
         }
-
-        Die bought = offer.Die.Clone(nextDieId++);
-        ResetRoundState(bought);
-        bool bloodPactDevour = dice.Count >= DiceCapacity && HasDiceOfType(DieType.BloodPactCaptain);
-        dice.Add(bought);
-        string buyEffectText = ResolvePigMarketActionEffects(MarketActionKind.BuyDie, bought, dice.Count - 1);
-        buyEffectText += ResolveTrainingPirateBuyEffects(bought);
-        MarketRoute boughtRoute = MarketRouteForType(bought.Type);
-        if (boughtRoute != MarketRoute.None)
-        {
-            marketRecentPurchaseRoute = boughtRoute;
-            marketTendencySlotIndex = index;
-        }
-
-        if (bloodPactDevour)
-        {
-            dice.RemoveAt(dice.Count - 1);
-        }
-
-        marketOffers[index] = EmptyMarketOffer();
-        string purchaseEffectText = ResolveDevilPurchaseEffects();
-        if (bloodPactDevour)
-        {
-            purchaseEffectText += ResolveDevour(bought, "血契吞噬");
-            MarkAllDiceOfTypeTriggered(DieType.BloodPactCaptain, "满袋血契");
-            rewardBanner = "购买 " + DieDisplayName(bought) + "，血契未入袋并直接吞噬。货架已空。" + dieDiscountText + buyEffectText + purchaseEffectText;
-            AddLog("血契买入 " + DieDisplayName(bought) + "，-" + buyPrice + " 金币；未入袋并直接吞噬。" + dieDiscountText + buyEffectText + purchaseEffectText);
-            SaveRun();
-            return;
-        }
-
-        rewardBanner = "购买 " + DieDisplayName(bought) + "，骰袋 " + dice.Count + " / " + DiceCapacity + "。货架已空。" + dieDiscountText + buyEffectText + purchaseEffectText;
-        AddLog("买入 " + DieDisplayName(bought) + "，-" + buyPrice + " 金币。货架已空。" + dieDiscountText + buyEffectText + purchaseEffectText);
+        rewardBanner = "购买 " + name + "，实付 " + price + " 金。" + effect;
+        AddLog(rewardBanner);
         SaveRun();
     }
 
     private bool CanBuyMarketOffer(MarketOffer offer)
     {
-        if (offer == null || offer.Kind == MarketOfferKind.Empty || chapterGold < CurrentOfferPrice(offer))
+        if (marketLeaveEffectSequenceActive || offer == null || offer.Kind == MarketOfferKind.Empty || chapterGold < CurrentOfferPrice(offer))
         {
             return false;
         }
@@ -24488,10 +24023,10 @@ public sealed class DiceKingDemo : MonoBehaviour
 
             if (offer.Die.Type == DieType.Tribute)
             {
-                return dice.Count > 0;
+                return FirstOfferingDemon() != null;
             }
 
-            return dice.Count < DiceCapacity || dice.Count > 0 && HasDiceOfType(DieType.BloodPactCaptain);
+            return dice.Count < DiceCapacity;
         }
 
         if (offer.Kind == MarketOfferKind.Spell)
@@ -25247,8 +24782,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             || v02DevilFamilyMarketOnly
             || v02TurtleAttachmentMarketOnly
             || v02PirateFamilyMarketOnly
-            || v02NeutralFamilyMarketOnly
-            || v02DualFamilyMarketOnly;
+            || v02NeutralFamilyMarketOnly;
     }
 
     private bool UsesV02CoreFamiliesMarketPool()
@@ -25266,11 +24800,6 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (v02NeutralFamilyMarketOnly)
         {
             return IsV02NeutralFamilyMarketType(type);
-        }
-
-        if (v02DualFamilyMarketOnly)
-        {
-            return IsV02DualFamilyMarketType(type);
         }
 
         if (v02TurtleAttachmentMarketOnly)
@@ -25293,7 +24822,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             return IsV02PigCoreMarketType(type);
         }
 
-        return !UsesV02CoreFamiliesMarketPool() || IsV02CurrentRosterMarketType(type);
+        return IsV02CurrentRosterMarketType(type);
     }
 
     private static bool IsV02PigCoreMarketType(DieType type)
@@ -25304,13 +24833,12 @@ public sealed class DiceKingDemo : MonoBehaviour
             case DieType.MeatPig:
             case DieType.TradePig:
             case DieType.SowPig:
-            case DieType.ThreeLittlePigs:
             case DieType.GreedyPig:
             case DieType.FeedWholesaler:
                 return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     private static bool IsV02DevilCoreMarketType(DieType type)
@@ -25318,14 +24846,15 @@ public sealed class DiceKingDemo : MonoBehaviour
         switch (type)
         {
             case DieType.Imp:
-            case DieType.Devourer:
-            case DieType.Demon:
             case DieType.DemonBat:
+            case DieType.Demon:
             case DieType.AbyssSummon:
+            case DieType.Devourer:
+            case DieType.ProgenitorDemon:
                 return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     private static bool IsV02TurtleCoreMarketType(DieType type)
@@ -25335,24 +24864,13 @@ public sealed class DiceKingDemo : MonoBehaviour
             case DieType.MoneyTurtle:
             case DieType.TinyTurtle:
             case DieType.DoubleTurtle:
-            case DieType.LuckyTurtle:
-            case DieType.MagnetTurtle:
-            case DieType.RallyTurtle:
             case DieType.LeaderTurtle:
-            case DieType.GuideTurtle:
-            case DieType.HeavyArmorTurtle:
-            case DieType.GreatTurtle:
-            case DieType.SpellApprenticeTurtle:
-            case DieType.ScribeTurtle:
-            case DieType.CurseShellTurtle:
-            case DieType.GrandSpellTurtle:
-            case DieType.RunawayTurtle:
-            case DieType.CloneTurtle:
-            case DieType.ElderTurtle:
+            case DieType.CaravanTurtle:
+            case DieType.BasicTurtle:
                 return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     private static bool IsV02PirateCoreMarketType(DieType type)
@@ -25360,17 +24878,15 @@ public sealed class DiceKingDemo : MonoBehaviour
         switch (type)
         {
             case DieType.RefreshPirate:
-            case DieType.PlunderPirate:
-            case DieType.CrewPirate:
-            case DieType.PirateCaptain:
-            case DieType.TrainingPirate:
-            case DieType.TreasurePirate:
             case DieType.RobberyPirate:
+            case DieType.TreasurePirate:
             case DieType.PirateKing:
+            case DieType.PirateCaptain:
+            case DieType.CrewPirate:
                 return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     private static bool IsV02CurrentRosterMarketType(DieType type)
@@ -25379,8 +24895,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             || IsV02DevilCoreMarketType(type)
             || IsV02TurtleCoreMarketType(type)
             || IsV02PirateCoreMarketType(type)
-            || IsV02NeutralFamilyMarketType(type)
-            || IsV02DualFamilyMarketType(type);
+            || IsV02NeutralFamilyMarketType(type);
     }
 
     private static bool IsCurrentRosterOrSystemType(DieType type)
@@ -25392,93 +24907,26 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private static bool IsV02PigFamilyMarketType(DieType type)
     {
-        switch (type)
-        {
-            case DieType.PigFarmer:
-            case DieType.MeatPig:
-            case DieType.TradePig:
-            case DieType.SowPig:
-            case DieType.ThreeLittlePigs:
-            case DieType.GreedyPig:
-            case DieType.FeedWholesaler:
-            case DieType.TributePig:
-            case DieType.ClearancePig:
-            case DieType.SupplyPig:
-            case DieType.RotationTurtle:
-                return true;
-        }
-
-        return false;
+        return IsV02PigCoreMarketType(type);
     }
 
     private static bool IsV02DevilFamilyMarketType(DieType type)
     {
-        switch (type)
-        {
-            case DieType.Imp:
-            case DieType.Devourer:
-            case DieType.Demon:
-            case DieType.DemonBat:
-            case DieType.AbyssSummon:
-            case DieType.BlackSailBat:
-            case DieType.TributePig:
-            case DieType.BlackMarketImp:
-            case DieType.BloodPactCaptain:
-            case DieType.LegacyDemonTurtle:
-                return true;
-        }
-
-        return false;
+        return IsV02DevilCoreMarketType(type);
     }
 
     private static bool IsV02TurtleAttachmentMarketType(DieType type)
     {
-        return IsV02TurtleCoreMarketType(type)
-            || type == DieType.RotationTurtle
-            || type == DieType.LegacyDemonTurtle
-            || type == DieType.EmptyHoldTurtle;
+        return IsV02TurtleCoreMarketType(type);
     }
 
     private static bool IsV02PirateFamilyMarketType(DieType type)
     {
-        switch (type)
-        {
-            case DieType.RefreshPirate:
-            case DieType.PlunderPirate:
-            case DieType.CrewPirate:
-            case DieType.PirateCaptain:
-            case DieType.TrainingPirate:
-            case DieType.TreasurePirate:
-            case DieType.RobberyPirate:
-            case DieType.PirateKing:
-            case DieType.BlackSailBat:
-            case DieType.BlackMarketImp:
-            case DieType.BloodPactCaptain:
-            case DieType.ClearancePig:
-            case DieType.SupplyPig:
-            case DieType.EmptyHoldTurtle:
-                return true;
-        }
-
-        return false;
+        return IsV02PirateCoreMarketType(type);
     }
 
     private static bool IsV02DualFamilyMarketType(DieType type)
     {
-        switch (type)
-        {
-            case DieType.BlackSailBat:
-            case DieType.TributePig:
-            case DieType.BlackMarketImp:
-            case DieType.BloodPactCaptain:
-            case DieType.ClearancePig:
-            case DieType.SupplyPig:
-            case DieType.RotationTurtle:
-            case DieType.LegacyDemonTurtle:
-            case DieType.EmptyHoldTurtle:
-                return true;
-        }
-
         return false;
     }
 
@@ -25487,17 +24935,15 @@ public sealed class DiceKingDemo : MonoBehaviour
         switch (type)
         {
             case DieType.Lightfang:
-            case DieType.Duet:
-            case DieType.Trigger:
             case DieType.Crown:
-            case DieType.Relief:
-            case DieType.Airstrike:
-            case DieType.Pact:
-            case DieType.Stitch:
+            case DieType.Enchanter:
+            case DieType.TaxCollector:
+            case DieType.Rewind:
+            case DieType.Duet:
                 return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     private static MainFamily MainFamilyForType(DieType type)
@@ -25582,11 +25028,6 @@ public sealed class DiceKingDemo : MonoBehaviour
             return DieType.Lightfang;
         }
 
-        if (v02DualFamilyMarketOnly)
-        {
-            return DieType.SupplyPig;
-        }
-
         if (v02TurtleAttachmentMarketOnly)
         {
             return DieType.MoneyTurtle;
@@ -25600,16 +25041,6 @@ public sealed class DiceKingDemo : MonoBehaviour
         if (v02DevilFamilyMarketOnly)
         {
             return DieType.Imp;
-        }
-
-        if (v02PigFamilyMarketOnly)
-        {
-            return DieType.PigFarmer;
-        }
-
-        if (UsesV02CoreFamiliesMarketPool())
-        {
-            return DieType.PigFarmer;
         }
 
         return DieType.PigFarmer;
@@ -25632,21 +25063,20 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             return 0;
         }
-
         int price = Mathf.Max(0, offer.Price);
-        if (offer.Kind == MarketOfferKind.Die && offer.Die != null && IsV02PirateFamilyMarketType(offer.Die.Type) && CountDiceOfType(DieType.PirateCaptain) > 0)
-        {
-            price = Mathf.FloorToInt(price * 0.5f);
-        }
         if (offer.Kind == MarketOfferKind.Die && offer.Die != null)
         {
+            price = Mathf.Max(0, price - CountDiceOfType(DieType.TaxCollector));
+            if (HasPirateDiscount(offer.Die.Type))
+            {
+                price /= 2;
+            }
             price -= Mathf.Max(0, nextDiePurchaseDiscount);
         }
-        else if (offer.Kind == MarketOfferKind.Spell && offer.Spell != null)
+        else if (offer.Kind == MarketOfferKind.Spell)
         {
             price -= Mathf.Max(0, nextSpellPurchaseDiscount);
         }
-
         return Mathf.Max(0, price);
     }
 
@@ -25662,8 +25092,8 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             return 0;
         }
-
-        return FormulaSellPrice(die.Type, die.Faces, ActiveDiceMaterial(die), die.InstanceSellValue, Mathf.Max(0, die.FeedCount) + TurtleAttachmentSellValue(die));
+        int baseValue = die.InstanceSellValue >= 0 ? die.InstanceSellValue : BaseSellPrice(die.Type);
+        return MarketAdd(baseValue, TurtleAttachmentSellValue(die));
     }
 
     private int FormulaSellPrice(DieType type, int[] faces, DiceMaterial material, int instanceSellValue, int stateValue)
@@ -25692,19 +25122,19 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         int[] baseline = DefaultFaces(type);
-        int faceSum = FaceValueSum(faces);
-        int baselineSum = FaceValueSum(baseline);
-        return Mathf.FloorToInt((faceSum - baselineSum) / 6f);
+        long faceSum = FaceValueSum(faces);
+        long baselineSum = FaceValueSum(baseline);
+        return SaturatingRoundInt((long)Math.Floor((faceSum - baselineSum) / 6d));
     }
 
-    private int FaceValueSum(int[] faces)
+    private long FaceValueSum(int[] faces)
     {
         if (faces == null)
         {
             return 0;
         }
 
-        int sum = 0;
+        long sum = 0;
         for (int i = 0; i < faces.Length; i++)
         {
             sum += faces[i];
@@ -25746,46 +25176,9 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string FeedSellDetailText(Die die)
     {
-        if (die == null)
-        {
-            return string.Empty;
-        }
-
-        if (die.Type == DieType.TributePig)
-        {
-            return "基础卖价 " + BaseSellPrice(die.Type) + "，喂养不提高卖价";
-        }
-
-        int feedCount = Mathf.Max(0, die.FeedCount);
-        int turtleSell = TurtleAttachmentSellValue(die);
-        if (die.InstanceSellValue >= 0)
-        {
-            return "这颗骰卖价 " + die.InstanceSellValue;
-        }
-
-        int faceModifier = FaceValueModifier(die.Type, die.Faces);
-        if (feedCount <= 0 && turtleSell <= 0 && faceModifier == 0)
-        {
-            return "当前卖价 " + SellPrice(die);
-        }
-
-        string text = "当前卖价 " + SellPrice(die);
-        if (faceModifier != 0)
-        {
-            text += " 面值" + SignedDeltaText(faceModifier);
-        }
-
-        if (feedCount > 0)
-        {
-            text += " + 喂养 " + feedCount;
-        }
-
-        if (turtleSell > 0)
-        {
-            text += " + 龟壳 " + turtleSell;
-        }
-
-        return text;
+        if (die == null) return string.Empty;
+        int shells = TurtleAttachmentSellValue(die);
+        return "卖价 " + SellPrice(die) + (shells > 0 ? "（含龟壳 " + shells + "）" : string.Empty);
     }
 
     private int TurtleAttachmentSellValue(Die die)
@@ -25801,7 +25194,7 @@ public sealed class DiceKingDemo : MonoBehaviour
             TurtleAttachment attachment = die.TurtleAttachments[i];
             if (attachment != null && attachment.Source == TurtleAttachmentSource.RealTurtle)
             {
-                total += Mathf.Max(0, attachment.SellValue);
+                total = SaturatingRoundInt((long)total + Mathf.Max(0, attachment.SellValue));
             }
         }
 
@@ -25810,129 +25203,27 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string FeedStateText(Die die)
     {
-        if (die == null || die.FeedCount <= 0 && die.FeedValue <= 0)
-        {
-            return string.Empty;
-        }
-
-        return "喂养 " + Mathf.Max(0, die.FeedCount) + " 次"
-            + "｜最低点 +" + Mathf.Max(0, die.FeedValue)
-            + "｜卖价 +" + Mathf.Max(0, die.FeedCount);
+        if (die == null || die.FeedCount <= 0) return string.Empty;
+        return "饲料 " + die.FeedCount + " 份｜各面累计 +" + die.FeedValue;
     }
 
     private string DevourStateText(Die die)
     {
-        if (die == null || die.LastDevourGain <= 0)
-        {
-            return string.Empty;
-        }
-
-        string source = TooltipTrim(die.LastDevourSource, 12);
-        if (string.IsNullOrEmpty(source))
-        {
-            source = "货架骰";
-        }
-
-        return "上次吞噬：" + source
-            + "｜全部六面 +" + Mathf.Max(0, die.LastDevourGain)
-            + "｜" + DevourTriggerShortText(die.LastDevourTrigger);
+        if (die == null || string.IsNullOrEmpty(die.LastDevourSource)) return string.Empty;
+        return "上次吞噬 " + TooltipTrim(die.LastDevourSource, 12) + "｜" + die.LastDevourTrigger;
     }
 
-    private string DevourTriggerShortText(string trigger)
-    {
-        if (string.IsNullOrEmpty(trigger))
-        {
-            return "吞噬";
-        }
 
-        if (trigger.Contains("魔蝠"))
-        {
-            return "魔蝠";
-        }
-
-        if (trigger.Contains("贡品"))
-        {
-            return "贡品";
-        }
-
-        return TooltipTrim(trigger, 8);
-    }
 
     private string TurtleAttachmentStateText(Die die)
     {
-        if (die == null || die.TurtleAttachments == null || die.TurtleAttachments.Count <= 0)
-        {
-            return string.Empty;
-        }
-
-        int totalFaceGain = 0;
-        for (int i = 0; i < die.TurtleAttachments.Count; i++)
-        {
-            TurtleAttachment attachment = die.TurtleAttachments[i];
-            if (attachment == null)
-            {
-                continue;
-            }
-
-            totalFaceGain += Mathf.Max(0, attachment.FaceGain);
-        }
-
-        StringBuilder text = new StringBuilder();
-        text.Append("化壳 ").Append(die.TurtleAttachments.Count).Append(" 颗")
-            .Append("｜全部六面 +").Append(totalFaceGain)
-            .Append("｜卖价 +").Append(TurtleAttachmentSellValue(die));
-
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.GuideTurtle, "领路", "同宿主下一次真壳转移 +1");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.MoneyTurtle, "金钱", "每关首结 +1 金/层");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.TinyTurtle, "小小", "每关首结获得 1 层基础壳/层");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.DoubleTurtle, "双倍", "化壳时最低面翻倍");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.LuckyTurtle, "幸运", "每关首结按最大面");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.HeavyArmorTurtle, "重甲", "同宿主其它真壳各 +2 单骰分");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.GreatTurtle, "伟大", "每关首结复唱本体");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.MagnetTurtle, "磁力", "每关首结向其它非龟分发基础壳");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.RallyTurtle, "呼朋", "其它真壳宿主各 +2 单骰分");
-        AppendTurtleAttachmentEffectSummary(text, die, DieType.CurseShellTurtle, "咒壳", "下一次结算每层充能 +2 最终点");
-
-        int guideCharge = TurtleAttachmentStateValue(die, DieType.GuideTurtle);
-        int curseCharge = TurtleAttachmentStateValue(die, DieType.CurseShellTurtle);
-        if (guideCharge > 0 || curseCharge > 0)
-        {
-            text.Append("\n待用：领路 +").Append(guideCharge).Append("｜咒壳充能 ").Append(curseCharge);
-        }
-
-        return text.ToString();
+        if (die == null || die.TurtleAttachments == null || die.TurtleAttachments.Count == 0) return string.Empty;
+        return "已吸附 " + die.TurtleAttachments.Count + " 只｜壳卖价 +" + TurtleAttachmentSellValue(die);
     }
 
-    private void AppendTurtleAttachmentEffectSummary(StringBuilder text, Die die, DieType type, string label, string effect)
-    {
-        int count = CountTurtleAttachmentsOfType(die, type);
-        if (count <= 0)
-        {
-            return;
-        }
 
-        text.Append("\n").Append(label).Append("x").Append(count).Append("：").Append(effect);
-    }
 
-    private int TurtleAttachmentStateValue(Die die, DieType type)
-    {
-        if (die == null || die.TurtleAttachments == null)
-        {
-            return 0;
-        }
 
-        int total = 0;
-        for (int i = 0; i < die.TurtleAttachments.Count; i++)
-        {
-            TurtleAttachment attachment = die.TurtleAttachments[i];
-            if (attachment != null && attachment.Type == type)
-            {
-                total += Mathf.Max(0, attachment.StateValue);
-            }
-        }
-
-        return total;
-    }
 
     private string TurtleAttachmentShortText(Die die)
     {
@@ -25941,17 +25232,12 @@ public sealed class DiceKingDemo : MonoBehaviour
             return string.Empty;
         }
 
-        return "化壳" + die.TurtleAttachments.Count;
+        return "龟壳 " + die.TurtleAttachments.Count;
     }
 
     private string FeedStateShortText(Die die)
     {
-        if (die == null || die.FeedCount <= 0 && die.FeedValue <= 0)
-        {
-            return string.Empty;
-        }
-
-        return "喂养" + Mathf.Max(0, die.FeedCount) + " 最低点+" + Mathf.Max(0, die.FeedValue);
+        return die == null || die.FeedCount <= 0 ? string.Empty : "饲料" + die.FeedCount + "份";
     }
 
     private string ResolvePigMarketActionEffects(MarketActionKind action, Die subject, int subjectOriginalIndex)
@@ -26018,9 +25304,9 @@ public sealed class DiceKingDemo : MonoBehaviour
             return string.Empty;
         }
 
-        if (action == MarketActionKind.BuyDie && die.Id == subject.Id && die.Type == DieType.FeedWholesaler)
+        if (action == MarketActionKind.SellDie && die.Id == subject.Id && die.Type == DieType.FeedWholesaler)
         {
-            return ApplyFeedWholesalerBuyEffect(die);
+            return ApplyFeedWholesalerSellEffect(die);
         }
 
         if (action == MarketActionKind.SellDie && die.Id == subject.Id && die.Type == DieType.TradePig)
@@ -26056,12 +25342,12 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string AddGoldIncome(int amount, string sourceLabel, bool triggerTreasurePirates)
     {
-        if (amount <= 0)
+        if (amount <= 0 || chapterGold == int.MaxValue)
         {
             return string.Empty;
         }
 
-        chapterGold += amount;
+        chapterGold = MarketAdd(chapterGold, amount);
         return triggerTreasurePirates ? ResolveTreasurePirateGoldEvent(sourceLabel) : string.Empty;
     }
 
@@ -26165,41 +25451,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         return candidates[UnityEngine.Random.Range(0, candidates.Count)];
     }
 
-    private bool HasCrewPirateSellSource(Die soldDie)
-    {
-        if (soldDie != null && soldDie.Type == DieType.CrewPirate)
-        {
-            return true;
-        }
 
-        return CountDiceOfType(DieType.CrewPirate) > 0;
-    }
-
-    private string ResolveCrewPirateSellEffect(bool hasCrewPirate)
-    {
-        if (!hasCrewPirate)
-        {
-            return string.Empty;
-        }
-
-        currentMarketPirateSellCount++;
-        if (currentMarketPirateSellCount % 2 != 0)
-        {
-            return " 人口海盗记账 " + currentMarketPirateSellCount % 2 + "/2。";
-        }
-
-        if (dice.Count >= DiceCapacity)
-        {
-            return " 人口海盗招募失败：骰袋已满。";
-        }
-
-        Die recruit = NewDie("招募基础骰", DieType.Basic, new int[] { 1, 2, 3, 4, 5, 6 });
-        recruit.InstanceSellValue = UnityEngine.Random.Range(0, 4);
-        dice.Add(recruit);
-        string text = "人口海盗招募 " + DieDisplayName(recruit) + "，随机售价 " + recruit.InstanceSellValue + "。";
-        AddLog(text);
-        return " " + text;
-    }
 
     private string ResolveTrainingPirateBuyEffects(Die bought)
     {
@@ -26235,40 +25487,24 @@ public sealed class DiceKingDemo : MonoBehaviour
         return CombineMarketEffectTexts(effectTexts);
     }
 
-    private string TradePigSellTransfer(Die soldDie)
+    private string TradePigSellTransfer(Die sold)
     {
-        if (soldDie == null || soldDie.Type != DieType.TradePig || soldDie.FeedCount <= 0 || soldDie.FeedValue <= 0)
+        if (sold == null || sold.Type != DieType.TradePig || sold.FeedCount <= 0 || sold.FeedValue <= 0)
         {
             return string.Empty;
         }
 
-        List<Die> candidates = new List<Die>();
-        for (int i = 0; i < dice.Count; i++)
+        Die target = RandomNonTemporaryDie(sold.Id);
+        if (target == null)
         {
-            Die candidate = dice[i];
-            if (candidate != null && !candidate.Temporary && candidate.Id != soldDie.Id)
-            {
-                candidates.Add(candidate);
-            }
+            return "饲料没有继承者。";
         }
 
-        if (candidates.Count <= 0)
-        {
-            return "喂养无人继承。";
-        }
-
-        Die target = candidates[UnityEngine.Random.Range(0, candidates.Count)];
-        int count = Mathf.Max(0, soldDie.FeedCount);
-        int value = Mathf.Max(0, soldDie.FeedValue);
-        target.FeedCount += count;
-        target.FeedValue += value;
-        ApplyFeedMinimum(target);
-        target.RoundNote = AppendNote(target.RoundNote, "贸易 饲+" + count + " 底+" + value);
-        AddLog("贸易猪卖出：把 " + count + " 份喂养 / 底+" + value + " 转给 " + DieDisplayName(target) + "。");
-        return "贸易猪把 " + count + " 喂养 / 底+" + value + " 转给 " + DieDisplayName(target) + "。";
+        GrantFeed(target, sold.FeedCount, "转移猪", sold, true, null, false, sold.FeedValue);
+        return "转移猪将 " + sold.FeedCount + " 份饲料转给" + DieDisplayName(target) + "。";
     }
 
-    private string ApplyFeedWholesalerBuyEffect(Die bought)
+    private string ApplyFeedWholesalerSellEffect(Die bought)
     {
         if (bought == null || bought.Type != DieType.FeedWholesaler)
         {
@@ -26276,40 +25512,126 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
 
         int previousQuality = Mathf.Max(1, feedQuality);
-        feedQuality = previousQuality + 1;
+        feedQuality = SaturatingRoundInt((long)previousQuality + 1);
         MarkTypeTriggered(bought);
         bought.RoundNote = AppendNote(bought.RoundNote, "质 " + previousQuality + "→" + feedQuality);
         return "喂养质量 " + previousQuality + "→" + feedQuality + "。";
     }
 
-    private string ResolveImpStageEndTavernGrowth()
+    private static int MarketAdd(int value, int change)
     {
-        int count = CountDiceOfType(DieType.Imp);
-        if (count <= 0)
+        return SaturatingRoundInt((long)value + change);
+    }
+
+    private bool HasPirateDiscount(DieType type)
+    {
+        return !pirateDiscountUsed && IsV02PirateCoreMarketType(type) && HasDiceOfType(DieType.PirateCaptain);
+    }
+
+    private string ResolvePopulationSale(Die sold)
+    {
+        var results = new List<string>();
+        foreach (Die owner in dice)
+        {
+            if (owner != null && !owner.Temporary && owner.Type == DieType.CrewPirate)
+            {
+                results.Add(CountPopulationSale(owner));
+            }
+        }
+        if (sold.Type == DieType.CrewPirate)
+        {
+            results.Add(CountPopulationSale(sold));
+        }
+        return CombineMarketEffectTexts(results);
+    }
+
+    private string CountPopulationSale(Die owner)
+    {
+        owner.CrewSaleProgress = owner.CrewSaleProgress == 0 ? 1 : 0;
+        if (owner.CrewSaleProgress == 1)
+        {
+            return "人口海盗记账 1/2。";
+        }
+        MarkTypeTriggered(owner);
+        return "人口海盗售出两颗，获得 1 金。" + AddGoldIncome(1, "人口海盗", true);
+    }
+
+    private Die FirstOfferingDemon()
+    {
+        return dice.Find(die => die != null && !die.Temporary && IsV02DevilCoreMarketType(die.Type));
+    }
+
+    private int FirstDemonMealIndex()
+    {
+        int tribute = marketOffers.FindIndex(offer => offer != null && offer.Kind == MarketOfferKind.Die
+            && offer.Die != null && offer.Die.Type == DieType.Tribute);
+        return tribute >= 0 ? tribute : NextDevourableMarketOfferIndex();
+    }
+
+    private string ConsumeMarketDie(int slot, Die demon, string reason)
+    {
+        Die source = marketOffers[slot].Die;
+        marketOffers[slot] = EmptyMarketOffer();
+        return DevourInto(demon, source, reason);
+    }
+
+    private string ResolveProgenitorPurchases()
+    {
+        var results = new List<string>();
+        foreach (Die demon in dice)
+        {
+            if (demon == null || demon.Temporary || demon.Type != DieType.ProgenitorDemon)
+            {
+                continue;
+            }
+            int slot = RandomRobbableMarketOfferIndex();
+            if (slot < 0)
+            {
+                break;
+            }
+            results.Add(ConsumeMarketDie(slot, demon, "始祖魔吞噬"));
+        }
+        return CombineMarketEffectTexts(results);
+    }
+
+    private string DevourInto(Die target, Die source, string reason)
+    {
+        if (target == null || source == null || target == source || !IsV02DevilCoreMarketType(target.Type))
         {
             return string.Empty;
         }
-
-        int previousMinimum = TavernMinimumValue();
-        tavernBaseMinimumBonus += count;
-        for (int i = 0; i < dice.Count; i++)
+        AddFaceValues(target, source.Faces);
+        string faces = FaceText(source.Faces);
+        RecordDevourState(target, source, 1, reason + " " + faces);
+        target.RoundNote = AppendNote(target.RoundNote, "吞噬 " + faces);
+        MarkTypeTriggered(target);
+        string result = DieDisplayName(target) + "吞噬" + DieDisplayName(source) + "，逐面获得 " + faces + "。";
+        if (activeGameplayChain == null)
         {
-            if (dice[i] != null && dice[i].Type == DieType.Imp)
-            {
-                MarkTypeTriggered(dice[i]);
-                dice[i].RoundNote = AppendNote(dice[i].RoundNote, "市场最低点+" + count);
-            }
+            result += ResolveDevourerGold();
         }
+        else
+        {
+            QueueDevourResponses(source, reason, true);
+        }
+        AddLog(result);
+        return result;
+    }
 
-        string text = "小鬼让市场最低 " + previousMinimum + "→" + TavernMinimumValue() + "。";
+    private string ResolveImpStageEndTavernGrowth()
+    {
+        int count = CountDiceOfType(DieType.Imp);
+        if (count == 0)
+        {
+            return string.Empty;
+        }
+        tavernBaseMinimumBonus = MarketAdd(tavernBaseMinimumBonus, count);
+        MarkAllDiceOfTypeTriggered(DieType.Imp, "货架六面 +" + count);
+        string text = "小鬼使本局货架六面累计 +" + tavernBaseMinimumBonus + "。";
         AddLog(text);
         return text;
     }
 
-    private int TavernMinimumValue()
-    {
-        return 1 + Mathf.Max(0, tavernBaseMinimumBonus) + Mathf.Max(0, marketTemporaryMinimumBonus);
-    }
 
     private void ApplyCurrentTavernMinimumToMarketOffers()
     {
@@ -26329,46 +25651,32 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             return;
         }
-
-        int minimum = TavernMinimumValue();
-        if (minimum <= 1)
+        if (die.MarketPurchaseFaces == null)
         {
-            return;
+            die.MarketPurchaseFaces = new int[die.Faces.Length];
+            for (int i = 0; i < die.Faces.Length; i++)
+            {
+                die.MarketPurchaseFaces[i] = MarketAdd(die.Faces[i], tavernBaseMinimumBonus);
+            }
         }
-
         for (int i = 0; i < die.Faces.Length; i++)
         {
-            die.Faces[i] = Mathf.Max(minimum, die.Faces[i]);
+            die.Faces[i] = MarketAdd(die.MarketPurchaseFaces[i], marketTemporaryMinimumBonus);
         }
-
-        Array.Sort(die.Faces);
     }
 
     private string ResolveDevilPurchaseEffects()
     {
-        int demonCount = 0;
-        for (int i = 0; i < dice.Count; i++)
-        {
-            Die die = dice[i];
-            if (die == null || die.Temporary || die.Type != DieType.Demon)
-            {
-                continue;
-            }
-
-            demonCount++;
-            MarkTypeTriggered(die);
-            die.RoundNote = AppendNote(die.RoundNote, "本市底+1");
-        }
-
-        if (demonCount <= 0)
+        int count = CountDiceOfType(DieType.Demon);
+        if (count <= 0)
         {
             return string.Empty;
         }
-
-        int previousMinimum = TavernMinimumValue();
-        marketTemporaryMinimumBonus += demonCount;
+        int gain = 2 * count;
+        marketTemporaryMinimumBonus = MarketAdd(marketTemporaryMinimumBonus, gain);
+        MarkAllDiceOfTypeTriggered(DieType.Demon, "货架六面 +" + gain);
         ApplyCurrentTavernMinimumToMarketOffers();
-        return " 恶魔骰子让本市市场最低 " + previousMinimum + "→" + TavernMinimumValue() + "。";
+        return " 吸血使本店货架临时六面 +" + gain + "。";
     }
 
     private string ResolveDemonBatLeaveDevour(Die bat)
@@ -26377,87 +25685,24 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             return string.Empty;
         }
-
-        int offerIndex = NextDevourableMarketOfferIndex();
-        if (offerIndex < 0)
+        var results = new List<string>();
+        foreach (Die demon in dice)
         {
-            MarkTypeTriggered(bat);
-            bat.RoundNote = AppendNote(bat.RoundNote, "无货可吞");
-            return DieDisplayName(bat) + "无货可吞。";
-        }
-
-        MarketOffer offer = marketOffers[offerIndex];
-        Die source = offer != null ? offer.Die : null;
-        if (source == null)
-        {
-            MarkTypeTriggered(bat);
-            bat.RoundNote = AppendNote(bat.RoundNote, "无货可吞");
-            return DieDisplayName(bat) + "无货可吞。";
-        }
-
-        MarkTypeTriggered(bat);
-        bat.RoundNote = AppendNote(bat.RoundNote, "吞货架");
-        string sourceName = DieDisplayName(source);
-        string devourText = ResolveDevour(source, "魔蝠吞噬");
-        marketOffers[offerIndex] = EmptyMarketOffer();
-        AddLog("魔蝠离开市场吞掉第 " + (offerIndex + 1) + " 格 " + sourceName + "。" + devourText);
-        return DieDisplayName(bat) + "吞掉第 " + (offerIndex + 1) + " 格 " + sourceName + "。" + devourText;
-    }
-
-    private string ResolveRobberyPirateLeaveSteal(Die robber)
-    {
-        if (robber == null || robber.Temporary || robber.Type != DieType.RobberyPirate)
-        {
-            return string.Empty;
-        }
-
-        MarkTypeTriggered(robber);
-        if (dice.Count >= DiceCapacity)
-        {
-            robber.RoundNote = AppendNote(robber.RoundNote, "袋满停抢");
-            return DieDisplayName(robber) + "袋满，停止抢劫。";
-        }
-
-        int offerIndex = RandomRobbableMarketOfferIndex();
-        if (offerIndex < 0)
-        {
-            robber.RoundNote = AppendNote(robber.RoundNote, "无货可抢");
-            return DieDisplayName(robber) + "没有非空货架可抢。";
-        }
-
-        MarketOffer offer = marketOffers[offerIndex];
-        Die source = offer != null ? offer.Die : null;
-        if (source == null)
-        {
-            robber.RoundNote = AppendNote(robber.RoundNote, "无货可抢");
-            return DieDisplayName(robber) + "没有非空货架可抢。";
-        }
-
-        Die stolen = source.Clone(nextDieId++);
-        ResetRoundState(stolen);
-        dice.Add(stolen);
-        if (marketLeaveEffectSequenceActive)
-        {
-            marketLeaveRootDieIds.Add(stolen.Id);
-            if (HasMarketLeaveEffect(stolen))
+            if (demon == null || demon == bat || demon.Temporary || !IsV02DevilCoreMarketType(demon.Type))
             {
-                marketLeaveEffectTotalCount++;
+                continue;
             }
-            LogGameplayChain(
-                "state_delta",
-                sourceDieId: robber.Id,
-                sourceLabel: DieDisplayName(robber),
-                targetDieId: stolen.Id,
-                targetLabel: DieDisplayName(stolen),
-                result: "root_appended",
-                delta: "robbery_exception_appended_to_leave_queue");
+            int index = FirstDemonMealIndex();
+            if (index < 0)
+            {
+                break;
+            }
+            results.Add(ConsumeMarketDie(index, demon, "蝠魔指挥"));
         }
-        marketOffers[offerIndex] = EmptyMarketOffer();
-        robber.RoundNote = AppendNote(robber.RoundNote, "抢第" + (offerIndex + 1) + "格");
-        string text = DieDisplayName(robber) + "抢走第 " + (offerIndex + 1) + " 格 " + DieDisplayName(stolen) + "，加入骰袋末尾。";
-        AddLog(text);
-        return text;
+        MarkTypeTriggered(bat);
+        return results.Count > 0 ? CombineMarketEffectTexts(results) : "蝠魔无可用食物或同伴。";
     }
+
 
     private string ResolveClearancePigLeaveFeed(Die clearancePig)
     {
@@ -26516,86 +25761,29 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string DemonBatLeavePreviewText()
     {
-        int batCount = CountDiceOfType(DieType.DemonBat);
-        if (batCount <= 0)
-        {
-            return string.Empty;
-        }
-
-        int available = AvailableDevourableMarketOfferCount();
-        if (available <= 0)
-        {
-            return "离开：魔蝠无货可吞";
-        }
-
-        return "离开：魔蝠吞 " + Mathf.Min(batCount, available) + " 个货架";
+        int bats = CountDiceOfType(DieType.DemonBat);
+        int demons = dice.FindAll(die => die != null && !die.Temporary && IsV02DevilCoreMarketType(die.Type)).Count;
+        int count = Mathf.Min(bats * Mathf.Max(0, demons - 1), AvailableDevourableMarketOfferCount());
+        return "离开：蝠魔指挥吞噬 " + count + " 颗货架骰";
     }
 
     private string MarketLeavePreviewText()
     {
-        int total = CountMarketLeaveEffectDice();
-        if (total <= 0)
-        {
-            return string.Empty;
-        }
-
         int turtleCount = 0;
-        int batCount = 0;
-        int robberCount = 0;
-        int clearanceCount = 0;
         for (int i = 0; i < dice.Count; i++)
         {
             Die die = dice[i];
-            if (die == null || die.Temporary)
-            {
-                continue;
-            }
-
-            if (die.Type == DieType.DemonBat)
-            {
-                batCount++;
-            }
-            else if (die.Type == DieType.RobberyPirate)
-            {
-                robberCount++;
-            }
-            else if (die.Type == DieType.ClearancePig)
-            {
-                clearanceCount++;
-            }
-            else if (IsF018AbsorbableTurtleType(die.Type) && NextPositionTurtleAttachmentHost(i) != null)
+            if (die != null && !die.Temporary && IsF018AbsorbableTurtleType(die.Type) && NextPositionTurtleAttachmentHost(i) != null)
             {
                 turtleCount++;
             }
         }
-
-        if (clearanceCount > 0 && robberCount <= 0 && turtleCount <= 0 && batCount <= 0)
+        string turtle = turtleCount > 0 ? "离开：" + turtleCount + " 颗龟尝试吸附" : string.Empty;
+        if (!HasDiceOfType(DieType.DemonBat))
         {
-            return "离开：清仓猪按 " + EmptyMarketOfferCount() + " 个空货架获得喂养";
+            return turtle;
         }
-
-        if (robberCount > 0 && turtleCount <= 0 && batCount <= 0 && clearanceCount <= 0)
-        {
-            int available = AvailableDevourableMarketOfferCount();
-            if (dice.Count >= DiceCapacity)
-            {
-                return "离开：抢劫海盗袋满停抢";
-            }
-
-            return available > 0 ? "离开：抢劫 " + Mathf.Min(robberCount, available) + " 个货架" : "离开：抢劫海盗无货可抢";
-        }
-
-        if (turtleCount > 0 && batCount <= 0 && robberCount <= 0 && clearanceCount <= 0)
-        {
-            return "离开：" + turtleCount + " 颗龟龟尝试向后一格化壳";
-        }
-
-        if (batCount > 0 && turtleCount <= 0 && robberCount <= 0 && clearanceCount <= 0)
-        {
-            return DemonBatLeavePreviewText();
-        }
-
-        return "离开：离场效果 " + total + " 个";
+        return string.IsNullOrEmpty(turtle) ? DemonBatLeavePreviewText() : turtle + "；" + DemonBatLeavePreviewText();
     }
 
     private int AvailableDevourableMarketOfferCount()
@@ -26627,38 +25815,6 @@ public sealed class DiceKingDemo : MonoBehaviour
         return -1;
     }
 
-    private string ResolveDevour(Die source, string triggerLabel, bool tavernSource = true)
-    {
-        if (source == null)
-        {
-            return string.Empty;
-        }
-
-        Die target = LowestMinimumFaceDie();
-        if (target == null)
-        {
-            return " 没有可吞噬目标。";
-        }
-
-        int transfer = DevourTransferValue(source);
-        AddValueToAllFaces(target, transfer);
-        target.RoundNote = AppendNote(target.RoundNote, "吞+" + transfer);
-        RecordDevourState(target, source, transfer, triggerLabel);
-        string sharedFeastText = ResolveSharedFeastDevourSplit(target, transfer);
-        string goldText = string.Empty;
-        string blackMarketText = string.Empty;
-        if (activeGameplayChain != null)
-        {
-            QueueDevourResponses(source, triggerLabel, tavernSource);
-        }
-        else
-        {
-            goldText = ResolveDevourerGold();
-            blackMarketText = tavernSource ? ResolveBlackMarketImpDiscount() : string.Empty;
-        }
-        AddLog(triggerLabel + "：" + DieDisplayName(source) + " 期望+" + transfer + " 给 " + DieDisplayName(target) + "，面组 " + FaceText(target.Faces) + "。" + sharedFeastText + goldText + blackMarketText);
-        return " " + triggerLabel + " +" + transfer + " 给 " + DieDisplayName(target) + "。" + sharedFeastText + goldText + blackMarketText;
-    }
 
     private void QueueDevourResponses(Die source, string triggerLabel, bool tavernSource)
     {
@@ -26744,34 +25900,6 @@ public sealed class DiceKingDemo : MonoBehaviour
         }
     }
 
-    private string ResolveSharedFeastDevourSplit(Die host, int devourGain)
-    {
-        int layerCount = CountTurtleAttachmentsOfType(host, DieType.SharedFeastDemonTurtle);
-        if (host == null || layerCount <= 0)
-        {
-            return string.Empty;
-        }
-
-        int hostIndex = DiceIndexById(host.Id);
-        if (hostIndex < 0 || hostIndex + 1 >= dice.Count)
-        {
-            return string.Empty;
-        }
-
-        Die target = dice[hostIndex + 1];
-        if (target == null || target.Temporary || IsAnyTurtleFamilyType(target.Type))
-        {
-            return string.Empty;
-        }
-
-        int perLayerGain = Mathf.Max(1, Mathf.Max(0, devourGain) / 2);
-        int totalGain = perLayerGain * layerCount;
-        AddValueToAllFaces(target, totalGain);
-        target.RoundNote = AppendNote(target.RoundNote, "共食+" + totalGain);
-        host.RoundNote = AppendNote(host.RoundNote, "共食x" + layerCount);
-        AddLog(DieDisplayName(host) + " 的共食魔龟把吞噬成长分给右邻 " + DieDisplayName(target) + "，全部六面 +" + totalGain + "；不会再次触发吞噬效果。");
-        return " 共食右邻 +" + totalGain + "。";
-    }
 
     private string ResolveBlackMarketImpDiscount()
     {
@@ -26800,27 +25928,18 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string ResolveDevourerGold()
     {
-        int count = 0;
-        for (int i = 0; i < dice.Count; i++)
+        var rewards = new List<string>();
+        foreach (Die die in dice)
         {
-            Die die = dice[i];
             if (die == null || die.Temporary || die.Type != DieType.Devourer)
             {
                 continue;
             }
-
-            count++;
             MarkTypeTriggered(die);
             die.RoundNote = AppendNote(die.RoundNote, "吞金+1");
+            rewards.Add("吞噬骰子 +1 金。" + AddGoldIncome(1, "吞噬骰子", true));
         }
-
-        if (count <= 0)
-        {
-            return string.Empty;
-        }
-
-        string treasureText = AddGoldIncome(count, "吞噬骰子", true);
-        return " 吞噬骰子 +" + count + " 金。" + treasureText;
+        return CombineMarketEffectTexts(rewards);
     }
 
     private Die LowestMinimumFaceDie()
@@ -26871,10 +25990,8 @@ public sealed class DiceKingDemo : MonoBehaviour
 
         for (int i = 0; i < target.Faces.Length; i++)
         {
-            target.Faces[i] += value;
+            target.Faces[i] = SaturatingRoundInt((long)target.Faces[i] + value);
         }
-
-        Array.Sort(target.Faces);
     }
 
     private void AddValueToAllFacesAndCurrentRoll(Die target, int value, HashSet<int> settledIds)
@@ -26893,22 +26010,8 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private static bool IsF018AbsorbableTurtleType(DieType type)
     {
-        switch (type)
-        {
-            case DieType.GuideTurtle:
-            case DieType.MoneyTurtle:
-            case DieType.TinyTurtle:
-            case DieType.DoubleTurtle:
-            case DieType.LuckyTurtle:
-            case DieType.HeavyArmorTurtle:
-            case DieType.GreatTurtle:
-            case DieType.MagnetTurtle:
-            case DieType.RallyTurtle:
-            case DieType.CurseShellTurtle:
-                return true;
-        }
-
-        return false;
+        return type == DieType.MoneyTurtle || type == DieType.TinyTurtle || type == DieType.DoubleTurtle
+            || type == DieType.LeaderTurtle || type == DieType.CaravanTurtle || type == DieType.BasicTurtle;
     }
 
     private static bool IsF018TurtleFamilyType(DieType type)
@@ -26964,48 +26067,29 @@ public sealed class DiceKingDemo : MonoBehaviour
             return string.Empty;
         }
 
-        int turtleIndex = DiceIndexById(turtle.Id);
-        if (turtleIndex < 0)
-        {
-            return string.Empty;
-        }
-
-        Die host = NextPositionTurtleAttachmentHost(turtleIndex);
+        int slot = DiceIndexById(turtle.Id);
+        Die host = NextPositionTurtleAttachmentHost(slot);
         if (host == null)
         {
-            return TypeName(turtle.Type) + "后一格没有可化壳目标，仍留在骰袋。";
+            return TypeName(turtle.Type) + "后一格没有可吸附的宿主。";
         }
 
-        int guideBonus = ConsumeGuideTurtleTransferBonus(host);
-        int queuedBonus = Mathf.Max(0, nextTurtleTransferBonus);
-        nextTurtleTransferBonus = 0;
-        int transferBonus = guideBonus + queuedBonus;
-        int transfer = DevourTransferValue(turtle) + transferBonus;
-        int sellValue = BaseSellPrice(turtle.Type);
-        string applyText = AddTurtleAttachment(host, turtle.Type, transfer, sellValue, TurtleAttachmentSource.RealTurtle, null);
-        string sourceName = DieDisplayName(turtle);
-        string hostName = DieDisplayName(host);
-        int hostId = host.Id;
-        int targetIndex = turtleIndex + 1;
-        int diceCountBefore = dice.Count;
-        dice.RemoveAt(turtleIndex);
-        host.RoundNote = AppendNote(host.RoundNote, TypeName(turtle.Type) + "化壳+" + transfer);
-        SetMarketLeaveAttachmentVisual(turtle.Type, hostId, turtleIndex, targetIndex);
-        string leaveText = string.Empty;
-        string leaderText = string.Empty;
-        if (activeGameplayChain != null)
+        int sellValue = SellPrice(turtle);
+        AddFaceValues(host, turtle.Faces);
+        EnsureTurtleAttachments(host);
+        host.TurtleAttachments.Add(new TurtleAttachment
         {
-            QueueTurtleAbsorptionResponses(turtle, diceCountBefore, dice.Count, turtle.Type);
-        }
-        else
-        {
-            leaveText = ResolveResidentPermanentLeaveEffects(turtle, "真实吸附");
-            leaveText += ResolveEmptyHoldTransition(diceCountBefore, dice.Count, "真实吸附");
-            leaderText = ResolveLeaderTurtleCopies(turtle.Type, transfer);
-        }
-        string bonusText = transferBonus > 0 ? "（顺序加值 +" + transferBonus + "）" : string.Empty;
-        string result = TypeName(turtle.Type) + "完成化壳，附着到 " + hostName + "，全部六面 +" + transfer + bonusText + applyText + leaveText + leaderText;
-        AddLog(sourceName + " 完成化壳并离开骰袋，" + hostName + " 全部六面 +" + transfer + bonusText + "，面组 " + FaceText(host.Faces) + "。" + leaveText + leaderText);
+            Type = turtle.Type,
+            Source = TurtleAttachmentSource.RealTurtle,
+            SellValue = sellValue
+        });
+        dice.RemoveAt(slot);
+        SetMarketLeaveAttachmentVisual(turtle.Type, host.Id, slot, slot + 1);
+        string result = DieDisplayName(turtle) + "吸附到" + DieDisplayName(host) + "，六面逐项增加 "
+            + FaceText(turtle.Faces) + "，卖价 +" + sellValue + "。";
+        host.RoundNote = AppendNote(host.RoundNote, TypeName(turtle.Type) + "吸附");
+        EmitGameplayChainEvent("turtle_absorbed", turtle, "吸附");
+        AddLog(result);
         return result;
     }
 
@@ -27380,9 +26464,8 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string TributeOfferHint(Die die)
     {
-        Die target = LowestMinimumFaceDie();
-        string targetText = target != null ? DieDisplayName(target) : "最低点骰";
-        return "奉献 +" + DevourTransferValue(die) + " 给 " + targetText;
+        Die target = FirstOfferingDemon();
+        return target != null ? "奉献六面给 " + DieDisplayName(target) : "需要一颗恶魔";
     }
 
     private int BaseSellPrice(DieType type)
@@ -27398,6 +26481,11 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private FaceTemplateConfig PickFaceTemplate(DieType type)
     {
+        if (type == DieType.BasicTurtle || type == DieType.Tribute)
+        {
+            return null;
+        }
+
         int chapter = CurrentChapterIndex();
         int totalWeight = 0;
         for (int i = 0; i < faceTemplateConfigs.Count; i++)
@@ -27477,7 +26565,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private int[] FacesForTemplate(FaceTemplateConfig config, DieType type)
     {
-        if (config == null)
+        if (config == null || type == DieType.BasicTurtle || type == DieType.Tribute)
         {
             return DefaultFaces(type);
         }
@@ -27629,61 +26717,18 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private MarketRoute MarketRouteForType(DieType type)
     {
-        switch (type)
+        switch (MainFamilyForType(type))
         {
-            case DieType.Basic:
-            case DieType.Tribute:
-            case DieType.Lightfang:
-            case DieType.Duet:
-            case DieType.Trigger:
-            case DieType.Crown:
-            case DieType.Relief:
-            case DieType.Airstrike:
-            case DieType.Pact:
-            case DieType.Stitch:
-                return MarketRoute.None;
-            case DieType.PigFarmer:
-            case DieType.MeatPig:
-            case DieType.TradePig:
-            case DieType.SowPig:
-            case DieType.ThreeLittlePigs:
-            case DieType.GreedyPig:
-            case DieType.FeedWholesaler:
-            case DieType.RefreshPirate:
-            case DieType.PlunderPirate:
-            case DieType.CrewPirate:
-            case DieType.PirateCaptain:
-            case DieType.TrainingPirate:
-            case DieType.TreasurePirate:
-            case DieType.RobberyPirate:
-            case DieType.PirateKing:
-            case DieType.BlackSailBat:
-            case DieType.BlackMarketImp:
-            case DieType.BloodPactCaptain:
-            case DieType.ClearancePig:
-            case DieType.SupplyPig:
-            case DieType.TributePig:
+            case MainFamily.Pig:
+            case MainFamily.Pirate:
                 return MarketRoute.Gold;
-            case DieType.Imp:
-            case DieType.Devourer:
-            case DieType.Demon:
-            case DieType.DemonBat:
-            case DieType.AbyssSummon:
+            case MainFamily.Devil:
                 return MarketRoute.Burst;
-            case DieType.MoneyTurtle:
-            case DieType.TinyTurtle:
-            case DieType.DoubleTurtle:
-            case DieType.LuckyTurtle:
-            case DieType.MagnetTurtle:
-            case DieType.RallyTurtle:
-            case DieType.LeaderTurtle:
-            case DieType.PackTurtle:
-            case DieType.SharedFeastDemonTurtle:
-            case DieType.SafetyNetTurtle:
+            case MainFamily.Turtle:
                 return MarketRoute.Turtle;
+            default:
+                return MarketRoute.None;
         }
-
-        return MarketRoute.None;
     }
 
     private MarketDieConfig PickMarketDieConfig(HashSet<DieType> excludedTypes, bool forceHighTier, HashSet<DieType> previousRefreshTypes)
@@ -27848,7 +26893,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private bool IsMarketDieUnlocked(DieType type, int chapter)
     {
-        return IsCurrentRosterOrSystemType(type);
+        return IsV02CurrentRosterMarketType(type);
     }
 
     private bool IsDiceMaterialUnlocked(DiceMaterial material, int chapter)
@@ -27962,7 +27007,6 @@ public sealed class DiceKingDemo : MonoBehaviour
         int baseCost = Mathf.Max(0, chapterMarket ? rule.BossRefreshCost : rule.NormalRefreshCost);
         bool usesEscalatingV02Refresh = v02PigFamilyMarketOnly
             || v02PirateFamilyMarketOnly
-            || v02DualFamilyMarketOnly
             || UsesV02CoreFamiliesMarketPool();
         if (v02DevilFamilyMarketOnly || marketRefreshCostStep <= 0 || !usesEscalatingV02Refresh)
         {
@@ -28396,7 +27440,6 @@ public sealed class DiceKingDemo : MonoBehaviour
         v02TurtleAttachmentMarketOnly = false;
         v02PirateFamilyMarketOnly = false;
         v02NeutralFamilyMarketOnly = false;
-        v02DualFamilyMarketOnly = false;
         feedQualityStart = 1;
         feedQuality = Mathf.Max(1, feedQualityStart);
         marketRefreshCostStep = 1;
@@ -28562,7 +27605,7 @@ public sealed class DiceKingDemo : MonoBehaviour
                 v02NeutralFamilyMarketOnly = value > 0;
                 return true;
             case "v02_dual_family_market_only":
-                v02DualFamilyMarketOnly = value > 0;
+                // Retired test flag in older global tables.
                 return true;
             case "feed_quality_start":
                 feedQualityStart = Mathf.Max(1, value);
@@ -29552,7 +28595,7 @@ public sealed class DiceKingDemo : MonoBehaviour
         {
             Type = type,
             DisplayName = displayName,
-            TooltipEffect = displayName + "效果说明未配置"
+            TooltipEffect = MarketDieEffectHint(type)
         };
     }
 
@@ -30524,118 +29567,86 @@ public sealed class DiceKingDemo : MonoBehaviour
         switch (type)
         {
             case DieType.Basic:
-                return new MarketDieConfig { Type = type, BuyPrice = 3, SellPrice = 1, Tier = "T0", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
-            case DieType.PigFarmer:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 16, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.MeatPig:
-                return new MarketDieConfig { Type = type, BuyPrice = 7, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.TradePig:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 12, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.SowPig:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 8 };
-            case DieType.ThreeLittlePigs:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 11, WeightChapter6To10 = 10 };
-            case DieType.GreedyPig:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.FeedWholesaler:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
-            case DieType.Imp:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.Devourer:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.Demon:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
-            case DieType.DemonBat:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
-            case DieType.AbyssSummon:
-                return new MarketDieConfig { Type = type, BuyPrice = 11, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 7, WeightChapter6To10 = 9 };
-            case DieType.RefreshPirate:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.PlunderPirate:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.CrewPirate:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.PirateCaptain:
-                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 4, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
-            case DieType.TrainingPirate:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.TreasurePirate:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 10, WeightChapter6To10 = 10 };
-            case DieType.RobberyPirate:
-                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 4, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
-            case DieType.PirateKing:
-                return new MarketDieConfig { Type = type, BuyPrice = 13, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 8 };
-            case DieType.BlackSailBat:
-                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
-            case DieType.RotationTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
-            case DieType.TributePig:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
-            case DieType.BlackMarketImp:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 8, WeightChapter6To10 = 9 };
-            case DieType.BloodPactCaptain:
-                return new MarketDieConfig { Type = type, BuyPrice = 13, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 8 };
-            case DieType.ClearancePig:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.SupplyPig:
-                return new MarketDieConfig { Type = type, BuyPrice = 7, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 12, WeightChapter3To5 = 11, WeightChapter6To10 = 8 };
-            case DieType.LegacyDemonTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 5, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
-            case DieType.EmptyHoldTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+                return MarketConfig(type, 3, 1, "T0", 0, 0, 0);
             case DieType.Tribute:
-                return new MarketDieConfig { Type = type, BuyPrice = 1, SellPrice = 0, Tier = "T0", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
-            case DieType.GuideTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+                return MarketConfig(type, 1, 0, "T0", 0, 0, 0);
+            case DieType.PigFarmer:
+                return MarketConfig(type, 6, 2, "T1", 16, 12, 8);
+            case DieType.MeatPig:
+                return MarketConfig(type, 7, 2, "T1", 14, 12, 8);
+            case DieType.TradePig:
+                return MarketConfig(type, 6, 2, "T1", 12, 12, 8);
+            case DieType.SowPig:
+                return MarketConfig(type, 9, 3, "T2", 8, 10, 8);
+            case DieType.GreedyPig:
+                return MarketConfig(type, 8, 3, "T2", 8, 10, 9);
+            case DieType.FeedWholesaler:
+                return MarketConfig(type, 10, 4, "T2", 6, 9, 9);
             case DieType.MoneyTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+                return MarketConfig(type, 6, 2, "T1", 14, 12, 8);
             case DieType.TinyTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.SpellApprenticeTurtle:
-            case DieType.RunawayTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.CloneTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 7, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 12, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
+                return MarketConfig(type, 6, 2, "T1", 14, 12, 8);
             case DieType.DoubleTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.LuckyTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.HeavyArmorTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.MagnetTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 6, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
-            case DieType.ScribeTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.CurseShellTurtle:
-            case DieType.ElderTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 9, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 7, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.GreatTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
-            case DieType.RallyTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 11, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
-            case DieType.GrandSpellTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 6, WeightChapter6To10 = 8 };
+                return MarketConfig(type, 8, 3, "T2", 8, 10, 9);
             case DieType.LeaderTurtle:
-                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 0, WeightChapter3To5 = 5, WeightChapter6To10 = 8 };
+                return MarketConfig(type, 12, 5, "T3", 0, 5, 8);
+            case DieType.CaravanTurtle:
+                return MarketConfig(type, 11, 5, "T3", 0, 6, 8);
+            case DieType.BasicTurtle:
+                return MarketConfig(type, 3, 1, "T1", 14, 12, 8);
+            case DieType.Imp:
+                return MarketConfig(type, 6, 2, "T1", 14, 12, 8);
+            case DieType.DemonBat:
+                return MarketConfig(type, 9, 4, "T2", 6, 9, 9);
+            case DieType.Demon:
+                return MarketConfig(type, 9, 4, "T2", 6, 9, 9);
+            case DieType.AbyssSummon:
+                return MarketConfig(type, 11, 5, "T3", 0, 7, 9);
+            case DieType.Devourer:
+                return MarketConfig(type, 8, 3, "T2", 8, 10, 9);
+            case DieType.ProgenitorDemon:
+                return MarketConfig(type, 12, 5, "T3", 0, 6, 8);
+            case DieType.RefreshPirate:
+                return MarketConfig(type, 6, 6, "T1", 14, 12, 8);
+            case DieType.RobberyPirate:
+                return MarketConfig(type, 12, 12, "T3", 0, 6, 8);
+            case DieType.TreasurePirate:
+                return MarketConfig(type, 9, 9, "T2", 6, 10, 10);
+            case DieType.PirateKing:
+                return MarketConfig(type, 13, 13, "T3", 0, 5, 8);
+            case DieType.PirateCaptain:
+                return MarketConfig(type, 12, 12, "T3", 0, 6, 8);
+            case DieType.CrewPirate:
+                return MarketConfig(type, 8, 8, "T2", 8, 10, 9);
             case DieType.Lightfang:
-                return new MarketDieConfig { Type = type, BuyPrice = 13, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 5, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
-            case DieType.Duet:
-                return new MarketDieConfig { Type = type, BuyPrice = 12, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 6, WeightChapter3To5 = 8, WeightChapter6To10 = 8 };
-            case DieType.Trigger:
-                return new MarketDieConfig { Type = type, BuyPrice = 10, SellPrice = 4, Tier = "T2", WeightChapter1To2 = 8, WeightChapter3To5 = 9, WeightChapter6To10 = 9 };
+                return MarketConfig(type, 13, 5, "T3", 5, 8, 8);
             case DieType.Crown:
-                return new MarketDieConfig { Type = type, BuyPrice = 14, SellPrice = 5, Tier = "T3", WeightChapter1To2 = 4, WeightChapter3To5 = 7, WeightChapter6To10 = 7 };
-            case DieType.Relief:
-                return new MarketDieConfig { Type = type, BuyPrice = 7, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.Airstrike:
-                return new MarketDieConfig { Type = type, BuyPrice = 6, SellPrice = 2, Tier = "T1", WeightChapter1To2 = 14, WeightChapter3To5 = 12, WeightChapter6To10 = 8 };
-            case DieType.Pact:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 10, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
-            case DieType.Stitch:
-                return new MarketDieConfig { Type = type, BuyPrice = 8, SellPrice = 3, Tier = "T2", WeightChapter1To2 = 10, WeightChapter3To5 = 10, WeightChapter6To10 = 9 };
+                return MarketConfig(type, 14, 5, "T3", 4, 7, 7);
+            case DieType.Enchanter:
+                return MarketConfig(type, 12, 5, "T3", 5, 8, 8);
+            case DieType.TaxCollector:
+                return MarketConfig(type, 7, 2, "T1", 14, 12, 8);
+            case DieType.Rewind:
+                return MarketConfig(type, 12, 5, "T3", 5, 8, 8);
+            case DieType.Duet:
+                return MarketConfig(type, 12, 5, "T3", 6, 8, 8);
+            default:
+                return MarketConfig(type, 0, 0, "T0", 0, 0, 0);
         }
+    }
 
-        return new MarketDieConfig { Type = DieType.Basic, BuyPrice = 3, SellPrice = 1, Tier = "T0", WeightChapter1To2 = 0, WeightChapter3To5 = 0, WeightChapter6To10 = 0 };
+    private static MarketDieConfig MarketConfig(DieType type, int buyPrice, int sellPrice, string tier, int earlyWeight, int middleWeight, int lateWeight)
+    {
+        return new MarketDieConfig
+        {
+            Type = type,
+            BuyPrice = buyPrice,
+            SellPrice = sellPrice,
+            Tier = tier,
+            WeightChapter1To2 = earlyWeight,
+            WeightChapter3To5 = middleWeight,
+            WeightChapter6To10 = lateWeight
+        };
     }
 
     private DiceMaterialConfig DefaultDiceMaterialConfig(DiceMaterial material)
@@ -31193,6 +30204,7 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         switch (type)
         {
+            case DieType.BasicTurtle:
             case DieType.Tribute:
                 return new int[] { 1, 1, 1, 1, 1, 1 };
             case DieType.Odd:
@@ -31210,211 +30222,7 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string DefaultName(DieType type)
     {
-        switch (type)
-        {
-            case DieType.Piggy:
-                return "猪猪骰";
-            case DieType.PigFarmer:
-                return "养猪骰";
-            case DieType.MeatPig:
-                return "肉猪骰";
-            case DieType.TradePig:
-                return "贸易猪骰";
-            case DieType.SowPig:
-                return "母猪骰";
-            case DieType.ThreeLittlePigs:
-                return "三只小猪骰";
-            case DieType.GreedyPig:
-                return "贪吃猪骰";
-            case DieType.FeedWholesaler:
-                return "批发商骰";
-            case DieType.Imp:
-                return "小鬼骰";
-            case DieType.Devourer:
-                return "吞噬骰";
-            case DieType.Demon:
-                return "恶魔骰";
-            case DieType.DemonBat:
-                return "魔蝠骰";
-            case DieType.AbyssSummon:
-                return "深渊召唤";
-            case DieType.Tribute:
-                return "贡品骰";
-            case DieType.Turtle:
-                return "龟龟骰";
-            case DieType.GuideTurtle:
-                return "领路龟骰";
-            case DieType.MoneyTurtle:
-                return "金钱龟骰";
-            case DieType.TinyTurtle:
-                return "小小龟骰";
-            case DieType.DoubleTurtle:
-                return "双倍龟骰";
-            case DieType.LuckyTurtle:
-                return "幸运龟骰";
-            case DieType.HeavyArmorTurtle:
-                return "重甲龟骰";
-            case DieType.GreatTurtle:
-                return "伟大龟骰";
-            case DieType.MagnetTurtle:
-                return "磁力龟骰";
-            case DieType.RallyTurtle:
-                return "呼朋唤友龟骰";
-            case DieType.SpellApprenticeTurtle:
-                return "法术学徒龟骰";
-            case DieType.ScribeTurtle:
-                return "抄经龟骰";
-            case DieType.CurseShellTurtle:
-                return "咒壳龟骰";
-            case DieType.GrandSpellTurtle:
-                return "大法术龟骰";
-            case DieType.RunawayTurtle:
-                return "离家出走龟骰";
-            case DieType.CloneTurtle:
-                return "克隆龟骰";
-            case DieType.ElderTurtle:
-                return "长老龟骰";
-            case DieType.LeaderTurtle:
-                return "首领龟骰";
-            case DieType.RotationTurtle:
-                return "轮作龟骰";
-            case DieType.LegacyDemonTurtle:
-                return "遗产魔龟骰";
-            case DieType.EmptyHoldTurtle:
-                return "空舱龟骰";
-            case DieType.RefreshPirate:
-                return "刷新海盗骰";
-            case DieType.PlunderPirate:
-                return "劫掠海盗骰";
-            case DieType.CrewPirate:
-                return "人口海盗骰";
-            case DieType.PirateCaptain:
-                return "海盗头领骰";
-            case DieType.TrainingPirate:
-                return "练腿海盗骰";
-            case DieType.TreasurePirate:
-                return "财宝海盗骰";
-            case DieType.RobberyPirate:
-                return "抢劫海盗骰";
-            case DieType.PirateKing:
-                return "海贼王骰";
-            case DieType.BlackSailBat:
-                return "黑帆魔蝠骰";
-            case DieType.PackTurtle:
-                return "驮粮龟骰";
-            case DieType.TributePig:
-                return "贡猪骰";
-            case DieType.BlackMarketImp:
-                return "黑市小鬼骰";
-            case DieType.BloodPactCaptain:
-                return "血契船长骰";
-            case DieType.ClearancePig:
-                return "清仓猪骰";
-            case DieType.SupplyPig:
-                return "补给猪骰";
-            case DieType.SharedFeastDemonTurtle:
-                return "共食魔龟骰";
-            case DieType.SafetyNetTurtle:
-                return "托底龟骰";
-            case DieType.Shellsmith:
-                return "壳匠骰";
-            case DieType.Nest:
-                return "巢穴骰";
-            case DieType.SlowTurtle:
-                return "慢龟骰";
-            case DieType.Double:
-                return "双倍骰";
-            case DieType.Odd:
-                return "奇数骰";
-            case DieType.Even:
-                return "偶数骰";
-            case DieType.LoneWitness:
-                return "孤证骰";
-            case DieType.Stamp:
-                return "盖章骰";
-            case DieType.HalfStep:
-                return "半步骰";
-            case DieType.Track:
-                return "轨道骰";
-            case DieType.ParityNeighborDiff:
-                return "异邻骰";
-            case DieType.ParityNeighborSame:
-                return "同邻骰";
-            case DieType.ParityComplete:
-                return "补全骰";
-            case DieType.ParityReview:
-                return "复核骰";
-            case DieType.ParityFlipScore:
-                return "翻号骰";
-            case DieType.ParityHoldScore:
-                return "守号骰";
-            case DieType.ParityTurner:
-                return "转号骰";
-            case DieType.Tree:
-                return "大树骰";
-            case DieType.Gardener:
-                return "园丁骰";
-            case DieType.Irrigation:
-                return "灌溉骰";
-            case DieType.PointSeedTree:
-                return "点籽树";
-            case DieType.PatternTree:
-                return "牌谱树";
-            case DieType.CanopyTree:
-                return "冠层树";
-            case DieType.RingTree:
-                return "年轮树";
-            case DieType.FertilizerTree:
-                return "肥料树";
-            case DieType.PruningTree:
-                return "修枝树";
-            case DieType.RootTree:
-                return "根系树";
-            case DieType.Gambler:
-                return "赌徒骰";
-            case DieType.Treasury:
-                return "国库骰";
-            case DieType.Bribe:
-                return "贿赂骰";
-            case DieType.Investment:
-                return "投资骰";
-            case DieType.BountyGold:
-                return "悬赏骰";
-            case DieType.TopGold:
-                return "顶金骰";
-            case DieType.HandTax:
-                return "牌税骰";
-            case DieType.Collection:
-                return "收账骰";
-            case DieType.CompoundInterest:
-                return "复利骰";
-            case DieType.LeadTicket:
-                return "铅票骰";
-            case DieType.ShellTax:
-                return "壳税骰";
-            case DieType.CounterGold:
-                return "柜台骰";
-            case DieType.LumberGold:
-                return "伐木骰";
-            case DieType.Lightfang:
-                return "光牙骰";
-            case DieType.Duet:
-                return "二重唱骰";
-            case DieType.Trigger:
-                return "触发器骰";
-            case DieType.Crown:
-                return "王冠骰";
-            case DieType.Relief:
-                return "接济骰";
-            case DieType.Airstrike:
-                return "空袭骰";
-            case DieType.Pact:
-                return "盟约骰";
-            case DieType.Stitch:
-                return "缝合骰";
-        }
-
-        return "基础骰";
+        return TypeName(type);
     }
 
     private string DieDisplayName(Die die)
@@ -31495,209 +30303,73 @@ public sealed class DiceKingDemo : MonoBehaviour
     {
         switch (type)
         {
-            case DieType.Piggy:
-                return "猪猪";
+            case DieType.Basic:
+                return "普通基础骰";
+            case DieType.Tribute:
+                return "祭品";
             case DieType.PigFarmer:
-                return "养猪";
+                return "喂养者";
             case DieType.MeatPig:
                 return "肉猪";
             case DieType.TradePig:
-                return "贸易猪";
+                return "转移猪";
             case DieType.SowPig:
                 return "母猪";
-            case DieType.ThreeLittlePigs:
-                return "三只小猪";
             case DieType.GreedyPig:
                 return "贪吃猪";
             case DieType.FeedWholesaler:
                 return "批发商";
-            case DieType.Imp:
-                return "小鬼";
-            case DieType.Devourer:
-                return "吞噬";
-            case DieType.Demon:
-                return "恶魔";
-            case DieType.DemonBat:
-                return "魔蝠";
-            case DieType.AbyssSummon:
-                return "深渊";
-            case DieType.Tribute:
-                return "贡品";
-            case DieType.Turtle:
-                return "龟龟";
-            case DieType.GuideTurtle:
-                return "领路龟";
             case DieType.MoneyTurtle:
                 return "金钱龟";
             case DieType.TinyTurtle:
                 return "小小龟";
             case DieType.DoubleTurtle:
-                return "双倍龟";
-            case DieType.LuckyTurtle:
-                return "幸运龟";
-            case DieType.HeavyArmorTurtle:
-                return "重甲龟";
-            case DieType.GreatTurtle:
-                return "伟大龟";
-            case DieType.MagnetTurtle:
-                return "磁力龟";
-            case DieType.RallyTurtle:
-                return "呼朋龟";
-            case DieType.SpellApprenticeTurtle:
-                return "法术学徒龟";
-            case DieType.ScribeTurtle:
-                return "抄经龟";
-            case DieType.CurseShellTurtle:
-                return "咒壳龟";
-            case DieType.GrandSpellTurtle:
-                return "大法术龟";
-            case DieType.RunawayTurtle:
-                return "离家出走龟";
-            case DieType.CloneTurtle:
-                return "克隆龟";
-            case DieType.ElderTurtle:
-                return "长老龟";
+                return "倍数龟";
             case DieType.LeaderTurtle:
                 return "首领龟";
-            case DieType.RotationTurtle:
-                return "轮作龟";
-            case DieType.LegacyDemonTurtle:
-                return "遗产魔龟";
-            case DieType.EmptyHoldTurtle:
-                return "空舱龟";
+            case DieType.CaravanTurtle:
+                return "领队龟";
+            case DieType.BasicTurtle:
+                return "基础龟";
+            case DieType.Imp:
+                return "小鬼骰子";
+            case DieType.DemonBat:
+                return "蝠魔骰子";
+            case DieType.Demon:
+                return "吸血骰子";
+            case DieType.AbyssSummon:
+                return "深渊骰子";
+            case DieType.Devourer:
+                return "吞噬骰子";
+            case DieType.ProgenitorDemon:
+                return "始祖魔骰子";
             case DieType.RefreshPirate:
-                return "刷新海盗";
-            case DieType.PlunderPirate:
-                return "劫掠海盗";
-            case DieType.CrewPirate:
-                return "人口海盗";
-            case DieType.PirateCaptain:
-                return "海盗头领";
-            case DieType.TrainingPirate:
-                return "练腿海盗";
-            case DieType.TreasurePirate:
-                return "财宝海盗";
+                return "哨兵海盗";
             case DieType.RobberyPirate:
                 return "抢劫海盗";
+            case DieType.TreasurePirate:
+                return "财宝海盗";
             case DieType.PirateKing:
                 return "海贼王";
-            case DieType.BlackSailBat:
-                return "黑帆魔蝠";
-            case DieType.PackTurtle:
-                return "驮粮龟";
-            case DieType.TributePig:
-                return "贡猪";
-            case DieType.BlackMarketImp:
-                return "黑市小鬼";
-            case DieType.BloodPactCaptain:
-                return "血契船长";
-            case DieType.ClearancePig:
-                return "清仓猪";
-            case DieType.SupplyPig:
-                return "补给猪";
-            case DieType.SharedFeastDemonTurtle:
-                return "共食魔龟";
-            case DieType.SafetyNetTurtle:
-                return "托底龟";
-            case DieType.Shellsmith:
-                return "壳匠";
-            case DieType.Nest:
-                return "巢穴";
-            case DieType.SlowTurtle:
-                return "慢龟";
-            case DieType.Double:
-                return "双倍";
-            case DieType.Odd:
-                return "奇数";
-            case DieType.Even:
-                return "偶数";
-            case DieType.LoneWitness:
-                return "孤证";
-            case DieType.Stamp:
-                return "盖章";
-            case DieType.HalfStep:
-                return "半步";
-            case DieType.Track:
-                return "轨道";
-            case DieType.ParityNeighborDiff:
-                return "异邻";
-            case DieType.ParityNeighborSame:
-                return "同邻";
-            case DieType.ParityComplete:
-                return "补全";
-            case DieType.ParityReview:
-                return "复核";
-            case DieType.ParityFlipScore:
-                return "翻号";
-            case DieType.ParityHoldScore:
-                return "守号";
-            case DieType.ParityTurner:
-                return "转号";
-            case DieType.Tree:
-                return "大树";
-            case DieType.Gardener:
-                return "园丁";
-            case DieType.Irrigation:
-                return "灌溉";
-            case DieType.PointSeedTree:
-                return "点籽";
-            case DieType.PatternTree:
-                return "牌谱";
-            case DieType.CanopyTree:
-                return "冠层";
-            case DieType.RingTree:
-                return "年轮";
-            case DieType.FertilizerTree:
-                return "肥料";
-            case DieType.PruningTree:
-                return "修枝";
-            case DieType.RootTree:
-                return "根系";
-            case DieType.Gambler:
-                return "赌徒";
-            case DieType.Treasury:
-                return "国库";
-            case DieType.Bribe:
-                return "贿赂";
-            case DieType.Investment:
-                return "投资";
-            case DieType.BountyGold:
-                return "悬赏";
-            case DieType.TopGold:
-                return "顶金";
-            case DieType.HandTax:
-                return "牌税";
-            case DieType.Collection:
-                return "收账";
-            case DieType.CompoundInterest:
-                return "复利";
-            case DieType.LeadTicket:
-                return "铅票";
-            case DieType.ShellTax:
-                return "壳税";
-            case DieType.CounterGold:
-                return "柜台";
-            case DieType.LumberGold:
-                return "伐木";
+            case DieType.PirateCaptain:
+                return "海盗头领";
+            case DieType.CrewPirate:
+                return "人口海盗";
             case DieType.Lightfang:
-                return "光牙";
-            case DieType.Duet:
-                return "二重唱";
-            case DieType.Trigger:
-                return "触发器";
+                return "光牙骰子";
             case DieType.Crown:
-                return "王冠";
-            case DieType.Relief:
-                return "接济";
-            case DieType.Airstrike:
-                return "空袭";
-            case DieType.Pact:
-                return "盟约";
-            case DieType.Stitch:
-                return "缝合";
+                return "王冠骰子";
+            case DieType.Enchanter:
+                return "附魔师骰子";
+            case DieType.TaxCollector:
+                return "税务骰子";
+            case DieType.Rewind:
+                return "回溯骰子";
+            case DieType.Duet:
+                return "二重唱骰子";
+            default:
+                return "已废弃骰子";
         }
-
-        return "基础";
     }
 
     private string ShortTypeName(DieType type)
@@ -31786,368 +30458,18 @@ public sealed class DiceKingDemo : MonoBehaviour
 
     private string RoundTag(Die die)
     {
-        if (die == null)
-        {
-            return string.Empty;
-        }
-
-        if (die.Temporary)
-        {
-            return "临时";
-        }
-
-        if (ShouldHighlightRecentDevour(die))
-        {
-            return "吞+" + Mathf.Max(0, die.LastDevourGain);
-        }
-
-        string turtleAttachmentText = TurtleAttachmentShortText(die);
-        if (!string.IsNullOrEmpty(turtleAttachmentText))
-        {
-            return turtleAttachmentText;
-        }
-
+        if (die == null) return string.Empty;
+        if (die.TurtleAttachments != null && die.TurtleAttachments.Count > 0)
+            return TurtleAttachmentShortText(die);
+        if (die.FeedCount > 0) return FeedStateShortText(die);
         switch (die.Type)
         {
-            case DieType.GuideTurtle:
-                return "下枚真壳+1";
-            case DieType.HeavyArmorTurtle:
-                return "同宿主真壳+2";
-            case DieType.GreatTurtle:
-                return "首结复唱";
-            case DieType.SpellApprenticeTurtle:
-                return die.TurtleStageTriggered ? "本关已产券" : "首结法术-1";
-            case DieType.ScribeTurtle:
-                return die.TurtleMarketTriggered ? "本市已抄经" : "首买法术";
-            case DieType.CurseShellTurtle:
-                return "施法储能";
-            case DieType.GrandSpellTurtle:
-                return "施法群体充能";
-            case DieType.RunawayTurtle:
-                return die.TurtleMarketTriggered ? "本市已出走" : "离店生领路";
-            case DieType.CloneTurtle:
-                return die.TurtleStageTriggered ? "本关已克隆" : "首结面+1";
-            case DieType.ElderTurtle:
-                return "驻场龟+3";
-            case DieType.RotationTurtle:
-                return die.TurtleStageTriggered ? "本关已轮作" : "等待抬点";
-            case DieType.LegacyDemonTurtle:
-                return die.TurtleMarketTriggered ? "本市已继承" : "等待离袋";
-            case DieType.EmptyHoldTurtle:
-                return die.TurtleMarketTriggered ? "本市已腾舱" : "等待腾位";
-            case DieType.BlackSailBat:
-                return "刷新吞旧货";
-            case DieType.PackTurtle:
-                return "饲2转基壳";
-            case DieType.TributePig:
-                return "卖出奉献";
-            case DieType.BlackMarketImp:
-                return currentMarketBlackMarketRefreshDiscount > 0 ? "下刷-" + currentMarketBlackMarketRefreshDiscount : "吞噬减刷";
-            case DieType.BloodPactCaptain:
-                return "满袋血契";
-            case DieType.ClearancePig:
-                string clearanceFeed = FeedStateShortText(die);
-                return string.IsNullOrEmpty(clearanceFeed) ? "空位吃料" : clearanceFeed;
-            case DieType.SupplyPig:
-                string supplyFeed = FeedStateShortText(die);
-                return string.IsNullOrEmpty(supplyFeed) ? "刷新补给" : supplyFeed;
-            case DieType.SharedFeastDemonTurtle:
-                return "吞噬分右邻";
-            case DieType.SafetyNetTurtle:
-                return "托底生壳";
+            case DieType.CrewPirate: return "售出 " + die.CrewSaleProgress + "/2";
+            case DieType.PirateCaptain: return pirateDiscountUsed ? "半价已用" : "海盗半价";
+            case DieType.PirateKing: return "每面 +" + Mathf.Max(0, chapterGold) / 3;
+            case DieType.Basic: return string.Empty;
+            default: return TooltipTriggerLabel(die.Type);
         }
-
-        if (IsV02NeutralFamilyMarketType(die.Type))
-        {
-            switch (die.Type)
-            {
-                case DieType.Lightfang:
-                    return "每家族面+2";
-                case DieType.Duet:
-                    return "复制左邻";
-                case DieType.Trigger:
-                    return "事件 +2";
-                case DieType.Crown:
-                    return "最高点均值";
-                case DieType.Relief:
-                    return "每家族 +1金";
-                case DieType.Airstrike:
-                    return "缺家族 +2";
-                case DieType.Pact:
-                    return "异族邻位 +2";
-                case DieType.Stitch:
-                    return "每家族 +2";
-            }
-        }
-
-        if (IsV02PigFamilyMarketType(die.Type))
-        {
-            if (die.Type == DieType.ThreeLittlePigs && die.PigTemporaryScoreBonus > 0)
-            {
-                return "三猪 +" + die.PigTemporaryScoreBonus;
-            }
-
-            string feedText = FeedStateShortText(die);
-            return string.IsNullOrEmpty(feedText) ? TypeName(die.Type) : feedText;
-        }
-
-        if (IsV02DevilFamilyMarketType(die.Type))
-        {
-            if (die.Type == DieType.Imp)
-            {
-                return "市场最低点";
-            }
-
-            if (die.Type == DieType.Devourer)
-            {
-                return "吞噬金";
-            }
-
-            if (die.Type == DieType.Demon)
-            {
-                return "本市底";
-            }
-
-            if (die.Type == DieType.DemonBat)
-            {
-                return "离市吞";
-            }
-
-            if (die.Type == DieType.AbyssSummon)
-            {
-                return "贡品";
-            }
-        }
-
-        if (IsV02PirateFamilyMarketType(die.Type))
-        {
-            switch (die.Type)
-            {
-                case DieType.RefreshPirate:
-                    return "刷新-1";
-                case DieType.PlunderPirate:
-                    return "劫左右";
-                case DieType.CrewPirate:
-                    return "招募 " + currentMarketPirateSellCount % 2 + "/2";
-                case DieType.PirateCaptain:
-                    return "海盗半价";
-                case DieType.TrainingPirate:
-                    return "买后练腿";
-                case DieType.TreasurePirate:
-                    return "读金币";
-                case DieType.RobberyPirate:
-                    return "离市抢";
-                case DieType.PirateKing:
-                    return "王财 x" + Mathf.Max(0, chapterGold) / 3;
-            }
-        }
-
-        if (die.Type == DieType.Piggy && die.TargetFace > 0)
-        {
-            return "目标 " + die.TargetFace;
-        }
-
-        if (die.Type == DieType.BountyGold && die.TargetFace > 0)
-        {
-            return "悬赏 " + die.TargetFace;
-        }
-
-        if (die.Type == DieType.TopGold)
-        {
-            return RolledHighestFace(die) ? "顶金 +" + topGoldPerHit : "顶金";
-        }
-
-        if (die.Type == DieType.HandTax)
-        {
-            int gold = CurrentHandTaxGold();
-            return gold > 0 ? "牌税 +" + gold : "牌税";
-        }
-
-        if (die.Type == DieType.Collection)
-        {
-            return die.CollectionTriggeredThisStage ? "已收账" : "收账";
-        }
-
-        if (die.Type == DieType.CompoundInterest)
-        {
-            int compound = CompoundInterestPreview(StageInterestPreview());
-            return compound > 0 ? "复利 +" + compound : "复利";
-        }
-
-        if (die.Type == DieType.LeadTicket)
-        {
-            return die.CheatRerolledThisSettle ? "铅票 +" + leadTicketGold : "铅票";
-        }
-
-        if (die.Type == DieType.ShellTax)
-        {
-            int count = rollPhase == RollPhase.Scoring || rollPhase == RollPhase.StageClear ? lastTurtleTemporaryDieCount : previewTurtleTemporaryDieCount;
-            return shellTaxThreshold > 0 && count >= shellTaxThreshold ? "壳税 +" + shellTaxGold : "壳税";
-        }
-
-        if (die.Type == DieType.CounterGold)
-        {
-            return "柜台";
-        }
-
-        if (die.Type == DieType.LumberGold)
-        {
-            return "伐木";
-        }
-
-        if (die.Type == DieType.Tree && die.TargetFace > 0)
-        {
-            return "命中 " + die.TargetFace;
-        }
-
-        if (die.Type == DieType.PointSeedTree && die.TargetFace > 0)
-        {
-            return die.EffectiveValue == die.TargetFace ? "籽中成长" : "籽 " + die.TargetFace;
-        }
-
-        if (die.Type == DieType.PatternTree)
-        {
-            string target = TreePatternTargetShortText(die.PatternTarget);
-            return CurrentRollHasLockedResults() && PatternTreeTargetHit(die.PatternTarget, CurrentDiceHandResult()) ? "谱成成长" : "谱 " + target;
-        }
-
-        if (die.Type == DieType.CanopyTree)
-        {
-            return RolledHighestFace(die) ? "冠顶成长" : "冠层";
-        }
-
-        if (die.Type == DieType.RingTree)
-        {
-            return "年轮";
-        }
-
-        if (die.Type == DieType.FertilizerTree)
-        {
-            int fertilizerGrowth = FertilizerGrowthCount();
-            return fertilizerGrowth > 0 ? "肥料 x" + fertilizerGrowth : "肥料";
-        }
-
-        if (die.Type == DieType.PruningTree)
-        {
-            if (die.TypeTriggeredThisSettle)
-            {
-                return "修枝成长";
-            }
-
-            return die.CheatRerolledThisSettle ? "已修枝" : "修枝";
-        }
-
-        if (die.Type == DieType.RootTree)
-        {
-            string triggerLabel;
-            return RootTreeTriggerLabel(die, out triggerLabel) ? triggerLabel : "根系";
-        }
-
-        if (die.Type == DieType.Gambler && die.GamblerThreshold > 0)
-        {
-            return "阈值 " + die.GamblerThreshold;
-        }
-
-        if (die.Type == DieType.Treasury)
-        {
-            return "本金 +" + TreasuryScoreBonus();
-        }
-
-        if (die.Type == DieType.Bribe && previewBribeGoldCost > 0)
-        {
-            return "可补";
-        }
-
-        if (die.Type == DieType.Investment)
-        {
-            int bonus = InvestmentScoreBonus(die);
-            return bonus > 0 ? "投资 +" + bonus : "投资";
-        }
-
-        if (die.Type == DieType.LoneWitness)
-        {
-            return die.LoneWitnessRerolled ? "孤证 " + die.LoneWitnessPreviousValue + "→" + die.EffectiveValue : "孤证";
-        }
-
-        if (die.Type == DieType.Stamp)
-        {
-            return HasSameEffectiveValuePartner(die) ? "盖章 6分" : "待同点";
-        }
-
-        if (die.Type == DieType.HalfStep)
-        {
-            return die.HalfStepBorrowed ? "借 " + die.EffectiveValue + "→" + (die.EffectiveValue - 1) : "半步";
-        }
-
-        if (die.Type == DieType.Track)
-        {
-            return HasTrackValuesComplete() ? "轨道 8分" : "等 2/4/6";
-        }
-
-        if (die.Type == DieType.ParityNeighborDiff)
-        {
-            return HasLeftParityRelation(die, false) ? "异邻 6" : "异邻";
-        }
-
-        if (die.Type == DieType.ParityNeighborSame)
-        {
-            return HasLeftParityRelation(die, true) ? "同邻 6" : "同邻";
-        }
-
-        if (die.Type == DieType.ParityComplete)
-        {
-            return die.ParityCompleteUsed ? "补全" : "补全";
-        }
-
-        if (die.Type == DieType.ParityReview)
-        {
-            return die.ParityReviewRerolled ? "复核 " + die.ParityReviewPreviousValue + "→" + die.EffectiveValue : "复核";
-        }
-
-        if (die.Type == DieType.ParityFlipScore)
-        {
-            return CheatParityChanged(die) ? "翻号 8" : "翻号";
-        }
-
-        if (die.Type == DieType.ParityHoldScore)
-        {
-            return CheatParityHeld(die) ? "守号 6" : "守号";
-        }
-
-        if (die.Type == DieType.ParityTurner)
-        {
-            return die.CheatRerolledThisSettle ? "转号" : "转号";
-        }
-
-        if (die.Type == DieType.Gardener)
-        {
-            int naturalHits = NaturalTreeHitCount();
-            return naturalHits > 0 ? "园丁 +" + naturalHits : "园丁";
-        }
-
-        if (die.Type == DieType.Irrigation)
-        {
-            return FindIrrigationPreviewTarget(die) != null ? "灌溉命中" : "灌溉";
-        }
-
-        if (die.Type == DieType.Shellsmith)
-        {
-            int bonus = rollPhase == RollPhase.Scoring || rollPhase == RollPhase.StageClear ? lastTurtleTemporaryDieCount : previewTurtleTemporaryDieCount;
-            return bonus > 0 ? "壳 +" + bonus : "壳匠";
-        }
-
-        if (die.Type == DieType.Nest)
-        {
-            int bonus = rollPhase == RollPhase.Scoring || rollPhase == RollPhase.StageClear ? lastNestBonusDieCount : previewNestBonusDieCount;
-            return bonus > 0 ? "巢 +" + bonus : "巢穴";
-        }
-
-        if (die.Type == DieType.SlowTurtle)
-        {
-            return "慢壳链";
-        }
-
-        return TypeName(die.Type);
     }
 
     private Color TypeColor(DieType type)

@@ -18,6 +18,8 @@ Current implementation source of truth is `Assets/Scripts/DiceKingDemo.cs`. If c
 
 ## Product Direction
 
+2026-11-23 的 F024 已接入可玩原型。普通商店采用猪、龟、恶魔、海盗、中立各六颗的 30 骰名单。四个家族分别围绕饲料、吸附、吞噬、买卖同价。普通开局骰与祭品走系统入口。旧双阵营与其余退役骰均不参与普通、保底、专项或回退抽取。下文早期 54 骰、托底喂养及驻场龟路线记录供历史对照。[当前规则](DICE_ARCHETYPES.md) · [运行验证](Docs/QA/20261123_f024_runtime.md)
+
 - Working title: `骰子王`.
 - Genre target: roguelite score-builder built around dice rolls, inspired by the score-engine feel of `Balatro`, but using readable dice types, long-term dice state, and board-like encounter rules.
 - Tone: light, witty, and relaxed, but not childish. Current presentation uses a midnight old-arcade / retro-electronic world; `骰子王` is a circuit champion title rather than a monarch. Royal bureaucracy, ledgers, seals, crowns, and palace packaging are legacy exploration unless a later feature explicitly re-approves them.
